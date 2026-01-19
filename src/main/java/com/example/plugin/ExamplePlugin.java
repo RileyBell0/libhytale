@@ -13,6 +13,7 @@ public class ExamplePlugin extends JavaPlugin {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     private ComponentType<ChunkStore, ExampleBlock> exampleBlockComponentType;
+    private ComponentType<ChunkStore, TickingBlock> tickingBlockComponentType;
 
     public static ExamplePlugin get() {
         return instance;
@@ -29,11 +30,17 @@ public class ExamplePlugin extends JavaPlugin {
         LOGGER.atInfo().log("Setting up plugin " + this.getName());
         this.exampleBlockComponentType = this.getChunkStoreRegistry().registerComponent(ExampleBlock.class,
                 "ExampleBlock", ExampleBlock.CODEC);
+        this.tickingBlockComponentType = this.getChunkStoreRegistry().registerComponent(TickingBlock.class,
+                "TickingBlock", TickingBlock.CODEC);
         this.getChunkStoreRegistry().registerSystem(new ExampleSystem());
 
     }
 
     public ComponentType<ChunkStore, ExampleBlock> getExampleBlockComponentType() {
         return this.exampleBlockComponentType;
+    }
+
+    public ComponentType<ChunkStore, TickingBlock> getTickingBlockComponentType() {
+        return this.tickingBlockComponentType;
     }
 }

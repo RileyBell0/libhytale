@@ -44,24 +44,28 @@ public class ExampleSystem extends EntityTickingSystem<ChunkStore> {
 
         blocks.forEachTicking(blockComponentChunk, commandBuffer, section.getY(),
                 (blockComponentChunk1, commandBuffer1, localX, localY, localZ, blockId) -> {
-
+                    // get a ref to our block
                     Ref<ChunkStore> blockRef = blockComponentChunk1
                             .getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
                     if (blockRef == null) {
                         return BlockTickStrategy.IGNORED;
                     }
 
+                    // get the block itself from the chunk
                     ExampleBlock exampleBlock = (ExampleBlock) commandBuffer1.getComponent(blockRef,
                             ExampleBlock.getComponentType());
                     if (exampleBlock == null) {
                         return BlockTickStrategy.IGNORED;
                     }
 
+                    // Grab the world for figuring out the global coords of our block
                     WorldChunk worldChunk = (WorldChunk) commandBuffer
                             .getComponent(section.getChunkColumnReference(), WorldChunk.getComponentType());
+                    int globalX = localX + (worldChunk.getX() * 32);
+                    int globalZ = localZ + (worldChunk.getZ() * 32);
 
-                    exampleBlock.tick(localX, localY, localZ, worldChunk.getWorld());
-
+                    // tick our block
+                    exampleBlock.tick(globalX, localY, globalZ, worldChunk.getWorld());
                     return BlockTickStrategy.CONTINUE;
                 });
     }
