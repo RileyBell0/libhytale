@@ -1,0 +1,8 @@
+#!/bin/bash
+
+./gradlew build
+
+cp -r build/libs/* libs/mods/
+
+cd libs
+./run

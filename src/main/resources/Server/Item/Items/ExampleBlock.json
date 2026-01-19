@@ -1,0 +1,25 @@
+{
+  "TranslationProperties": {
+    "Name": "items.ExampleBlock.name",
+    "Description": "items.ExampleBlock.description"
+  },
+  "Id": "ExampleBlock",
+  "PlayerAnimationsId": "Block",
+  "MaxStack": 100,
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Cube",
+    "Opacity": "Transparent",
+    "Textures": [
+      {
+        "All": "BlockTextures/texture.png"
+      }
+    ],
+    "BlockEntity": {
+      "Components": {
+        "ExampleBlock": {}
+      }
+    }
+  },
+  "Icon": "Icons/ItemsGenerated/ExampleBlock.png"
+}
