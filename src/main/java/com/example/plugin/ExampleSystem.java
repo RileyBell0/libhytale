@@ -65,7 +65,7 @@ public class ExampleSystem extends EntityTickingSystem<ChunkStore> {
                     int globalZ = localZ + (worldChunk.getZ() * 32);
 
                     // tick our block
-                    exampleBlock.tick(globalX, localY, globalZ, worldChunk.getWorld());
+                    exampleBlock.tick(globalX, localY, globalZ, commandBuffer1, worldChunk.getWorld());
                     return BlockTickStrategy.CONTINUE;
                 });
     }
