@@ -29,11 +29,10 @@ public class ExamplePlugin extends JavaPlugin {
         instance = this;
         LOGGER.atInfo().log("Setting up plugin " + this.getName());
         this.exampleBlockComponentType = this.getChunkStoreRegistry().registerComponent(ExampleBlock.class,
-                "ExampleBlock", ExampleBlock.CODEC);
+                "ExampleBlock", ExampleBlock.CODEC2);
         this.tickingBlockComponentType = this.getChunkStoreRegistry().registerComponent(TickingBlock.class,
                 "TickingBlock", TickingBlock.CODEC);
         this.getChunkStoreRegistry().registerSystem(new ExampleSystem());
-
     }
 
     public ComponentType<ChunkStore, ExampleBlock> getExampleBlockComponentType() {

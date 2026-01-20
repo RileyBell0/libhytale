@@ -19,6 +19,27 @@
       "Components": {
         "ExampleBlock": {}
       }
+    },
+    "Flags": {
+      "IsUsable": true
+    },
+    "State": {
+      "Id": "container",
+      "Capacity": 5,
+      "Definitions": {
+        "CloseWindow": {
+          "InteractionSoundEventId": "SFX_Chest_Wooden_Close",
+          "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Close.blockyanim"
+        },
+        "OpenWindow": {
+          "InteractionSoundEventId": "SFX_Chest_Wooden_Open",
+          "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Open.blockyanim"
+        }
+      }
+    },
+    "Interactions": {
+      "Primary": "Break_Container",
+      "Use": "Open_Container"
     }
   },
   "Icon": "Icons/ItemsGenerated/ExampleBlock.png"
