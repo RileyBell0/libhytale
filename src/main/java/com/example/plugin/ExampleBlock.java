@@ -18,15 +18,15 @@ import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
 import com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
 public class ExampleBlock extends ItemContainerState {
     public static final BuilderCodec<ExampleBlock> CODEC2 = BuilderCodec
-            .builder(ExampleBlock.class, ExampleBlock::new)
+            .builder(ExampleBlock.class, ExampleBlock::new, BlockState.BASE_CODEC)
             .build();
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -35,15 +35,12 @@ public class ExampleBlock extends ItemContainerState {
             .getComponentType(ItemContainerState.class);
     private boolean isRunning = false;
     private int tick = 0;
-    private boolean initialized = false;
-
-    private World world;
-    private int x, y, z;
 
     private ArrayList<Ref<ChunkStore>> containers = new ArrayList<Ref<ChunkStore>>();
 
     public ExampleBlock() {
         super();
+
         LOGGER.atInfo().log("Version 2");
     }
 
@@ -53,22 +50,22 @@ public class ExampleBlock extends ItemContainerState {
 
     // I want this one to extract from a chest it touches
     public void tick(int x, int y, int z, ComponentAccessor<ChunkStore> cmd, World world) {
-        LOGGER.atInfo().log(BlockType.fromString("ExampleBlock").toString());
-        if (!initialized) {
-            this.initialize(BlockType.fromString("ExampleBlock"));
-            LOGGER.atInfo().log("INITIALIZING...");
+        // this.initialize(this.getBlockType());
 
-            this.initialized = true;
-            this.world = world;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.initialize();
-            return;
+        // if (!world.isTicking() || !world.isStarted()) {
+        // return;
+        // }
+
+        if (!this.runOnce) {
+            LOGGER.atInfo().log("INITIALIZING...");
+            this.firstTimeSetup(world, x, y, z);
+            this.initialize(BlockType.getAssetMap().getAsset("ExampleBlock"));
         }
-        var count = this.itemContainer.countItemStacks(itemStack -> itemStack.isValid());
-        LOGGER.atInfo().log(count + " ITEMS in chest thing");
-        LOGGER.atInfo().log(this.getBlockType().toString());
+
+        // var count = this.itemContainer.countItemStacks(
+        // itemStack -> itemStack != null);
+        // LOGGER.atInfo().log(count + " ITEMS in chest thing");
+
         if (this.isRunning) {
             return;
         }
@@ -138,9 +135,15 @@ public class ExampleBlock extends ItemContainerState {
         // return Optional.of(this.contents);
     }
 
-    private void initialize() {
+    private boolean runOnce = false;
+
+    private void firstTimeSetup(World world, int x, int y, int z) {
+        if (this.runOnce) {
+            return;
+        }
+        this.runOnce = true;
         this.isRunning = true;
-        var surrounding = Block.getTouching(this.world, this.x, this.y, this.z);
+        var surrounding = Block.getTouching(world, x, y, z);
 
         surrounding.thenRun(() -> {
             for (var elem : surrounding.join()) {
