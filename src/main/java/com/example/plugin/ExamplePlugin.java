@@ -21,7 +21,8 @@ public class ExamplePlugin extends JavaPlugin {
 
     public ExamplePlugin(@Nonnull JavaPluginInit init) {
         super(init);
-        LOGGER.atInfo().log("Hello from " + this.getName() + " version " + this.getManifest().getVersion().toString());
+        LOGGER.atInfo()
+                .log("Initializing " + this.getName() + " version " + this.getManifest().getVersion().toString());
     }
 
     @Override

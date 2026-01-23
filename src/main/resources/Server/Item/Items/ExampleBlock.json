@@ -24,7 +24,7 @@
       "IsUsable": true
     },
     "State": {
-      "Id": "container",
+      "Id": "ExampleBlock",
       "Capacity": 5,
       "Definitions": {
         "CloseWindow": {
