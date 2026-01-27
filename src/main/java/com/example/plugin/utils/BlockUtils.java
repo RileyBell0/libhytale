@@ -1,10 +1,5 @@
 package com.example.plugin.utils;
 
-import java.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.example.plugin.structs.ExampleBlock;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
@@ -18,6 +13,9 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
@@ -27,8 +25,9 @@ public class BlockUtils {
 
     @Nullable
     public static BlockModule.BlockStateInfo getInfo(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
         var blockInfoComponentType = BlockModule.BlockStateInfo.getComponentType();
         if (blockInfoComponentType == null) {
             return null;
@@ -47,15 +46,15 @@ public class BlockUtils {
     // get the chunk for a given block
     @Nullable
     public static WorldChunk getWorldChunk(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockModule.BlockStateInfo info) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockModule.BlockStateInfo info
+    ) {
         var chunkComponentType = WorldChunk.getComponentType();
         if (chunkComponentType == null) {
             return null;
         }
 
-        return commandBuffer.getComponent(info.getChunkRef(),
-                chunkComponentType);
+        return commandBuffer.getComponent(info.getChunkRef(), chunkComponentType);
     }
 
     // Get the local coords of the block in its chunk
@@ -69,8 +68,10 @@ public class BlockUtils {
     }
 
     // Get the local coords of the block in its chunk
-    public static Vector3i getCoordsInChunk(@Nonnull Ref<ChunkStore> ref,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+    public static Vector3i getCoordsInChunk(
+        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {
         var info = BlockUtils.getInfo(commandBuffer, ref);
         if (info == null) {
             return null;
@@ -81,7 +82,7 @@ public class BlockUtils {
 
     public static CompletableFuture<Ref<ChunkStore>> get(World world, int x, int y, int z) {
         var worldChunk = world.getChunkAsync(ChunkUtil.indexChunkFromBlock(x, z));
-        var blockRef = worldChunk.thenApply((chunk) -> chunk.getBlockComponentEntity(x, y, z));
+        var blockRef = worldChunk.thenApply(chunk -> chunk.getBlockComponentEntity(x, y, z));
 
         return blockRef;
     }
@@ -116,8 +117,11 @@ public class BlockUtils {
         return BlockUtils.setTicking(cmd, ref, true);
     }
 
-    public static boolean setTicking(@Nonnull CommandBuffer<ChunkStore> cmd, @Nonnull Ref<ChunkStore> ref,
-            boolean ticking) {
+    public static boolean setTicking(
+        @Nonnull CommandBuffer<ChunkStore> cmd,
+        @Nonnull Ref<ChunkStore> ref,
+        boolean ticking
+    ) {
         var info = BlockUtils.getInfo(cmd, ref);
         if (info == null) {
             console.log("Info was null");
@@ -140,11 +144,11 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull CommandBuffer<ChunkStore> cmd,
-            @Nonnull Ref<ChunkStore> ref,
-            @Nonnull BlockIGuess<T> t) {
-        return (ExampleBlock) cmd.getComponent(ref,
-                ExampleBlock.getComponentType()) != null;
+        @Nonnull CommandBuffer<ChunkStore> cmd,
+        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull BlockIGuess<T> t
+    ) {
+        return (ExampleBlock) cmd.getComponent(ref, ExampleBlock.getComponentType()) != null;
     }
 
     /**
@@ -170,5 +174,4 @@ public class BlockUtils {
     public static int getBlockId(@Nonnull String blockId) {
         return BlockType.getAssetMap().getIndex(blockId);
     }
-
 }
