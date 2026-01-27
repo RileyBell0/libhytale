@@ -26,7 +26,7 @@ public class RileysPlugin extends ModdedServerPlugin {
     }
 
     protected void start() {
-        this.getChunkStoreRegistry().registerSystem(new TickingInitializer());
+        this.getChunkStoreRegistry().registerSystem(new Initialiser());
         this.getChunkStoreRegistry().registerSystem(new TickingSystem());
     }
 }

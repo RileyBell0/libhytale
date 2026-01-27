@@ -13,15 +13,11 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
-public class TickingInitializer extends RefSystem<ChunkStore> {
+public class Initialiser extends RefSystem<ChunkStore> {
 
     /**
-     * When blocks are loaded, we need to mark them as "ticking" ourselves
-     *
-     * @param ref
-     * @param reason
-     * @param store
-     * @param commandBuffer
+     * If you have blocks that you want to "tick", you need to "initialise" them
+     * when they are loaded into the world or placed etc
      */
     @Override
     public void onEntityAdded(
