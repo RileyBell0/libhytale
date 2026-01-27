@@ -100,44 +100,57 @@ public class TickingSystem extends BlockTickingSystem {
             commandBuffer,
             section.getY(),
             (blockComponentChunk1, commandBuffer1, localX, localY, localZ, blockId) -> {
-                Ref<ChunkStore> blockRef = blockComponentChunk1.getEntityReference(
-                    ChunkUtil.indexBlockInColumn(localX, localY, localZ)
-                );
-                if (blockRef == null) {
-                    return BlockTickStrategy.IGNORED;
-                }
-
-                ExampleBlock exampleBlock = (ExampleBlock) commandBuffer1.getComponent(
-                    blockRef,
-                    ExampleBlock.getComponentType()
-                );
-                if (exampleBlock == null) {
-                    return BlockTickStrategy.IGNORED;
-                }
-
-                var wcct = WorldChunk.getComponentType();
-                if (wcct == null) {
-                    return BlockTickStrategy.CONTINUE;
-                }
-
-                WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(chunkColumnReference, wcct);
-                var world = worldChunk.getWorld();
-                if (world == null) {
-                    return BlockTickStrategy.CONTINUE;
-                }
-
-                int globalX = localX + (worldChunk.getX() * 32);
-                int globalZ = localZ + (worldChunk.getZ() * 32);
-                return exampleBlock.onTick(
-                    world,
-                    worldChunk,
-                    globalX,
+                return TickingSystem.tickPassthrough(
+                    blockComponentChunk1,
+                    commandBuffer1,
+                    chunkColumnReference,
+                    localX,
                     localY,
-                    globalZ,
-                    BlockUtils.getBlockId("RileysBlock")
+                    localZ,
+                    blockId
                 );
             }
         );
+    }
+
+    private static BlockTickStrategy tickPassthrough(
+        BlockComponentChunk blockComponentChunk1,
+        CommandBuffer<ChunkStore> commandBuffer,
+        Ref<ChunkStore> chunkColumnReference,
+        int localX,
+        int localY,
+        int localZ,
+        int blockId
+    ) {
+        Ref<ChunkStore> blockRef = blockComponentChunk1.getEntityReference(
+            ChunkUtil.indexBlockInColumn(localX, localY, localZ)
+        );
+        if (blockRef == null) {
+            return BlockTickStrategy.IGNORED;
+        }
+
+        ExampleBlock exampleBlock = (ExampleBlock) commandBuffer.getComponent(
+            blockRef,
+            ExampleBlock.getComponentType()
+        );
+        if (exampleBlock == null) {
+            return BlockTickStrategy.IGNORED;
+        }
+
+        var wcct = WorldChunk.getComponentType();
+        if (wcct == null) {
+            return BlockTickStrategy.CONTINUE;
+        }
+
+        WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(chunkColumnReference, wcct);
+        var world = worldChunk.getWorld();
+        if (world == null) {
+            return BlockTickStrategy.CONTINUE;
+        }
+
+        int globalX = localX + (worldChunk.getX() * 32);
+        int globalZ = localZ + (worldChunk.getZ() * 32);
+        return exampleBlock.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
     }
     // @Override
     // public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore>
