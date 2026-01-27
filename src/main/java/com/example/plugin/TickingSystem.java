@@ -50,6 +50,40 @@ public class TickingSystem extends BlockTickingSystem {
         return Query.and(BlockSection.getComponentType(), ChunkSection.getComponentType());
     }
 
+    private static BlockSection getTickingBlocks(@Nonnull ArchetypeChunk<ChunkStore> archetypeChunk, int index) {
+        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, BlockSection.getComponentType());
+        if (blocks == null || blocks.getTickingBlocksCountCopy() == 0) {
+            return null;
+        }
+        return blocks;
+    }
+
+    private static ChunkSection getChunkSection(@Nonnull ArchetypeChunk<ChunkStore> archetypeChunk, int index) {
+        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ChunkSection.getComponentType());
+        if (section == null) {
+            return null;
+        }
+        return section;
+    }
+
+    private static BlockComponentChunk getBlockComponentChunk(
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        ChunkSection section
+    ) {
+        var chunkColumnReference = section.getChunkColumnReference();
+        if (chunkColumnReference == null) {
+            return null;
+        }
+        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer.getComponent(
+            chunkColumnReference,
+            BlockComponentChunk.getComponentType()
+        );
+        if (blockComponentChunk == null) {
+            return null;
+        }
+        return blockComponentChunk;
+    }
+
     /**
      * Tick blocks!!
      */
@@ -60,89 +94,69 @@ public class TickingSystem extends BlockTickingSystem {
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        var blockSectionComponentType = BlockSection.getComponentType();
-        if (blockSectionComponentType == null) {
+        BlockSection blocks = TickingSystem.getTickingBlocks(archetypeChunk, index);
+        ChunkSection section = TickingSystem.getChunkSection(archetypeChunk, index);
+        if (blocks == null || section == null) {
             return;
         }
 
-        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, blockSectionComponentType);
-        if (blocks == null || blocks.getTickingBlocksCountCopy() == 0) {
+        BlockComponentChunk blockComponentChunk = TickingSystem.getBlockComponentChunk(commandBuffer, section);
+        if (blockComponentChunk == null) {
             return;
         }
 
-        var chunkSectionComponentType = ChunkSection.getComponentType();
-        if (chunkSectionComponentType == null) {
-            return;
-        }
-        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, chunkSectionComponentType);
-        if (section == null) {
-            return;
-        }
-
-        var chunkColumnReference = section.getChunkColumnReference();
-        if (chunkColumnReference == null) {
-            return;
-        }
-
-        var blockChunkComponentType = BlockComponentChunk.getComponentType();
-        if (blockChunkComponentType == null) {
-            return;
-        }
-
-        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer.getComponent(
-            chunkColumnReference,
-            blockChunkComponentType
-        );
-        assert blockComponentChunk != null;
-
-        blocks.forEachTicking(
-            blockComponentChunk,
-            commandBuffer,
-            section.getY(),
-            (blockComponentChunk1, commandBuffer1, localX, localY, localZ, blockId) -> {
-                return TickingSystem.tickPassthrough(
-                    blockComponentChunk1,
-                    commandBuffer1,
-                    chunkColumnReference,
-                    localX,
-                    localY,
-                    localZ,
-                    blockId
-                );
-            }
-        );
+        blocks.forEachTicking(blockComponentChunk, commandBuffer, section.getY(), TickingSystem::tickPassthrough);
     }
 
-    private static BlockTickStrategy tickPassthrough(
-        BlockComponentChunk blockComponentChunk1,
+    private static Ref<ChunkStore> getBlockRef(BlockComponentChunk chunk, int localX, int localY, int localZ) {
+        return chunk.getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
+    }
+
+    private static ExampleBlock getBlock(
         CommandBuffer<ChunkStore> commandBuffer,
-        Ref<ChunkStore> chunkColumnReference,
+        BlockComponentChunk chunk,
+        int localX,
+        int localY,
+        int localZ
+    ) {
+        var block = TickingSystem.getBlockRef(chunk, localX, localY, localZ);
+        if (block == null) {
+            return null;
+        }
+
+        return commandBuffer.getComponent(block, ExampleBlock.getComponentType());
+    }
+
+    @Nonnull
+    private static BlockTickStrategy tickPassthrough(
+        BlockComponentChunk chunk,
+        CommandBuffer<ChunkStore> commandBuffer,
         int localX,
         int localY,
         int localZ,
         int blockId
     ) {
-        Ref<ChunkStore> blockRef = blockComponentChunk1.getEntityReference(
-            ChunkUtil.indexBlockInColumn(localX, localY, localZ)
-        );
-        if (blockRef == null) {
+        var ref = chunk.getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
+        if (ref == null) {
             return BlockTickStrategy.IGNORED;
         }
 
-        ExampleBlock exampleBlock = (ExampleBlock) commandBuffer.getComponent(
-            blockRef,
-            ExampleBlock.getComponentType()
-        );
-        if (exampleBlock == null) {
+        var block = TickingSystem.getBlock(commandBuffer, chunk, localX, localY, localZ);
+        if (block == null) {
             return BlockTickStrategy.IGNORED;
         }
 
+        BlockUtils.getWorldChunk(commandBuffer, ref);
         var wcct = WorldChunk.getComponentType();
         if (wcct == null) {
             return BlockTickStrategy.CONTINUE;
         }
 
-        WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(chunkColumnReference, wcct);
+        WorldChunk worldChunk = BlockUtils.getWorldChunk(commandBuffer, ref);
+        if (worldChunk == null) {
+            return BlockTickStrategy.CONTINUE;
+        }
+
         var world = worldChunk.getWorld();
         if (world == null) {
             return BlockTickStrategy.CONTINUE;
@@ -150,22 +164,25 @@ public class TickingSystem extends BlockTickingSystem {
 
         int globalX = localX + (worldChunk.getX() * 32);
         int globalZ = localZ + (worldChunk.getZ() * 32);
-        return exampleBlock.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
+        block.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
+        return BlockTickStrategy.CONTINUE;
     }
+
     // @Override
-    // public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore>
-    // archetypeChunk,
-    // @Nonnull Store<ChunkStore> store, @Nonnull CommandBuffer<ChunkStore>
-    // commandBuffer) {
+    // public void tick(
+    //     float dt,
+    //     int index,
+    //     @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+    //     @Nonnull Store<ChunkStore> store,
+    //     @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    // ) {
+    //     // Sanity check - validate our component is on here
+    //     Ref<ChunkStore> ref = archetypeChunk.getReferenceTo(index);
+    //     if (!BlockUtils.hasComponent(commandBuffer, ref, RileysTickingComponent::getComponentType)) {
+    //         return;
+    //     }
 
-    // // Sanity check - validate our component is on here
-    // Ref<ChunkStore> ref = archetypeChunk.getReferenceTo(index);
-    // if (!BlockUtils.hasComponent(commandBuffer, ref,
-    // RileysTickingComponent::getComponentType)) {
-    // return;
-    // }
-
-    // // TICK
-    // TickingSystem.tickBlock(commandBuffer, ref);
+    //     // TICK
+    //     TickingSystem.tickBlock(commandBuffer, ref);
     // }
 }

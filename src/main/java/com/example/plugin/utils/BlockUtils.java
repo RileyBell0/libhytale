@@ -47,6 +47,25 @@ public class BlockUtils {
     @Nullable
     public static WorldChunk getWorldChunk(
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
+        var info = BlockUtils.getInfo(commandBuffer, ref);
+        if (info == null) {
+            return null;
+        }
+
+        var chunkComponentType = WorldChunk.getComponentType();
+        if (chunkComponentType == null) {
+            return null;
+        }
+
+        return commandBuffer.getComponent(info.getChunkRef(), chunkComponentType);
+    }
+
+    // get the chunk for a given block
+    @Nullable
+    public static WorldChunk getWorldChunk(
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull BlockModule.BlockStateInfo info
     ) {
         var chunkComponentType = WorldChunk.getComponentType();
