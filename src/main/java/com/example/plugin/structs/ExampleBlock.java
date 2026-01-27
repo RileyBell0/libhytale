@@ -1,44 +1,47 @@
 package com.example.plugin.structs;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.example.plugin.interfaces.ModdedComponent;
 import com.example.plugin.interfaces.ModdedServerPlugin;
-import com.hypixel.hytale.builtin.blocktick.procedure.BasicChanceBlockGrowthProcedure;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
-import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ExampleBlock implements ModdedComponent {
-    ////////////////////////////////
+
+    // //////////////////////////////
     // Tick! (example method just logs how many ticks it's been around every
     // 30 ticks. 30 ticks is 1 second by default)
-    ////////////////////////////////
+    // //////////////////////////////
 
     private int ticks = 0;
 
     @Nonnull
-    public static final BuilderCodec<ExampleBlock> CODEC = BuilderCodec
-            .builder(ExampleBlock.class, ExampleBlock::new)
-            .append(
-                    new KeyedCodec<Integer>("Ticks", Codec.INTEGER),
-                    (data, value) -> data.ticks = value,
-                    (data) -> data.ticks)
-            .add()
-            .build();
+    public static final BuilderCodec<ExampleBlock> CODEC = BuilderCodec.builder(ExampleBlock.class, ExampleBlock::new)
+        .append(
+            new KeyedCodec<Integer>("Ticks", Codec.INTEGER),
+            (data, value) -> data.ticks = value,
+            data -> data.ticks
+        )
+        .add()
+        .build();
 
     // Ticking a block or entity? put it in here!
     @Nonnull
     public BlockTickStrategy onTick(
-            @Nonnull World world, WorldChunk wc, int worldX, int worldY, int worldZ, int blockId) {
+        @Nonnull World world,
+        WorldChunk wc,
+        int worldX,
+        int worldY,
+        int worldZ,
+        int blockId
+    ) {
         this.ticks += 1;
         console.log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " ) " + this.ticks + " times");
 
@@ -57,14 +60,14 @@ public class ExampleBlock implements ModdedComponent {
     @Nonnull
     @SuppressWarnings("null")
     public static String Id = ExampleBlock.class.getSimpleName();
+
     private static ComponentType<ChunkStore, ExampleBlock> componentType;
 
     ////////////////////////////////
     // CONSTRUCTORS (for cloning etc)
     ////////////////////////////////
 
-    public ExampleBlock() {
-    }
+    public ExampleBlock() {}
 
     public ExampleBlock(ExampleBlock self) {
         this.ticks = self.ticks;
@@ -89,10 +92,9 @@ public class ExampleBlock implements ModdedComponent {
      * @return
      */
     public static ComponentType<ChunkStore, ExampleBlock> registerToPlugin(ModdedServerPlugin plugin) {
-        var component = plugin.getChunkStoreRegistry().registerComponent(
-                ExampleBlock.class,
-                ExampleBlock.Id,
-                ExampleBlock.CODEC);
+        var component = plugin
+            .getChunkStoreRegistry()
+            .registerComponent(ExampleBlock.class, ExampleBlock.Id, ExampleBlock.CODEC);
 
         plugin.addToRegister(ExampleBlock.Id, component);
 
@@ -117,15 +119,17 @@ public class ExampleBlock implements ModdedComponent {
         // As long as you don't break the contract of "actually initialize the block"
         // then this will never fail
         if (ExampleBlock.componentType == null) {
-            throw new RuntimeException("Called " + ExampleBlock.class.getName()
-                    + ".getComponentType() before plugin was setup.\nHint: make sure to call `"
-                    + ExampleBlock.class.getName()
-                    + ".registerFor(this);` within your plugin's `setup` function ");
+            throw new RuntimeException(
+                "Called " +
+                    ExampleBlock.class.getName() +
+                    ".getComponentType() before plugin was setup.\nHint: make sure to call `" +
+                    ExampleBlock.class.getName() +
+                    ".registerFor(this);` within your plugin's `setup` function "
+            );
         }
 
         return ExampleBlock.componentType;
     }
-
 }
 
 // @Nonnull

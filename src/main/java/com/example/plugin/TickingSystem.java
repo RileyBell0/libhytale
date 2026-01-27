@@ -1,7 +1,5 @@
 package com.example.plugin;
 
-import javax.annotation.Nonnull;
-
 import com.example.plugin.structs.ExampleBlock;
 import com.example.plugin.utils.BlockUtils;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -16,6 +14,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.ChunkSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import javax.annotation.Nonnull;
 
 /**
  * If you have a component you want to tick, make its class extend the
@@ -44,6 +43,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
  * stuff for us. YOU have to listen to these events yourself and dispatch them
  */
 public class TickingSystem extends ChunkTickingSystem {
+
     /**
      * KEEP THIS AT THE TOP OF YOUR CLASS. ALWAYS. it is by far the most important
      * thing. this is where you say "my class will be responsible for running the
@@ -58,9 +58,13 @@ public class TickingSystem extends ChunkTickingSystem {
      * Tick blocks!!
      */
 
-    public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-            @Nonnull Store<ChunkStore> store,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+    public void tick(
+        float dt,
+        int index,
+        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+        @Nonnull Store<ChunkStore> store,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {
         var ct = BlockSection.getComponentType();
         if (ct == null) {
             return;
@@ -90,43 +94,46 @@ public class TickingSystem extends ChunkTickingSystem {
             return;
         }
 
-        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer
-                .getComponent(sccr, bccct);
+        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer.getComponent(sccr, bccct);
         assert blockComponentChunk != null;
 
-        blocks.forEachTicking(blockComponentChunk, commandBuffer, section.getY(),
-                (blockComponentChunk1, commandBuffer1, localX, localY, localZ, blockId) -> {
-                    Ref<ChunkStore> blockRef = blockComponentChunk1
-                            .getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
-                    if (blockRef == null) {
-                        return BlockTickStrategy.IGNORED;
-                    }
+        blocks.forEachTicking(
+            blockComponentChunk,
+            commandBuffer,
+            section.getY(),
+            (blockComponentChunk1, commandBuffer1, localX, localY, localZ, blockId) -> {
+                Ref<ChunkStore> blockRef = blockComponentChunk1.getEntityReference(
+                    ChunkUtil.indexBlockInColumn(localX, localY, localZ)
+                );
+                if (blockRef == null) {
+                    return BlockTickStrategy.IGNORED;
+                }
 
-                    ExampleBlock exampleBlock = (ExampleBlock) commandBuffer1.getComponent(blockRef,
-                            ExampleBlock.getComponentType());
-                    if (exampleBlock == null) {
-                        return BlockTickStrategy.IGNORED;
+                ExampleBlock exampleBlock = (ExampleBlock) commandBuffer1.getComponent(
+                    blockRef,
+                    ExampleBlock.getComponentType()
+                );
+                if (exampleBlock == null) {
+                    return BlockTickStrategy.IGNORED;
+                }
 
-                    }
-
-                    var wcct = WorldChunk.getComponentType();
-                    if (wcct == null) {
-                        return BlockTickStrategy.CONTINUE;
-                    }
-
-                    WorldChunk worldChunk = (WorldChunk) commandBuffer
-                            .getComponent(sccr, wcct);
-                    var world = worldChunk.getWorld();
-                    if (world == null) {
-                        return BlockTickStrategy.CONTINUE;
-                    }
-
-                    int globalX = localX + (worldChunk.getX() * 32);
-                    int globalZ = localZ + (worldChunk.getZ() * 32);
-                    exampleBlock.onTick(world, worldChunk, globalX, localY, globalZ,
-                            BlockUtils.getBlockId("RileysBlock"));
+                var wcct = WorldChunk.getComponentType();
+                if (wcct == null) {
                     return BlockTickStrategy.CONTINUE;
-                });
+                }
+
+                WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(sccr, wcct);
+                var world = worldChunk.getWorld();
+                if (world == null) {
+                    return BlockTickStrategy.CONTINUE;
+                }
+
+                int globalX = localX + (worldChunk.getX() * 32);
+                int globalZ = localZ + (worldChunk.getZ() * 32);
+                exampleBlock.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
+                return BlockTickStrategy.CONTINUE;
+            }
+        );
     }
     // @Override
     // public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore>

@@ -1,12 +1,12 @@
 package com.example.plugin;
 
-import javax.annotation.Nonnull;
-
 import com.example.plugin.interfaces.ModdedServerPlugin;
 import com.example.plugin.structs.ExampleBlock;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import javax.annotation.Nonnull;
 
 public class RileysPlugin extends ModdedServerPlugin {
+
     protected static RileysPlugin instance;
 
     public static RileysPlugin get() {
