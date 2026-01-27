@@ -128,6 +128,18 @@ public class BlockUtils {
             return false;
         }
 
+        return BlockUtils.setTicking(cmd, info, ticking);
+    }
+
+    public static boolean setTicking(@Nonnull CommandBuffer<ChunkStore> cmd, @Nonnull BlockModule.BlockStateInfo info) {
+        return BlockUtils.setTicking(cmd, info, true);
+    }
+
+    public static boolean setTicking(
+        @Nonnull CommandBuffer<ChunkStore> cmd,
+        @Nonnull BlockModule.BlockStateInfo info,
+        boolean ticking
+    ) {
         var worldChunk = BlockUtils.getWorldChunk(cmd, info);
         if (worldChunk == null) {
             console.log("World chunk was null");
@@ -135,6 +147,14 @@ public class BlockUtils {
         }
 
         var coords = BlockUtils.getCoordsInChunk(info);
+        return BlockUtils.setTicking(worldChunk, coords, ticking);
+    }
+
+    public static boolean setTicking(@Nonnull WorldChunk worldChunk, @Nonnull Vector3i coords) {
+        return BlockUtils.setTicking(worldChunk, coords, true);
+    }
+
+    public static boolean setTicking(@Nonnull WorldChunk worldChunk, @Nonnull Vector3i coords, boolean ticking) {
         return worldChunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }
 
