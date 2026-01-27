@@ -1,7 +1,11 @@
 {
   "Group": "com.example",
-  "Name": "ExampleBlock",
+  "Name": "RileysPlugin",
   "Version": "1.0.0",
-  "Main": "com.example.plugin.ExamplePlugin",
-  "IncludesAssetPack": true
+  "Main": "com.example.plugin.RileysPlugin",
+  "IncludesAssetPack": true,
+  "Dependencies": {
+    "Hytale:EntityModule": "*",
+    "Hytale:BlockModule": "*"
+  }
 }
