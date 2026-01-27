@@ -1,6 +1,7 @@
 package com.example.plugin.structs;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.example.plugin.interfaces.ModdedComponent;
 import com.example.plugin.interfaces.ModdedServerPlugin;
@@ -8,6 +9,7 @@ import com.hypixel.hytale.builtin.blocktick.procedure.BasicChanceBlockGrowthProc
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
@@ -15,7 +17,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
-public class ExampleBlock extends TickProcedure implements ModdedComponent {
+public class ExampleBlock implements ModdedComponent {
     ////////////////////////////////
     // Tick! (example method just logs how many ticks it's been around every
     // 30 ticks. 30 ticks is 1 second by default)
@@ -25,7 +27,7 @@ public class ExampleBlock extends TickProcedure implements ModdedComponent {
 
     @Nonnull
     public static final BuilderCodec<ExampleBlock> CODEC = BuilderCodec
-            .builder(ExampleBlock.class, ExampleBlock::new, TickProcedure.BASE_CODEC)
+            .builder(ExampleBlock.class, ExampleBlock::new)
             .append(
                     new KeyedCodec<Integer>("Ticks", Codec.INTEGER),
                     (data, value) -> data.ticks = value,
@@ -35,7 +37,6 @@ public class ExampleBlock extends TickProcedure implements ModdedComponent {
 
     // Ticking a block or entity? put it in here!
     @Nonnull
-    @Override
     public BlockTickStrategy onTick(
             @Nonnull World world, WorldChunk wc, int worldX, int worldY, int worldZ, int blockId) {
         this.ticks += 1;
@@ -69,6 +70,7 @@ public class ExampleBlock extends TickProcedure implements ModdedComponent {
         this.ticks = self.ticks;
     }
 
+    @Nullable
     public ExampleBlock clone() {
         return new ExampleBlock(this);
     }
@@ -94,8 +96,8 @@ public class ExampleBlock extends TickProcedure implements ModdedComponent {
 
         plugin.addToRegister(ExampleBlock.Id, component);
 
-        TickProcedure.CODEC.register(ExampleBlock.Id, ExampleBlock.class,
-                ExampleBlock.CODEC);
+        // TickProcedure.CODEC.register(ExampleBlock.Id, ExampleBlock.class,
+        // ExampleBlock.CODEC);
 
         // also keep me a copy of the component type after registering
         ExampleBlock.componentType = component;

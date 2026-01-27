@@ -12,7 +12,9 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
 public class TickingInitializer extends RefSystem<ChunkStore> {
@@ -29,19 +31,19 @@ public class TickingInitializer extends RefSystem<ChunkStore> {
     @Override
     public void onEntityAdded(@Nonnull Ref<ChunkStore> ref, @Nonnull AddReason reason, @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-
-        // Ensure the given block has our component (sanity check - java scary)
-        if (!BlockUtils.hasComponent(commandBuffer, ref, ExampleBlock::getComponentType)) {
-            console.log("Block does not have component");
+        BlockModule.BlockStateInfo info = (BlockModule.BlockStateInfo) commandBuffer.getComponent(ref,
+                BlockModule.BlockStateInfo.getComponentType());
+        if (info == null)
             return;
-        }
 
-        // Mark it as ticking (will now be picked up by the tick method)
-        if (!BlockUtils.setTicking(commandBuffer, ref)) {
-            console.log("Failed to set block to ticking! " + ref);
-            return;
+        int x = ChunkUtil.xFromBlockInColumn(info.getIndex());
+        int y = ChunkUtil.yFromBlockInColumn(info.getIndex());
+        int z = ChunkUtil.zFromBlockInColumn(info.getIndex());
+        WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(info.getChunkRef(),
+                WorldChunk.getComponentType());
+        if (worldChunk != null) {
+            worldChunk.setTicking(x, y, z, true);
         }
-        console.log("Set block ticking!! " + ref);
     }
 
     @Override
