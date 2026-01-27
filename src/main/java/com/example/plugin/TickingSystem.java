@@ -61,17 +61,37 @@ public class TickingSystem extends ChunkTickingSystem {
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, BlockSection.getComponentType());
-        assert blocks != null;
-        if (blocks.getTickingBlocksCountCopy() == 0) {
+        var ct = BlockSection.getComponentType();
+        if (ct == null) {
             return;
         }
 
-        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ChunkSection.getComponentType());
-        assert section != null;
+        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, ct);
+        if (blocks == null || blocks.getTickingBlocksCountCopy() == 0) {
+            return;
+        }
+
+        var ct2 = ChunkSection.getComponentType();
+        if (ct2 == null) {
+            return;
+        }
+        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ct2);
+        if (section == null) {
+            return;
+        }
+
+        var sccr = section.getChunkColumnReference();
+        if (sccr == null) {
+            return;
+        }
+
+        var bccct = BlockComponentChunk.getComponentType();
+        if (bccct == null) {
+            return;
+        }
 
         BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer
-                .getComponent(section.getChunkColumnReference(), BlockComponentChunk.getComponentType());
+                .getComponent(sccr, bccct);
         assert blockComponentChunk != null;
 
         blocks.forEachTicking(blockComponentChunk, commandBuffer, section.getY(),
@@ -80,21 +100,32 @@ public class TickingSystem extends ChunkTickingSystem {
                             .getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
                     if (blockRef == null) {
                         return BlockTickStrategy.IGNORED;
-                    } else {
-                        ExampleBlock exampleBlock = (ExampleBlock) commandBuffer1.getComponent(blockRef,
-                                ExampleBlock.getComponentType());
-                        if (exampleBlock != null) {
-                            WorldChunk worldChunk = (WorldChunk) commandBuffer
-                                    .getComponent(section.getChunkColumnReference(), WorldChunk.getComponentType());
-                            int globalX = localX + (worldChunk.getX() * 32);
-                            int globalZ = localZ + (worldChunk.getZ() * 32);
-                            exampleBlock.onTick(worldChunk.getWorld(), worldChunk, globalX, localY, globalZ,
-                                    BlockUtils.getBlockId("RileysBlock"));
-                            return BlockTickStrategy.CONTINUE;
-                        } else {
-                            return BlockTickStrategy.IGNORED;
-                        }
                     }
+
+                    ExampleBlock exampleBlock = (ExampleBlock) commandBuffer1.getComponent(blockRef,
+                            ExampleBlock.getComponentType());
+                    if (exampleBlock == null) {
+                        return BlockTickStrategy.IGNORED;
+
+                    }
+
+                    var wcct = WorldChunk.getComponentType();
+                    if (wcct == null) {
+                        return BlockTickStrategy.CONTINUE;
+                    }
+
+                    WorldChunk worldChunk = (WorldChunk) commandBuffer
+                            .getComponent(sccr, wcct);
+                    var world = worldChunk.getWorld();
+                    if (world == null) {
+                        return BlockTickStrategy.CONTINUE;
+                    }
+
+                    int globalX = localX + (worldChunk.getX() * 32);
+                    int globalZ = localZ + (worldChunk.getZ() * 32);
+                    exampleBlock.onTick(world, worldChunk, globalX, localY, globalZ,
+                            BlockUtils.getBlockId("RileysBlock"));
+                    return BlockTickStrategy.CONTINUE;
                 });
     }
     // @Override

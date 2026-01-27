@@ -3,7 +3,6 @@ package com.example.plugin;
 import javax.annotation.Nonnull;
 
 import com.example.plugin.structs.ExampleBlock;
-import com.example.plugin.utils.BlockUtils;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -11,14 +10,12 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
 public class TickingInitializer extends RefSystem<ChunkStore> {
-    private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     /**
      * When blocks are loaded, we need to mark them as "ticking" ourselves
@@ -31,16 +28,24 @@ public class TickingInitializer extends RefSystem<ChunkStore> {
     @Override
     public void onEntityAdded(@Nonnull Ref<ChunkStore> ref, @Nonnull AddReason reason, @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        var ct1 = BlockModule.BlockStateInfo.getComponentType();
+        if (ct1 == null) {
+            return;
+        }
         BlockModule.BlockStateInfo info = (BlockModule.BlockStateInfo) commandBuffer.getComponent(ref,
-                BlockModule.BlockStateInfo.getComponentType());
+                ct1);
         if (info == null)
             return;
 
         int x = ChunkUtil.xFromBlockInColumn(info.getIndex());
         int y = ChunkUtil.yFromBlockInColumn(info.getIndex());
         int z = ChunkUtil.zFromBlockInColumn(info.getIndex());
+        var ct = WorldChunk.getComponentType();
+        if (ct == null) {
+            return;
+        }
         WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(info.getChunkRef(),
-                WorldChunk.getComponentType());
+                ct);
         if (worldChunk != null) {
             worldChunk.setTicking(x, y, z, true);
         }
