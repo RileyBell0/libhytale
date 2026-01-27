@@ -1,6 +1,7 @@
 package com.example.plugin;
 
 import com.example.plugin.structs.ExampleBlock;
+import com.example.plugin.utils.BlockUtils;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -31,14 +32,7 @@ public class TickingInitializer extends RefSystem<ChunkStore> {
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        var blockStateInfoComponentType = BlockModule.BlockStateInfo.getComponentType();
-        if (blockStateInfoComponentType == null) {
-            return;
-        }
-        BlockModule.BlockStateInfo info = (BlockModule.BlockStateInfo) commandBuffer.getComponent(
-            ref,
-            blockStateInfoComponentType
-        );
+        var info = BlockUtils.getInfo(commandBuffer, ref);
         if (info == null) return;
 
         int x = ChunkUtil.xFromBlockInColumn(info.getIndex());
