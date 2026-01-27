@@ -65,36 +65,39 @@ public class TickingSystem extends ChunkTickingSystem {
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        var ct = BlockSection.getComponentType();
-        if (ct == null) {
+        var blockSectionComponentType = BlockSection.getComponentType();
+        if (blockSectionComponentType == null) {
             return;
         }
 
-        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, ct);
+        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, blockSectionComponentType);
         if (blocks == null || blocks.getTickingBlocksCountCopy() == 0) {
             return;
         }
 
-        var ct2 = ChunkSection.getComponentType();
-        if (ct2 == null) {
+        var chunkSectionComponentType = ChunkSection.getComponentType();
+        if (chunkSectionComponentType == null) {
             return;
         }
-        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ct2);
+        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, chunkSectionComponentType);
         if (section == null) {
             return;
         }
 
-        var sccr = section.getChunkColumnReference();
-        if (sccr == null) {
+        var chunkColumnReference = section.getChunkColumnReference();
+        if (chunkColumnReference == null) {
             return;
         }
 
-        var bccct = BlockComponentChunk.getComponentType();
-        if (bccct == null) {
+        var blockChunkComponentType = BlockComponentChunk.getComponentType();
+        if (blockChunkComponentType == null) {
             return;
         }
 
-        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer.getComponent(sccr, bccct);
+        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer.getComponent(
+            chunkColumnReference,
+            blockChunkComponentType
+        );
         assert blockComponentChunk != null;
 
         blocks.forEachTicking(
@@ -122,7 +125,7 @@ public class TickingSystem extends ChunkTickingSystem {
                     return BlockTickStrategy.CONTINUE;
                 }
 
-                WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(sccr, wcct);
+                WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(chunkColumnReference, wcct);
                 var world = worldChunk.getWorld();
                 if (world == null) {
                     return BlockTickStrategy.CONTINUE;

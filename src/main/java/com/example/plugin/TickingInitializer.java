@@ -31,21 +31,24 @@ public class TickingInitializer extends RefSystem<ChunkStore> {
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        var ct1 = BlockModule.BlockStateInfo.getComponentType();
-        if (ct1 == null) {
+        var blockStateInfoComponentType = BlockModule.BlockStateInfo.getComponentType();
+        if (blockStateInfoComponentType == null) {
             return;
         }
-        BlockModule.BlockStateInfo info = (BlockModule.BlockStateInfo) commandBuffer.getComponent(ref, ct1);
+        BlockModule.BlockStateInfo info = (BlockModule.BlockStateInfo) commandBuffer.getComponent(
+            ref,
+            blockStateInfoComponentType
+        );
         if (info == null) return;
 
         int x = ChunkUtil.xFromBlockInColumn(info.getIndex());
         int y = ChunkUtil.yFromBlockInColumn(info.getIndex());
         int z = ChunkUtil.zFromBlockInColumn(info.getIndex());
-        var ct = WorldChunk.getComponentType();
-        if (ct == null) {
+        var worldChunkComponentType = WorldChunk.getComponentType();
+        if (worldChunkComponentType == null) {
             return;
         }
-        WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(info.getChunkRef(), ct);
+        WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(info.getChunkRef(), worldChunkComponentType);
         if (worldChunk != null) {
             worldChunk.setTicking(x, y, z, true);
         }
