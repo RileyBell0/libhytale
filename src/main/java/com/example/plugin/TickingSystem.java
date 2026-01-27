@@ -9,8 +9,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
+import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.ChunkSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
@@ -112,19 +112,36 @@ public class TickingSystem extends BlockTickingSystem {
         return chunk.getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
     }
 
-    private static ExampleBlock getBlock(
+    @SuppressWarnings("unused")
+    private static ExampleBlock getComponent(
         CommandBuffer<ChunkStore> commandBuffer,
         BlockComponentChunk chunk,
         int localX,
         int localY,
         int localZ
     ) {
-        var block = TickingSystem.getBlockRef(chunk, localX, localY, localZ);
-        if (block == null) {
+        var ref = TickingSystem.getBlockRef(chunk, localX, localY, localZ);
+        if (ref == null) {
             return null;
         }
 
-        return commandBuffer.getComponent(block, ExampleBlock.getComponentType());
+        return commandBuffer.getComponent(ref, ExampleBlock.getComponentType());
+    }
+
+    @SuppressWarnings("unused")
+    private static BlockModule.BlockStateInfo getInfo(
+        CommandBuffer<ChunkStore> commandBuffer,
+        BlockComponentChunk chunk,
+        int localX,
+        int localY,
+        int localZ
+    ) {
+        var ref = TickingSystem.getBlockRef(chunk, localX, localY, localZ);
+        if (ref == null) {
+            return null;
+        }
+
+        return BlockUtils.getInfo(commandBuffer, ref);
     }
 
     @Nonnull
@@ -136,23 +153,18 @@ public class TickingSystem extends BlockTickingSystem {
         int localZ,
         int blockId
     ) {
-        var ref = chunk.getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
+        var ref = BlockUtils.getRef(chunk, localX, localY, localZ);
         if (ref == null) {
             return BlockTickStrategy.IGNORED;
         }
+        // var info = BlockUtils.getInfo(commandBuffer, ref);
 
-        var block = TickingSystem.getBlock(commandBuffer, chunk, localX, localY, localZ);
+        ExampleBlock block = BlockUtils.getComponent(ExampleBlock::getComponentType, commandBuffer, ref);
         if (block == null) {
             return BlockTickStrategy.IGNORED;
         }
 
-        BlockUtils.getWorldChunk(commandBuffer, ref);
-        var wcct = WorldChunk.getComponentType();
-        if (wcct == null) {
-            return BlockTickStrategy.CONTINUE;
-        }
-
-        WorldChunk worldChunk = BlockUtils.getWorldChunk(commandBuffer, ref);
+        var worldChunk = BlockUtils.getWorldChunk(commandBuffer, ref);
         if (worldChunk == null) {
             return BlockTickStrategy.CONTINUE;
         }
@@ -162,10 +174,11 @@ public class TickingSystem extends BlockTickingSystem {
             return BlockTickStrategy.CONTINUE;
         }
 
+        // BlockUtils.getGlobalCoords(commandBuffer, ref);
+
         int globalX = localX + (worldChunk.getX() * 32);
         int globalZ = localZ + (worldChunk.getZ() * 32);
-        block.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
-        return BlockTickStrategy.CONTINUE;
+        return block.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
     }
 
     // @Override

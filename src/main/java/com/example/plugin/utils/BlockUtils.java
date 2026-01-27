@@ -1,6 +1,5 @@
 package com.example.plugin.utils;
 
-import com.example.plugin.structs.ExampleBlock;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -11,9 +10,11 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -77,7 +78,7 @@ public class BlockUtils {
     }
 
     // Get the local coords of the block in its chunk
-    public static Vector3i getCoordsInChunk(@Nonnull BlockModule.BlockStateInfo info) {
+    public static Vector3i getLocalCoords(@Nonnull BlockModule.BlockStateInfo info) {
         var indexInChunk = info.getIndex();
         int x = ChunkUtil.xFromBlockInColumn(indexInChunk);
         int y = ChunkUtil.yFromBlockInColumn(indexInChunk);
@@ -86,8 +87,34 @@ public class BlockUtils {
         return new Vector3i(x, y, z);
     }
 
+    // get the chunk for a given block
+    @Nullable
+    public static Vector3i getGlobalCoords(
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockModule.BlockStateInfo info
+    ) {
+        var chunk = BlockUtils.getWorldChunk(commandBuffer, info);
+        if (chunk == null) {
+            return null;
+        }
+
+        var localCoords = BlockUtils.getLocalCoords(info);
+        return BlockUtils.toGlobalCoords(chunk, localCoords);
+    }
+
+    public static Vector3i toGlobalCoords(WorldChunk chunk, int localX, int localY, int localZ) {
+        int globalX = localX + (chunk.getX() * 32);
+        int globalZ = localZ + (chunk.getZ() * 32);
+
+        return new Vector3i(globalX, localY, globalZ);
+    }
+
+    public static Vector3i toGlobalCoords(WorldChunk chunk, Vector3i coords) {
+        return BlockUtils.toGlobalCoords(chunk, coords.x, coords.y, coords.z);
+    }
+
     // Get the local coords of the block in its chunk
-    public static Vector3i getCoordsInChunk(
+    public static Vector3i getLocalCoords(
         @Nonnull Ref<ChunkStore> ref,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
@@ -96,7 +123,7 @@ public class BlockUtils {
             return null;
         }
 
-        return BlockUtils.getCoordsInChunk(info);
+        return BlockUtils.getLocalCoords(info);
     }
 
     public static CompletableFuture<Ref<ChunkStore>> get(World world, int x, int y, int z) {
@@ -168,7 +195,7 @@ public class BlockUtils {
             return false;
         }
 
-        var coords = BlockUtils.getCoordsInChunk(info);
+        var coords = BlockUtils.getLocalCoords(info);
         return BlockUtils.setTicking(worldChunk, coords, ticking);
     }
 
@@ -180,17 +207,40 @@ public class BlockUtils {
         return worldChunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }
 
-    @FunctionalInterface
-    public interface BlockIGuess<T extends Component<ChunkStore>> {
-        ComponentType<ChunkStore, T> getComponentType();
+    public static Ref<ChunkStore> getRef(BlockComponentChunk chunk, int localX, int localY, int localZ) {
+        return chunk.getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
+    }
+
+    public static <T extends Component<ChunkStore>> T getComponent(
+        Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        CommandBuffer<ChunkStore> commandBuffer,
+        BlockComponentChunk chunk,
+        int localX,
+        int localY,
+        int localZ
+    ) {
+        var ref = BlockUtils.getRef(chunk, localX, localY, localZ);
+        if (ref == null) {
+            return null;
+        }
+
+        return commandBuffer.getComponent(ref, getComponentType.get());
+    }
+
+    public static <T extends Component<ChunkStore>> T getComponent(
+        Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        CommandBuffer<ChunkStore> commandBuffer,
+        Ref<ChunkStore> ref
+    ) {
+        return commandBuffer.getComponent(ref, getComponentType.get());
     }
 
     public static <T extends Component<ChunkStore>> boolean hasComponent(
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull Ref<ChunkStore> ref,
-        @Nonnull BlockIGuess<T> t
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType
     ) {
-        return (ExampleBlock) commandBuffer.getComponent(ref, ExampleBlock.getComponentType()) != null;
+        return (T) commandBuffer.getComponent(ref, getComponentType.get()) != null;
     }
 
     /**

@@ -40,7 +40,7 @@ public abstract class BlockTickingSystem extends ChunkBlockTickSystem.Ticking {
         }
 
         // and its associated coords
-        var coords = BlockUtils.getCoordsInChunk(info);
+        var coords = BlockUtils.getLocalCoords(info);
 
         // ACTION
         return tickProcedure(world, worldChunk, coords.x, coords.y, coords.z, worldChunk.getBlock(coords));
