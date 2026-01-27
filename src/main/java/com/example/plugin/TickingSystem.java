@@ -153,32 +153,30 @@ public class TickingSystem extends BlockTickingSystem {
         int localZ,
         int blockId
     ) {
+        // Get a ref to the block we're ticking
         var ref = BlockUtils.getRef(chunk, localX, localY, localZ);
         if (ref == null) {
             return BlockTickStrategy.IGNORED;
         }
-        // var info = BlockUtils.getInfo(commandBuffer, ref);
 
-        ExampleBlock block = BlockUtils.getComponent(ExampleBlock::getComponentType, commandBuffer, ref);
-        if (block == null) {
-            return BlockTickStrategy.IGNORED;
-        }
-
+        // Get the chunk it's located in
         var worldChunk = BlockUtils.getWorldChunk(commandBuffer, ref);
         if (worldChunk == null) {
             return BlockTickStrategy.CONTINUE;
         }
 
-        var world = worldChunk.getWorld();
-        if (world == null) {
-            return BlockTickStrategy.CONTINUE;
-        }
+        // Get a ref to the component we're actually interested in
+        var coords = BlockUtils.toGlobalCoords(worldChunk, localX, localY, localZ);
+        var block = BlockUtils.getComponent(ExampleBlock::getComponentType, commandBuffer, ref);
 
-        // BlockUtils.getGlobalCoords(commandBuffer, ref);
-
-        int globalX = localX + (worldChunk.getX() * 32);
-        int globalZ = localZ + (worldChunk.getZ() * 32);
-        return block.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
+        return block.onTick(
+            worldChunk.getWorld(),
+            worldChunk,
+            coords.x,
+            coords.y,
+            coords.z,
+            BlockUtils.getBlockId("RileysBlock")
+        );
     }
 
     // @Override

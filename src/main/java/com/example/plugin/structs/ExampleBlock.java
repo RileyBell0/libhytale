@@ -39,7 +39,7 @@ public class ExampleBlock implements Component<ChunkStore> {
     @Nonnull
     public BlockTickStrategy onTick(
         @Nonnull World world,
-        WorldChunk wc,
+        @Nonnull WorldChunk wc,
         int worldX,
         int worldY,
         int worldZ,

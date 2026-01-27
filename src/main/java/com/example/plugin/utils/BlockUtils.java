@@ -44,6 +44,20 @@ public class BlockUtils {
         return info;
     }
 
+    public static BlockModule.BlockStateInfo getInfo(
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockComponentChunk chunk,
+        int localX,
+        int localY,
+        int localZ
+    ) {
+        var ref = BlockUtils.getRef(chunk, localX, localY, localZ);
+        if (ref == null) {
+            return null;
+        }
+        return BlockUtils.getInfo(commandBuffer, ref);
+    }
+
     // get the chunk for a given block
     @Nullable
     public static WorldChunk getWorldChunk(
@@ -102,15 +116,16 @@ public class BlockUtils {
         return BlockUtils.toGlobalCoords(chunk, localCoords);
     }
 
-    public static Vector3i toGlobalCoords(WorldChunk chunk, int localX, int localY, int localZ) {
+    @Nonnull
+    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, int localX, int localY, int localZ) {
         int globalX = localX + (chunk.getX() * 32);
         int globalZ = localZ + (chunk.getZ() * 32);
 
         return new Vector3i(globalX, localY, globalZ);
     }
 
-    public static Vector3i toGlobalCoords(WorldChunk chunk, Vector3i coords) {
-        return BlockUtils.toGlobalCoords(chunk, coords.x, coords.y, coords.z);
+    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull Vector3i localCoords) {
+        return BlockUtils.toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
     }
 
     // Get the local coords of the block in its chunk
@@ -126,14 +141,14 @@ public class BlockUtils {
         return BlockUtils.getLocalCoords(info);
     }
 
-    public static CompletableFuture<Ref<ChunkStore>> get(World world, int x, int y, int z) {
+    public static CompletableFuture<Ref<ChunkStore>> get(@Nonnull World world, int x, int y, int z) {
         var worldChunk = world.getChunkAsync(ChunkUtil.indexChunkFromBlock(x, z));
         var blockRef = worldChunk.thenApply(chunk -> chunk.getBlockComponentEntity(x, y, z));
 
         return blockRef;
     }
 
-    public static CompletableFuture<Ref<ChunkStore>[]> getTouching(World world, int x, int y, int z) {
+    public static CompletableFuture<Ref<ChunkStore>[]> getTouching(@Nonnull World world, int x, int y, int z) {
         var future = new CompletableFuture<Ref<ChunkStore>[]>();
 
         @SuppressWarnings("unchecked")
@@ -207,14 +222,14 @@ public class BlockUtils {
         return worldChunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }
 
-    public static Ref<ChunkStore> getRef(BlockComponentChunk chunk, int localX, int localY, int localZ) {
+    public static Ref<ChunkStore> getRef(@Nonnull BlockComponentChunk chunk, int localX, int localY, int localZ) {
         return chunk.getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
     }
 
     public static <T extends Component<ChunkStore>> T getComponent(
-        Supplier<ComponentType<ChunkStore, T>> getComponentType,
-        CommandBuffer<ChunkStore> commandBuffer,
-        BlockComponentChunk chunk,
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockComponentChunk chunk,
         int localX,
         int localY,
         int localZ
@@ -228,17 +243,17 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> T getComponent(
-        Supplier<ComponentType<ChunkStore, T>> getComponentType,
-        CommandBuffer<ChunkStore> commandBuffer,
-        Ref<ChunkStore> ref
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
     ) {
         return commandBuffer.getComponent(ref, getComponentType.get());
     }
 
     public static <T extends Component<ChunkStore>> boolean hasComponent(
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType
+        @Nonnull Ref<ChunkStore> ref
     ) {
         return (T) commandBuffer.getComponent(ref, getComponentType.get()) != null;
     }
