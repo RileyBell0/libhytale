@@ -9,7 +9,16 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class ChunkTickingSystem extends ChunkBlockTickSystem.Ticking {
+/**
+ * This is the "main loop" kind of code for your ticking blocks
+ * Every single block you have gets ticked through here
+ *
+ * As far as systems go, this one's pretty straightforward
+ * - SCOPE: all blocks that match the query
+ * - ACTION: run their tick method
+ * - WHEN: every tick
+ */
+public abstract class BlockTickingSystem extends ChunkBlockTickSystem.Ticking {
 
     @Nullable
     protected static BlockTickStrategy tickBlock(@Nonnull CommandBuffer<ChunkStore> cmd, @Nonnull Ref<ChunkStore> ref) {
@@ -33,6 +42,7 @@ public abstract class ChunkTickingSystem extends ChunkBlockTickSystem.Ticking {
         // and its associated coords
         var coords = BlockUtils.getCoordsInChunk(info);
 
+        // ACTION
         return tickProcedure(world, worldChunk, coords.x, coords.y, coords.z, worldChunk.getBlock(coords));
     }
 }

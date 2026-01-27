@@ -42,13 +42,9 @@ import javax.annotation.Nonnull;
  * Yup. Your code calls your own code. Hytale does not call any `onEntityAdded`
  * stuff for us. YOU have to listen to these events yourself and dispatch them
  */
-public class TickingSystem extends ChunkTickingSystem {
+public class TickingSystem extends BlockTickingSystem {
 
-    /**
-     * KEEP THIS AT THE TOP OF YOUR CLASS. ALWAYS. it is by far the most important
-     * thing. this is where you say "my class will be responsible for running the
-     * ticks for my blocks/entities that match this stuff"
-     */
+    /** SCOPE: runs on these blocks */
     @Override
     public Query<ChunkStore> getQuery() {
         return Query.and(BlockSection.getComponentType(), ChunkSection.getComponentType());
@@ -57,7 +53,6 @@ public class TickingSystem extends ChunkTickingSystem {
     /**
      * Tick blocks!!
      */
-
     public void tick(
         float dt,
         int index,
@@ -133,8 +128,14 @@ public class TickingSystem extends ChunkTickingSystem {
 
                 int globalX = localX + (worldChunk.getX() * 32);
                 int globalZ = localZ + (worldChunk.getZ() * 32);
-                exampleBlock.onTick(world, worldChunk, globalX, localY, globalZ, BlockUtils.getBlockId("RileysBlock"));
-                return BlockTickStrategy.CONTINUE;
+                return exampleBlock.onTick(
+                    world,
+                    worldChunk,
+                    globalX,
+                    localY,
+                    globalZ,
+                    BlockUtils.getBlockId("RileysBlock")
+                );
             }
         );
     }
