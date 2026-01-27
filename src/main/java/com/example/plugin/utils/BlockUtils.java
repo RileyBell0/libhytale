@@ -132,34 +132,37 @@ public class BlockUtils {
         return future;
     }
 
-    public static boolean setTicking(@Nonnull CommandBuffer<ChunkStore> cmd, @Nonnull Ref<ChunkStore> ref) {
-        return BlockUtils.setTicking(cmd, ref, true);
+    public static boolean setTicking(@Nonnull CommandBuffer<ChunkStore> commandBuffer, @Nonnull Ref<ChunkStore> ref) {
+        return BlockUtils.setTicking(commandBuffer, ref, true);
     }
 
     public static boolean setTicking(
-        @Nonnull CommandBuffer<ChunkStore> cmd,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull Ref<ChunkStore> ref,
         boolean ticking
     ) {
-        var info = BlockUtils.getInfo(cmd, ref);
+        var info = BlockUtils.getInfo(commandBuffer, ref);
         if (info == null) {
             console.log("Info was null");
             return false;
         }
 
-        return BlockUtils.setTicking(cmd, info, ticking);
-    }
-
-    public static boolean setTicking(@Nonnull CommandBuffer<ChunkStore> cmd, @Nonnull BlockModule.BlockStateInfo info) {
-        return BlockUtils.setTicking(cmd, info, true);
+        return BlockUtils.setTicking(commandBuffer, info, ticking);
     }
 
     public static boolean setTicking(
-        @Nonnull CommandBuffer<ChunkStore> cmd,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockModule.BlockStateInfo info
+    ) {
+        return BlockUtils.setTicking(commandBuffer, info, true);
+    }
+
+    public static boolean setTicking(
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull BlockModule.BlockStateInfo info,
         boolean ticking
     ) {
-        var worldChunk = BlockUtils.getWorldChunk(cmd, info);
+        var worldChunk = BlockUtils.getWorldChunk(commandBuffer, info);
         if (worldChunk == null) {
             console.log("World chunk was null");
             return false;
@@ -183,11 +186,11 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> boolean hasComponent(
-        @Nonnull CommandBuffer<ChunkStore> cmd,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull Ref<ChunkStore> ref,
         @Nonnull BlockIGuess<T> t
     ) {
-        return (ExampleBlock) cmd.getComponent(ref, ExampleBlock.getComponentType()) != null;
+        return (ExampleBlock) commandBuffer.getComponent(ref, ExampleBlock.getComponentType()) != null;
     }
 
     /**
