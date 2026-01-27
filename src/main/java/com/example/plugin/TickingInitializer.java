@@ -10,7 +10,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
@@ -31,20 +30,7 @@ public class TickingInitializer extends RefSystem<ChunkStore> {
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        var info = BlockUtils.getInfo(commandBuffer, ref);
-        if (info == null) return;
-
-        var coords = BlockUtils.getCoordsInChunk(info);
-
-        var worldChunkComponentType = WorldChunk.getComponentType();
-        if (worldChunkComponentType == null) {
-            return;
-        }
-        WorldChunk worldChunk = (WorldChunk) commandBuffer.getComponent(info.getChunkRef(), worldChunkComponentType);
-        if (worldChunk != null) {
-            BlockUtils.setTicking(worldChunk, coords);
-            // worldChunk.setTicking(coords.x, coords.y, coords.z, true);
-        }
+        BlockUtils.setTicking(commandBuffer, ref);
     }
 
     @Override
