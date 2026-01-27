@@ -1,6 +1,5 @@
 package com.example.plugin.structs;
 
-import com.example.plugin.interfaces.ModdedComponent;
 import com.example.plugin.interfaces.ModdedServerPlugin;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -18,7 +17,7 @@ import javax.annotation.Nonnull;
  * - has data/state
  * - saves said data/state
  */
-public class DataComponent implements ModdedComponent {
+public class DataComponent implements Component<ChunkStore> {
 
     private Boolean exampleField = true;
 
