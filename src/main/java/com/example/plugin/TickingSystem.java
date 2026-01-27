@@ -1,20 +1,12 @@
 package com.example.plugin;
 
-import com.example.plugin.structs.ExampleBlock;
-import com.example.plugin.utils.BlockUtils;
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
+import com.example.plugin.structs.TickingBlockEntity;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
-import com.hypixel.hytale.server.core.modules.block.BlockModule;
-import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.ChunkSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 /**
  * If you have a component you want to tick, make its class extend the
@@ -42,158 +34,15 @@ import javax.annotation.Nonnull;
  * Yup. Your code calls your own code. Hytale does not call any `onEntityAdded`
  * stuff for us. YOU have to listen to these events yourself and dispatch them
  */
-public class TickingSystem extends BlockTickingSystem {
+public class TickingSystem<T extends TickingBlockEntity> extends BlockTickingSystem<T> {
+
+    public TickingSystem(Supplier<ComponentType<ChunkStore, T>> supplier) {
+        super(supplier);
+    }
 
     /** SCOPE: runs on these blocks */
     @Override
     public Query<ChunkStore> getQuery() {
         return Query.and(BlockSection.getComponentType(), ChunkSection.getComponentType());
     }
-
-    private static BlockSection getTickingBlocks(@Nonnull ArchetypeChunk<ChunkStore> archetypeChunk, int index) {
-        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, BlockSection.getComponentType());
-        if (blocks == null || blocks.getTickingBlocksCountCopy() == 0) {
-            return null;
-        }
-        return blocks;
-    }
-
-    private static ChunkSection getChunkSection(@Nonnull ArchetypeChunk<ChunkStore> archetypeChunk, int index) {
-        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ChunkSection.getComponentType());
-        if (section == null) {
-            return null;
-        }
-        return section;
-    }
-
-    private static BlockComponentChunk getBlockComponentChunk(
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-        ChunkSection section
-    ) {
-        var chunkColumnReference = section.getChunkColumnReference();
-        if (chunkColumnReference == null) {
-            return null;
-        }
-        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer.getComponent(
-            chunkColumnReference,
-            BlockComponentChunk.getComponentType()
-        );
-        if (blockComponentChunk == null) {
-            return null;
-        }
-        return blockComponentChunk;
-    }
-
-    /**
-     * Tick blocks!!
-     */
-    public void tick(
-        float dt,
-        int index,
-        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
-    ) {
-        BlockSection blocks = TickingSystem.getTickingBlocks(archetypeChunk, index);
-        ChunkSection section = TickingSystem.getChunkSection(archetypeChunk, index);
-        if (blocks == null || section == null) {
-            return;
-        }
-
-        BlockComponentChunk blockComponentChunk = TickingSystem.getBlockComponentChunk(commandBuffer, section);
-        if (blockComponentChunk == null) {
-            return;
-        }
-
-        blocks.forEachTicking(blockComponentChunk, commandBuffer, section.getY(), TickingSystem::tickPassthrough);
-    }
-
-    private static Ref<ChunkStore> getBlockRef(BlockComponentChunk chunk, int localX, int localY, int localZ) {
-        return chunk.getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
-    }
-
-    @SuppressWarnings("unused")
-    private static ExampleBlock getComponent(
-        CommandBuffer<ChunkStore> commandBuffer,
-        BlockComponentChunk chunk,
-        int localX,
-        int localY,
-        int localZ
-    ) {
-        var ref = TickingSystem.getBlockRef(chunk, localX, localY, localZ);
-        if (ref == null) {
-            return null;
-        }
-
-        return commandBuffer.getComponent(ref, ExampleBlock.getComponentType());
-    }
-
-    @SuppressWarnings("unused")
-    private static BlockModule.BlockStateInfo getInfo(
-        CommandBuffer<ChunkStore> commandBuffer,
-        BlockComponentChunk chunk,
-        int localX,
-        int localY,
-        int localZ
-    ) {
-        var ref = TickingSystem.getBlockRef(chunk, localX, localY, localZ);
-        if (ref == null) {
-            return null;
-        }
-
-        return BlockUtils.getInfo(commandBuffer, ref);
-    }
-
-    @Nonnull
-    private static BlockTickStrategy tickPassthrough(
-        BlockComponentChunk chunk,
-        CommandBuffer<ChunkStore> commandBuffer,
-        int localX,
-        int localY,
-        int localZ,
-        int blockId
-    ) {
-        // Get a ref to the block we're ticking
-        var ref = BlockUtils.getRef(chunk, localX, localY, localZ);
-        if (ref == null) {
-            return BlockTickStrategy.IGNORED;
-        }
-
-        // Get the chunk it's located in
-        var worldChunk = BlockUtils.getWorldChunk(commandBuffer, ref);
-        if (worldChunk == null) {
-            return BlockTickStrategy.CONTINUE;
-        }
-
-        // Get a ref to the component we're actually interested in
-        var coords = BlockUtils.toGlobalCoords(worldChunk, localX, localY, localZ);
-        var block = BlockUtils.getComponent(ExampleBlock::getComponentType, commandBuffer, ref);
-
-        return block.onTick(
-            worldChunk.getWorld(),
-            worldChunk,
-            coords.x,
-            coords.y,
-            coords.z,
-            BlockUtils.getBlockId("RileysBlock")
-        );
-    }
-
-    // @Override
-    // public void tick(
-    //     float dt,
-    //     int index,
-    //     @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-    //     @Nonnull Store<ChunkStore> store,
-    //     @Nonnull CommandBuffer<ChunkStore> commandBuffer
-    // ) {
-    //     // Sanity check - validate our component is on here
-    //     Ref<ChunkStore> ref = archetypeChunk.getReferenceTo(index);
-    //     if (!BlockUtils.hasComponent(commandBuffer, ref, RileysTickingComponent::getComponentType)) {
-    //         return;
-    //     }
-
-    //     // TICK
-    //     TickingSystem.tickBlock(commandBuffer, ref);
-    // }
 }

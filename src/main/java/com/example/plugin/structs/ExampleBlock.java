@@ -4,7 +4,6 @@ import com.example.plugin.interfaces.ModdedServerPlugin;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
@@ -14,7 +13,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class ExampleBlock implements Component<ChunkStore> {
+public class ExampleBlock implements TickingBlockEntity {
 
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
