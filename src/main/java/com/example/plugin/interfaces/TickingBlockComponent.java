@@ -1,4 +1,4 @@
-package com.example.plugin.structs;
+package com.example.plugin.interfaces;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
-public interface TickingBlockEntity extends Component<ChunkStore> {
+public interface TickingBlockComponent extends Component<ChunkStore> {
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     // Ticking a block? Just need some damn code to run in game while testing? put it in here!

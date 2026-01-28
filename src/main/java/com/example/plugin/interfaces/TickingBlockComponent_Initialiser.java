@@ -1,6 +1,5 @@
-package com.example.plugin;
+package com.example.plugin.interfaces;
 
-import com.example.plugin.structs.ExampleBlock;
 import com.example.plugin.utils.BlockUtils;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,11 +8,18 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
-import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
-public class Initialiser extends RefSystem<ChunkStore> {
+public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
+
+    private Query<ChunkStore> query;
+
+    public TickingBlockComponent_Initialiser(Query<ChunkStore> query) {
+        this.query = query;
+    }
+
+    protected TickingBlockComponent_Initialiser() {}
 
     /**
      * If you have blocks that you want to "tick", you need to "initialise" them
@@ -37,8 +43,10 @@ public class Initialiser extends RefSystem<ChunkStore> {
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {}
 
+    // Example: I override `getQuery` and use the following
+    // `return Query.and(BlockModule.BlockStateInfo.getComponentType(), ExampleTickingComponent.getComponentType());`
     @Override
     public Query<ChunkStore> getQuery() {
-        return Query.and(BlockModule.BlockStateInfo.getComponentType(), ExampleBlock.getComponentType());
+        return this.query;
     }
 }

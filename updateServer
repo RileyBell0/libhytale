@@ -1,0 +1,23 @@
+#!/bin/bash
+
+HYTALE_HOME=~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/install/release/package/game/latest
+printf "\nUpdating Hytale Server resources from:\n"
+printf "$HYTALE_HOME\n\n"
+
+
+printf "Removing files...\n"
+if [[ -f libs/HytaleServer.jar ]]; then
+    printf "  Removing | libs/HytaleServer.jar\n"
+    rm libs/HytaleServer.jar
+fi
+if [[ -f libs/Assets.zip ]]; then
+    printf "  Removing | libs/Assets.zip\n"
+    rm libs/Assets.zip
+fi
+
+printf "Copying files...\n"
+printf "  Copying  | HytaleServer.jar  ->  libs/HytaleServer.jar\n"
+cp $HYTALE_HOME/Server/HytaleServer.jar libs/
+
+printf "  Copying  | Assets.zip        ->  libs/Assets.zip\n"
+cp $HYTALE_HOME/Assets.zip libs/

@@ -1,6 +1,6 @@
-package com.example.plugin.structs;
+package com.example.plugin.examples;
 
-import com.example.plugin.interfaces.ModdedServerPlugin;
+import com.example.plugin.interfaces.ModPlugin;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -17,14 +17,13 @@ import javax.annotation.Nonnull;
  * - has data/state
  * - saves said data/state
  */
-public class DataComponent implements Component<ChunkStore> {
+public class UNUSED_ExampleNonTickingBlockComponent implements Component<ChunkStore> {
 
     private Boolean exampleField = true;
 
     // //////////////////////////////
     // SERIALIZATION (saving/loading for next time you log into your server)
     // //////////////////////////////
-
     /**
      * This is where you define how to serialise your object to disk and deserialise
      * it again
@@ -38,9 +37,9 @@ public class DataComponent implements Component<ChunkStore> {
      * an entry here
      */
     @Nonnull
-    public static final BuilderCodec<DataComponent> CODEC = BuilderCodec.builder(
-        DataComponent.class,
-        DataComponent::new
+    public static final BuilderCodec<UNUSED_ExampleNonTickingBlockComponent> CODEC = BuilderCodec.builder(
+        UNUSED_ExampleNonTickingBlockComponent.class,
+        UNUSED_ExampleNonTickingBlockComponent::new
         // Optional third parameter: an existing codec you want to extend/inherit from
     )
         // use `.append` for each and every property you define that you want saved AND
@@ -72,10 +71,10 @@ public class DataComponent implements Component<ChunkStore> {
     // //////////////////////////////
 
     // Example constructor
-    public DataComponent() {}
+    public UNUSED_ExampleNonTickingBlockComponent() {}
 
     // Example constructor
-    public DataComponent(Boolean exampleField) {
+    public UNUSED_ExampleNonTickingBlockComponent(Boolean exampleField) {
         this.exampleField = exampleField;
     }
 
@@ -87,7 +86,7 @@ public class DataComponent implements Component<ChunkStore> {
      *
      * effectively, this should be functional, immutable kinda vibes
      */
-    public DataComponent(DataComponent self) {
+    public UNUSED_ExampleNonTickingBlockComponent(UNUSED_ExampleNonTickingBlockComponent self) {
         this.exampleField = self.exampleField;
     }
 
@@ -97,60 +96,61 @@ public class DataComponent implements Component<ChunkStore> {
      * accidentally have the clone own and mutate your data!!
      */
     public Component<ChunkStore> clone() {
-        return new DataComponent(this);
+        return new UNUSED_ExampleNonTickingBlockComponent(this);
     }
 
     // //////////////////////////////
-    // BOILERPLATE
+    // BOILERPLATE - there's a bunch of boilerplate to make life easy
     // //////////////////////////////
-    @Nonnull
-    public static final String ID = DataComponent.class.getName();
 
-    private static ComponentType<ChunkStore, DataComponent> componentType;
+    @Nonnull
+    public static final String ID = UNUSED_ExampleNonTickingBlockComponent.class.getName();
+
+    private static ComponentType<ChunkStore, UNUSED_ExampleNonTickingBlockComponent> componentType;
 
     /**
-     * This function is here to make it easier to register your block, no more
-     * remembering "what the fuck am i meant to type in?"
+     * Registers your component to the given plugin.
      *
-     * just, call "CustomBlock.register(this)" in your plugin and DONE
-     *
-     * @param plugin
-     * @return
+     * Call `NameOfThisClass.registerToPlugin(this);` in your plugin's setup method
      */
-    public static ComponentType<ChunkStore, DataComponent> registerToPlugin(ModdedServerPlugin plugin) {
+    public static ComponentType<ChunkStore, UNUSED_ExampleNonTickingBlockComponent> registerToPlugin(ModPlugin plugin) {
         var component = plugin
             .getChunkStoreRegistry()
-            .registerComponent(DataComponent.class, DataComponent.ID, DataComponent.CODEC);
+            .registerComponent(
+                UNUSED_ExampleNonTickingBlockComponent.class,
+                UNUSED_ExampleNonTickingBlockComponent.ID,
+                UNUSED_ExampleNonTickingBlockComponent.CODEC
+            );
 
-        plugin.addToRegister(DataComponent.ID, component);
+        plugin.addToRegister(UNUSED_ExampleNonTickingBlockComponent.ID, component);
 
         // also keep me a copy of the component type after registering
-        DataComponent.componentType = component;
+        UNUSED_ExampleNonTickingBlockComponent.componentType = component;
 
         return component;
     }
 
     /**
-     * This function should only ever be called AFTER your plugin has finished its
-     * setup function,
-     * as otherwise we'll not have set this field yet
+     * WARNING: Only ever call this AFTER your plugin's setup function (e.g. plugin's
+     * start function, or really anywhere else in the code)
      *
-     * @return
+     * This is designed to be easy to use throughout the code, so we assume it to always succeed
+     * and it WILL always succeed as long as you register your component before calling it
      */
     @Nonnull
-    public static ComponentType<ChunkStore, DataComponent> getComponentType() {
+    public static ComponentType<ChunkStore, UNUSED_ExampleNonTickingBlockComponent> getComponentType() {
         // As long as you don't break the contract of "actually initialize the block"
         // then this will never fail
-        if (DataComponent.componentType == null) {
+        if (UNUSED_ExampleNonTickingBlockComponent.componentType == null) {
             throw new RuntimeException(
                 "Called " +
-                    DataComponent.class.getName() +
+                    UNUSED_ExampleNonTickingBlockComponent.class.getName() +
                     ".getComponentType() before plugin was setup.\nHint: make sure to call `" +
-                    DataComponent.class.getName() +
+                    UNUSED_ExampleNonTickingBlockComponent.class.getName() +
                     ".registerFor(this);` within your plugin's `setup` function "
             );
         }
 
-        return DataComponent.componentType;
+        return UNUSED_ExampleNonTickingBlockComponent.componentType;
     }
 }

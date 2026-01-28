@@ -16,7 +16,7 @@
     ],
     "BlockEntity": {
       "Components": {
-        "ExampleBlock": {},
+        "ExampleTickingBlockComponent": {},
         "ItemContainerState": {}
       }
     },

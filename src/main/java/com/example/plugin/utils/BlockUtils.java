@@ -11,6 +11,8 @@ import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
+import com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule;
+import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -112,6 +114,12 @@ import javax.annotation.Nullable;
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
 public class BlockUtils {
+
+    // This is a constant i need for checking if something its touching is a
+    // container
+    @SuppressWarnings("removal")
+    public static final ComponentType<ChunkStore, ItemContainerState> ITEM_CONTAINER_TYPE =
+        BlockStateModule.get().getComponentType(ItemContainerState.class);
 
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
@@ -339,6 +347,14 @@ public class BlockUtils {
         @Nonnull Ref<ChunkStore> ref
     ) {
         return commandBuffer.getComponent(ref, getComponentType.get());
+    }
+
+    public static <T extends Component<ChunkStore>> T getComponent(
+        @Nonnull ComponentType<ChunkStore, T> componentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
+        return commandBuffer.getComponent(ref, componentType);
     }
 
     public static <T extends Component<ChunkStore>> boolean hasComponent(

@@ -1,8 +1,8 @@
 {
   "Group": "com.example",
-  "Name": "RileysPlugin",
+  "Name": "ExamplePlugin",
   "Version": "1.0.0",
-  "Main": "com.example.plugin.RileysPlugin",
+  "Main": "com.example.plugin.ExamplePlugin",
   "IncludesAssetPack": true,
   "Dependencies": {
     "Hytale:EntityModule": "*",

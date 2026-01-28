@@ -1,12 +1,12 @@
-package com.example.plugin;
+package com.example.plugin.interfaces;
 
-import com.example.plugin.structs.TickingBlockEntity;
 import com.example.plugin.utils.BlockUtils;
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
@@ -30,14 +30,36 @@ import javax.annotation.Nonnull;
  * its designed to "just work" for people that don't need super advanced features (or all
  * the variables they might not be using)
  */
-public class BlockTickingSystem<T extends TickingBlockEntity> extends ChunkBlockTickSystem.Ticking {
+public class TickingBlockComponent_System<T extends TickingBlockComponent> extends ChunkBlockTickSystem.Ticking {
 
-    private Supplier<ComponentType<ChunkStore, T>> supplier;
+    private Supplier<ComponentType<ChunkStore, T>> supplier = null;
+    private ComponentType<ChunkStore, T> tickingComponentType = null;
 
-    // e.g. i use ExampleBlock::getComponentType for my supplier
-    public BlockTickingSystem(Supplier<ComponentType<ChunkStore, T>> supplier) {
+    /**
+     * @param supplier A function that gives the type of the component you're wanting to tick
+     *                 e.g. I'd normally use MyComponent::getComponentType
+     *
+     *                 but HOW do I use that? easy -> dodgy (ish) code. When my component is
+     *                 registered i initialise its ComponentType field with what i got back from
+     *                 registering it to the plugin
+     *
+     *                 so what if this static method gets called before its registered?
+     *
+     *                 shit breaks
+     *
+     *                 just don't do something weird and try and use a non-registered component and you'll be fine
+     *
+     *                 it will ALWAYS work after the block is regsitered. so yeah, it's a bit dodgy
+     *                 but, importantly, who cares, it works!
+     */
+    public TickingBlockComponent_System(Supplier<ComponentType<ChunkStore, T>> supplier) {
         super();
         this.supplier = supplier;
+    }
+
+    public TickingBlockComponent_System(ComponentType<ChunkStore, T> tickingComponentType) {
+        super();
+        this.tickingComponentType = tickingComponentType;
     }
 
     /**
@@ -73,13 +95,16 @@ public class BlockTickingSystem<T extends TickingBlockEntity> extends ChunkBlock
         @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        BlockSection blocks = BlockTickingSystem.getTickingBlocks(archetypeChunk, index);
-        ChunkSection section = BlockTickingSystem.getChunkSection(archetypeChunk, index);
+        BlockSection blocks = TickingBlockComponent_System.getTickingBlocks(archetypeChunk, index);
+        ChunkSection section = TickingBlockComponent_System.getChunkSection(archetypeChunk, index);
         if (blocks == null || section == null) {
             return;
         }
 
-        BlockComponentChunk blockComponentChunk = BlockTickingSystem.getBlockComponentChunk(commandBuffer, section);
+        BlockComponentChunk blockComponentChunk = TickingBlockComponent_System.getBlockComponentChunk(
+            commandBuffer,
+            section
+        );
         if (blockComponentChunk == null) {
             return;
         }
@@ -113,7 +138,10 @@ public class BlockTickingSystem<T extends TickingBlockEntity> extends ChunkBlock
 
         // Get a ref to the component we're actually interested in
         var coords = BlockUtils.toGlobalCoords(worldChunk, localX, localY, localZ);
-        T block = BlockUtils.getComponent(this.supplier, commandBuffer, ref);
+        if (this.tickingComponentType == null) {
+            this.tickingComponentType = this.supplier.get();
+        }
+        T block = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, ref);
 
         return block.onTick(
             worldChunk.getWorld(),
@@ -160,5 +188,11 @@ public class BlockTickingSystem<T extends TickingBlockEntity> extends ChunkBlock
             return null;
         }
         return blockComponentChunk;
+    }
+
+    // No touchy unless you know what you're doing. You probably don't need to touch this
+    @Override
+    public Query<ChunkStore> getQuery() {
+        return Query.and(BlockSection.getComponentType(), ChunkSection.getComponentType());
     }
 }
