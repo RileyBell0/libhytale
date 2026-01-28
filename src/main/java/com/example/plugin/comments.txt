@@ -1,0 +1,230 @@
+
+    // I want this one to extract from a chest it touches
+    public void tick(int x, int y, int z, ComponentAccessor<ChunkStore> cmd, World world) {
+        if (!this.isInitialized) {
+            this.firstTimeSetup(world, x, y, z);
+            this.initialize(BlockType.getAssetMap().getAsset("ExampleBlock"));
+        }
+
+        if (this.isRunning) {
+            return;
+        }
+
+        // only run every 2 seconds at most
+        if (this.tick < 60) {
+            this.tick++;
+            return;
+        }
+
+        this.tick = 0;
+
+        world.execute(() -> {
+            var maybeNextItem = this.takeItem();
+            if (maybeNextItem.isEmpty()) {
+                return;
+            }
+            var nextItem = maybeNextItem.get();
+            var asList = new ArrayList<ItemStack>();
+            asList.add(nextItem);
+
+            // now spawn that item above the block
+            var itemEntityHolders = ItemComponent.generateItemDrops(
+                    world.getEntityStore().getStore(),
+                    (List<ItemStack>) asList,
+                    new Vector3d(x, y + 1, z),
+                    Vector3f.ZERO);
+
+            if (itemEntityHolders.length > 0) {
+                world.execute(() -> world.getEntityStore().getStore().addEntities(itemEntityHolders, AddReason.SPAWN));
+            }
+        });
+    }
+
+
+    private Optional<ItemStack> takeItem() {
+        return Optional.empty();
+        // if (this.itemContainer.validateQuantity != null) {
+        // return Optional.of(this.contents);
+        // }
+
+        // var containers = this.getContainers();
+
+        // if (containers.size() == 0) {
+        // return Optional.empty();
+        // }
+
+        // for (var container : containers) {
+        // if (container.isEmpty()) {
+        // continue;
+        // }
+
+        // var items = container.removeAllItemStacks();
+
+        // var item = items.removeFirst();
+
+        // container.addItemStacks(items);
+
+        // this.contents = item;
+
+        // break;
+        // }
+
+        // if (this.contents == null) {
+        // return Optional.empty();
+        // }
+
+        // return Optional.of(this.contents);
+    }
+
+
+    private void firstTimeSetup(World world, int x, int y, int z) {
+        if (this.isInitialized) {
+            return;
+        }
+        this.isInitialized = true;
+        this.isRunning = true;
+        var surrounding = Block.getTouching(world, x, y, z);
+
+        surrounding.thenRun(() -> {
+            for (var elem : surrounding.join()) {
+                if (elem == null || !elem.isValid()) {
+                    continue;
+                }
+
+                var containerComponent = elem.getStore().ensureAndGetComponent(elem, Utils.ITEM_CONTAINER_TYPE);
+                if (containerComponent != null) {
+                    this.containers.add(elem);
+                }
+            }
+            this.isRunning = false;
+        });
+    }
+
+
+    /**
+     * Get the current state of containers from around the block
+     */
+    private ArrayList<ItemContainer> getContainers() {
+        var toRemove = new ArrayList<Integer>();
+        var containers = new ArrayList<ItemContainer>();
+
+        for (int i = 0; i < this.containers.size(); i++) {
+            var elem = this.containers.get(i);
+            if (elem == null || !elem.isValid()) {
+                toRemove.add(i);
+                continue;
+            }
+
+            var containerComponent = elem.getStore().ensureAndGetComponent(elem, Utils.ITEM_CONTAINER_TYPE);
+            if (containerComponent == null) {
+                toRemove.add(i);
+                continue;
+            }
+
+            containers.add(containerComponent.getItemContainer());
+        }
+
+        // cleanup containers we found to no longer be valid
+        for (int i : toRemove.reversed()) {
+            this.containers.remove(i);
+        }
+
+        return containers;
+    }
+
+
+
+
+/////////
+
+
+    public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        // Get blocks
+        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, BlockSection.getComponentType());
+        assert blocks != null;
+
+        // Setup section
+        if (blocks.getTickingBlocksCountCopy() == 0) {
+            return;
+        }
+        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ChunkSection.getComponentType());
+        assert section != null;
+
+        // Component chunk
+        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer
+                .getComponent(section.getChunkColumnReference(), BlockComponentChunk.getComponentType());
+        assert blockComponentChunk != null;
+
+        blocks.forEachTicking(blockComponentChunk, commandBuffer, section.getY(),
+                (blockComponentChunk1, commandBuffer1, localX, localY, localZ, blockId) -> {
+                    // get a ref to our block
+                    Ref<ChunkStore> blockRef = blockComponentChunk1
+                            .getEntityReference(ChunkUtil.indexBlockInColumn(localX, localY, localZ));
+                    if (blockRef == null) {
+                        return BlockTickStrategy.IGNORED;
+                    }
+
+                    // get the block itself from the chunk
+                    ExampleBlock exampleBlock = (ExampleBlock) commandBuffer1.getComponent(blockRef,
+                            ExampleBlock.getComponentType());
+                    if (exampleBlock == null) {
+                        return BlockTickStrategy.IGNORED;
+                    }
+
+                    // Grab the world for figuring out the global coords of our block
+                    WorldChunk worldChunk = (WorldChunk) commandBuffer
+                            .getComponent(section.getChunkColumnReference(), WorldChunk.getComponentType());
+                    int globalX = localX + (worldChunk.getX() * 32);
+                    int globalZ = localZ + (worldChunk.getZ() * 32);
+
+                    // tick our block
+                    exampleBlock.tick(globalX, localY, globalZ, commandBuffer1, worldChunk.getWorld());
+                    return BlockTickStrategy.CONTINUE;
+                });
+    }
+
+
+/////////
+
+
+
+
+// package com.example.plugin;
+
+// import javax.annotation.Nullable;
+
+// import com.hypixel.hytale.codec.builder.BuilderCodec;
+// import com.hypixel.hytale.component.Component;
+// import com.hypixel.hytale.component.ComponentType;
+// import com.hypixel.hytale.server.core.universe.world.World;
+// import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+
+// public class TickingBlock implements Component<ChunkStore> {
+
+// public static final BuilderCodec<TickingBlock> CODEC;
+
+// public TickingBlock() {
+
+// }
+
+// public static ComponentType<ChunkStore, TickingBlock> getComponentType() {
+// return ExamplePlugin.get().getTickingBlockComponentType();
+// }
+
+// public void runBlockAction(int x, int y, int z, World world) {
+// world.execute(() -> {
+// world.setBlock(x + 1, y, z, "Rock_Ice");
+// });
+// }
+
+// @Nullable
+// public Component<ChunkStore> clone() {
+// return new TickingBlock();
+// }
+
+// static {
+// CODEC = BuilderCodec.builder(TickingBlock.class, TickingBlock::new).build();
+// }
+// }
