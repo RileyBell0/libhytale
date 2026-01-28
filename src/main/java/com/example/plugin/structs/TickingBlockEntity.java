@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 public interface TickingBlockEntity extends Component<ChunkStore> {
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
-    // Ticking a block or entity? put it in here!
+    // Ticking a block? Just need some damn code to run in game while testing? put it in here!
     @Nonnull
     public default BlockTickStrategy onTick(
         @Nonnull World world,
