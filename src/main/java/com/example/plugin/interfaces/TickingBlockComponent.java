@@ -33,8 +33,11 @@ public interface TickingBlockComponent extends Component<ChunkStore> {
         int blockId
     ) {
         console.log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " )");
-
         return BlockTickStrategy.CONTINUE;
+    }
+
+    public default ComponentType<ChunkStore, ? extends TickingBlockComponent> getComponentType() {
+        return getComponentType(this.getClass());
     }
 
     /**

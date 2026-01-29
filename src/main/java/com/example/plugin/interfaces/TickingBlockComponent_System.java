@@ -32,8 +32,8 @@ import javax.annotation.Nonnull;
  */
 public class TickingBlockComponent_System<T extends TickingBlockComponent> extends ChunkBlockTickSystem.Ticking {
 
-    private Supplier<ComponentType<ChunkStore, T>> supplier = null;
-    private ComponentType<ChunkStore, T> tickingComponentType = null;
+    @Nonnull
+    private ComponentType<ChunkStore, T> tickingComponentType;
 
     /**
      * @param supplier A function that gives the type of the component you're wanting to tick
@@ -54,12 +54,12 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
      */
     public TickingBlockComponent_System(Supplier<ComponentType<ChunkStore, T>> supplier) {
         super();
-        this.supplier = supplier;
+        this.tickingComponentType = supplier.get();
     }
 
     public TickingBlockComponent_System(Class<T> componentClass) {
         super();
-        this.supplier = () -> TickingBlockComponent.getComponentType(componentClass);
+        this.tickingComponentType = TickingBlockComponent.getComponentType(componentClass);
     }
 
     public TickingBlockComponent_System(ComponentType<ChunkStore, T> tickingComponentType) {
@@ -143,9 +143,6 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
 
         // Get a ref to the component we're actually interested in
         var coords = BlockUtils.toGlobalCoords(worldChunk, localX, localY, localZ);
-        if (this.tickingComponentType == null) {
-            this.tickingComponentType = this.supplier.get();
-        }
         T block = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, ref);
 
         return block.onTick(
@@ -158,6 +155,7 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         );
     }
 
+    // some knowledge of what this does, but really no clue. lifted it from hytale's code
     protected static final BlockSection getTickingBlocks(
         @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
         int index
@@ -169,6 +167,7 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         return blocks;
     }
 
+    // no clue what this does, lifted it from hytale's code
     protected static final ChunkSection getChunkSection(@Nonnull ArchetypeChunk<ChunkStore> archetypeChunk, int index) {
         ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ChunkSection.getComponentType());
         if (section == null) {
@@ -177,6 +176,7 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         return section;
     }
 
+    // no clue what this does, lifted it from hytale's code
     protected static final BlockComponentChunk getBlockComponentChunk(
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         ChunkSection section
@@ -196,6 +196,7 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
     }
 
     // No touchy unless you know what you're doing. You probably don't need to touch this
+    // heck, i dont even know what it does really
     @Override
     public Query<ChunkStore> getQuery() {
         return Query.and(BlockSection.getComponentType(), ChunkSection.getComponentType());

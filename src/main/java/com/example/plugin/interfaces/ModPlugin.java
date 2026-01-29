@@ -86,10 +86,8 @@ public abstract class ModPlugin extends JavaPlugin {
      *
      * Call `NameOfThisClass.register(this);` in your plugin's setup method
      */
-    public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> easyRegisterComponent(
-        Class<T> myClass,
-        BuilderCodec<T> codec
-    ) {
+    public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> easyRegisterComponent(BuilderCodec<T> codec) {
+        var myClass = codec.getInnerClass();
         var defaultId = myClass.getSimpleName();
         var component = this.getChunkStoreRegistry().registerComponent(myClass, defaultId, codec);
 
@@ -100,14 +98,14 @@ public abstract class ModPlugin extends JavaPlugin {
     }
 
     /**
-     * Registers your component to the given plugin.
+     * Registers your component to the plugin.
      *
-     * Call `NameOfThisClass.register(this);` in your plugin's setup method
+     * Note: this method is "easy" because we default the ID to the name of your class
+     * Also, we get your class from the codec itself
      */
     public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> easyRegisterTickingComponent(
-        Class<T> myClass,
         BuilderCodec<T> codec
     ) {
-        return this.registerTickingBlock(this.easyRegisterComponent(myClass, codec));
+        return this.registerTickingBlock(this.easyRegisterComponent(codec));
     }
 }
