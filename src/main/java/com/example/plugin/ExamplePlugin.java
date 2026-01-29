@@ -13,6 +13,6 @@ public class ExamplePlugin extends ModPlugin {
 
     @Override
     protected void setup() {
-        this.easyRegisterTickingComponent(ExampleTickingBlockComponent.CODEC);
+        this.setupTickingComponent(ExampleTickingBlockComponent.CODEC);
     }
 }
