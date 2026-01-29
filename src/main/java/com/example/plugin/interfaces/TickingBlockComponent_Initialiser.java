@@ -56,7 +56,9 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
         @Nonnull RemoveReason reason,
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
-    ) {}
+    ) {
+        // BlockUtils.setTicking(commandBuffer, ref, false);
+    }
 
     // Example: I override `getQuery` and use the following
     // `return Query.and(BlockModule.BlockStateInfo.getComponentType(), ExampleTickingComponent.getComponentType());`

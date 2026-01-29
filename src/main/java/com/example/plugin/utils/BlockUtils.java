@@ -200,7 +200,6 @@ public class BlockUtils {
         return new Vector3i(x, y, z);
     }
 
-    // get the chunk for a given block
     @Nullable
     public static Vector3i getGlobalCoords(
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
@@ -211,6 +210,12 @@ public class BlockUtils {
             return null;
         }
 
+        var localCoords = BlockUtils.getLocalCoords(info);
+        return BlockUtils.toGlobalCoords(chunk, localCoords);
+    }
+
+    @Nullable
+    public static Vector3i getGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull BlockModule.BlockStateInfo info) {
         var localCoords = BlockUtils.getLocalCoords(info);
         return BlockUtils.toGlobalCoords(chunk, localCoords);
     }

@@ -7,10 +7,7 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
-import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
-import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
-import com.hypixel.hytale.server.core.universe.world.chunk.section.ChunkSection;
+import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -100,105 +97,34 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        BlockSection blocks = TickingBlockComponent_System.getTickingBlocks(archetypeChunk, index);
-        ChunkSection section = TickingBlockComponent_System.getChunkSection(archetypeChunk, index);
-        if (blocks == null || section == null) {
-            return;
-        }
-
-        BlockComponentChunk blockComponentChunk = TickingBlockComponent_System.getBlockComponentChunk(
-            commandBuffer,
-            section
-        );
-        if (blockComponentChunk == null) {
-            return;
-        }
-
-        blocks.forEachTicking(blockComponentChunk, commandBuffer, section.getY(), this::tickBlock);
-    }
-
-    /**
-     * Literally just the contents of BlockSection::forEachTicking (cause i just, hate indentation)
-     */
-    @Nonnull
-    protected final BlockTickStrategy tickBlock(
-        BlockComponentChunk chunk,
-        CommandBuffer<ChunkStore> commandBuffer,
-        int localX,
-        int localY,
-        int localZ,
-        int blockId
-    ) {
-        // Get a ref to the block we're ticking
-        var ref = BlockUtils.getRef(chunk, localX, localY, localZ);
+        var ref = archetypeChunk.getComponent(index, BlockModule.BlockStateInfo.getComponentType());
         if (ref == null) {
-            return BlockTickStrategy.IGNORED;
+            return;
+        }
+
+        var block = archetypeChunk.getComponent(index, this.tickingComponentType);
+        if (block == null) {
+            return;
         }
 
         // Get the chunk it's located in
         var worldChunk = BlockUtils.getWorldChunk(commandBuffer, ref);
         if (worldChunk == null) {
-            return BlockTickStrategy.CONTINUE;
+            return;
         }
 
-        // Get a ref to the component we're actually interested in
-        var coords = BlockUtils.toGlobalCoords(worldChunk, localX, localY, localZ);
-        T block = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, ref);
-
-        return block.onTick(
-            worldChunk.getWorld(),
-            worldChunk,
-            coords.x,
-            coords.y,
-            coords.z,
-            worldChunk.getBlock(coords)
-        );
-    }
-
-    // some knowledge of what this does, but really no clue. lifted it from hytale's code
-    protected static final BlockSection getTickingBlocks(
-        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        int index
-    ) {
-        BlockSection blocks = (BlockSection) archetypeChunk.getComponent(index, BlockSection.getComponentType());
-        if (blocks == null || blocks.getTickingBlocksCountCopy() == 0) {
-            return null;
+        var coords = BlockUtils.getGlobalCoords(worldChunk, ref);
+        if (coords == null) {
+            return;
         }
-        return blocks;
-    }
 
-    // no clue what this does, lifted it from hytale's code
-    protected static final ChunkSection getChunkSection(@Nonnull ArchetypeChunk<ChunkStore> archetypeChunk, int index) {
-        ChunkSection section = (ChunkSection) archetypeChunk.getComponent(index, ChunkSection.getComponentType());
-        if (section == null) {
-            return null;
-        }
-        return section;
-    }
-
-    // no clue what this does, lifted it from hytale's code
-    protected static final BlockComponentChunk getBlockComponentChunk(
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-        ChunkSection section
-    ) {
-        var chunkColumnReference = section.getChunkColumnReference();
-        if (chunkColumnReference == null) {
-            return null;
-        }
-        BlockComponentChunk blockComponentChunk = (BlockComponentChunk) commandBuffer.getComponent(
-            chunkColumnReference,
-            BlockComponentChunk.getComponentType()
-        );
-        if (blockComponentChunk == null) {
-            return null;
-        }
-        return blockComponentChunk;
+        block.onTick(worldChunk.getWorld(), worldChunk, coords.x, coords.y, coords.z, worldChunk.getBlock(coords));
     }
 
     // No touchy unless you know what you're doing. You probably don't need to touch this
     // heck, i dont even know what it does really
     @Override
     public Query<ChunkStore> getQuery() {
-        return Query.and(BlockSection.getComponentType(), ChunkSection.getComponentType());
+        return Query.and(this.tickingComponentType);
     }
 }
