@@ -1,5 +1,6 @@
 package com.example.plugin.examples;
 
+import com.example.plugin.interfaces.TickingBlockComponent;
 import com.example.plugin.interfaces.TickingBlockComponent_Initialiser;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
@@ -15,7 +16,7 @@ public class ExampleTickingBlockComponent__Initialiser extends TickingBlockCompo
     public Query<ChunkStore> getQuery() {
         return Query.and(
             BlockModule.BlockStateInfo.getComponentType(),
-            ExampleTickingBlockComponent.getComponentType()
+            TickingBlockComponent.getComponentType(ExampleTickingBlockComponent.class)
         );
     }
 }

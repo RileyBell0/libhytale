@@ -57,6 +57,11 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         this.supplier = supplier;
     }
 
+    public TickingBlockComponent_System(Class<T> componentClass) {
+        super();
+        this.supplier = () -> TickingBlockComponent.getComponentType(componentClass);
+    }
+
     public TickingBlockComponent_System(ComponentType<ChunkStore, T> tickingComponentType) {
         super();
         this.tickingComponentType = tickingComponentType;

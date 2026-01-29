@@ -12,6 +12,6 @@ import com.example.plugin.interfaces.TickingBlockComponent_System;
 public class ExampleTickingBlockComponent__System extends TickingBlockComponent_System<ExampleTickingBlockComponent> {
 
     public ExampleTickingBlockComponent__System() {
-        super(ExampleTickingBlockComponent::getComponentType);
+        super(ExampleTickingBlockComponent.class);
     }
 }

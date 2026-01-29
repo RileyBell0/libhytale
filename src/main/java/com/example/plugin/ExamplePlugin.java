@@ -12,11 +12,9 @@ public class ExamplePlugin extends ModPlugin {
         super(init);
     }
 
+    @Override
     protected void setup() {
-        super.setup();
-
-        // REQUIRED: register all pluigin components
-        ExampleTickingBlockComponent.registerToPluginWithNewSystems(this);
+        this.easyRegisterComponent(ExampleTickingBlockComponent.class, ExampleTickingBlockComponent.CODEC);
     }
 
     // If you haven't already setup your ticking blocks, you have two main reccomended approaches to chose from
