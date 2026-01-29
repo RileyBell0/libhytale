@@ -1,6 +1,5 @@
 package com.example.plugin.examples;
 
-import com.example.plugin.interfaces.ModPlugin;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -107,28 +106,6 @@ public class UNUSED_ExampleNonTickingBlockComponent implements Component<ChunkSt
     public static final String ID = UNUSED_ExampleNonTickingBlockComponent.class.getName();
 
     private static ComponentType<ChunkStore, UNUSED_ExampleNonTickingBlockComponent> componentType;
-
-    /**
-     * Registers your component to the given plugin.
-     *
-     * Call `NameOfThisClass.registerToPlugin(this);` in your plugin's setup method
-     */
-    public static ComponentType<ChunkStore, UNUSED_ExampleNonTickingBlockComponent> registerToPlugin(ModPlugin plugin) {
-        var component = plugin
-            .getChunkStoreRegistry()
-            .registerComponent(
-                UNUSED_ExampleNonTickingBlockComponent.class,
-                UNUSED_ExampleNonTickingBlockComponent.ID,
-                UNUSED_ExampleNonTickingBlockComponent.CODEC
-            );
-
-        plugin.addToRegister(UNUSED_ExampleNonTickingBlockComponent.ID, component);
-
-        // also keep me a copy of the component type after registering
-        UNUSED_ExampleNonTickingBlockComponent.componentType = component;
-
-        return component;
-    }
 
     /**
      * WARNING: Only ever call this AFTER your plugin's setup function (e.g. plugin's
