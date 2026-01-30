@@ -80,23 +80,8 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // IF YOU WANT TO OVERWRITE THIS, simply @Override the tick method itself,
-        // because, well, if you're out here overwriting my _tickAllBlocks method
-        // you probably know more than i do, write it from scratch, if you have improvements
-        // please submit a PR they're much appreciated
-        this._tickAllBlocks(index, archetypeChunk, commandBuffer);
-    }
+        // because, well, i just kinda wrote stuff here until stuff worked
 
-    /**
-     * Tick blocks!!
-     * this is my default implementation, seemed general enough and good enough that i don't wanna
-     * touch it anymore. Feel free to modify it if you need, but i made it private specifically
-     * to say "hey, don't like try and do schenanigans, just overwrite my process, seriously this is not a stable API"
-     */
-    private final void _tickAllBlocks(
-        int index,
-        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
-    ) {
         var ref = archetypeChunk.getComponent(index, BlockModule.BlockStateInfo.getComponentType());
         if (ref == null) {
             return;

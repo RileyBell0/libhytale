@@ -28,8 +28,6 @@ public abstract class ModPlugin extends JavaPlugin {
         super.setup0();
     }
 
-    protected void setup() {}
-
     /**
      * Register the specified component via codec. Does NOT setup system/initialiser.
      * Useful especially for non-ticking components

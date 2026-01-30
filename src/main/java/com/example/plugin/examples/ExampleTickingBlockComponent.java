@@ -38,6 +38,7 @@ public class ExampleTickingBlockComponent implements TickingBlockComponent {
 
     /**
      * Run actions every tick
+     * TODO have the caller actually process and handle blocktickstrategy
      */
     @Nonnull
     public BlockTickStrategy onTick(
