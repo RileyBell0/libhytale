@@ -1,6 +1,6 @@
-package com.example.plugin.examples;
+package dev.twunk.examples;
 
-import com.example.plugin.interfaces.TickingBlockComponent_Initialiser;
+import dev.twunk.interfaces.TickingBlockComponent_Initialiser;
 
 // Unused. Though, that's as simple as it gets
 public class ExampleTickingBlockComponent__Initialiser extends TickingBlockComponent_Initialiser {

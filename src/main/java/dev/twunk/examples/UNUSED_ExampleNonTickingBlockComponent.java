@@ -1,4 +1,4 @@
-package com.example.plugin.examples;
+package dev.twunk.examples;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -103,6 +103,7 @@ public class UNUSED_ExampleNonTickingBlockComponent implements Component<ChunkSt
     // //////////////////////////////
 
     @Nonnull
+    @SuppressWarnings("null")
     public static final String ID = UNUSED_ExampleNonTickingBlockComponent.class.getName();
 
     private static ComponentType<ChunkStore, UNUSED_ExampleNonTickingBlockComponent> componentType;

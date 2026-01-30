@@ -1,8 +1,7 @@
-package com.example.plugin;
+package dev.twunk.examples;
 
-import com.example.plugin.examples.ExampleTickingBlockComponent;
-import com.example.plugin.interfaces.ModPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import dev.twunk.interfaces.ModPlugin;
 import javax.annotation.Nonnull;
 
 public class ExamplePlugin extends ModPlugin {

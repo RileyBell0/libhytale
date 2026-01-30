@@ -1,6 +1,5 @@
-package com.example.plugin.interfaces;
+package dev.twunk.interfaces;
 
-import com.example.plugin.utils.BlockUtils;
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,6 +8,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
@@ -49,17 +49,22 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
      *                 it will ALWAYS work after the block is regsitered. so yeah, it's a bit dodgy
      *                 but, importantly, who cares, it works!
      */
-    public TickingBlockComponent_System(Supplier<ComponentType<ChunkStore, T>> supplier) {
+    public TickingBlockComponent_System(@Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
         super();
-        this.tickingComponentType = supplier.get();
+        var val = supplier.get();
+        if (val == null) {
+            throw new RuntimeException("HECK supplier failed");
+        }
+
+        this.tickingComponentType = val;
     }
 
-    public TickingBlockComponent_System(Class<T> componentClass) {
+    public TickingBlockComponent_System(@Nonnull Class<T> componentClass) {
         super();
         this.tickingComponentType = TickingBlockComponent.getComponentType(componentClass);
     }
 
-    public TickingBlockComponent_System(ComponentType<ChunkStore, T> tickingComponentType) {
+    public TickingBlockComponent_System(@Nonnull ComponentType<ChunkStore, T> tickingComponentType) {
         super();
         this.tickingComponentType = tickingComponentType;
     }
@@ -82,7 +87,11 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         // IF YOU WANT TO OVERWRITE THIS, simply @Override the tick method itself,
         // because, well, i just kinda wrote stuff here until stuff worked
 
-        var ref = archetypeChunk.getComponent(index, BlockModule.BlockStateInfo.getComponentType());
+        var blockInfoComponentType = BlockModule.BlockStateInfo.getComponentType();
+        if (blockInfoComponentType == null) {
+            return;
+        }
+        var ref = archetypeChunk.getComponent(index, blockInfoComponentType);
         if (ref == null) {
             return;
         }
@@ -99,11 +108,12 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         }
 
         var coords = BlockUtils.getGlobalCoords(worldChunk, ref);
-        if (coords == null) {
+        var world = worldChunk.getWorld();
+        if (world == null) {
             return;
         }
 
-        block.onTick(worldChunk.getWorld(), worldChunk, coords.x, coords.y, coords.z, worldChunk.getBlock(coords));
+        block.onTick(world, worldChunk, coords.x, coords.y, coords.z, worldChunk.getBlock(coords));
     }
 
     // No touchy unless you know what you're doing. You probably don't need to touch this

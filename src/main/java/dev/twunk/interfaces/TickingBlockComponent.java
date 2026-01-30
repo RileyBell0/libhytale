@@ -1,4 +1,4 @@
-package com.example.plugin.interfaces;
+package dev.twunk.interfaces;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -11,7 +11,6 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 public interface TickingBlockComponent extends Component<ChunkStore> {
-    public static final String RILEY = "test";
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     static HashMap<

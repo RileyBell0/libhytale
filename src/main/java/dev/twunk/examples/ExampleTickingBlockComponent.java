@@ -1,6 +1,5 @@
-package com.example.plugin.examples;
+package dev.twunk.examples;
 
-import com.example.plugin.interfaces.TickingBlockComponent;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -8,6 +7,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
+import dev.twunk.interfaces.TickingBlockComponent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

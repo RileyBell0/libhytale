@@ -2,8 +2,8 @@ plugins {
     id("java")
 }
 
-group = "com.example"
-version = "1.0-SNAPSHOT"
+group = "dev.twunk"
+version = "0.1.0"
 
 repositories {
     mavenCentral()

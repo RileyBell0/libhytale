@@ -1,4 +1,4 @@
-package com.example.plugin.interfaces;
+package dev.twunk.interfaces;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
@@ -34,9 +34,13 @@ public abstract class ModPlugin extends JavaPlugin {
      *
      * If you want that to be auto-registered, call `setupTickingComponent` instead
      */
+    @Nonnull
     public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> registerComponent(BuilderCodec<T> codec) {
         var myClass = codec.getInnerClass();
         var defaultId = myClass.getSimpleName();
+        if (defaultId == null) {
+            throw new RuntimeException("HECK, for some reason couldn't get the simple classname");
+        }
 
         var component = this.getChunkStoreRegistry().registerComponent(myClass, defaultId, codec);
 
@@ -59,15 +63,22 @@ public abstract class ModPlugin extends JavaPlugin {
     /**
      * Setup system/initialiser for the given component type
      */
+    @Nonnull
     public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> setupTickingComponent(
         @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier
     ) {
-        return this.setupTickingComponent(supplier.get());
+        var val = supplier.get();
+        if (val == null) {
+            throw new RuntimeException("ERROR - supplier failed");
+        }
+
+        return this.setupTickingComponent(val);
     }
 
     /**
      * Setup system/initialiser for the given component type
      */
+    @Nonnull
     public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> setupTickingComponent(
         @Nonnull ComponentType<ChunkStore, T> componentType
     ) {

@@ -1,6 +1,5 @@
-package com.example.plugin.interfaces;
+package dev.twunk.interfaces;
 
-import com.example.plugin.utils.BlockUtils;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -10,6 +9,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.utils.BlockUtils;
 import javax.annotation.Nonnull;
 
 public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {

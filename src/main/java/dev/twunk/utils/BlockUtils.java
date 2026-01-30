@@ -1,4 +1,4 @@
-package com.example.plugin.utils;
+package dev.twunk.utils;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
@@ -191,6 +191,7 @@ public class BlockUtils {
     }
 
     // Get the local coords of the block in its chunk
+    @Nonnull
     public static Vector3i getLocalCoords(@Nonnull BlockModule.BlockStateInfo info) {
         var indexInChunk = info.getIndex();
         int x = ChunkUtil.xFromBlockInColumn(indexInChunk);
@@ -214,7 +215,7 @@ public class BlockUtils {
         return BlockUtils.toGlobalCoords(chunk, localCoords);
     }
 
-    @Nullable
+    @Nonnull
     public static Vector3i getGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull BlockModule.BlockStateInfo info) {
         var localCoords = BlockUtils.getLocalCoords(info);
         return BlockUtils.toGlobalCoords(chunk, localCoords);
@@ -228,6 +229,7 @@ public class BlockUtils {
         return new Vector3i(globalX, localY, globalZ);
     }
 
+    @Nonnull
     public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull Vector3i localCoords) {
         return BlockUtils.toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
     }
@@ -342,8 +344,12 @@ public class BlockUtils {
         if (ref == null) {
             return null;
         }
+        var componentType = getComponentType.get();
+        if (componentType == null) {
+            return null;
+        }
 
-        return commandBuffer.getComponent(ref, getComponentType.get());
+        return commandBuffer.getComponent(ref, componentType);
     }
 
     public static <T extends Component<ChunkStore>> T getComponent(
@@ -351,7 +357,11 @@ public class BlockUtils {
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull Ref<ChunkStore> ref
     ) {
-        return commandBuffer.getComponent(ref, getComponentType.get());
+        var componentType = getComponentType.get();
+        if (componentType == null) {
+            return null;
+        }
+        return commandBuffer.getComponent(ref, componentType);
     }
 
     public static <T extends Component<ChunkStore>> T getComponent(
@@ -367,7 +377,12 @@ public class BlockUtils {
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull Ref<ChunkStore> ref
     ) {
-        return (T) commandBuffer.getComponent(ref, getComponentType.get()) != null;
+        var componentType = getComponentType.get();
+        if (componentType == null) {
+            return false;
+        }
+
+        return (T) commandBuffer.getComponent(ref, componentType) != null;
     }
 
     /**

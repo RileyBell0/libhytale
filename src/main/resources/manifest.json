@@ -1,8 +1,8 @@
 {
-  "Group": "com.example",
+  "Group": "dev.twunk",
   "Name": "ExamplePlugin",
   "Version": "1.0.0",
-  "Main": "com.example.plugin.ExamplePlugin",
+  "Main": "dev.twunk.ExamplePlugin",
   "IncludesAssetPack": true,
   "Dependencies": {
     "Hytale:EntityModule": "*",

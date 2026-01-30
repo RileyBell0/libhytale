@@ -64,7 +64,7 @@ This will display a title message saying "Hello world!" to the player.
 ## Project Structure
 
 ```
-src/main/java/com/example/plugin/
+src/main/java/dev.twunk/
 ├── HelloPlugin.java    # Main plugin class
 └── HelloCommand.java   # Command implementation
 ```
