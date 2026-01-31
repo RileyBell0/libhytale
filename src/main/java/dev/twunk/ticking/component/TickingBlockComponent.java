@@ -1,4 +1,4 @@
-package dev.twunk.interfaces;
+package dev.twunk.ticking.component;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -7,6 +7,8 @@ import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.ticking.strategy.TickStrategy;
+import dev.twunk.ticking.strategy.TickStrategyFrequency;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 
@@ -31,6 +33,10 @@ public interface TickingBlockComponent extends Component<ChunkStore> {
 
     public default ComponentType<ChunkStore, ? extends TickingBlockComponent> getComponentType() {
         return getComponentType(this.getClass());
+    }
+
+    public default TickStrategy getTickingStrategy() {
+        return new TickStrategyFrequency();
     }
 
     /**

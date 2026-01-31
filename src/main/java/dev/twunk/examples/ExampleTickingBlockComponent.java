@@ -7,7 +7,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import dev.twunk.interfaces.TickingBlockComponent;
+import dev.twunk.ticking.component.TickingBlockComponent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -19,18 +19,17 @@ public class ExampleTickingBlockComponent implements TickingBlockComponent {
     // serializing/deserializing your vars
     @Nonnull
     public static final BuilderCodec<ExampleTickingBlockComponent> CODEC = BuilderCodec.builder(
-        ExampleTickingBlockComponent.class,
-        ExampleTickingBlockComponent::new
-    )
-        .append(
-            new KeyedCodec<Integer>("Ticks", Codec.INTEGER),
-            (data, value) -> data.ticks = value,
-            data -> data.ticks
-        )
-        .add()
-        .build();
+            ExampleTickingBlockComponent.class,
+            ExampleTickingBlockComponent::new)
+            .append(
+                    new KeyedCodec<Integer>("Ticks", Codec.INTEGER),
+                    (data, value) -> data.ticks = value,
+                    data -> data.ticks)
+            .add()
+            .build();
 
-    public ExampleTickingBlockComponent() {}
+    public ExampleTickingBlockComponent() {
+    }
 
     public ExampleTickingBlockComponent(int ticks) {
         this.ticks = ticks;
@@ -42,17 +41,16 @@ public class ExampleTickingBlockComponent implements TickingBlockComponent {
      */
     @Nonnull
     public BlockTickStrategy onTick(
-        @Nonnull World world,
-        @Nonnull WorldChunk wc,
-        int worldX,
-        int worldY,
-        int worldZ,
-        int blockId
-    ) {
+            @Nonnull World world,
+            @Nonnull WorldChunk wc,
+            int worldX,
+            int worldY,
+            int worldZ,
+            int blockId) {
         this.ticks++;
         HytaleLogger.forEnclosingClass()
-            .atInfo()
-            .log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " ) " + this.ticks + " times");
+                .atInfo()
+                .log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " ) " + this.ticks + " times");
 
         return BlockTickStrategy.CONTINUE;
     }

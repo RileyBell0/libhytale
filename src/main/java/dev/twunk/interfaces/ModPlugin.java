@@ -8,6 +8,9 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.ticking.component.TickingBlockComponent;
+import dev.twunk.ticking.system.TickingBlockComponent_Initialiser;
+import dev.twunk.ticking.system.TickingBlockComponent_System;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
@@ -28,7 +31,7 @@ public abstract class ModPlugin extends JavaPlugin {
         super.setup0();
     }
 
-    public void initGlobalTickScheduler() {
+    public void setupGlobalTickScheduler() {
         var globalScheduler = new GlobalTickScheduler();
         this.getChunkStoreRegistry().registerSystem(globalScheduler);
     }

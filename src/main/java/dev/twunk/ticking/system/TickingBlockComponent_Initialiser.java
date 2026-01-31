@@ -1,4 +1,4 @@
-package dev.twunk.interfaces;
+package dev.twunk.ticking.system;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,6 +9,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.ticking.component.TickingBlockComponent;
 import dev.twunk.utils.BlockUtils;
 import javax.annotation.Nonnull;
 
