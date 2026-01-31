@@ -28,8 +28,14 @@ public abstract class ModPlugin extends JavaPlugin {
         super.setup0();
     }
 
+    public void initGlobalTickScheduler() {
+        var globalScheduler = new GlobalTickScheduler();
+        this.getChunkStoreRegistry().registerSystem(globalScheduler);
+    }
+
     /**
-     * Register the specified component via codec. Does NOT setup system/initialiser.
+     * Register the specified component via codec. Does NOT setup
+     * system/initialiser.
      * Useful especially for non-ticking components
      *
      * If you want that to be auto-registered, call `setupTickingComponent` instead
@@ -51,11 +57,11 @@ public abstract class ModPlugin extends JavaPlugin {
     }
 
     /**
-     * Register component AND setup system/initialiser for the given component (associated by codec)
+     * Register component AND setup system/initialiser for the given component
+     * (associated by codec)
      */
     public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> setupTickingComponent(
-        @Nonnull BuilderCodec<T> codec
-    ) {
+            @Nonnull BuilderCodec<T> codec) {
         var component = registerComponent(codec);
         return this.setupTickingComponent(component);
     }
@@ -65,8 +71,7 @@ public abstract class ModPlugin extends JavaPlugin {
      */
     @Nonnull
     public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> setupTickingComponent(
-        @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier
-    ) {
+            @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
         var val = supplier.get();
         if (val == null) {
             throw new RuntimeException("ERROR - supplier failed");
@@ -80,11 +85,9 @@ public abstract class ModPlugin extends JavaPlugin {
      */
     @Nonnull
     public <T extends TickingBlockComponent> ComponentType<ChunkStore, T> setupTickingComponent(
-        @Nonnull ComponentType<ChunkStore, T> componentType
-    ) {
+            @Nonnull ComponentType<ChunkStore, T> componentType) {
         var initialiser = new TickingBlockComponent_Initialiser(
-            Query.and(BlockModule.BlockStateInfo.getComponentType(), componentType)
-        );
+                Query.and(BlockModule.BlockStateInfo.getComponentType(), componentType));
         var system = new TickingBlockComponent_System<T>(componentType);
 
         this.getChunkStoreRegistry().registerSystem(initialiser);

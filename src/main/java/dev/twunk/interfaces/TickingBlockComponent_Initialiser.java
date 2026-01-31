@@ -24,9 +24,8 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
     // up with a default query
     public TickingBlockComponent_Initialiser(Class<? extends TickingBlockComponent> componentClass) {
         this.query = Query.and(
-            BlockModule.BlockStateInfo.getComponentType(),
-            TickingBlockComponent.getComponentType(componentClass)
-        );
+                BlockModule.BlockStateInfo.getComponentType(),
+                TickingBlockComponent.getComponentType(componentClass));
     }
 
     /**
@@ -35,26 +34,27 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
      */
     @Override
     public void onEntityAdded(
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull AddReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
-    ) {
+            @Nonnull Ref<ChunkStore> ref,
+            @Nonnull AddReason reason,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
         BlockUtils.setTicking(commandBuffer, ref);
     }
 
     @Override
     public void onEntityRemove(
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull RemoveReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
-    ) {}
+            @Nonnull Ref<ChunkStore> ref,
+            @Nonnull RemoveReason reason,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+    }
 
     // Example: I override `getQuery` and use the following
-    // `return Query.and(BlockModule.BlockStateInfo.getComponentType(), ExampleTickingComponent.getComponentType());`
+    // `return Query.and(BlockModule.BlockStateInfo.getComponentType(),
+    // ExampleTickingComponent.getComponentType());`
     //
-    // and since that seems to be a common pattern, i've made a constructor that you can just pass your class
+    // and since that seems to be a common pattern, i've made a constructor that you
+    // can just pass your class
     // to, and given you've actually registered your component it'll "just work"
     @Override
     public Query<ChunkStore> getQuery() {
