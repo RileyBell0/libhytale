@@ -9,8 +9,8 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.ticking.component.TickingBlockComponent;
-import dev.twunk.ticking.system.TickingBlockComponent_Initialiser;
-import dev.twunk.ticking.system.TickingBlockComponent_System;
+import dev.twunk.ticking.component.system.TickingBlockComponent_Initialiser;
+import dev.twunk.ticking.component.system.TickingBlockComponent_System;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 

@@ -1,4 +1,4 @@
-package dev.twunk.ticking.system;
+package dev.twunk.ticking.component.system;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;

@@ -1,6 +1,6 @@
 package dev.twunk.examples;
 
-import dev.twunk.ticking.system.TickingBlockComponent_System;
+import dev.twunk.ticking.component.system.TickingBlockComponent_System;
 
 // Unused. Though, that's as simple as it gets
 public class ExampleTickingBlockComponent__System extends TickingBlockComponent_System<ExampleTickingBlockComponent> {

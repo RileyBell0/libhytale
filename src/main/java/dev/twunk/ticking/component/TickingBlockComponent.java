@@ -8,9 +8,9 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.ticking.strategy.TickStrategy;
-import dev.twunk.ticking.strategy.TickStrategyFrequency;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public interface TickingBlockComponent extends Component<ChunkStore> {
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
@@ -35,8 +35,17 @@ public interface TickingBlockComponent extends Component<ChunkStore> {
         return getComponentType(this.getClass());
     }
 
+    /**
+     * Override this to set the frequency/strategy you want your component to be
+     * ticked with
+     *
+     * Null means you DON'T want automatic ticking registered for your component
+     *
+     * RETURN NULL if you have systems that handle stuff for you instead
+     */
+    @Nullable
     public default TickStrategy getTickingStrategy() {
-        return new TickStrategyFrequency();
+        return null;
     }
 
     /**
