@@ -19,6 +19,7 @@ import dev.twunk.utils.BlockUtils;
 import javax.annotation.Nonnull;
 
 public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
+    @SuppressWarnings("unused")
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     private Query<ChunkStore> query;
@@ -45,14 +46,12 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
             @Nonnull AddReason reason,
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-
         ComponentType<ChunkStore, ModTickingAwakeComponent> tickingAwake = ModTickingAwakeComponent.getComponentType();
 
         // Ensure we have at least 1x ticking component (for queries)
         if (!BlockUtils.hasComponent(tickingAwake, commandBuffer, ref)
                 && !BlockUtils.hasComponent(ModTickingSleepComponent.getComponentType(), commandBuffer, ref)
                 && !BlockUtils.hasComponent(ModTickingIgnoredComponent.getComponentType(), commandBuffer, ref)) {
-            console.log("Adding ticking component to block " + ref);
             commandBuffer.ensureComponent(ref, tickingAwake);
         }
     }

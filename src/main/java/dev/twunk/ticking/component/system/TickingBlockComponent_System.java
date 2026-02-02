@@ -7,10 +7,6 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickManager;
-import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
-import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.ticking.component.ITickingComponent;
 import dev.twunk.ticking.component.ModTickingAwakeComponent;
@@ -41,7 +37,6 @@ import javax.annotation.Nonnull;
  * me(tick) -> store(tick) -> me(archetype's other ticking method)
  */
 public class TickingBlockComponent_System<T extends ITickingComponent> extends ChunkBlockTickSystem.Ticking {
-    private static HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     @Nonnull
@@ -97,68 +92,33 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
         this.query = Query.and(ModTickingAwakeComponent.getComponentType(), this.tickingComponentType);
     }
 
-    @SuppressWarnings("removal")
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
             @Nonnull Store<ChunkStore> store, @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
         var ref = archetypeChunk.getReferenceTo(index);
 
-        var worldChunkComponentType = WorldChunk.getComponentType();
-        if (worldChunkComponentType == null) {
+        var info = BlockUtils.getInfo(commandBuffer, ref);
+        if (info == null) {
             return;
         }
-
-        WorldChunk worldChunk = (WorldChunk) archetypeChunk.getComponent(index, worldChunkComponentType);
+        var worldChunk = BlockUtils.getWorldChunk(commandBuffer, info);
         if (worldChunk == null) {
             return;
         }
-
-        var chunk = worldChunk.getBlockChunk();
-        if (chunk == null) {
+        var world = worldChunk.getWorld();
+        if (world == null) {
             return;
         }
 
+        var component = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, ref);
+        var coords = BlockUtils.getGlobalCoords(worldChunk, info);
+
         try {
-            int ticked = chunk.forEachTicking(ref, worldChunk,
-                    (r, c, localX, localY, localZ, blockId) -> {
-                        console.log(String.format("Ticking block at (%d, %d, %d)", localX, localY, localZ));
-                        World world = c.getWorld();
-                        if (world == null) {
-                            return BlockTickStrategy.IGNORED;
-                        }
-
-                        int blockX = c.getX() << 5 | localX;
-                        int blockZ = c.getZ() << 5 | localZ;
-
-                        if (!world.getWorldConfig().isBlockTicking() || !BlockTickManager.hasBlockTickProvider()) {
-                            return BlockTickStrategy.IGNORED;
-                        }
-
-                        var tickComponent = BlockUtils.getComponent(this.tickingComponentType, commandBuffer,
-                                ref);
-                        if (tickComponent == null) {
-                            return BlockTickStrategy.IGNORED;
-                        }
-
-                        try {
-                            return tickComponent.onTick(world, worldChunk, commandBuffer, blockX, localY, blockZ,
-                                    blockId);
-                        } catch (Throwable var9) {
-                            LOGGER.atWarning().withCause(var9).log(
-                                    "Failed to tick block at (%d, %d, %d) ID %s in world %s:", blockX, localY, blockZ,
-                                    blockId, world.getName());
-
-                            return BlockTickStrategy.SLEEP;
-                        }
-                    });
-
-            if (ticked > 0) {
-                LOGGER.atFiner().log("Ticked %d blocks in chunk (%d, %d)", ticked,
-                        worldChunk.getX(), worldChunk.getZ());
-            }
-        } catch (Throwable var9) {
-            LOGGER.atSevere().withCause(var9)
-                    .log("Failed to tick chunk: %s", worldChunk);
+            var tickResponse = component.onTick(world, worldChunk, commandBuffer, coords.x, coords.y, coords.z,
+                    worldChunk.getBlock(coords));
+        } catch (Throwable e) {
+            console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
         }
+
     }
 
     /**
