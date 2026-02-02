@@ -380,6 +380,21 @@ public class BlockUtils {
         return commandBuffer.getComponent(ref, componentType);
     }
 
+    @Nullable
+    public static <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull ComponentType<ChunkStore, T> componentType,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+            @Nonnull BlockComponentChunk chunk,
+            int localX,
+            int localY,
+            int localZ) {
+        var ref = getRef(chunk, localX, localY, localZ);
+        if (ref == null) {
+            return null;
+        }
+        return commandBuffer.getComponent(ref, componentType);
+    }
+
     public static <T extends Component<ChunkStore>> boolean hasComponent(
             @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer,
@@ -388,6 +403,14 @@ public class BlockUtils {
         if (componentType == null) {
             return false;
         }
+
+        return hasComponent(componentType, commandBuffer, ref);
+    }
+
+    public static <T extends Component<ChunkStore>> boolean hasComponent(
+            @Nonnull ComponentType<ChunkStore, T> componentType,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+            @Nonnull Ref<ChunkStore> ref) {
 
         return (T) commandBuffer.getComponent(ref, componentType) != null;
     }

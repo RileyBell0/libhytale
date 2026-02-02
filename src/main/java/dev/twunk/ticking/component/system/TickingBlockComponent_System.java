@@ -1,26 +1,23 @@
 package dev.twunk.ticking.component.system;
 
-import com.hypixel.hytale.builtin.blocktick.BlockTickPlugin;
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.dependency.SystemDependency;
-import com.hypixel.hytale.component.dependency.Dependency;
-import com.hypixel.hytale.component.dependency.Order;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickManager;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
-import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.interfaces.GlobalTickScheduler;
-import dev.twunk.ticking.component.TickingBlockComponent;
-import java.util.Set;
+import dev.twunk.ticking.component.ITickingComponent;
+import dev.twunk.ticking.component.ModTickingAwakeComponent;
+import dev.twunk.ticking.strategy.TickStrategy;
+import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
-
-/// TODO look into BlockTickManager
 
 /**
  * This is the "main loop" kind of code for your ticking blocks
@@ -38,17 +35,17 @@ import javax.annotation.Nonnull;
  * its designed to "just work" for people that don't need super advanced
  * features (or all
  * the variables they might not be using)
+ *
+ * also note, we should extend ArchetypeTickingSystem, and then we simply call
+ * store.tick(this) and it goes
+ * me(tick) -> store(tick) -> me(archetype's other ticking method)
  */
-public class TickingBlockComponent_System<T extends TickingBlockComponent> extends ChunkBlockTickSystem.Ticking {
-    @SuppressWarnings("null")
-    @Nonnull
-    private static final Set<Dependency<ChunkStore>> DEPENDENCIES = Set
-            .of(new SystemDependency<ChunkStore, GlobalTickScheduler>(Order.AFTER, GlobalTickScheduler.class));
+public class TickingBlockComponent_System<T extends ITickingComponent> extends ChunkBlockTickSystem.Ticking {
+    private static HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     @Nonnull
-    public Set<Dependency<ChunkStore>> getDependencies() {
-        return DEPENDENCIES;
-    }
+    private Query<ChunkStore> query;
 
     @Nonnull
     private ComponentType<ChunkStore, T> tickingComponentType;
@@ -82,105 +79,101 @@ public class TickingBlockComponent_System<T extends TickingBlockComponent> exten
         if (val == null) {
             throw new RuntimeException("HECK supplier failed");
         }
-
         this.tickingComponentType = val;
+        this.query = Query.and(ModTickingAwakeComponent.getComponentType(), this.tickingComponentType);
     }
 
     public TickingBlockComponent_System(@Nonnull Class<T> componentClass) {
         super();
-        this.tickingComponentType = TickingBlockComponent.getComponentType(componentClass);
+
+        this.tickingComponentType = ITickingComponent.getComponentType(componentClass);
+        this.query = Query.and(ModTickingAwakeComponent.getComponentType(), this.tickingComponentType);
     }
 
     public TickingBlockComponent_System(@Nonnull ComponentType<ChunkStore, T> tickingComponentType) {
         super();
+
         this.tickingComponentType = tickingComponentType;
+        this.query = Query.and(ModTickingAwakeComponent.getComponentType(), this.tickingComponentType);
     }
 
-    protected static BlockTickStrategy tickProcedure(@Nonnull World world, @Nonnull WorldChunk chunk, int blockX,
-            int blockY, int blockZ, int blockId) {
-        HytaleLogger.forEnclosingClass().atInfo()
-                .log(String.format("Ticking block at %d %d %d", blockX, blockY, blockZ));
-        if (!world.getWorldConfig().isBlockTicking() || !BlockTickManager.hasBlockTickProvider()) {
-            return BlockTickStrategy.IGNORED;
+    @SuppressWarnings("removal")
+    public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store, @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        var ref = archetypeChunk.getReferenceTo(index);
+
+        var worldChunkComponentType = WorldChunk.getComponentType();
+        if (worldChunkComponentType == null) {
+            return;
         }
 
-        TickProcedure procedure = BlockTickPlugin.get().getTickProcedure(blockId);
-        if (procedure == null) {
-            return BlockTickStrategy.IGNORED;
+        WorldChunk worldChunk = (WorldChunk) archetypeChunk.getComponent(index, worldChunkComponentType);
+        if (worldChunk == null) {
+            return;
+        }
+
+        var chunk = worldChunk.getBlockChunk();
+        if (chunk == null) {
+            return;
         }
 
         try {
-            return procedure.onTick(world, chunk, blockX, blockY, blockZ, blockId);
-        } catch (Throwable e) {
-            ((HytaleLogger.Api) HytaleLogger.forEnclosingClass().atWarning().withCause(e)).log(
-                    "Failed to tick block at (%d, %d, %d) in world %s:", blockX, blockY, blockZ, world.getName());
-            return BlockTickStrategy.SLEEP;
+            int ticked = chunk.forEachTicking(ref, worldChunk,
+                    (r, c, localX, localY, localZ, blockId) -> {
+                        console.log(String.format("Ticking block at (%d, %d, %d)", localX, localY, localZ));
+                        World world = c.getWorld();
+                        if (world == null) {
+                            return BlockTickStrategy.IGNORED;
+                        }
+
+                        int blockX = c.getX() << 5 | localX;
+                        int blockZ = c.getZ() << 5 | localZ;
+
+                        if (!world.getWorldConfig().isBlockTicking() || !BlockTickManager.hasBlockTickProvider()) {
+                            return BlockTickStrategy.IGNORED;
+                        }
+
+                        var tickComponent = BlockUtils.getComponent(this.tickingComponentType, commandBuffer,
+                                ref);
+                        if (tickComponent == null) {
+                            return BlockTickStrategy.IGNORED;
+                        }
+
+                        try {
+                            return tickComponent.onTick(world, worldChunk, commandBuffer, blockX, localY, blockZ,
+                                    blockId);
+                        } catch (Throwable var9) {
+                            LOGGER.atWarning().withCause(var9).log(
+                                    "Failed to tick block at (%d, %d, %d) ID %s in world %s:", blockX, localY, blockZ,
+                                    blockId, world.getName());
+
+                            return BlockTickStrategy.SLEEP;
+                        }
+                    });
+
+            if (ticked > 0) {
+                LOGGER.atFiner().log("Ticked %d blocks in chunk (%d, %d)", ticked,
+                        worldChunk.getX(), worldChunk.getZ());
+            }
+        } catch (Throwable var9) {
+            LOGGER.atSevere().withCause(var9)
+                    .log("Failed to tick chunk: %s", worldChunk);
         }
     }
 
     /**
-     * Tick blocks!!
-     * feel free to override my method, i don't even use the Store or delta time
-     * they give us
-     *
-     * note: very useful to override my method in cases where you need more than (or
-     * don't want) my default testing block being ticked
+     * Define how often you want your system to tick
      */
-    // @Override
-    // public void tick(
-    // float dt,
-    // int index,
-    // @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-    // @Nonnull Store<ChunkStore> store,
-    // @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-    // // IF YOU WANT TO OVERWRITE THIS, simply @Override the tick method itself,
-    // // because, well, i just kinda wrote stuff here until stuff worked
-
-    // var blockInfoComponentType = BlockModule.BlockStateInfo.getComponentType();
-    // if (blockInfoComponentType == null) {
-    // return;
-    // }
-    // var info = archetypeChunk.getComponent(index, blockInfoComponentType);
-    // if (info == null) {
-    // return;
-    // }
-
-    // var block = archetypeChunk.getComponent(index, this.tickingComponentType);
-    // if (block == null) {
-    // return;
-    // }
-
-    // // Get the chunk it's located in
-    // var worldChunk = BlockUtils.getWorldChunk(commandBuffer, info);
-    // if (worldChunk == null) {
-    // return;
-    // }
-
-    // var localCoords = BlockUtils.getLocalCoords(info);
-    // var coords = BlockUtils.toGlobalCoords(worldChunk, localCoords);
-    // var world = worldChunk.getWorld();
-    // if (world == null) {
-    // return;
-    // }
-
-    // block.onTick(world, worldChunk, coords.x, coords.y, coords.z,
-    // worldChunk.getBlock(coords));
-
-    // var gameTime = GameTime.get(commandBuffer);
-    // if (gameTime == null) {
-    // return;
-    // }
-
-    // BlockUtils.setTicking(worldChunk, coords, false);
-    // GlobalTickScheduler.scheduleTick(new TickRequest(info.getChunkRef(),
-    // gameTime.plusSeconds(100)));
-    // }
+    @Nonnull
+    public TickStrategy getTickStrategy() {
+        return TickStrategy.always();
+    }
 
     // No touchy unless you know what you're doing. You probably don't need to touch
     // this
     // heck, i dont even know what it does really
     @Override
     public Query<ChunkStore> getQuery() {
-        return Query.and(this.tickingComponentType);
+        return this.query;
     }
 }

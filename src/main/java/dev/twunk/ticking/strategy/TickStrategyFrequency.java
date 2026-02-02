@@ -18,14 +18,6 @@ public class TickStrategyFrequency extends TickStrategy {
         this.initialDelay = 0;
     }
 
-    private static int enforceFrequencyBounds(int tickFrequency) {
-        return tickFrequency < 1 ? 1 : tickFrequency;
-    }
-
-    private static int enforceInitialDelayBounds(int initialDelay) {
-        return initialDelay < 0 ? 0 : initialDelay;
-    }
-
     public TickStrategyFrequency(int tickFrequency) {
         this.tickFrequency = enforceFrequencyBounds(tickFrequency);
         this.initialDelay = 0;
@@ -34,6 +26,18 @@ public class TickStrategyFrequency extends TickStrategy {
     public TickStrategyFrequency(int tickFrequency, int initialDelay) {
         this.tickFrequency = enforceFrequencyBounds(tickFrequency);
         this.initialDelay = enforceInitialDelayBounds(initialDelay);
+    }
+
+    private static int enforceFrequencyBounds(int tickFrequency) {
+        return tickFrequency < 1 ? 1 : tickFrequency;
+    }
+
+    private static int enforceInitialDelayBounds(int initialDelay) {
+        return initialDelay < 0 ? 0 : initialDelay;
+    }
+
+    public static TickStrategyFrequency always() {
+        return new TickStrategyFrequency();
     }
 
 }
