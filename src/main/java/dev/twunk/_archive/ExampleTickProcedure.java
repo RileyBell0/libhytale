@@ -1,4 +1,4 @@
-package dev.twunk.ticking.component.system;
+package dev.twunk._archive;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.logger.HytaleLogger;
