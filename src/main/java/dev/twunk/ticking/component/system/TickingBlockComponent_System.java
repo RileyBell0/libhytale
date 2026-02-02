@@ -9,7 +9,8 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.ticking.component.ITickingComponent;
-import dev.twunk.ticking.component.ModTickingAwakeComponent;
+import dev.twunk.ticking.response.TickResponse;
+import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.strategy.TickStrategy;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
@@ -75,21 +76,21 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
             throw new RuntimeException("HECK supplier failed");
         }
         this.tickingComponentType = val;
-        this.query = Query.and(ModTickingAwakeComponent.getComponentType(), this.tickingComponentType);
+        this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
     }
 
     public TickingBlockComponent_System(@Nonnull Class<T> componentClass) {
         super();
 
         this.tickingComponentType = ITickingComponent.getComponentType(componentClass);
-        this.query = Query.and(ModTickingAwakeComponent.getComponentType(), this.tickingComponentType);
+        this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
     }
 
     public TickingBlockComponent_System(@Nonnull ComponentType<ChunkStore, T> tickingComponentType) {
         super();
 
         this.tickingComponentType = tickingComponentType;
-        this.query = Query.and(ModTickingAwakeComponent.getComponentType(), this.tickingComponentType);
+        this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
     }
 
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
@@ -111,14 +112,20 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
 
         var component = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, ref);
         var coords = BlockUtils.getGlobalCoords(worldChunk, info);
-
+        TickResponse tickResponse;
         try {
-            var tickResponse = component.onTick(world, worldChunk, commandBuffer, coords.x, coords.y, coords.z,
+            tickResponse = component.onTick(world, worldChunk, commandBuffer, coords.x, coords.y, coords.z,
                     worldChunk.getBlock(coords));
         } catch (Throwable e) {
             console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
+            return;
         }
 
+        // Transition to the state returned by the block
+        if (tickResponse != null) {
+            commandBuffer.tryRemoveComponent(ref, tickingComponentType);
+            commandBuffer.addComponent(ref, tickResponse.getComponentType());
+        }
     }
 
     /**

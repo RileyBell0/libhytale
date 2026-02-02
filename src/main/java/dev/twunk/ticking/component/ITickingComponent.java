@@ -9,9 +9,11 @@ import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.component.system.InherentTickProcedure;
+import dev.twunk.ticking.component.system.ExampleTickProcedure;
+import dev.twunk.ticking.response.TickResponse;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 // "BlockType": {
 //   "TickProcedure": {
@@ -37,8 +39,8 @@ public interface ITickingComponent extends Component<ChunkStore> {
      * instead of "i want my component to tick", nah, you want a SYSTEM that
      * queries just your component to tick
      */
-    @Nonnull
-    public default BlockTickStrategy onTick(
+    @Nullable
+    public default TickResponse onTick(
             @Nonnull World world,
             @Nonnull WorldChunk wc,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer,
@@ -48,10 +50,10 @@ public interface ITickingComponent extends Component<ChunkStore> {
             int blockId) {
         HytaleLogger.forEnclosingClass().atInfo()
                 .log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " )");
-        return BlockTickStrategy.CONTINUE;
+        return null;
     }
 
-    TickProcedure customProcedure = new InherentTickProcedure() {
+    TickProcedure customProcedure = new ExampleTickProcedure() {
         public BlockTickStrategy onTick(World var1, WorldChunk var2, int var3, int var4, int var5,
                 int var6) {
             return super.onTick(var1, var2, var3, var4, var5, var6);

@@ -7,12 +7,12 @@ import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 
-public class InherentTickProcedure extends TickProcedure {
-    public static final BuilderCodec<InherentTickProcedure> CODEC = BuilderCodec.builder(
-            InherentTickProcedure.class, InherentTickProcedure::new, TickProcedure.BASE_CODEC)
+public class ExampleTickProcedure extends TickProcedure {
+    public static final BuilderCodec<ExampleTickProcedure> CODEC = BuilderCodec.builder(
+            ExampleTickProcedure.class, ExampleTickProcedure::new, TickProcedure.BASE_CODEC)
             .build();
 
-    public InherentTickProcedure() {
+    public ExampleTickProcedure() {
         HytaleLogger.forEnclosingClass().atInfo().log("CONSTRUCTING INHERENT TICK PROCEDURE");
     }
 

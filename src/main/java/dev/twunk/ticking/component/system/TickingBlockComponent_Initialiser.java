@@ -12,9 +12,9 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.ticking.component.ITickingComponent;
-import dev.twunk.ticking.component.ModTickingAwakeComponent;
-import dev.twunk.ticking.component.ModTickingIgnoredComponent;
-import dev.twunk.ticking.component.ModTickingSleepComponent;
+import dev.twunk.ticking.response.TickContinue;
+import dev.twunk.ticking.response.TickSleep;
+import dev.twunk.ticking.response.TickStop;
 import dev.twunk.utils.BlockUtils;
 import javax.annotation.Nonnull;
 
@@ -46,12 +46,12 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
             @Nonnull AddReason reason,
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-        ComponentType<ChunkStore, ModTickingAwakeComponent> tickingAwake = ModTickingAwakeComponent.getComponentType();
+        ComponentType<ChunkStore, TickContinue> tickingAwake = TickContinue.COMPONENT_TYPE;
 
         // Ensure we have at least 1x ticking component (for queries)
         if (!BlockUtils.hasComponent(tickingAwake, commandBuffer, ref)
-                && !BlockUtils.hasComponent(ModTickingSleepComponent.getComponentType(), commandBuffer, ref)
-                && !BlockUtils.hasComponent(ModTickingIgnoredComponent.getComponentType(), commandBuffer, ref)) {
+                && !BlockUtils.hasComponent(TickSleep.COMPONENT_TYPE, commandBuffer, ref)
+                && !BlockUtils.hasComponent(TickStop.COMPONENT_TYPE, commandBuffer, ref)) {
             commandBuffer.ensureComponent(ref, tickingAwake);
         }
     }
@@ -65,7 +65,7 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
     }
 
     // Example: I override `getQuery` and use the following
-    // `return Query.and(BlockModule.BlockStateInfo.getComponentType(),
+    // `return Query.and(BlockModule.BlockResponseInfo.getComponentType(),
     // ExampleTickingComponent.getComponentType());`
     //
     // and since that seems to be a common pattern, i've made a constructor that you
