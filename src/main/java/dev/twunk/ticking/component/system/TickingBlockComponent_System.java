@@ -111,20 +111,25 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
         }
 
         var component = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, ref);
+        var tickComponent = BlockUtils.getComponent(TickContinue.COMPONENT_TYPE, commandBuffer, ref);
         var coords = BlockUtils.getGlobalCoords(worldChunk, info);
-        TickResponse tickResponse;
         try {
-            tickResponse = component.onTick(world, worldChunk, commandBuffer, coords.x, coords.y, coords.z,
+            TickResponse tickResponse = component.onTick(world, worldChunk, commandBuffer, coords.x, coords.y, coords.z,
                     worldChunk.getBlock(coords));
+
+            // Transition to the state returned by the block
+            if (tickResponse != null && !tickResponse.equals(tickComponent)) {
+                if (tickResponse.getComponentType() == TickContinue.COMPONENT_TYPE) {
+                    commandBuffer.replaceComponent(ref, TickContinue.COMPONENT_TYPE,
+                            (TickContinue) tickResponse);
+                } else {
+                    commandBuffer.removeComponent(ref, component.getComponentType());
+                    commandBuffer.addComponent(ref, tickResponse.getComponentType());
+                }
+            }
         } catch (Throwable e) {
             console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
             return;
-        }
-
-        // Transition to the state returned by the block
-        if (tickResponse != null) {
-            commandBuffer.tryRemoveComponent(ref, tickingComponentType);
-            commandBuffer.addComponent(ref, tickResponse.getComponentType());
         }
     }
 

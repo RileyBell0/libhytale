@@ -17,9 +17,9 @@ public abstract class TwunkLib {
         if (hasRegisteredTickComponents) {
             return;
         }
-        plugin.registerComponent(TickContinue.CODEC);
-        plugin.registerComponent(TickStop.CODEC);
-        plugin.registerComponent(TickSleep.CODEC);
+        TickContinue.COMPONENT_TYPE = plugin.registerComponent(TickContinue.CODEC);
+        TickStop.COMPONENT_TYPE = plugin.registerComponent(TickStop.CODEC);
+        TickSleep.COMPONENT_TYPE = plugin.registerComponent(TickSleep.CODEC);
         hasRegisteredTickComponents = true;
     }
 }

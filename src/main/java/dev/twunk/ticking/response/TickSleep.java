@@ -13,10 +13,9 @@ import javax.annotation.Nullable;
  * notably, you can set this to be sleeping forever
  */
 public class TickSleep implements TickResponse {
+    @SuppressWarnings("null")
     @Nonnull
-    public static ComponentType<ChunkStore, ? extends TickSleep> COMPONENT_TYPE = ITickingComponent
-            .getComponentType(TickSleep.class);
-
+    public static ComponentType<ChunkStore, TickSleep> COMPONENT_TYPE;
     @Nullable
     public final Integer sleepForTicks;
 
@@ -61,8 +60,13 @@ public class TickSleep implements TickResponse {
         return new TickSleep();
     }
 
+    @SuppressWarnings("unused")
     @Nonnull
     public ComponentType<ChunkStore, ? extends TickResponse> getComponentType() {
+        if (COMPONENT_TYPE != null) {
+            return COMPONENT_TYPE;
+        }
+        COMPONENT_TYPE = ITickingComponent.getComponentType(TickSleep.class);
         return COMPONENT_TYPE;
     }
 }

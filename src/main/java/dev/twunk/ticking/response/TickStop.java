@@ -10,9 +10,9 @@ import javax.annotation.Nonnull;
  * Goodbye ticking forever
  */
 public class TickStop implements TickResponse {
+    @SuppressWarnings("null")
     @Nonnull
-    public static ComponentType<ChunkStore, ? extends TickStop> COMPONENT_TYPE = ITickingComponent
-            .getComponentType(TickStop.class);
+    public static ComponentType<ChunkStore, TickStop> COMPONENT_TYPE;
 
     // serializing/deserializing your vars
     @Nonnull
@@ -26,9 +26,13 @@ public class TickStop implements TickResponse {
         return new TickStop();
     }
 
+    @SuppressWarnings("unused")
     @Nonnull
-    public ComponentType<ChunkStore, ? extends TickResponse> getComponentType() {
+    public ComponentType<ChunkStore, ? extends TickStop> getComponentType() {
+        if (COMPONENT_TYPE != null) {
+            return COMPONENT_TYPE;
+        }
+        COMPONENT_TYPE = ITickingComponent.getComponentType(TickStop.class);
         return COMPONENT_TYPE;
     }
-
 }

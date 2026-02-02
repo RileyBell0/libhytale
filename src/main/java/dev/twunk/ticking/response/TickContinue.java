@@ -10,9 +10,9 @@ import javax.annotation.Nonnull;
  * Keep ticking at the same frequency as before
  */
 public class TickContinue implements TickResponse {
+    @SuppressWarnings("null")
     @Nonnull
-    public static ComponentType<ChunkStore, TickContinue> COMPONENT_TYPE = ITickingComponent
-            .getComponentType(TickContinue.class);
+    public static ComponentType<ChunkStore, TickContinue> COMPONENT_TYPE;
 
     // serializing/deserializing your vars
     @Nonnull
@@ -26,12 +26,13 @@ public class TickContinue implements TickResponse {
         return new TickContinue();
     }
 
+    @SuppressWarnings("unused")
     @Nonnull
-    public ComponentType<ChunkStore, ? extends TickResponse> getComponentType() {
+    public ComponentType<ChunkStore, ? extends TickContinue> getComponentType() {
+        if (COMPONENT_TYPE != null) {
+            return COMPONENT_TYPE;
+        }
+        COMPONENT_TYPE = ITickingComponent.getComponentType(TickContinue.class);
         return COMPONENT_TYPE;
-    }
-
-    public static void register() {
-
     }
 }
