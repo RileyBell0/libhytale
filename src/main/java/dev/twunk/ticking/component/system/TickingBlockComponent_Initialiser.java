@@ -11,6 +11,7 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.ticking.component.IRegisteredComponent;
 import dev.twunk.ticking.component.ITickingComponent;
 import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.response.TickSleep;
@@ -33,7 +34,7 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
     public TickingBlockComponent_Initialiser(Class<? extends ITickingComponent> componentClass) {
         this.query = Query.and(
                 BlockModule.BlockStateInfo.getComponentType(),
-                ITickingComponent.getComponentType(componentClass));
+                IRegisteredComponent.getComponentType(componentClass));
     }
 
     /**

@@ -3,7 +3,7 @@ package dev.twunk.ticking.response;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.component.ITickingComponent;
+import dev.twunk.ticking.component.IRegisteredComponent;
 import javax.annotation.Nonnull;
 
 /**
@@ -32,7 +32,7 @@ public class TickStop implements TickResponse {
         if (COMPONENT_TYPE != null) {
             return COMPONENT_TYPE;
         }
-        COMPONENT_TYPE = ITickingComponent.getComponentType(TickStop.class);
+        COMPONENT_TYPE = IRegisteredComponent.getComponentType(TickStop.class);
         return COMPONENT_TYPE;
     }
 }

@@ -13,6 +13,8 @@ public interface TickResponse extends Component<ChunkStore> {
     public static final TickResponse SLEEP = (TickResponse) new TickSleep();
     @Nonnull
     public static final TickResponse STOP = (TickResponse) new TickStop();
+    @Nonnull
+    public static final TickResponse BROKEN = (TickResponse) new TickBroken();
 
     @Nonnull
     public abstract ComponentType<ChunkStore, ? extends Component<ChunkStore>> getComponentType();

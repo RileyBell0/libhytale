@@ -8,6 +8,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.ticking.component.IRegisteredComponent;
 import dev.twunk.ticking.component.ITickingComponent;
 import dev.twunk.ticking.response.TickResponse;
 import dev.twunk.ticking.response.TickContinue;
@@ -82,7 +83,7 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
     public TickingBlockComponent_System(@Nonnull Class<T> componentClass) {
         super();
 
-        this.tickingComponentType = ITickingComponent.getComponentType(componentClass);
+        this.tickingComponentType = IRegisteredComponent.getComponentType(componentClass);
         this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
     }
 
@@ -123,7 +124,7 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
                     commandBuffer.replaceComponent(ref, TickContinue.COMPONENT_TYPE,
                             (TickContinue) tickResponse);
                 } else {
-                    commandBuffer.removeComponent(ref, component.getComponentType());
+                    commandBuffer.removeComponent(ref, this.tickingComponentType);
                     commandBuffer.addComponent(ref, tickResponse.getComponentType());
                 }
             }
