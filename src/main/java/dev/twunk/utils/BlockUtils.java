@@ -198,18 +198,18 @@ public class BlockUtils {
         return new Vector3i(x, y, z);
     }
 
-    @Nullable
-    public static Vector3i getGlobalCoords(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockModule.BlockStateInfo info) {
-        var chunk = getWorldChunk(commandBuffer, info);
-        if (chunk == null) {
-            return null;
-        }
+    // @Nullable
+    // public static Vector3i getGlobalCoords(
+    // @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+    // @Nonnull BlockModule.BlockStateInfo info) {
+    // var chunk = getWorldChunk(commandBuffer, info);
+    // if (chunk == null) {
+    // return null;
+    // }
 
-        var localCoords = getLocalCoords(info);
-        return toGlobalCoords(chunk, localCoords);
-    }
+    // var localCoords = getLocalCoords(info);
+    // return toGlobalCoords(chunk, localCoords);
+    // }
 
     @Nonnull
     public static Vector3i getGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull BlockModule.BlockStateInfo info) {
@@ -218,7 +218,13 @@ public class BlockUtils {
     }
 
     @Nonnull
-    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, int localX, int localY, int localZ) {
+    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull Vector3i localCoords) {
+        return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
+    }
+
+    @Nonnull
+    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, int localX,
+            int localY, int localZ) {
         int globalX = localX + (chunk.getX() * 32);
         int globalZ = localZ + (chunk.getZ() * 32);
 
@@ -226,20 +232,9 @@ public class BlockUtils {
     }
 
     @Nonnull
-    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull Vector3i localCoords) {
-        return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
-    }
-
-    // Get the local coords of the block in its chunk
-    public static Vector3i getLocalCoords(
-            @Nonnull Ref<ChunkStore> ref,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-        var info = getInfo(commandBuffer, ref);
-        if (info == null) {
-            return null;
-        }
-
-        return getLocalCoords(info);
+    public static Vector3i getLocalCoords(@Nonnull Ref<ChunkStore> ref) {
+        var index = ref.getIndex();
+        return new Vector3i(index & 31, index >> 10 & 31, index >> 5 & 31);
     }
 
     // public static Ref<ChunkStore> get(@Nonnull World world, int globalX, int

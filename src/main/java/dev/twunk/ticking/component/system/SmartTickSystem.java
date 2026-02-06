@@ -3,6 +3,8 @@ package dev.twunk.ticking.component.system;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
@@ -10,9 +12,15 @@ import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.component.dependency.Order;
 import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.HolderSystem;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.math.util.ChunkUtil;
+import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.server.core.modules.block.BlockModule;
+import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.ModPlugin;
 import dev.twunk.ticking.response.TickResponse;
@@ -20,6 +28,8 @@ import dev.twunk.ticking.response.TickSleep;
 import dev.twunk.ticking.response.TickStop;
 import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.strategy.TickStrategy;
+import dev.twunk.utils.BlockUtils;
+import it.unimi.dsi.fastutil.Hash;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,6 +154,13 @@ import javax.annotation.Nullable;
 public abstract class SmartTickSystem {
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
+    static ComponentType<ChunkStore, BlockModule.BlockStateInfo> BLOCK_INFO_COMPONENT_TYPE = BlockModule.BlockStateInfo
+            .getComponentType();
+    static ComponentType<ChunkStore, BlockChunk> BLOCK_CHUNK_COMPONENT_TYPE = BlockChunk
+            .getComponentType();
+    @Nonnull
+    private final HashMap<Ref<ChunkStore>, BlockModule.BlockStateInfo> refToInfo = new HashMap<>();
+
     // TODO find a way to get the block info, make a wrapper around Ref<ChunkStore>
     // and use
     // the location of the block as the key, means we'd be able to find it without
@@ -219,6 +236,8 @@ public abstract class SmartTickSystem {
             @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        // i'm trying to get the coords of the block
+
         // var info = BlockUtils.getInfo(commandBuffer, ref);
         // if (info == null) {
         // return TickResponse.BROKEN;
@@ -285,6 +304,35 @@ public abstract class SmartTickSystem {
                 @Nonnull final AddReason reason,
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
+            // need to index the block by system.
+            // goal: easily remove block from associated trackers.
+            // plan: store refs to where it's being tracked inside itself
+            // problem: don't want to add more components to the block, this is meant to be
+            // system specific
+            // solution: store block location somewhere?
+            // problem: the block ref is slow to hash
+            // back to goal: is there anything else we can keep track of it with?
+            // no
+            // okay so how about we add a component to it? we've got tick state? that's
+            // cool???
+            // ok
+            // SO tick state stores system id -> refs?
+            // yes
+            ref.getIndex();
+            var info = store.getComponent(ref, BLOCK_INFO_COMPONENT_TYPE);
+            var chunk = store.getComponent(
+                    info.getChunkRef(),
+                    BLOCK_CHUNK_COMPONENT_TYPE);
+
+            // step 2: make coords
+            var index = info.getIndex();
+            var coords = new Vector3i(
+                    chunk.getX() << 5 | index & 31,
+                    index >> 10 & ChunkUtil.HEIGHT_MASK,
+                    chunk.getZ() << 5 | index >> 5 & 31);
+
+            // want our coords to be the hash
+
             var tickState = commandBuffer.ensureAndGetComponent(ref, TickState.getComponentType());
             var systemState = tickState.getSystemState(id);
 
@@ -318,10 +366,20 @@ public abstract class SmartTickSystem {
             entityLocation.put(ref, bucket);
         }
 
-        static int LEN = 5;
-        private long[] shortaverage = new long[LEN];
-        private long[] longaverage = new long[LEN * 5];
-        private int index = 0;
+        @Nonnull
+        public static Vector3i getGlobalCoords(@Nonnull BlockChunk chunk,
+                @Nonnull Ref<ChunkStore> ref) {
+            var index = ref.getIndex();
+
+            return new Vector3i(
+                    chunk.getX() << 5 | index & 31,
+                    index >> 10 & 31,
+                    chunk.getZ() << 5 | index >> 5 & 31);
+        }
+
+        private ArrayList<Integer> timings = new ArrayList<>();
+        private int len = 0;
+        private int total = 0;
 
         /**
          * Mark the entity for removal.
@@ -335,50 +393,67 @@ public abstract class SmartTickSystem {
                 @Nonnull final RemoveReason reason,
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
-            // // var tickState = commandBuffer.ensureAndGetComponent(ref,
-            // // TickState.getComponentType());
-            // var location = entityLocation.get(ref);
-            // if (location == null) {
-            // return;
-            // }
+            var location = entityLocation.get(ref);
+            if (location == null) {
+                return;
+            }
 
-            // var now = System.nanoTime();
+            var now = System.nanoTime();
+            // GOAL: get global coods for a block
+            // step 1: find the chunk the block is in
+            // cmd/store -> 1480
+            // store/cmd -> 1430
+            // store/store -> 1305
+            var info = store.getComponent(ref, BLOCK_INFO_COMPONENT_TYPE);
+            var chunk = store.getComponent(
+                    info.getChunkRef(),
+                    BLOCK_CHUNK_COMPONENT_TYPE);
 
-            // var info = BlockUtils.getInfo(commandBuffer, ref);
-            // var coords = BlockUtils.getGlobalCoords(commandBuffer, info);
-            // var duration = System.nanoTime() - now;
+            // step 2: make coords
+            var index = info.getIndex();
+            var x = chunk.getX() << 5 | index & 31;
+            var y = index >> 10 & ChunkUtil.HEIGHT_MASK;
+            var z = chunk.getZ() << 5 | index >> 5 & 31;
 
-            // ticking.remove(ref);
-            // // if (location == TickBucket.COMATOSE) {
-            // // comatose.remove(ref);
-            // // } else if (location == TickBucket.SLEEPING) {
-            // // sleeping.remove(ref);
-            // // } else if (location == TickBucket.STOPPED) {
-            // // stopped.remove(ref);
-            // // } else if (location == TickBucket.TICKING) {
-            // // ticking.remove(ref);
-            // // } else {
-            // // broken.remove(ref);
-            // // }
-            // entityLocation.remove(ref);
+            var duration = System.nanoTime() - now;
+            timings.add(((Long) duration).intValue());
+            total += duration;
+            len++;
 
-            // shortaverage[index % LEN] = duration;
-            // longaverage[index] = duration;
-            // index = ++index % (LEN * 5);
-            // if (index % LEN == 0) {
-            // var total = 0;
-            // for (var item : shortaverage) {
-            // total += item;
-            // }
-            // console.log(String.format("short average: %.2f", total / 100.0 / LEN));
-            // }
-            // if (index % (LEN * 5) == 0) {
-            // var total = 0;
-            // for (var item : longaverage) {
-            // total += item;
-            // }
-            // console.log(String.format("short average: %.2f", total / 100.0 / LEN / 5));
-            // }
+            double shortAverage = 0;
+            if (timings.size() > 10) {
+                var last10 = timings.subList(timings.size() - 10, timings.size() - 1);
+
+                var shortTotal = 0;
+                for (var i : last10) {
+                    shortTotal += i;
+                }
+                shortAverage = (double) shortTotal / (double) last10.size();
+            }
+
+            // ref, chunkRef, globalCoords
+
+            console.log(
+                    String.format("getGlobalCoords duration: %.2f %.2f (%d, %d, %d)",
+                            (double) total / (double) len, shortAverage, x, y,
+                            z));
+
+            // int blockX = c.getX() << 5 | localX;
+            // int blockZ = c.getZ() << 5 | localZ;
+            ticking.remove(ref);
+            if (location == TickBucket.COMATOSE) {
+                comatose.remove(ref);
+            } else if (location == TickBucket.SLEEPING) {
+                sleeping.remove(ref);
+            } else if (location == TickBucket.STOPPED) {
+                stopped.remove(ref);
+            } else if (location == TickBucket.TICKING) {
+                ticking.remove(ref);
+            } else {
+                broken.remove(ref);
+            }
+
+            entityLocation.remove(ref);
         }
 
     }
