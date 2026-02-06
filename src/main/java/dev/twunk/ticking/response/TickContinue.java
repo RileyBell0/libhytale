@@ -35,4 +35,10 @@ public class TickContinue implements TickResponse {
         COMPONENT_TYPE = IRegisteredComponent.getComponentType(TickContinue.class);
         return COMPONENT_TYPE;
     }
+
+    @Override
+    @Nonnull
+    public String getType() {
+        return TickResponse.TYPE_CONTINUE;
+    }
 }

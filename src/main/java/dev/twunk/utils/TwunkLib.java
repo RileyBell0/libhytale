@@ -1,6 +1,8 @@
 package dev.twunk.utils;
 
 import dev.twunk.interfaces.ModPlugin;
+import dev.twunk.ticking.component.system.TickState;
+import dev.twunk.ticking.response.TickBroken;
 import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.response.TickSleep;
 import dev.twunk.ticking.response.TickStop;
@@ -17,8 +19,14 @@ public abstract class TwunkLib {
         if (hasRegisteredTickComponents) {
             return;
         }
+
+        // per-system ticking
+        TickState.COMPONENT_TYPE = plugin.registerComponent(TickState.CODEC);
+
+        // component-based ticking
         TickContinue.COMPONENT_TYPE = plugin.registerComponent(TickContinue.CODEC);
         TickStop.COMPONENT_TYPE = plugin.registerComponent(TickStop.CODEC);
+        TickBroken.COMPONENT_TYPE = plugin.registerComponent(TickBroken.CODEC);
         TickSleep.COMPONENT_TYPE = plugin.registerComponent(TickSleep.CODEC);
         hasRegisteredTickComponents = true;
     }

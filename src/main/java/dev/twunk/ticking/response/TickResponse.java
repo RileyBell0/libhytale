@@ -7,6 +7,14 @@ import javax.annotation.Nonnull;
 
 public interface TickResponse extends Component<ChunkStore> {
 
+    public static final String TYPE_CONTINUE = "continue";
+    public static final String TYPE_SLEEP = "sleep";
+    public static final String TYPE_STOP = "stop";
+    public static final String TYPE_BROKEN = "broken";
+
+    @Nonnull
+    public String getType();
+
     @Nonnull
     public static final TickResponse CONTINUE = (TickResponse) new TickContinue();
     @Nonnull

@@ -15,13 +15,14 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.ModPlugin;
-import dev.twunk.ticking.component.ITickingComponent;
 import dev.twunk.ticking.response.TickResponse;
 import dev.twunk.ticking.response.TickSleep;
 import dev.twunk.ticking.response.TickStop;
 import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.strategy.TickStrategy;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -140,20 +141,32 @@ import javax.annotation.Nullable;
  * system-tick
  *
  */
-public abstract class SmartTickSystem<T extends ITickingComponent> {
+public abstract class SmartTickSystem {
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
+    // TODO find a way to get the block info, make a wrapper around Ref<ChunkStore>
+    // and use
+    // the location of the block as the key, means we'd be able to find it without
+    // doing funky stuff, and as long as its not hard to get
+    // block info, should be fine
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> ticking = new ArrayList<>();
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> sleeping = new ArrayList<>();
     @Nonnull
-    private final ArrayList<Ref<ChunkStore>> vegetables = new ArrayList<>();
+    private final ArrayList<Ref<ChunkStore>> comatose = new ArrayList<>();
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> stopped = new ArrayList<>();
-
     @Nonnull
-    private final ArrayList<Ref<ChunkStore>> toRemove = new ArrayList<>();
+    private final ArrayList<Ref<ChunkStore>> broken = new ArrayList<>();
+
+    private enum TickBucket {
+        TICKING,
+        SLEEPING,
+        COMATOSE,
+        STOPPED,
+        BROKEN
+    }
 
     /**
      * Needs to be globally unique. This is how you save/load data. Don't lose it,
@@ -206,7 +219,6 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
             @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-        console.log("Testing testing 123 + ref " + ref);
         // var info = BlockUtils.getInfo(commandBuffer, ref);
         // if (info == null) {
         // return TickResponse.BROKEN;
@@ -244,6 +256,9 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
      * the entities that are ticking (with minimal mutations to components etc)
      */
     public class EntityRegister extends RefSystem<ChunkStore> {
+        @Nonnull
+        private final Map<Ref<ChunkStore>, TickBucket> entityLocation = new HashMap<>();
+
         /**
          * This is where the parent's query actually gets used - only for the entity
          * register
@@ -270,25 +285,43 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
                 @Nonnull final AddReason reason,
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
-            var tickState = store.ensureAndGetComponent(ref, TickState.getComponentType());
-
+            var tickState = commandBuffer.ensureAndGetComponent(ref, TickState.getComponentType());
             var systemState = tickState.getSystemState(id);
 
-            if (systemState instanceof TickSleep) {
+            ArrayList<Ref<ChunkStore>> area;
+            TickBucket bucket;
+            if (systemState instanceof TickContinue) {
+                area = ticking;
+                bucket = TickBucket.TICKING;
+            } else if (systemState instanceof TickSleep) {
                 if (((TickSleep) systemState).isIndefinite()) {
-                    vegetables.add(ref);
+                    area = comatose;
+                    bucket = TickBucket.COMATOSE;
                 } else {
-                    sleeping.add(ref);
+                    area = sleeping;
+                    bucket = TickBucket.SLEEPING;
                 }
             } else if (systemState instanceof TickStop) {
-                stopped.add(ref);
-            } else if (systemState instanceof TickContinue) {
-                ticking.add(ref);
-            } else if (systemState == null || true) {
+                area = stopped;
+                bucket = TickBucket.STOPPED;
+            } else if (systemState == null) {
                 // default state, in the future we should use the TickStrategy to define this
-                ticking.add(ref);
+                area = ticking;
+                systemState = new TickContinue();
+                bucket = TickBucket.TICKING;
+            } else {
+                area = broken;
+                bucket = TickBucket.BROKEN;
             }
+
+            area.add(ref);
+            entityLocation.put(ref, bucket);
         }
+
+        static int LEN = 5;
+        private long[] shortaverage = new long[LEN];
+        private long[] longaverage = new long[LEN * 5];
+        private int index = 0;
 
         /**
          * Mark the entity for removal.
@@ -302,7 +335,50 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
                 @Nonnull final RemoveReason reason,
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
-            toRemove.add(ref);
+            // // var tickState = commandBuffer.ensureAndGetComponent(ref,
+            // // TickState.getComponentType());
+            // var location = entityLocation.get(ref);
+            // if (location == null) {
+            // return;
+            // }
+
+            // var now = System.nanoTime();
+
+            // var info = BlockUtils.getInfo(commandBuffer, ref);
+            // var coords = BlockUtils.getGlobalCoords(commandBuffer, info);
+            // var duration = System.nanoTime() - now;
+
+            // ticking.remove(ref);
+            // // if (location == TickBucket.COMATOSE) {
+            // // comatose.remove(ref);
+            // // } else if (location == TickBucket.SLEEPING) {
+            // // sleeping.remove(ref);
+            // // } else if (location == TickBucket.STOPPED) {
+            // // stopped.remove(ref);
+            // // } else if (location == TickBucket.TICKING) {
+            // // ticking.remove(ref);
+            // // } else {
+            // // broken.remove(ref);
+            // // }
+            // entityLocation.remove(ref);
+
+            // shortaverage[index % LEN] = duration;
+            // longaverage[index] = duration;
+            // index = ++index % (LEN * 5);
+            // if (index % LEN == 0) {
+            // var total = 0;
+            // for (var item : shortaverage) {
+            // total += item;
+            // }
+            // console.log(String.format("short average: %.2f", total / 100.0 / LEN));
+            // }
+            // if (index % (LEN * 5) == 0) {
+            // var total = 0;
+            // for (var item : longaverage) {
+            // total += item;
+            // }
+            // console.log(String.format("short average: %.2f", total / 100.0 / LEN / 5));
+            // }
         }
 
     }
@@ -318,6 +394,9 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
     public class EntityTicker extends ArchetypeTickingSystem<ChunkStore> {
         @Nonnull
         private final ArrayList<TickResponse> tickResults = new ArrayList<>();
+
+        public EntityTicker() {
+        }
 
         @SuppressWarnings({ "null", "rawtypes", "unchecked" })
         @Nonnull
@@ -356,6 +435,7 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
                 @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
                 @Nonnull Store<ChunkStore> store,
                 @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+
         }
 
         /**
@@ -399,8 +479,10 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
             // }
         }
 
+        @Override
+        @Nullable
         public Query<ChunkStore> getQuery() {
-            return null;
+            return SmartTickSystem.this.getQuery();
         }
 
         /**
@@ -412,5 +494,4 @@ public abstract class SmartTickSystem<T extends ITickingComponent> {
             return DEPENDENCIES;
         }
     }
-
 }

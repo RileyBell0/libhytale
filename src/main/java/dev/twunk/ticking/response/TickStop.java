@@ -35,4 +35,10 @@ public class TickStop implements TickResponse {
         COMPONENT_TYPE = IRegisteredComponent.getComponentType(TickStop.class);
         return COMPONENT_TYPE;
     }
+
+    @Override
+    @Nonnull
+    public String getType() {
+        return TickResponse.TYPE_STOP;
+    }
 }

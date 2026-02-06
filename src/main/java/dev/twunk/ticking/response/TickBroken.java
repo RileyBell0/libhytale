@@ -41,4 +41,10 @@ public class TickBroken implements TickResponse {
         COMPONENT_TYPE = IRegisteredComponent.getComponentType(TickBroken.class);
         return COMPONENT_TYPE;
     }
+
+    @Override
+    @Nonnull
+    public String getType() {
+        return TickResponse.TYPE_BROKEN;
+    }
 }

@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.ticking.component.IRegisteredComponent;
 import dev.twunk.ticking.component.ITickingComponent;
 import dev.twunk.ticking.component.system.TickingBlockComponent_Initialiser;
 import dev.twunk.ticking.component.system.TickingBlockComponent_System;
@@ -54,7 +55,7 @@ public abstract class ModPlugin extends JavaPlugin {
         var component = this.getChunkStoreRegistry().registerComponent(myClass, defaultId, codec);
 
         // Store our component in the global register
-        ITickingComponent.registerComponentType(myClass, component);
+        IRegisteredComponent.registerComponentType(myClass, component);
 
         return component;
     }
