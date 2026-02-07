@@ -29,6 +29,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
+ * PLAN:
+ * - im okay with onAdd being slow, i don't like it but hey
+ */
+
+/**
  * Plan is: this system is NOT a normal query system. This is a "smart" system
  * that has another
  * tick method.
