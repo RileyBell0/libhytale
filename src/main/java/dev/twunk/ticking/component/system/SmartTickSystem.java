@@ -14,8 +14,6 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.modules.block.BlockModule;
-import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.ModPlugin;
 import dev.twunk.ticking.response.TickResponse;
@@ -149,11 +147,14 @@ import javax.annotation.Nullable;
  */
 public abstract class SmartTickSystem {
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+    private static int currId = 0;
 
-    static ComponentType<ChunkStore, BlockModule.BlockStateInfo> BLOCK_INFO_COMPONENT_TYPE = BlockModule.BlockStateInfo
-            .getComponentType();
-    static ComponentType<ChunkStore, BlockChunk> BLOCK_CHUNK_COMPONENT_TYPE = BlockChunk
-            .getComponentType();
+    // private static ComponentType<ChunkStore, BlockModule.BlockStateInfo>
+    // BLOCK_INFO_COMPONENT_TYPE = BlockModule.BlockStateInfo
+    // .getComponentType();
+    // private static ComponentType<ChunkStore, BlockChunk>
+    // BLOCK_CHUNK_COMPONENT_TYPE = BlockChunk
+    // .getComponentType();
 
     // TODO find a way to get the block info, make a wrapper around Ref<ChunkStore>
     // and use
@@ -176,15 +177,14 @@ public abstract class SmartTickSystem {
      * and if you change it, please make sure to migrate from the old one so players
      * don't lose all their data
      */
-    @Nonnull
-    public final String id;
+    public final int id;
     @Nonnull
     public final EntityRegister registrationSystem;
     @Nonnull
     public final EntityTicker tickingSystem;
 
     public SmartTickSystem(@Nonnull String id) {
-        this.id = id;
+        this.id = currId++;
         this.registrationSystem = new EntityRegister();
         this.tickingSystem = new EntityTicker();
     }
