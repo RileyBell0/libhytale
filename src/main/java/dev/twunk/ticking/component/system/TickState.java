@@ -24,14 +24,14 @@ public class TickState implements IRegisteredComponent {
     public static ComponentType<ChunkStore, TickState> COMPONENT_TYPE;
 
     @Nonnull
-    private HashMap<String, TickResponse> systemStates = new HashMap<>();
+    private final HashMap<String, TickResponse> systemStates = new HashMap<>();
 
     /**
      * Map from SystemID to locations where the item is stored (memory only,
      * not stored to disk)
      */
     @Nonnull
-    private HashMap<String, ArrayList<ArrayList<Ref<ChunkStore>>>> systemLocations = new HashMap<>();
+    public final HashMap<String, ArrayList<Ref<ChunkStore>>> location = new HashMap<>();
 
     @Nullable
     public TickResponse setSystemState(@Nonnull String systemId, @Nonnull TickResponse state) {
