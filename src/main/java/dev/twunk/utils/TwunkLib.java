@@ -1,11 +1,11 @@
 package dev.twunk.utils;
 
 import dev.twunk.interfaces.ModPlugin;
-import dev.twunk.ticking.component.system.SmartTickingInfo;
 import dev.twunk.ticking.response.TickBroken;
 import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.response.TickSleep;
 import dev.twunk.ticking.response.TickStop;
+import dev.twunk.ticking.system.smart.SmartTickingInfo;
 
 public abstract class TwunkLib {
     private static boolean hasRegisteredTickComponents = false;

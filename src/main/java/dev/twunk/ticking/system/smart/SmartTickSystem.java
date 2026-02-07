@@ -1,4 +1,4 @@
-package dev.twunk.ticking.component.system;
+package dev.twunk.ticking.system.smart;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -200,7 +200,7 @@ public abstract class SmartTickSystem {
     // IF YOU NEED TO SETUP DEPENDENCIES AROUND THIS just keep in mind that
     // these systems execute in order
     // 1) EntityRegister
-    // 2) EntityTicker
+    // 2) EntityTickerx
     ////////////////////////////////////////
     /**
      * Needs to be globally unique. This is how you save/load data. Don't lose it,

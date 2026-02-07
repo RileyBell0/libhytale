@@ -1,4 +1,4 @@
-package dev.twunk.ticking.component.system;
+package dev.twunk.ticking.system.easy;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;

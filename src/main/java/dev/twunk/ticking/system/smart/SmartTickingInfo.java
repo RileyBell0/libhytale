@@ -1,4 +1,4 @@
-package dev.twunk.ticking.component.system;
+package dev.twunk.ticking.system.smart;
 
 import com.hypixel.fastutil.ints.Int2ObjectConcurrentHashMap;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
