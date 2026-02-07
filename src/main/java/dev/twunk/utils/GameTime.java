@@ -8,8 +8,12 @@ import java.time.Instant;
 public abstract class GameTime {
 
     public static Instant get(CommandBuffer<ChunkStore> commandBuffer) {
-
-        return commandBuffer.getExternalData().getWorld().getEntityStore().getStore()
-                .getResource(WorldTimeResource.getResourceType()).getGameTime();
+        return commandBuffer
+            .getExternalData()
+            .getWorld()
+            .getEntityStore()
+            .getStore()
+            .getResource(WorldTimeResource.getResourceType())
+            .getGameTime();
     }
 }

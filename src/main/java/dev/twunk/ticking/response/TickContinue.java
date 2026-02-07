@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
  * Keep ticking at the same frequency as before
  */
 public class TickContinue implements TickResponse {
+
     @SuppressWarnings("null")
     @Nonnull
     public static ComponentType<ChunkStore, TickContinue> COMPONENT_TYPE;
@@ -17,9 +18,9 @@ public class TickContinue implements TickResponse {
     // serializing/deserializing your vars
     @Nonnull
     public static final BuilderCodec<TickContinue> CODEC = BuilderCodec.builder(
-            TickContinue.class,
-            TickContinue::new)
-            .build();
+        TickContinue.class,
+        TickContinue::new
+    ).build();
 
     @Nonnull
     public TickContinue clone() {

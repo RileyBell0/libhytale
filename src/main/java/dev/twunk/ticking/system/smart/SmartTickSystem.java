@@ -16,10 +16,10 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.ModPlugin;
+import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.response.TickResponse;
 import dev.twunk.ticking.response.TickSleep;
 import dev.twunk.ticking.response.TickStop;
-import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.strategy.TickStrategy;
 import java.util.ArrayList;
 import java.util.Set;
@@ -151,6 +151,7 @@ import javax.annotation.Nullable;
  *
  */
 public abstract class SmartTickSystem {
+
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     // each system gets a generated int ID so I can access info from it faster
@@ -175,12 +176,16 @@ public abstract class SmartTickSystem {
 
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> ticking = new ArrayList<>();
+
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> sleeping = new ArrayList<>();
+
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> comatose = new ArrayList<>();
+
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> stopped = new ArrayList<>();
+
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> broken = new ArrayList<>();
 
@@ -202,14 +207,17 @@ public abstract class SmartTickSystem {
     // 1) EntityRegister
     // 2) EntityTickerx
     ////////////////////////////////////////
+
     /**
      * Needs to be globally unique. This is how you save/load data. Don't lose it,
      * and if you change it, please make sure to migrate from the old one so players
      * don't lose all their data
      */
     public final int id;
+
     @Nonnull
     public final EntityRegister registrationSystem;
+
     @Nonnull
     public final EntityTicker tickingSystem;
 
@@ -247,11 +255,12 @@ public abstract class SmartTickSystem {
      */
     @Nullable
     public TickResponse onTick(
-            float dt,
-            @Nonnull Ref<ChunkStore> ref,
-            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-            @Nonnull Store<ChunkStore> store,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        float dt,
+        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+        @Nonnull Store<ChunkStore> store,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {
         console.log("Tick! " + ref + "  " + ticking.size());
 
         return null;
@@ -267,6 +276,11 @@ public abstract class SmartTickSystem {
         plugin.getChunkStoreRegistry().registerSystem(tickingSystem);
     }
 
+    ////////////////////////////////////////
+    ////////////////////////////////////////
+    // Unique sub-system for each entity register
+    ////////////////////////////////////////
+
     /**
      * Listens for add and remove events for any entity that matches our query, then
      * communicates this to the entity ticker.
@@ -276,9 +290,12 @@ public abstract class SmartTickSystem {
      * the entities that are ticking (with minimal mutations to components etc)
      */
     public class EntityRegister extends RefSystem<ChunkStore> {
+
+        // Component type of the place (on each entity matching our query) that i store
+        // whether it is ticking, sleeping etc
         @Nonnull
-        private static final ComponentType<ChunkStore, SmartTickingInfo> TICK_STATE_COMPONENT = SmartTickingInfo
-                .getComponentType();
+        private static final ComponentType<ChunkStore, SmartTickingInfo> TICK_STATE_COMPONENT =
+            SmartTickingInfo.getComponentType();
 
         /**
          * This is where the parent's query actually gets used - only for the entity
@@ -302,10 +319,11 @@ public abstract class SmartTickSystem {
          */
         @Override
         public void onEntityAdded(
-                @Nonnull final Ref<ChunkStore> ref,
-                @Nonnull final AddReason reason,
-                @Nonnull final Store<ChunkStore> store,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final AddReason reason,
+            @Nonnull final Store<ChunkStore> store,
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+        ) {
             var tickState = commandBuffer.ensureAndGetComponent(ref, SmartTickingInfo.getComponentType());
             var systemState = tickState.getTickingInfo(SmartTickSystem.this);
             if (systemState == null) {
@@ -330,7 +348,6 @@ public abstract class SmartTickSystem {
 
             tickState._setMemoryLocation(SmartTickSystem.this, area);
             area.add(ref);
-
         }
 
         // @Nonnull
@@ -352,10 +369,11 @@ public abstract class SmartTickSystem {
          */
         @Override
         public void onEntityRemove(
-                @Nonnull final Ref<ChunkStore> ref,
-                @Nonnull final RemoveReason reason,
-                @Nonnull final Store<ChunkStore> store,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final RemoveReason reason,
+            @Nonnull final Store<ChunkStore> store,
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+        ) {
             var location = store.getComponent(ref, TICK_STATE_COMPONENT)._dumpMemoryLocation(SmartTickSystem.this);
             if (location == null) {
                 return;
@@ -374,16 +392,17 @@ public abstract class SmartTickSystem {
      * need be. really just to change their state if requested)
      */
     public class EntityTicker extends ArchetypeTickingSystem<ChunkStore> {
+
         @Nonnull
         private final ArrayList<TickResponse> tickResults = new ArrayList<>();
 
-        public EntityTicker() {
-        }
+        public EntityTicker() {}
 
         @SuppressWarnings({ "null", "rawtypes", "unchecked" })
         @Nonnull
-        private final Set<Dependency<ChunkStore>> DEPENDENCIES = Set
-                .of(new SystemDependency(Order.AFTER, registrationSystem.getClass()));
+        private final Set<Dependency<ChunkStore>> DEPENDENCIES = Set.of(
+            new SystemDependency(Order.AFTER, registrationSystem.getClass())
+        );
 
         public void tick(float dt, int systemIndex, @Nonnull Store<ChunkStore> store) {
             store.tick(this, dt, systemIndex);
@@ -396,11 +415,11 @@ public abstract class SmartTickSystem {
          */
         @Override
         public void tick(
-                float dt,
-                @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-                @Nonnull Store<ChunkStore> store,
-                @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-
+            float dt,
+            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        ) {
             this._preTick(dt, archetypeChunk, store, commandBuffer);
             this._tick(dt, archetypeChunk, store, commandBuffer);
         }
@@ -413,21 +432,21 @@ public abstract class SmartTickSystem {
          * can be at least in the current instant
          */
         private void _preTick(
-                float dt,
-                @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-                @Nonnull Store<ChunkStore> store,
-                @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-
-        }
+            float dt,
+            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        ) {}
 
         /**
          * Run ticks on all awake entities that match the parent's query
          */
         private void _tick(
-                float dt,
-                @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-                @Nonnull Store<ChunkStore> store,
-                @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+            float dt,
+            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        ) {
             // We'll store our tick results in an array and process them at the end for
             // convenience and delegation of tasks
             tickResults.clear();

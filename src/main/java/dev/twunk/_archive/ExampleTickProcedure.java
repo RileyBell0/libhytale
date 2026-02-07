@@ -8,9 +8,12 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 
 public class ExampleTickProcedure extends TickProcedure {
+
     public static final BuilderCodec<ExampleTickProcedure> CODEC = BuilderCodec.builder(
-            ExampleTickProcedure.class, ExampleTickProcedure::new, TickProcedure.BASE_CODEC)
-            .build();
+        ExampleTickProcedure.class,
+        ExampleTickProcedure::new,
+        TickProcedure.BASE_CODEC
+    ).build();
 
     public ExampleTickProcedure() {
         HytaleLogger.forEnclosingClass().atInfo().log("CONSTRUCTING INHERENT TICK PROCEDURE");

@@ -1,6 +1,7 @@
 package dev.twunk.ticking.strategy;
 
 public class TickStrategyFrequency extends TickStrategy {
+
     // i want to run every X ticks
     // - basically just means we want to SLEEP x seconds between each run for each
     // component, BUT, they don't necessarily need to be synchronised
@@ -39,5 +40,4 @@ public class TickStrategyFrequency extends TickStrategy {
     public static TickStrategyFrequency always() {
         return new TickStrategyFrequency();
     }
-
 }

@@ -6,7 +6,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
 public interface TickResponse extends Component<ChunkStore> {
-
     public static final String TYPE_CONTINUE = "continue";
     public static final String TYPE_SLEEP = "sleep";
     public static final String TYPE_STOP = "stop";
@@ -17,10 +16,13 @@ public interface TickResponse extends Component<ChunkStore> {
 
     @Nonnull
     public static final TickResponse CONTINUE = (TickResponse) new TickContinue();
+
     @Nonnull
     public static final TickResponse SLEEP = (TickResponse) new TickSleep();
+
     @Nonnull
     public static final TickResponse STOP = (TickResponse) new TickStop();
+
     @Nonnull
     public static final TickResponse BROKEN = (TickResponse) new TickBroken();
 

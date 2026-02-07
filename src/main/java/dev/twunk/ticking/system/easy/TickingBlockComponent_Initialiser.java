@@ -20,6 +20,7 @@ import dev.twunk.utils.BlockUtils;
 import javax.annotation.Nonnull;
 
 public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
+
     @SuppressWarnings("unused")
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
@@ -33,8 +34,9 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
     // up with a default query
     public TickingBlockComponent_Initialiser(Class<? extends ITickingComponent> componentClass) {
         this.query = Query.and(
-                BlockModule.BlockStateInfo.getComponentType(),
-                IRegisteredComponent.getComponentType(componentClass));
+            BlockModule.BlockStateInfo.getComponentType(),
+            IRegisteredComponent.getComponentType(componentClass)
+        );
     }
 
     /**
@@ -43,27 +45,30 @@ public class TickingBlockComponent_Initialiser extends RefSystem<ChunkStore> {
      */
     @Override
     public void onEntityAdded(
-            @Nonnull Ref<ChunkStore> ref,
-            @Nonnull AddReason reason,
-            @Nonnull Store<ChunkStore> store,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull AddReason reason,
+        @Nonnull Store<ChunkStore> store,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {
         ComponentType<ChunkStore, TickContinue> tickingAwake = TickContinue.COMPONENT_TYPE;
 
         // Ensure we have at least 1x ticking component (for queries)
-        if (!BlockUtils.hasComponent(tickingAwake, commandBuffer, ref)
-                && !BlockUtils.hasComponent(TickSleep.COMPONENT_TYPE, commandBuffer, ref)
-                && !BlockUtils.hasComponent(TickStop.COMPONENT_TYPE, commandBuffer, ref)) {
+        if (
+            !BlockUtils.hasComponent(tickingAwake, commandBuffer, ref) &&
+            !BlockUtils.hasComponent(TickSleep.COMPONENT_TYPE, commandBuffer, ref) &&
+            !BlockUtils.hasComponent(TickStop.COMPONENT_TYPE, commandBuffer, ref)
+        ) {
             commandBuffer.ensureComponent(ref, tickingAwake);
         }
     }
 
     @Override
     public void onEntityRemove(
-            @Nonnull Ref<ChunkStore> ref,
-            @Nonnull RemoveReason reason,
-            @Nonnull Store<ChunkStore> store,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
-    }
+        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull RemoveReason reason,
+        @Nonnull Store<ChunkStore> store,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {}
 
     // Example: I override `getQuery` and use the following
     // `return Query.and(BlockModule.BlockResponseInfo.getComponentType(),

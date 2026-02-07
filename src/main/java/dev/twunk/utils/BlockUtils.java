@@ -119,15 +119,16 @@ public class BlockUtils {
     // This is a constant i need for checking if something its touching is a
     // container
     @SuppressWarnings("removal")
-    public static final ComponentType<ChunkStore, ItemContainerState> ITEM_CONTAINER_TYPE = BlockStateModule.get()
-            .getComponentType(ItemContainerState.class);
+    public static final ComponentType<ChunkStore, ItemContainerState> ITEM_CONTAINER_TYPE =
+        BlockStateModule.get().getComponentType(ItemContainerState.class);
 
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     @Nullable
     public static BlockModule.BlockStateInfo getInfo(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
         var blockInfoComponentType = BlockModule.BlockStateInfo.getComponentType();
         if (blockInfoComponentType == null) {
             return null;
@@ -144,11 +145,12 @@ public class BlockUtils {
     }
 
     public static BlockModule.BlockStateInfo getInfo(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockComponentChunk chunk,
-            int localX,
-            int localY,
-            int localZ) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockComponentChunk chunk,
+        int localX,
+        int localY,
+        int localZ
+    ) {
         var ref = getRef(chunk, localX, localY, localZ);
         if (ref == null) {
             return null;
@@ -159,8 +161,9 @@ public class BlockUtils {
     // get the chunk for a given block
     @Nullable
     public static WorldChunk getWorldChunk(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
         var info = getInfo(commandBuffer, ref);
         if (info == null) {
             return null;
@@ -177,8 +180,9 @@ public class BlockUtils {
     // get the chunk for a given block
     @Nullable
     public static WorldChunk getWorldChunk(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockModule.BlockStateInfo info) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockModule.BlockStateInfo info
+    ) {
         var chunkComponentType = WorldChunk.getComponentType();
         if (chunkComponentType == null) {
             return null;
@@ -223,8 +227,7 @@ public class BlockUtils {
     }
 
     @Nonnull
-    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, int localX,
-            int localY, int localZ) {
+    public static Vector3i toGlobalCoords(@Nonnull WorldChunk chunk, int localX, int localY, int localZ) {
         int globalX = localX + (chunk.getX() * 32);
         int globalZ = localZ + (chunk.getZ() * 32);
 
@@ -234,7 +237,7 @@ public class BlockUtils {
     @Nonnull
     public static Vector3i getLocalCoords(@Nonnull Ref<ChunkStore> ref) {
         var index = ref.getIndex();
-        return new Vector3i(index & 31, index >> 10 & 31, index >> 5 & 31);
+        return new Vector3i(index & 31, (index >> 10) & 31, (index >> 5) & 31);
     }
 
     // public static Ref<ChunkStore> get(@Nonnull World world, int globalX, int
@@ -280,9 +283,10 @@ public class BlockUtils {
     }
 
     public static boolean setTicking(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref,
-            boolean ticking) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref,
+        boolean ticking
+    ) {
         var info = getInfo(commandBuffer, ref);
         if (info == null) {
             console.log("Info was null");
@@ -293,15 +297,17 @@ public class BlockUtils {
     }
 
     public static boolean setTicking(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockModule.BlockStateInfo info) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockModule.BlockStateInfo info
+    ) {
         return setTicking(commandBuffer, info, true);
     }
 
     public static boolean setTicking(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockModule.BlockStateInfo info,
-            boolean ticking) {
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockModule.BlockStateInfo info,
+        boolean ticking
+    ) {
         var worldChunk = getWorldChunk(commandBuffer, info);
         if (worldChunk == null) {
             console.log("World chunk was null");
@@ -320,8 +326,11 @@ public class BlockUtils {
         return worldChunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }
 
-    public static boolean setTicking(@Nonnull BlockChunk chunk, @Nonnull BlockModule.BlockStateInfo info,
-            boolean ticking) {
+    public static boolean setTicking(
+        @Nonnull BlockChunk chunk,
+        @Nonnull BlockModule.BlockStateInfo info,
+        boolean ticking
+    ) {
         var coords = getLocalCoords(info);
         return chunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }
@@ -339,12 +348,13 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockComponentChunk chunk,
-            int localX,
-            int localY,
-            int localZ) {
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockComponentChunk chunk,
+        int localX,
+        int localY,
+        int localZ
+    ) {
         var ref = getRef(chunk, localX, localY, localZ);
         if (ref == null) {
             return null;
@@ -358,9 +368,10 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref) {
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
         var componentType = getComponentType.get();
         if (componentType == null) {
             return null;
@@ -369,20 +380,22 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref) {
+        @Nonnull ComponentType<ChunkStore, T> componentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
         return commandBuffer.getComponent(ref, componentType);
     }
 
     @Nullable
     public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockComponentChunk chunk,
-            int localX,
-            int localY,
-            int localZ) {
+        @Nonnull ComponentType<ChunkStore, T> componentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull BlockComponentChunk chunk,
+        int localX,
+        int localY,
+        int localZ
+    ) {
         var ref = getRef(chunk, localX, localY, localZ);
         if (ref == null) {
             return null;
@@ -391,9 +404,10 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref) {
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
         var componentType = getComponentType.get();
         if (componentType == null) {
             return false;
@@ -403,10 +417,10 @@ public class BlockUtils {
     }
 
     public static <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref) {
-
+        @Nonnull ComponentType<ChunkStore, T> componentType,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        @Nonnull Ref<ChunkStore> ref
+    ) {
         return (T) commandBuffer.getComponent(ref, componentType) != null;
     }
 

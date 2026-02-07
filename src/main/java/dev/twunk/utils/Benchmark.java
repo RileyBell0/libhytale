@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 public abstract class Benchmark {
+
     @Nonnull
     private static final HashMap<Supplier<?>, ArrayList<Long>> TIMINGS = new HashMap<>();
+
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     // report every X times the function is called
@@ -21,37 +23,27 @@ public abstract class Benchmark {
     ////////////////////////
     ////////////////////////
 
-    public static final <T> T timeFuncExecution(
-            @Nonnull Supplier<T> func) {
+    public static final <T> T timeFuncExecution(@Nonnull Supplier<T> func) {
         return timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
     }
 
-    public static final void timeFuncExecution(
-            @Nonnull Runnable func) {
+    public static final void timeFuncExecution(@Nonnull Runnable func) {
         timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
     }
 
-    public static final <T> T timeFuncExecutionWithFrequency(
-            @Nonnull Supplier<T> func,
-            int reportingFrequency) {
+    public static final <T> T timeFuncExecutionWithFrequency(@Nonnull Supplier<T> func, int reportingFrequency) {
         return timeFuncExecutionWithFrequency(func, reportingFrequency, false);
     }
 
-    public static final void timeFuncExecutionWithFrequency(
-            @Nonnull Runnable func,
-            int reportingFrequency) {
+    public static final void timeFuncExecutionWithFrequency(@Nonnull Runnable func, int reportingFrequency) {
         timeFuncExecutionWithFrequency(func, reportingFrequency, false);
     }
 
-    public static final <T> T timeFuncExecutionWithFrequency(
-            @Nonnull Supplier<T> func,
-            boolean logEveryTick) {
+    public static final <T> T timeFuncExecutionWithFrequency(@Nonnull Supplier<T> func, boolean logEveryTick) {
         return timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
     }
 
-    public static final void timeFuncExecutionWithFrequency(
-            @Nonnull Runnable func,
-            boolean logEveryTick) {
+    public static final void timeFuncExecutionWithFrequency(@Nonnull Runnable func, boolean logEveryTick) {
         timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
     }
 
@@ -62,9 +54,10 @@ public abstract class Benchmark {
     ////////////////////////
 
     public static final <T> T timeFuncExecutionWithFrequency(
-            @Nonnull Supplier<T> func,
-            int reportingFrequency,
-            boolean logEveryTick) {
+        @Nonnull Supplier<T> func,
+        int reportingFrequency,
+        boolean logEveryTick
+    ) {
         // run
         var stats = getStats((Runnable) func);
         var res = _run(func, stats);
@@ -75,9 +68,10 @@ public abstract class Benchmark {
     }
 
     public static final void timeFuncExecutionWithFrequency(
-            @Nonnull Runnable func,
-            int reportingFrequency,
-            boolean logEveryTick) {
+        @Nonnull Runnable func,
+        int reportingFrequency,
+        boolean logEveryTick
+    ) {
         // run
         var stats = getStats(func);
         _run(func, stats);
@@ -87,10 +81,11 @@ public abstract class Benchmark {
     }
 
     private static final void log(
-            String func,
-            @Nonnull ArrayList<Long> data,
-            int reportingFrequency,
-            boolean logEveryTick) {
+        String func,
+        @Nonnull ArrayList<Long> data,
+        int reportingFrequency,
+        boolean logEveryTick
+    ) {
         if (data.size() == 0) {
             return;
         }
@@ -118,8 +113,11 @@ public abstract class Benchmark {
             shortAverage = shortTotal / (double) SHORT_AVERAGE_TICKS;
         }
 
-        var res = String.format("%10s   |  Long average: %7s", func.toString().substring(0, 10),
-                ((Double) longAverage).toString());
+        var res = String.format(
+            "%10s   |  Long average: %7s",
+            func.toString().substring(0, 10),
+            ((Double) longAverage).toString()
+        );
 
         if (shortAverage != null) {
             res = String.format("%s  |  Short average: %7s", res, shortAverage.toString());

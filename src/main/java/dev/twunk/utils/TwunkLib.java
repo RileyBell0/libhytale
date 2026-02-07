@@ -8,6 +8,7 @@ import dev.twunk.ticking.response.TickStop;
 import dev.twunk.ticking.system.smart.SmartTickingInfo;
 
 public abstract class TwunkLib {
+
     private static boolean hasRegisteredTickComponents = false;
 
     // Called automatically when you load a mod plugin

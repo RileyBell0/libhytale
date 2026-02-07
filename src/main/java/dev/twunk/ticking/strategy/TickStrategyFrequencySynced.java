@@ -1,6 +1,7 @@
 package dev.twunk.ticking.strategy;
 
 public class TickStrategyFrequencySynced extends TickStrategy {
+
     // i want to run every X ticks
     // - Importantly, all entities of the given type are synced for this
     // meaning, they will still be "sleeping" but by predetermined amounts
@@ -45,5 +46,4 @@ public class TickStrategyFrequencySynced extends TickStrategy {
         this.initialDelay = initialDelay;
         this.tickOffset = tickOffset;
     }
-
 }

@@ -10,8 +10,8 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.ticking.component.IRegisteredComponent;
 import dev.twunk.ticking.component.ITickingComponent;
-import dev.twunk.ticking.response.TickResponse;
 import dev.twunk.ticking.response.TickContinue;
+import dev.twunk.ticking.response.TickResponse;
 import dev.twunk.ticking.strategy.TickStrategy;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
@@ -39,6 +39,7 @@ import javax.annotation.Nonnull;
  * me(tick) -> store(tick) -> me(archetype's other ticking method)
  */
 public class TickingBlockComponent_System<T extends ITickingComponent> extends ChunkBlockTickSystem.Ticking {
+
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     @Nonnull
@@ -82,20 +83,23 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
 
     public TickingBlockComponent_System(@Nonnull Class<T> componentClass) {
         super();
-
         this.tickingComponentType = IRegisteredComponent.getComponentType(componentClass);
         this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
     }
 
     public TickingBlockComponent_System(@Nonnull ComponentType<ChunkStore, T> tickingComponentType) {
         super();
-
         this.tickingComponentType = tickingComponentType;
         this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
     }
 
-    public void tick(float dt, int index, @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-            @Nonnull Store<ChunkStore> store, @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+    public void tick(
+        float dt,
+        int index,
+        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+        @Nonnull Store<ChunkStore> store,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {
         var ref = archetypeChunk.getReferenceTo(index);
 
         var info = BlockUtils.getInfo(commandBuffer, ref);
@@ -110,19 +114,25 @@ public class TickingBlockComponent_System<T extends ITickingComponent> extends C
         if (world == null) {
             return;
         }
+        var coords = BlockUtils.getGlobalCoords(worldChunk, info);
 
         var component = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, ref);
         var tickComponent = BlockUtils.getComponent(TickContinue.COMPONENT_TYPE, commandBuffer, ref);
-        var coords = BlockUtils.getGlobalCoords(worldChunk, info);
         try {
-            TickResponse tickResponse = component.onTick(world, worldChunk, commandBuffer, coords.x, coords.y, coords.z,
-                    worldChunk.getBlock(coords));
+            TickResponse tickResponse = component.onTick(
+                world,
+                worldChunk,
+                commandBuffer,
+                coords.x,
+                coords.y,
+                coords.z,
+                worldChunk.getBlock(coords)
+            );
 
             // Transition to the state returned by the block
             if (tickResponse != null && !tickResponse.equals(tickComponent)) {
                 if (tickResponse.getComponentType() == TickContinue.COMPONENT_TYPE) {
-                    commandBuffer.replaceComponent(ref, TickContinue.COMPONENT_TYPE,
-                            (TickContinue) tickResponse);
+                    commandBuffer.replaceComponent(ref, TickContinue.COMPONENT_TYPE, (TickContinue) tickResponse);
                 } else {
                     commandBuffer.removeComponent(ref, this.tickingComponentType);
                     commandBuffer.addComponent(ref, tickResponse.getComponentType());

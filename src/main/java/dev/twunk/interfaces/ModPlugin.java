@@ -83,7 +83,8 @@ public abstract class ModPlugin extends JavaPlugin {
      * (associated by codec)
      */
     public <T extends ITickingComponent> ComponentType<ChunkStore, T> registerTickingComponent(
-            @Nonnull BuilderCodec<T> codec) {
+        @Nonnull BuilderCodec<T> codec
+    ) {
         var component = registerComponent(codec);
 
         return this.registerTickingComponent(component);
@@ -94,7 +95,8 @@ public abstract class ModPlugin extends JavaPlugin {
      */
     @Nonnull
     public <T extends ITickingComponent> ComponentType<ChunkStore, T> registerTickingComponent(
-            @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
+        @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier
+    ) {
         var val = supplier.get();
         if (val == null) {
             throw new RuntimeException("ERROR - supplier failed");
@@ -114,9 +116,11 @@ public abstract class ModPlugin extends JavaPlugin {
      */
     @Nonnull
     public <T extends ITickingComponent> ComponentType<ChunkStore, T> registerTickingComponent(
-            @Nonnull ComponentType<ChunkStore, T> componentType) {
+        @Nonnull ComponentType<ChunkStore, T> componentType
+    ) {
         var initialiser = new TickingBlockComponent_Initialiser(
-                Query.and(BlockModule.BlockStateInfo.getComponentType(), componentType));
+            Query.and(BlockModule.BlockStateInfo.getComponentType(), componentType)
+        );
         var system = new TickingBlockComponent_System<T>(componentType);
 
         this.getChunkStoreRegistry().registerSystem(initialiser);

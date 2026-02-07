@@ -33,16 +33,17 @@ public interface ITickingComponent extends IRegisteredComponent {
      */
     @Nullable
     public default TickResponse onTick(
-            @Nonnull World world,
-            @Nonnull WorldChunk wc,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            int worldX,
-            int worldY,
-            int worldZ,
-            int blockId) {
-        HytaleLogger.forEnclosingClass().atInfo()
-                .log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " )");
+        @Nonnull World world,
+        @Nonnull WorldChunk wc,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        int worldX,
+        int worldY,
+        int worldZ,
+        int blockId
+    ) {
+        HytaleLogger.forEnclosingClass()
+            .atInfo()
+            .log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " )");
         return null;
     }
-
 }

@@ -13,18 +13,17 @@ import javax.annotation.Nullable;
  * notably, you can set this to be sleeping forever
  */
 public class TickSleep implements TickResponse {
+
     @SuppressWarnings("null")
     @Nonnull
     public static ComponentType<ChunkStore, TickSleep> COMPONENT_TYPE;
+
     @Nullable
     public final Integer sleepForTicks;
 
     // serializing/deserializing your vars
     @Nonnull
-    public static final BuilderCodec<TickSleep> CODEC = BuilderCodec.builder(
-            TickSleep.class,
-            TickSleep::new)
-            .build();
+    public static final BuilderCodec<TickSleep> CODEC = BuilderCodec.builder(TickSleep.class, TickSleep::new).build();
 
     @Nonnull
     public TickSleep clone() {

@@ -7,7 +7,13 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 public interface IRegisteredComponent extends Component<ChunkStore> {
-    public static final HashMap<Class<? extends Component<ChunkStore>>, ComponentType<ChunkStore, ? extends Component<ChunkStore>>> registeredComponents = new HashMap<Class<? extends Component<ChunkStore>>, ComponentType<ChunkStore, ? extends Component<ChunkStore>>>();
+    public static final HashMap<
+        Class<? extends Component<ChunkStore>>,
+        ComponentType<ChunkStore, ? extends Component<ChunkStore>>
+    > registeredComponents = new HashMap<
+        Class<? extends Component<ChunkStore>>,
+        ComponentType<ChunkStore, ? extends Component<ChunkStore>>
+    >();
 
     /**
      * WARNING: Only ever call this AFTER your plugin's setup function (e.g.
@@ -22,11 +28,13 @@ public interface IRegisteredComponent extends Component<ChunkStore> {
     @Nonnull
     @SuppressWarnings("unchecked")
     public static <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getComponentType(
-            Class<T> componentClass) {
+        Class<T> componentClass
+    ) {
         var componentType = registeredComponents.get(componentClass);
         if (componentType == null) {
             throw new RuntimeException(
-                    "Called getComponentType on class " + componentClass + " before initialising said class");
+                "Called getComponentType on class " + componentClass + " before initialising said class"
+            );
         }
 
         // casting is safe as long as i haven't stuffed something up
@@ -39,8 +47,9 @@ public interface IRegisteredComponent extends Component<ChunkStore> {
      * about EVERYTHING above it WOOOO
      */
     public static <T extends Component<ChunkStore>> void registerComponentType(
-            Class<T> myClass,
-            ComponentType<ChunkStore, T> componentType) {
+        Class<T> myClass,
+        ComponentType<ChunkStore, T> componentType
+    ) {
         registeredComponents.put(myClass, componentType);
     }
 }

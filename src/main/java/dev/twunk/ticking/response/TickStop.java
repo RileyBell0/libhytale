@@ -10,16 +10,14 @@ import javax.annotation.Nonnull;
  * Goodbye ticking forever
  */
 public class TickStop implements TickResponse {
+
     @SuppressWarnings("null")
     @Nonnull
     public static ComponentType<ChunkStore, TickStop> COMPONENT_TYPE;
 
     // serializing/deserializing your vars
     @Nonnull
-    public static final BuilderCodec<TickStop> CODEC = BuilderCodec.builder(
-            TickStop.class,
-            TickStop::new)
-            .build();
+    public static final BuilderCodec<TickStop> CODEC = BuilderCodec.builder(TickStop.class, TickStop::new).build();
 
     @Nonnull
     public TickStop clone() {

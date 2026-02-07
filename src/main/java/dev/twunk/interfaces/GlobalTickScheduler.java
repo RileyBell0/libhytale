@@ -19,23 +19,21 @@ import java.util.Comparator;
 import javax.annotation.Nonnull;
 
 public class GlobalTickScheduler extends ChunkBlockTickSystem.PreTick {
-    public record TickRequest(@Nonnull Ref<ChunkStore> block,
-            @Nonnull Instant requestedGameTime) {
-    }
 
-    public GlobalTickScheduler() {
+    public record TickRequest(@Nonnull Ref<ChunkStore> block, @Nonnull Instant requestedGameTime) {}
 
-    }
+    public GlobalTickScheduler() {}
 
     @Nonnull
     @SuppressWarnings("null")
-    private static final ComponentType<ChunkStore, BlockChunk> COMPONENT_TYPE = BlockChunk
-            .getComponentType();
+    private static final ComponentType<ChunkStore, BlockChunk> COMPONENT_TYPE = BlockChunk.getComponentType();
 
-    private static final Comparator<TickRequest> TICK_REQUEST_COMPARATOR = Comparator
-            .comparing(t -> t.requestedGameTime());
+    private static final Comparator<TickRequest> TICK_REQUEST_COMPARATOR = Comparator.comparing(t ->
+        t.requestedGameTime()
+    );
     private static final ObjectHeapPriorityQueue<TickRequest> SCHEDULED_TICKS = new ObjectHeapPriorityQueue<>(
-            TICK_REQUEST_COMPARATOR);
+        TICK_REQUEST_COMPARATOR
+    );
 
     public static void scheduleTick(TickRequest req) {
         HytaleLogger.forEnclosingClass().atInfo().log("SCHEDULED TICK FOR " + req);
@@ -52,11 +50,12 @@ public class GlobalTickScheduler extends ChunkBlockTickSystem.PreTick {
     // Re-enables blocks that are going to be ticking
     @Override
     public void tick(
-            float dt,
-            int index,
-            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-            @Nonnull Store<ChunkStore> store,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        float dt,
+        int index,
+        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+        @Nonnull Store<ChunkStore> store,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {
         Instant gameTime = GameTime.get(commandBuffer);
         var blockInfoComponentType = BlockModule.BlockStateInfo.getComponentType();
         if (blockInfoComponentType == null || COMPONENT_TYPE == null) {
@@ -66,8 +65,7 @@ public class GlobalTickScheduler extends ChunkBlockTickSystem.PreTick {
         // DEQUEUE all components that need ticking
         TickRequest request;
 
-        while (!SCHEDULED_TICKS.isEmpty()
-                && (request = SCHEDULED_TICKS.first()).requestedGameTime.isBefore(gameTime)) {
+        while (!SCHEDULED_TICKS.isEmpty() && (request = SCHEDULED_TICKS.first()).requestedGameTime.isBefore(gameTime)) {
             HytaleLogger.forEnclosingClass().atInfo().log("Running scheduled tick on " + request);
             SCHEDULED_TICKS.dequeue();
             if (!request.block.isValid()) {

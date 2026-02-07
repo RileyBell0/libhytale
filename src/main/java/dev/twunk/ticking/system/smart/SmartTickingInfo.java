@@ -25,12 +25,13 @@ import javax.annotation.Nullable;
  * but to be fair, stupid stuff is fun stuff
  */
 public class SmartTickingInfo implements IRegisteredComponent {
+
     // serializing/deserializing your vars
     @Nonnull
     public static final BuilderCodec<SmartTickingInfo> CODEC = BuilderCodec.builder(
-            SmartTickingInfo.class,
-            SmartTickingInfo::new)
-            .build();
+        SmartTickingInfo.class,
+        SmartTickingInfo::new
+    ).build();
 
     @SuppressWarnings("null")
     @Nonnull
@@ -58,7 +59,8 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * not stored to disk)
      */
     @Nonnull
-    private final Int2ObjectConcurrentHashMap<ArrayList<Ref<ChunkStore>>> memoryLocation = new Int2ObjectConcurrentHashMap<>();
+    private final Int2ObjectConcurrentHashMap<ArrayList<Ref<ChunkStore>>> memoryLocation =
+        new Int2ObjectConcurrentHashMap<>();
 
     /**
      * Store the current ticking state we've got for the given system (e.g. awake,
@@ -91,8 +93,9 @@ public class SmartTickingInfo implements IRegisteredComponent {
      */
     @Nullable
     public ArrayList<Ref<ChunkStore>> _setMemoryLocation(
-            @Nonnull SmartTickSystem system,
-            @Nonnull ArrayList<Ref<ChunkStore>> state) {
+        @Nonnull SmartTickSystem system,
+        @Nonnull ArrayList<Ref<ChunkStore>> state
+    ) {
         return memoryLocation.put(system.id, state);
     }
 
@@ -104,8 +107,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public ArrayList<Ref<ChunkStore>> _getMemoryLocation(
-            @Nonnull SmartTickSystem system) {
+    public ArrayList<Ref<ChunkStore>> _getMemoryLocation(@Nonnull SmartTickSystem system) {
         return memoryLocation.get(system.id);
     }
 
@@ -117,8 +119,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public ArrayList<Ref<ChunkStore>> _dumpMemoryLocation(
-            @Nonnull SmartTickSystem system) {
+    public ArrayList<Ref<ChunkStore>> _dumpMemoryLocation(@Nonnull SmartTickSystem system) {
         return memoryLocation.remove(system.id);
     }
 
@@ -129,7 +130,8 @@ public class SmartTickingInfo implements IRegisteredComponent {
 
     @Nonnull
     public static ComponentType<ChunkStore, SmartTickingInfo> getComponentType() {
-        return (ComponentType<ChunkStore, SmartTickingInfo>) IRegisteredComponent
-                .getComponentType(SmartTickingInfo.class);
+        return (ComponentType<ChunkStore, SmartTickingInfo>) IRegisteredComponent.getComponentType(
+            SmartTickingInfo.class
+        );
     }
 }
