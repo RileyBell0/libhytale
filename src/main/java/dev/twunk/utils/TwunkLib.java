@@ -1,7 +1,7 @@
 package dev.twunk.utils;
 
 import dev.twunk.interfaces.ModPlugin;
-import dev.twunk.ticking.component.system.TickState;
+import dev.twunk.ticking.component.system.SmartTickingInfo;
 import dev.twunk.ticking.response.TickBroken;
 import dev.twunk.ticking.response.TickContinue;
 import dev.twunk.ticking.response.TickSleep;
@@ -21,7 +21,7 @@ public abstract class TwunkLib {
         }
 
         // per-system ticking
-        TickState.COMPONENT_TYPE = plugin.registerComponent(TickState.CODEC);
+        SmartTickingInfo.COMPONENT_TYPE = plugin.registerComponent(SmartTickingInfo.CODEC);
 
         // component-based ticking
         TickContinue.COMPONENT_TYPE = plugin.registerComponent(TickContinue.CODEC);

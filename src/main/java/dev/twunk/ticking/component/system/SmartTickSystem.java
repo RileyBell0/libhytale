@@ -249,7 +249,8 @@ public abstract class SmartTickSystem {
      */
     public class EntityRegister extends RefSystem<ChunkStore> {
         @Nonnull
-        private static final ComponentType<ChunkStore, TickState> TICK_STATE_COMPONENT = TickState.getComponentType();
+        private static final ComponentType<ChunkStore, SmartTickingInfo> TICK_STATE_COMPONENT = SmartTickingInfo
+                .getComponentType();
 
         /**
          * This is where the parent's query actually gets used - only for the entity
@@ -277,7 +278,7 @@ public abstract class SmartTickSystem {
                 @Nonnull final AddReason reason,
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
-            var tickState = commandBuffer.ensureAndGetComponent(ref, TickState.getComponentType());
+            var tickState = commandBuffer.ensureAndGetComponent(ref, SmartTickingInfo.getComponentType());
             var systemState = tickState.getTickingInfo(SmartTickSystem.this);
             if (systemState == null) {
                 systemState = new TickContinue();

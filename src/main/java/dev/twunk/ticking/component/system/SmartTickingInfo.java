@@ -11,17 +11,17 @@ import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TickState implements IRegisteredComponent {
+public class SmartTickingInfo implements IRegisteredComponent {
     // serializing/deserializing your vars
     @Nonnull
-    public static final BuilderCodec<TickState> CODEC = BuilderCodec.builder(
-            TickState.class,
-            TickState::new)
+    public static final BuilderCodec<SmartTickingInfo> CODEC = BuilderCodec.builder(
+            SmartTickingInfo.class,
+            SmartTickingInfo::new)
             .build();
 
     @SuppressWarnings("null")
     @Nonnull
-    public static ComponentType<ChunkStore, TickState> COMPONENT_TYPE;
+    public static ComponentType<ChunkStore, SmartTickingInfo> COMPONENT_TYPE;
 
     @Nonnull
     private final Int2ObjectConcurrentHashMap<TickResponse> tickingState = new Int2ObjectConcurrentHashMap<>();
@@ -89,12 +89,13 @@ public class TickState implements IRegisteredComponent {
     }
 
     @Nonnull
-    public TickState clone() {
-        return new TickState();
+    public SmartTickingInfo clone() {
+        return new SmartTickingInfo();
     }
 
     @Nonnull
-    public static ComponentType<ChunkStore, TickState> getComponentType() {
-        return (ComponentType<ChunkStore, TickState>) IRegisteredComponent.getComponentType(TickState.class);
+    public static ComponentType<ChunkStore, SmartTickingInfo> getComponentType() {
+        return (ComponentType<ChunkStore, SmartTickingInfo>) IRegisteredComponent
+                .getComponentType(SmartTickingInfo.class);
     }
 }
