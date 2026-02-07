@@ -15,48 +15,81 @@ public abstract class Benchmark {
     private static final int REPORTING_FREQUENCY = 30;
     private static final int SHORT_AVERAGE_TICKS = 6;
 
-    public static final <T> T timeFuncExecution(@Nonnull Supplier<T> func) {
+    ////////////////////////
+    ////////////////////////
+    // TONS of overloads
+    ////////////////////////
+    ////////////////////////
+
+    public static final <T> T timeFuncExecution(
+            @Nonnull Supplier<T> func) {
+        return timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    }
+
+    public static final void timeFuncExecution(
+            @Nonnull Runnable func) {
+        timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    }
+
+    public static final <T> T timeFuncExecutionWithFrequency(
+            @Nonnull Supplier<T> func,
+            int reportingFrequency) {
+        return timeFuncExecutionWithFrequency(func, reportingFrequency, false);
+    }
+
+    public static final void timeFuncExecutionWithFrequency(
+            @Nonnull Runnable func,
+            int reportingFrequency) {
+        timeFuncExecutionWithFrequency(func, reportingFrequency, false);
+    }
+
+    public static final <T> T timeFuncExecutionWithFrequency(
+            @Nonnull Supplier<T> func,
+            boolean logEveryTick) {
+        return timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    }
+
+    public static final void timeFuncExecutionWithFrequency(
+            @Nonnull Runnable func,
+            boolean logEveryTick) {
+        timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    }
+
+    ////////////////////////
+    ////////////////////////
+    // Actual code for timing func execution
+    ////////////////////////
+    ////////////////////////
+
+    public static final <T> T timeFuncExecutionWithFrequency(
+            @Nonnull Supplier<T> func,
+            int reportingFrequency,
+            boolean logEveryTick) {
         // run
-        var stats = getStats(func);
+        var stats = getStats((Runnable) func);
         var res = _run(func, stats);
 
         // log
-        log(func, stats, REPORTING_FREQUENCY, false);
+        log(func.toString(), stats, reportingFrequency, logEveryTick);
         return res;
     }
 
-    public static final <T> T timeFuncExecutionWithFrequency(@Nonnull Supplier<T> func, int reportingFrequency) {
-        // run
-        var stats = getStats(func);
-        var res = _run(func, stats);
-
-        // log
-        log(func, stats, reportingFrequency, false);
-        return res;
-    }
-
-    public static final <T> T timeFuncExecutionWithFrequency(@Nonnull Supplier<T> func, int reportingFrequency,
+    public static final void timeFuncExecutionWithFrequency(
+            @Nonnull Runnable func,
+            int reportingFrequency,
             boolean logEveryTick) {
         // run
         var stats = getStats(func);
-        var res = _run(func, stats);
+        _run(func, stats);
 
         // log
-        log(func, stats, reportingFrequency, logEveryTick);
-        return res;
+        log(func.toString(), stats, reportingFrequency, logEveryTick);
     }
 
-    public static final <T> T timeFuncExecutionWithFrequency(@Nonnull Supplier<T> func, boolean logEveryTick) {
-        // run
-        var stats = getStats(func);
-        var res = _run(func, stats);
-
-        log(func, stats, REPORTING_FREQUENCY, logEveryTick);
-
-        return res;
-    }
-
-    private static final void log(@Nonnull Supplier<?> func, @Nonnull ArrayList<Long> data, int reportingFrequency,
+    private static final void log(
+            String func,
+            @Nonnull ArrayList<Long> data,
+            int reportingFrequency,
             boolean logEveryTick) {
         if (data.size() == 0) {
             return;
@@ -101,7 +134,7 @@ public abstract class Benchmark {
 
     @Nonnull
     @SuppressWarnings("null")
-    private static ArrayList<Long> getStats(@Nonnull Supplier<?> func) {
+    private static ArrayList<Long> getStats(@Nonnull Runnable func) {
         return TIMINGS.getOrDefault(func, new ArrayList<Long>());
     }
 
@@ -121,5 +154,21 @@ public abstract class Benchmark {
         stats.add(duration);
 
         return res;
+    }
+
+    private static final void _run(@Nonnull Runnable func, @Nonnull ArrayList<Long> stats) {
+        // start timer
+        var start = System.nanoTime();
+
+        // === USER FUNC ====
+        func.run();
+        // ==================
+
+        // end timer
+        var end = System.nanoTime();
+        var duration = end - start;
+
+        // store stats
+        stats.add(duration);
     }
 }

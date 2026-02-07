@@ -276,10 +276,10 @@ public abstract class SmartTickSystem {
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
             var tickState = commandBuffer.ensureAndGetComponent(ref, TickState.getComponentType());
-            var systemState = tickState.getSystemState(id);
+            var systemState = tickState.getSystemState(SmartTickSystem.this);
             if (systemState == null) {
                 systemState = new TickContinue();
-                tickState.setSystemState(id, systemState);
+                tickState.setSystemState(SmartTickSystem.this, systemState);
             }
 
             ArrayList<Ref<ChunkStore>> area;
@@ -299,6 +299,7 @@ public abstract class SmartTickSystem {
 
             tickState.location.put(id, area);
             area.add(ref);
+
         }
 
         // @Nonnull

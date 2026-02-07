@@ -34,13 +34,13 @@ public class TickState implements IRegisteredComponent {
     public final Int2ObjectConcurrentHashMap<ArrayList<Ref<ChunkStore>>> location = new Int2ObjectConcurrentHashMap<>();
 
     @Nullable
-    public TickResponse setSystemState(int systemId, @Nonnull TickResponse state) {
-        return this.systemStates.put(systemId, state);
+    public TickResponse setSystemState(SmartTickSystem system, @Nonnull TickResponse state) {
+        return this.systemStates.put(system.id, state);
     }
 
     @Nullable
-    public TickResponse getSystemState(int systemId) {
-        return this.systemStates.get(systemId);
+    public TickResponse getSystemState(SmartTickSystem system) {
+        return this.systemStates.get(system.id);
     }
 
     @Nonnull
