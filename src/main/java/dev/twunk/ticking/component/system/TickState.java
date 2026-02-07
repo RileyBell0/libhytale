@@ -24,23 +24,68 @@ public class TickState implements IRegisteredComponent {
     public static ComponentType<ChunkStore, TickState> COMPONENT_TYPE;
 
     @Nonnull
-    private final Int2ObjectConcurrentHashMap<TickResponse> systemStates = new Int2ObjectConcurrentHashMap<>();
+    private final Int2ObjectConcurrentHashMap<TickResponse> tickingState = new Int2ObjectConcurrentHashMap<>();
 
     /**
      * Map from SystemID to locations where the item is stored (memory only,
      * not stored to disk)
      */
     @Nonnull
-    public final Int2ObjectConcurrentHashMap<ArrayList<Ref<ChunkStore>>> location = new Int2ObjectConcurrentHashMap<>();
+    private final Int2ObjectConcurrentHashMap<ArrayList<Ref<ChunkStore>>> memoryLocation = new Int2ObjectConcurrentHashMap<>();
 
+    /**
+     * Returns the previously set state (if one was already there)
+     */
     @Nullable
-    public TickResponse setSystemState(SmartTickSystem system, @Nonnull TickResponse state) {
-        return this.systemStates.put(system.id, state);
+    public TickResponse setTickingInfo(@Nonnull SmartTickSystem system, @Nonnull TickResponse state) {
+        return this.tickingState.put(system.id, state);
     }
 
     @Nullable
-    public TickResponse getSystemState(SmartTickSystem system) {
-        return this.systemStates.get(system.id);
+    public TickResponse getTickingInfo(@Nonnull SmartTickSystem system) {
+        return this.tickingState.get(system.id);
+    }
+
+    /**
+     * Internal function for me. No touchy.
+     *
+     * Stores a ref to the place i currently keep track of our ticking state for our
+     * object
+     *
+     * useful so when the block that contains <THIS> is removed, i can do cleanup
+     * and *not* tick it anymore
+     */
+    @Nullable
+    public ArrayList<Ref<ChunkStore>> _setMemoryLocation(
+            @Nonnull SmartTickSystem system,
+            @Nonnull ArrayList<Ref<ChunkStore>> state) {
+        return memoryLocation.put(system.id, state);
+    }
+
+    /**
+     * Track a ref to where (in SmartTickSystem) i currently keep the ref to
+     * <THIS>
+     *
+     * useful so when the block that contains <THIS> is removed, i can do cleanup
+     * and *not* tick it anymore
+     */
+    @Nullable
+    public ArrayList<Ref<ChunkStore>> _getMemoryLocation(
+            @Nonnull SmartTickSystem system) {
+        return memoryLocation.get(system.id);
+    }
+
+    /**
+     * Track a ref to where (in SmartTickSystem) i currently keep the ref to
+     * <THIS>
+     *
+     * useful so when the block that contains <THIS> is removed, i can do cleanup
+     * and *not* tick it anymore
+     */
+    @Nullable
+    public ArrayList<Ref<ChunkStore>> _dumpMemoryLocation(
+            @Nonnull SmartTickSystem system) {
+        return memoryLocation.remove(system.id);
     }
 
     @Nonnull
