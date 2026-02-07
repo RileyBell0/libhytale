@@ -32,6 +32,11 @@ import javax.annotation.Nullable;
  */
 
 /**
+ * NOTE -> SmartTickSystem is STRONGLY LINKED and COMPLETELY OWNS the SmartTickInfo component
+ * and i WILL mercilessly throw it onto all entities I manage
+ */
+
+/**
  * Plan is: this system is NOT a normal query system. This is a "smart" system
  * that has another
  * tick method.
@@ -158,6 +163,16 @@ public abstract class SmartTickSystem {
     // BLOCK_CHUNK_COMPONENT_TYPE = BlockChunk
     // .getComponentType();
 
+    ////////////////////////////////////////
+    ////////////////////////////////////////
+    // We store refs to all entities that match the query
+    //
+    // Notably, we segment these all out into ticking, sleeping, etc
+    // with the idea being -> we'll probably want to tick tons of stuff
+    // and so the locality (and ease) of dumping it all into a list makes our
+    // life really easy
+    ////////////////////////////////////////
+
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> ticking = new ArrayList<>();
     @Nonnull
@@ -169,6 +184,24 @@ public abstract class SmartTickSystem {
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> broken = new ArrayList<>();
 
+    ////////////////////////////////////////
+    ////////////////////////////////////////
+    // Each SmartTickSystem needs a unique ID (so i can do funky stuff and tracking
+    // of things in the background efficiently)
+    //
+    // Don't worry, to run out of IDs you'd have to make, billions of systems.
+    //
+    // we'll be fine.
+    //
+    // Importantly, I wanted to hide the "pre" and "post" systems and internal
+    // details leaving just what any of us care about -> "i want code to run
+    // on my thing". Done. Treat "SmartTickSystem" as a single system.
+    //
+    // IF YOU NEED TO SETUP DEPENDENCIES AROUND THIS just keep in mind that
+    // these systems execute in order
+    // 1) EntityRegister
+    // 2) EntityTicker
+    ////////////////////////////////////////
     /**
      * Needs to be globally unique. This is how you save/load data. Don't lose it,
      * and if you change it, please make sure to migrate from the old one so players

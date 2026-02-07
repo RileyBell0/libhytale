@@ -8,5 +8,4 @@ public class TickingBlockComponent implements ITickingComponent {
     public TickingBlockComponent clone() {
         return new TickingBlockComponent();
     }
-
 }
