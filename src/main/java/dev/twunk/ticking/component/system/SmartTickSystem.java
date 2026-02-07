@@ -158,11 +158,6 @@ public abstract class SmartTickSystem {
     // BLOCK_CHUNK_COMPONENT_TYPE = BlockChunk
     // .getComponentType();
 
-    // TODO find a way to get the block info, make a wrapper around Ref<ChunkStore>
-    // and use
-    // the location of the block as the key, means we'd be able to find it without
-    // doing funky stuff, and as long as its not hard to get
-    // block info, should be fine
     @Nonnull
     private final ArrayList<Ref<ChunkStore>> ticking = new ArrayList<>();
     @Nonnull
