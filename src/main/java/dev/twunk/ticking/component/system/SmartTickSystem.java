@@ -147,7 +147,9 @@ import javax.annotation.Nullable;
  */
 public abstract class SmartTickSystem {
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
-    private static int currId = 0;
+
+    // each system gets a generated int ID so I can access info from it faster
+    private static int nextId = 0;
 
     // private static ComponentType<ChunkStore, BlockModule.BlockStateInfo>
     // BLOCK_INFO_COMPONENT_TYPE = BlockModule.BlockStateInfo
@@ -184,7 +186,7 @@ public abstract class SmartTickSystem {
     public final EntityTicker tickingSystem;
 
     public SmartTickSystem(@Nonnull String id) {
-        this.id = currId++;
+        this.id = nextId++;
         this.registrationSystem = new EntityRegister();
         this.tickingSystem = new EntityTicker();
     }
@@ -276,10 +278,10 @@ public abstract class SmartTickSystem {
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
             var tickState = commandBuffer.ensureAndGetComponent(ref, TickState.getComponentType());
-            var systemState = tickState.getSystemState(SmartTickSystem.this);
+            var systemState = tickState.getTickingInfo(SmartTickSystem.this);
             if (systemState == null) {
                 systemState = new TickContinue();
-                tickState.setSystemState(SmartTickSystem.this, systemState);
+                tickState.setTickingInfo(SmartTickSystem.this, systemState);
             }
 
             ArrayList<Ref<ChunkStore>> area;
@@ -297,7 +299,7 @@ public abstract class SmartTickSystem {
                 area = broken;
             }
 
-            tickState.location.put(id, area);
+            tickState._setMemoryLocation(SmartTickSystem.this, area);
             area.add(ref);
 
         }
@@ -325,7 +327,10 @@ public abstract class SmartTickSystem {
                 @Nonnull final RemoveReason reason,
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer) {
-            var location = store.getComponent(ref, TICK_STATE_COMPONENT).location.remove(id);
+            var location = store.getComponent(ref, TICK_STATE_COMPONENT)._dumpMemoryLocation(SmartTickSystem.this);
+            if (location == null) {
+                return;
+            }
 
             location.remove(ref);
         }
