@@ -1,22 +1,47 @@
-# HelloPlugin
+# libhytale (WIP)
 
-A simple example plugin for Hytale servers demonstrating the basics of plugin development.
+If you found this, uuh, it's very much really a work in progress.
 
-📺 **Video Tutorial**: [Watch on YouTube](https://www.youtube.com/watch?v=NEw9QjzZ9nM)
+Worth reading around to see how i do things if i happen to have solved or found
+areas of the code you're still figuring out (e.g. getting a block by coords)
 
-## Features
+Got most of my resources from reading the src code directly and from <https://hytalemodding.dev/en/docs>
 
-- Registers a `/hello` command
-- Displays a title message to players when executed
+highly reccomend <https://hytalemodding.dev/en/docs>, they're making TONS of changes and updates all the time, that's probably your best bet for learning this. Set an hour to read through their docs, then another day set aside another hour to read through their docs again.
 
-## Requirements
+The "[Entity Component System](https://hytalemodding.dev/en/docs/guides/ecs/entity-component-system)" docs are by FAR the most important ones for you to understand. I'm pretty new to modding so at least, seemed incredibly important for me.
 
-- Java 17+
-- Hytale Server API (`HytaleServer.jar`)
+Maybe come back in a few weeks or so when I've had the free time to finish more of this
+Don't expect the install instructions to work, honestly, if my computer carks it even I don't know how to install it yet
 
-## Getting HytaleServer.jar
+What is this
 
-You need the `HytaleServer.jar` file to compile plugins. There are two ways to obtain it:
+- Better API for hytale modding
+
+Better how?
+
+- Turns out its hard to do easy things in their API currently. Alot of this may just be due to there being no comments in their code currently, though regardless, its quite hard to use
+- Goal: make simple things easy to do (or really just easy to find)
+
+Like what?
+
+- Getting a block
+- Scheduling ticks on matches in systems
+- Easier getting world, world chunks, blocks, block info, etc
+
+---
+
+## Ignore everything below here
+
+Why?
+
+uuh, i forked someone else's code originally but completely threw all piece by piece except the gradle stuff
+
+well, i say forked. More like downloaded their example i think? really not sure it was a while ago (and so much churn ago)
+
+if you DO happen to stumble upon this and read through it for some reason, PRs are welcome, but honestly feedback or requests are far more welcome because, well, as mentioned, this is super super early development
+
+oh, and importantly, I'm really very much in a churn stage of this project, still getting used to hytale's API itself and thus, everything i write here is subject to change (and currently is changing)
 
 ### Option 1: From Hytale Launcher
 
