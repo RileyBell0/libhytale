@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public abstract class Benchmark {
 
     @Nonnull
-    private static final HashMap<Supplier<?>, ArrayList<Long>> TIMINGS = new HashMap<>();
+    private static final HashMap<String, ArrayList<Long>> TIMINGS = new HashMap<>();
 
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
@@ -23,28 +23,44 @@ public abstract class Benchmark {
     ////////////////////////
     ////////////////////////
 
-    public static final <T> T timeFuncExecution(@Nonnull Supplier<T> func) {
-        return timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    public static final <T> T timeFuncExecution(@Nonnull String id, @Nonnull Supplier<T> func) {
+        return timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, false);
     }
 
-    public static final void timeFuncExecution(@Nonnull Runnable func) {
-        timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    public static final void timeFuncExecution(@Nonnull String id, @Nonnull Runnable func) {
+        timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, false);
     }
 
-    public static final <T> T timeFuncExecutionWithFrequency(@Nonnull Supplier<T> func, int reportingFrequency) {
-        return timeFuncExecutionWithFrequency(func, reportingFrequency, false);
+    public static final <T> T timeFuncExecutionWithFrequency(
+        @Nonnull String id,
+        @Nonnull Supplier<T> func,
+        int reportingFrequency
+    ) {
+        return timeFuncExecutionWithFrequency(id, func, reportingFrequency, false);
     }
 
-    public static final void timeFuncExecutionWithFrequency(@Nonnull Runnable func, int reportingFrequency) {
-        timeFuncExecutionWithFrequency(func, reportingFrequency, false);
+    public static final void timeFuncExecutionWithFrequency(
+        @Nonnull String id,
+        @Nonnull Runnable func,
+        int reportingFrequency
+    ) {
+        timeFuncExecutionWithFrequency(id, func, reportingFrequency, false);
     }
 
-    public static final <T> T timeFuncExecutionWithFrequency(@Nonnull Supplier<T> func, boolean logEveryTick) {
-        return timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    public static final <T> T timeFuncExecutionWithFrequency(
+        @Nonnull String id,
+        @Nonnull Supplier<T> func,
+        boolean logEveryTick
+    ) {
+        return timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, logEveryTick);
     }
 
-    public static final void timeFuncExecutionWithFrequency(@Nonnull Runnable func, boolean logEveryTick) {
-        timeFuncExecutionWithFrequency(func, REPORTING_FREQUENCY, false);
+    public static final void timeFuncExecutionWithFrequency(
+        @Nonnull String id,
+        @Nonnull Runnable func,
+        boolean logEveryTick
+    ) {
+        timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, logEveryTick);
     }
 
     ////////////////////////
@@ -54,50 +70,54 @@ public abstract class Benchmark {
     ////////////////////////
 
     public static final <T> T timeFuncExecutionWithFrequency(
+        @Nonnull String id,
         @Nonnull Supplier<T> func,
         int reportingFrequency,
         boolean logEveryTick
     ) {
         // run
-        var stats = getStats((Runnable) func);
+        var stats = getStats(id);
         var res = _run(func, stats);
+        TIMINGS.put(id, stats);
 
         // log
-        log(func.toString(), stats, reportingFrequency, logEveryTick);
+        log(id, stats, reportingFrequency, logEveryTick);
         return res;
     }
 
     public static final void timeFuncExecutionWithFrequency(
+        @Nonnull String id,
         @Nonnull Runnable func,
         int reportingFrequency,
         boolean logEveryTick
     ) {
         // run
-        var stats = getStats(func);
+        var stats = getStats(id);
         _run(func, stats);
+        TIMINGS.put(id, stats);
 
         // log
-        log(func.toString(), stats, reportingFrequency, logEveryTick);
+        log(id, stats, reportingFrequency, logEveryTick);
     }
 
     private static final void log(
-        String func,
-        @Nonnull ArrayList<Long> data,
+        @Nonnull String id,
+        @Nonnull ArrayList<Long> stats,
         int reportingFrequency,
         boolean logEveryTick
     ) {
-        if (data.size() == 0) {
+        if (stats.size() == 0) {
             return;
         }
 
-        if (data.size() % reportingFrequency != 0) {
+        if (stats.size() % reportingFrequency != 0) {
             return;
         }
 
         // compute long average
-        var size = data.size();
+        var size = stats.size();
         var total = 0;
-        for (var i : data) {
+        for (var i : stats) {
             total += i;
         }
         double longAverage = total / (double) size;
@@ -105,7 +125,7 @@ public abstract class Benchmark {
         // compute short average
         Double shortAverage = null;
         if (size >= SHORT_AVERAGE_TICKS) {
-            var shortData = data.subList(size - SHORT_AVERAGE_TICKS - 1, size);
+            var shortData = stats.subList(size - SHORT_AVERAGE_TICKS - 1, size);
             var shortTotal = 0;
             for (var i : shortData) {
                 shortTotal += i;
@@ -113,18 +133,14 @@ public abstract class Benchmark {
             shortAverage = shortTotal / (double) SHORT_AVERAGE_TICKS;
         }
 
-        var res = String.format(
-            "%10s   |  Long average: %7s",
-            func.toString().substring(0, 10),
-            ((Double) longAverage).toString()
-        );
+        var res = String.format("%10s   |  Long average: %7s", id, ((Double) longAverage).toString());
 
         if (shortAverage != null) {
             res = String.format("%s  |  Short average: %7s", res, shortAverage.toString());
         }
 
         if (logEveryTick) {
-            res = String.format("%s  |  TICK: %7s", res, data.get(data.size() - 1));
+            res = String.format("%s  |  TICK: %7s", res, stats.get(stats.size() - 1));
         }
 
         console.log(res);
@@ -132,8 +148,8 @@ public abstract class Benchmark {
 
     @Nonnull
     @SuppressWarnings("null")
-    private static ArrayList<Long> getStats(@Nonnull Runnable func) {
-        return TIMINGS.getOrDefault(func, new ArrayList<Long>());
+    private static ArrayList<Long> getStats(String id) {
+        return TIMINGS.getOrDefault(id, new ArrayList<Long>());
     }
 
     private static final <T> T _run(@Nonnull Supplier<T> func, @Nonnull ArrayList<Long> stats) {

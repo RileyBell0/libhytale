@@ -13,7 +13,10 @@ import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
-import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.math.util.ChunkUtil;
+import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.server.core.modules.block.BlockModule;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.ModPlugin;
 import dev.twunk.ticking.response.TickContinue;
@@ -21,6 +24,7 @@ import dev.twunk.ticking.response.TickResponse;
 import dev.twunk.ticking.response.TickSleep;
 import dev.twunk.ticking.response.TickStop;
 import dev.twunk.ticking.strategy.TickStrategy;
+import dev.twunk.utils.Benchmark;
 import java.util.ArrayList;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -152,17 +156,17 @@ import javax.annotation.Nullable;
  */
 public abstract class SmartTickSystem {
 
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
-
     // each system gets a generated int ID so I can access info from it faster
     private static int nextId = 0;
 
-    // private static ComponentType<ChunkStore, BlockModule.BlockStateInfo>
-    // BLOCK_INFO_COMPONENT_TYPE = BlockModule.BlockStateInfo
-    // .getComponentType();
-    // private static ComponentType<ChunkStore, BlockChunk>
-    // BLOCK_CHUNK_COMPONENT_TYPE = BlockChunk
-    // .getComponentType();
+    @Nonnull
+    @SuppressWarnings("null")
+    private static ComponentType<ChunkStore, BlockModule.BlockStateInfo> BLOCK_INFO_COMPONENT_TYPE =
+        BlockModule.BlockStateInfo.getComponentType();
+
+    @Nonnull
+    @SuppressWarnings("null")
+    private static ComponentType<ChunkStore, WorldChunk> WORLD_CHUNK_COMPONENT_TYPE = WorldChunk.getComponentType();
 
     ////////////////////////////////////////
     ////////////////////////////////////////
@@ -175,19 +179,19 @@ public abstract class SmartTickSystem {
     ////////////////////////////////////////
 
     @Nonnull
-    private final ArrayList<Ref<ChunkStore>> ticking = new ArrayList<>();
+    private final ArrayList<TickingEntityMetadata> ticking = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<Ref<ChunkStore>> sleeping = new ArrayList<>();
+    private final ArrayList<TickingEntityMetadata> sleeping = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<Ref<ChunkStore>> comatose = new ArrayList<>();
+    private final ArrayList<TickingEntityMetadata> comatose = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<Ref<ChunkStore>> stopped = new ArrayList<>();
+    private final ArrayList<TickingEntityMetadata> stopped = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<Ref<ChunkStore>> broken = new ArrayList<>();
+    private final ArrayList<TickingEntityMetadata> broken = new ArrayList<>();
 
     ////////////////////////////////////////
     ////////////////////////////////////////
@@ -255,13 +259,12 @@ public abstract class SmartTickSystem {
      */
     @Nullable
     public TickResponse onTick(
+        @Nonnull TickingEntityMetadata state,
         float dt,
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        console.log("Tick! " + ref + "  " + ticking.size());
+        // console.log("Tick! " + ref + "  " + ticking.size());
 
         return null;
     }
@@ -313,6 +316,94 @@ public abstract class SmartTickSystem {
         }
 
         /**
+         * Get a cached version of the info required to tick an entity
+         */
+        @Nullable
+        private static TickingEntityMetadata getTickVars(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final Store<ChunkStore> store,
+            @Nonnull final ArrayList<TickingEntityMetadata> area
+        ) {
+            // We're going to spend a bunch of extra time in onEntityAdd to cache
+            // all the information we'll need when this thing is ticking
+            //
+            // Most of this starts from the "info"
+            var info = store.getComponent(ref, BLOCK_INFO_COMPONENT_TYPE);
+            if (info == null) {
+                return null;
+            }
+
+            // Now, we use the info to get the chunk that we're in
+            var chunkRef = info.getChunkRef();
+            var chunk = store.getComponent(chunkRef, WORLD_CHUNK_COMPONENT_TYPE);
+            if (chunk == null) {
+                return null;
+            }
+            var world = chunk.getWorld();
+            if (world == null) {
+                return null;
+            }
+
+            // We use the info + chunk to get the global coords of the block
+            // using some magic I found in the depths of the hytale source code
+            // split across a couple files
+            var indexInChunk = info.getIndex();
+            var globalCoords = new Vector3i(
+                (chunk.getX() << 5) | (indexInChunk & 31),
+                (indexInChunk >> 10) & ChunkUtil.HEIGHT_MASK,
+                (chunk.getZ() << 5) | ((indexInChunk >> 5) & 31)
+            );
+
+            // lets get this all bundled up for easy re-use
+            var blockId = chunk.getBlock(globalCoords);
+            var cache = new TickingEntityMetadata(world, chunk, ref, globalCoords, blockId, area);
+
+            return cache;
+        }
+
+        @Nonnull
+        private SmartTickingInfo loadEntityTickingState(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+        ) {
+            // Setup a tickingInfo component to track the state of our entitiy
+            // so it can resume ticking/sleeping/etc when the server reboots. really
+            // we just want to store shit so the lifetime extends past (NOW), and
+            // so we can QUICKLY remove the entity again later
+            var tickingInfo = commandBuffer.ensureAndGetComponent(ref, TICK_STATE_COMPONENT);
+            var systemState = tickingInfo.getTickingInfo(SmartTickSystem.this);
+            if (systemState == null) {
+                systemState = new TickContinue();
+                tickingInfo.setTickingInfo(SmartTickSystem.this, systemState);
+            }
+
+            return tickingInfo;
+        }
+
+        /**
+         * Get a ref to the list in which this entity should be placed based on its
+         * current ticking state (active, sleeping, stopped etc)
+         * @return
+         */
+        @Nonnull
+        private final ArrayList<TickingEntityMetadata> getEntityTickGroup(TickResponse currentState) {
+            // and finally, we'll store it in the right place
+            if (currentState instanceof TickContinue) {
+                return ticking;
+            } else if (currentState instanceof TickSleep) {
+                if (((TickSleep) currentState).isIndefinite()) {
+                    return comatose;
+                } else {
+                    return sleeping;
+                }
+            } else if (currentState instanceof TickStop) {
+                return stopped;
+            } else {
+                return broken;
+            }
+        }
+
+        /**
          * When an entity is added to the world that matches our query, we figure out
          * if it IS ticking already (or sleeping etc), and if it DOESN'T have a state
          * for our given system, we add one, a default.
@@ -324,42 +415,29 @@ public abstract class SmartTickSystem {
             @Nonnull final Store<ChunkStore> store,
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer
         ) {
-            var tickState = commandBuffer.ensureAndGetComponent(ref, SmartTickingInfo.getComponentType());
-            var systemState = tickState.getTickingInfo(SmartTickSystem.this);
-            if (systemState == null) {
-                systemState = new TickContinue();
-                tickState.setTickingInfo(SmartTickSystem.this, systemState);
+            // figure out the current/initial ticking state our entity has
+            var tickingInfo = loadEntityTickingState(ref, commandBuffer);
+            var initialState = tickingInfo.getTickingInfo(SmartTickSystem.this);
+
+            // Figure out which tick group we should put our entity in based on its
+            // state
+            var area = getEntityTickGroup(initialState);
+
+            // prepare the variables/references we need to run our tick method
+            // (whenever that tick happens)
+            var onTickCache = getTickVars(ref, store, area);
+            if (onTickCache == null) {
+                return;
             }
 
-            ArrayList<Ref<ChunkStore>> area;
-            if (systemState instanceof TickContinue) {
-                area = ticking;
-            } else if (systemState instanceof TickSleep) {
-                if (((TickSleep) systemState).isIndefinite()) {
-                    area = comatose;
-                } else {
-                    area = sleeping;
-                }
-            } else if (systemState instanceof TickStop) {
-                area = stopped;
-            } else {
-                area = broken;
-            }
+            // we'll put chuck our cache into the right ticking group (ready to go)
+            area.add(onTickCache);
 
-            tickState._setMemoryLocation(SmartTickSystem.this, area);
-            area.add(ref);
+            // and finally, we'll write down the area that we put said cache
+            // so our component (found by ref) can remove itself easily
+            // when it gets removed
+            tickingInfo._setMemoryLocation(SmartTickSystem.this, onTickCache);
         }
-
-        // @Nonnull
-        // public static Vector3i getGlobalCoords(@Nonnull BlockChunk chunk,
-        // @Nonnull Ref<ChunkStore> ref) {
-        // var index = ref.getIndex();
-
-        // return new Vector3i(
-        // chunk.getX() << 5 | index & 31,
-        // index >> 10 & 31,
-        // chunk.getZ() << 5 | index >> 5 & 31);
-        // }
 
         /**
          * Mark the entity for removal.
@@ -374,12 +452,18 @@ public abstract class SmartTickSystem {
             @Nonnull final Store<ChunkStore> store,
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer
         ) {
-            var location = store.getComponent(ref, TICK_STATE_COMPONENT)._dumpMemoryLocation(SmartTickSystem.this);
-            if (location == null) {
-                return;
-            }
+            this.dropEntity(ref, reason, store);
+        }
 
-            location.remove(ref);
+        /**
+         * Run cleanup for the entity being unloaded/removed
+         */
+        private void dropEntity(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final RemoveReason reason,
+            @Nonnull final Store<ChunkStore> store
+        ) {
+            store.getComponent(ref, TICK_STATE_COMPONENT).drop(SmartTickSystem.this, reason);
         }
     }
 
@@ -392,9 +476,6 @@ public abstract class SmartTickSystem {
      * need be. really just to change their state if requested)
      */
     public class EntityTicker extends ArchetypeTickingSystem<ChunkStore> {
-
-        @Nonnull
-        private final ArrayList<TickResponse> tickResults = new ArrayList<>();
 
         public EntityTicker() {}
 
@@ -436,7 +517,18 @@ public abstract class SmartTickSystem {
             @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer
-        ) {}
+        ) {
+            // ++currTick;
+            // if (currTick % 300 == 0) {
+            //     console.log(String.format("STATS:\n - ticking: %d", ticking.size()));
+            //     var i = 0;
+            //     for (var entity : ticking) {
+            //         console.log(
+            //             String.format("   %2s) (%d, %d, %d)", ("" + i), entity.pos.x, entity.pos.y, entity.pos.z)
+            //         );
+            //     }
+            // }
+        }
 
         /**
          * Run ticks on all awake entities that match the parent's query
@@ -447,37 +539,30 @@ public abstract class SmartTickSystem {
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer
         ) {
-            // We'll store our tick results in an array and process them at the end for
-            // convenience and delegation of tasks
-            tickResults.clear();
-            tickResults.ensureCapacity(ticking.size());
-
-            // tick all our refs (ugly loop syntaxt basically just to assert that it's not
-            // null. trust me, it's not, i guarantee it on its way in elsewhere, just want
-            // to avoid having to check something the java type system can't pick up for
-            // some reason)
-            for (@Nonnull
-            @SuppressWarnings("null")
-            var ticker : ticking) {
-                try {
+            Benchmark.timeFuncExecution("Thing", () -> {
+                // tick all our refs (ugly loop syntaxt basically just to assert that it's not
+                // null. trust me, it's not, i guarantee it on its way in elsewhere, just want
+                // to avoid having to check something the java type system can't pick up for
+                // some reason)
+                for (@Nonnull
+                @SuppressWarnings("null")
+                var ticker : ticking) {
                     // need to make it so that we check if the ref is still valid at this stage
                     // (eventually)
-                    tickResults.add(SmartTickSystem.this.onTick(dt, ticker, archetypeChunk, store, commandBuffer));
-                } catch (Throwable e) {
-                    console.log(String.format("ERROR: Failed to tick entity"));
-                }
-            }
+                    var res = SmartTickSystem.this.onTick(ticker, dt, store, commandBuffer);
 
-            // // Transition to the state returned by the block
-            // if (tickResponse != null && !tickResponse.equals(tickComponent)) {
-            // if (tickResponse.getComponentType() == TickContinue.COMPONENT_TYPE) {
-            // commandBuffer.replaceComponent(ref, TickContinue.COMPONENT_TYPE,
-            // (TickContinue) tickResponse);
-            // } else {
-            // commandBuffer.removeComponent(ref, this.tickingComponentType);
-            // commandBuffer.addComponent(ref, tickResponse.getComponentType());
-            // }
-            // }
+                    // Transition to the state returned by the block
+                    if (res != null) {
+                        switch (res.getType()) {
+                            case TickResponse.TYPE_BROKEN:
+                            case TickResponse.TYPE_SLEEP:
+                            case TickResponse.TYPE_STOP:
+                            default:
+                                break;
+                        }
+                    }
+                }
+            });
         }
 
         @Override

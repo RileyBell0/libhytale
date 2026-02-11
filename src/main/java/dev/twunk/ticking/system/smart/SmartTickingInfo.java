@@ -1,13 +1,12 @@
 package dev.twunk.ticking.system.smart;
 
-import com.hypixel.fastutil.ints.Int2ObjectConcurrentHashMap;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.ticking.component.IRegisteredComponent;
 import dev.twunk.ticking.response.TickResponse;
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -52,15 +51,14 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and god knows, block games really have alot of blocks
      */
     @Nonnull
-    private final Int2ObjectConcurrentHashMap<TickResponse> tickingState = new Int2ObjectConcurrentHashMap<>();
+    private final Int2ObjectOpenHashMap<TickResponse> tickingState = new Int2ObjectOpenHashMap<>();
 
     /**
      * Map from SystemID to locations where the item is stored (memory only,
      * not stored to disk)
      */
     @Nonnull
-    private final Int2ObjectConcurrentHashMap<ArrayList<Ref<ChunkStore>>> memoryLocation =
-        new Int2ObjectConcurrentHashMap<>();
+    private final Int2ObjectOpenHashMap<TickingEntityMetadata> memoryLocation = new Int2ObjectOpenHashMap<>();
 
     /**
      * Store the current ticking state we've got for the given system (e.g. awake,
@@ -92,9 +90,9 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public ArrayList<Ref<ChunkStore>> _setMemoryLocation(
+    public TickingEntityMetadata _setMemoryLocation(
         @Nonnull SmartTickSystem system,
-        @Nonnull ArrayList<Ref<ChunkStore>> state
+        @Nonnull TickingEntityMetadata state
     ) {
         return memoryLocation.put(system.id, state);
     }
@@ -107,7 +105,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public ArrayList<Ref<ChunkStore>> _getMemoryLocation(@Nonnull SmartTickSystem system) {
+    public TickingEntityMetadata _getMemoryLocation(@Nonnull SmartTickSystem system) {
         return memoryLocation.get(system.id);
     }
 
@@ -119,8 +117,19 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public ArrayList<Ref<ChunkStore>> _dumpMemoryLocation(@Nonnull SmartTickSystem system) {
+    public TickingEntityMetadata _dumpMemoryLocation(@Nonnull SmartTickSystem system, RemoveReason reason) {
+        if (reason == RemoveReason.REMOVE) {
+            this.tickingState.remove(system.id);
+        }
         return memoryLocation.remove(system.id);
+    }
+
+    public void drop(@Nonnull SmartTickSystem system, @Nonnull RemoveReason reason) {
+        if (reason == RemoveReason.REMOVE) {
+            this.tickingState.remove(system.id);
+        }
+        var cache = memoryLocation.remove(system.id);
+        cache.drop();
     }
 
     @Nonnull
