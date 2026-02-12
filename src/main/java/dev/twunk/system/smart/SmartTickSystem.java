@@ -1,4 +1,4 @@
-package dev.twunk.ticking.system.smart;
+package dev.twunk.system.smart;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -18,12 +18,12 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.interfaces.ModPlugin;
-import dev.twunk.ticking.response.TickContinue;
-import dev.twunk.ticking.response.TickResponse;
-import dev.twunk.ticking.response.TickSleep;
-import dev.twunk.ticking.response.TickStop;
-import dev.twunk.ticking.strategy.TickStrategy;
+import dev.twunk.plugin.ModPlugin;
+import dev.twunk.system.response.TickContinue;
+import dev.twunk.system.response.TickResponse;
+import dev.twunk.system.response.TickSleep;
+import dev.twunk.system.response.TickStop;
+import dev.twunk.system.strategy.TickStrategy;
 import dev.twunk.utils.Benchmark;
 import java.util.ArrayList;
 import java.util.Set;

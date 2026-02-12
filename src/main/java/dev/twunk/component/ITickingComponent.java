@@ -1,11 +1,11 @@
-package dev.twunk.ticking.component;
+package dev.twunk.component;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.response.TickResponse;
+import dev.twunk.system.response.TickResponse;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

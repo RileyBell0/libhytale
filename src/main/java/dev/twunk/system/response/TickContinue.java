@@ -1,9 +1,9 @@
-package dev.twunk.ticking.response;
+package dev.twunk.system.response;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.component.IRegisteredComponent;
+import dev.twunk.component.IRegisteredComponent;
 import javax.annotation.Nonnull;
 
 /**

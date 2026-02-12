@@ -1,11 +1,11 @@
-package dev.twunk.ticking.system.smart;
+package dev.twunk.system.smart;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.component.IRegisteredComponent;
-import dev.twunk.ticking.response.TickResponse;
+import dev.twunk.component.IRegisteredComponent;
+import dev.twunk.system.response.TickResponse;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

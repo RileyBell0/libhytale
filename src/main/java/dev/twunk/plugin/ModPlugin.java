@@ -1,4 +1,4 @@
-package dev.twunk.interfaces;
+package dev.twunk.plugin;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
@@ -10,10 +10,10 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.component.IRegisteredComponent;
-import dev.twunk.ticking.component.ITickingComponent;
-import dev.twunk.ticking.system.easy.TickingBlockComponent_Initialiser;
-import dev.twunk.ticking.system.easy.TickingBlockComponent_System;
+import dev.twunk.component.IRegisteredComponent;
+import dev.twunk.component.ITickingComponent;
+import dev.twunk.system.easy.TickingBlockComponent_Initialiser;
+import dev.twunk.system.easy.TickingBlockComponent_System;
 import dev.twunk.utils.TwunkLib;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;

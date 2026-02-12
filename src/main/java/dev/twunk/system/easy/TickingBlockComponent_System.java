@@ -1,4 +1,4 @@
-package dev.twunk.ticking.system.easy;
+package dev.twunk.system.easy;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -8,11 +8,11 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.component.IRegisteredComponent;
-import dev.twunk.ticking.component.ITickingComponent;
-import dev.twunk.ticking.response.TickContinue;
-import dev.twunk.ticking.response.TickResponse;
-import dev.twunk.ticking.strategy.TickStrategy;
+import dev.twunk.component.IRegisteredComponent;
+import dev.twunk.component.ITickingComponent;
+import dev.twunk.system.response.TickContinue;
+import dev.twunk.system.response.TickResponse;
+import dev.twunk.system.strategy.TickStrategy;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;

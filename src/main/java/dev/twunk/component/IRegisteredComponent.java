@@ -1,4 +1,4 @@
-package dev.twunk.ticking.component;
+package dev.twunk.component;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;

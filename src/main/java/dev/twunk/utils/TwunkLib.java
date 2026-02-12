@@ -1,11 +1,11 @@
 package dev.twunk.utils;
 
-import dev.twunk.interfaces.ModPlugin;
-import dev.twunk.ticking.response.TickBroken;
-import dev.twunk.ticking.response.TickContinue;
-import dev.twunk.ticking.response.TickSleep;
-import dev.twunk.ticking.response.TickStop;
-import dev.twunk.ticking.system.smart.SmartTickingInfo;
+import dev.twunk.plugin.ModPlugin;
+import dev.twunk.system.response.TickBroken;
+import dev.twunk.system.response.TickContinue;
+import dev.twunk.system.response.TickSleep;
+import dev.twunk.system.response.TickStop;
+import dev.twunk.system.smart.SmartTickingInfo;
 
 public abstract class TwunkLib {
 

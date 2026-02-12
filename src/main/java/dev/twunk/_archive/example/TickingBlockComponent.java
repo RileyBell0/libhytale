@@ -1,6 +1,6 @@
-package dev.twunk.ticking.example;
+package dev.twunk._archive.example;
 
-import dev.twunk.ticking.component.ITickingComponent;
+import dev.twunk.component.ITickingComponent;
 import javax.annotation.Nonnull;
 
 public class TickingBlockComponent implements ITickingComponent {

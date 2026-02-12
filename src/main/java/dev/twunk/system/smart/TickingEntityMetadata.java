@@ -1,4 +1,4 @@
-package dev.twunk.ticking.system.smart;
+package dev.twunk.system.smart;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3i;

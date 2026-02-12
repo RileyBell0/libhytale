@@ -1,4 +1,4 @@
-package dev.twunk.ticking.system.easy;
+package dev.twunk.system.easy;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -11,11 +11,11 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.ticking.component.IRegisteredComponent;
-import dev.twunk.ticking.component.ITickingComponent;
-import dev.twunk.ticking.response.TickContinue;
-import dev.twunk.ticking.response.TickSleep;
-import dev.twunk.ticking.response.TickStop;
+import dev.twunk.component.IRegisteredComponent;
+import dev.twunk.component.ITickingComponent;
+import dev.twunk.system.response.TickContinue;
+import dev.twunk.system.response.TickSleep;
+import dev.twunk.system.response.TickStop;
 import dev.twunk.utils.BlockUtils;
 import javax.annotation.Nonnull;
 
