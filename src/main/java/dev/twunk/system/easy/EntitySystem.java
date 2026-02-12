@@ -8,13 +8,18 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.dependency.Dependency;
+import com.hypixel.hytale.component.dependency.Order;
+import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.component.ITickingComponent;
+import dev.twunk.plugin.ModPlugin;
 import dev.twunk.utils.BlockUtils;
+import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
@@ -23,9 +28,16 @@ public abstract class EntitySystem<T extends ITickingComponent> {
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     @Nonnull
-    private ComponentType<ChunkStore, T> tickingComponentType;
+    private final LifetimeSystem lifetimeSystem = new LifetimeSystem();
 
-    private Query<ChunkStore> query;
+    @Nonnull
+    private final TickSystem tickSystem = new TickSystem();
+
+    @Nonnull
+    private final ComponentType<ChunkStore, T> tickingComponentType;
+
+    @Nonnull
+    private final Query<ChunkStore> query;
 
     /**
      * @param supplier A function that gives the type of the component you're
@@ -231,6 +243,12 @@ public abstract class EntitySystem<T extends ITickingComponent> {
      */
     public class TickSystem extends ChunkBlockTickSystem.Ticking {
 
+        @SuppressWarnings({ "null", "rawtypes", "unchecked" })
+        @Nonnull
+        private final Set<Dependency<ChunkStore>> DEPENDENCIES = Set.of(
+            new SystemDependency(Order.AFTER, lifetimeSystem.getClass())
+        );
+
         /**
          * i've done some really specific names for vars and comments in here to highlight what
          * i think is happening. notably, this is written whilst there's no comments
@@ -259,5 +277,19 @@ public abstract class EntitySystem<T extends ITickingComponent> {
         public Query<ChunkStore> getQuery() {
             return EntitySystem.this.query;
         }
+
+        /**
+         * must run AFTER the its own entity register system
+         */
+        @Nonnull
+        @Override
+        public Set<Dependency<ChunkStore>> getDependencies() {
+            return DEPENDENCIES;
+        }
+    }
+
+    public void registerTo(ModPlugin plugin) {
+        plugin.getChunkStoreRegistry().registerSystem(lifetimeSystem);
+        plugin.getChunkStoreRegistry().registerSystem(tickSystem);
     }
 }
