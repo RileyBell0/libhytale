@@ -14,18 +14,16 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.component.ITickingComponent;
-import dev.twunk.system.response.TickContinue;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 public abstract class EntitySystem<T extends ITickingComponent> {
 
+    private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+
     @Nonnull
     private ComponentType<ChunkStore, T> tickingComponentType;
-
-    @SuppressWarnings("unused")
-    private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     private Query<ChunkStore> query;
 
@@ -58,17 +56,17 @@ public abstract class EntitySystem<T extends ITickingComponent> {
             throw new RuntimeException("HECK supplier failed");
         }
         this.tickingComponentType = val;
-        this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
+        this.query = Query.and(this.tickingComponentType);
     }
 
     public EntitySystem(@Nonnull Class<T> componentClass) {
         this.tickingComponentType = IRegisteredComponent.getComponentType(componentClass);
-        this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
+        this.query = Query.and(this.tickingComponentType);
     }
 
     public EntitySystem(@Nonnull ComponentType<ChunkStore, T> tickingComponentType) {
         this.tickingComponentType = tickingComponentType;
-        this.query = Query.and(TickContinue.COMPONENT_TYPE, this.tickingComponentType);
+        this.query = Query.and(this.tickingComponentType);
     }
 
     /**
