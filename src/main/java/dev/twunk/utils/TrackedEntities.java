@@ -10,12 +10,11 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.component.TickSchedulerComponent;
 import dev.twunk.system.response.TickContinue;
 import dev.twunk.system.response.TickResponse;
 import dev.twunk.system.response.TickSleep;
 import dev.twunk.system.response.TickStop;
-import dev.twunk.system.smart.SmartTickingInfo;
-import dev.twunk.system.smart.TickingEntityMetadata;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,8 +47,8 @@ public class TrackedEntities {
     }
 
     @Nonnull
-    public static final ComponentType<ChunkStore, SmartTickingInfo> TICK_STATE_COMPONENT =
-        SmartTickingInfo.getComponentType();
+    public static final ComponentType<ChunkStore, TickSchedulerComponent> TICK_STATE_COMPONENT =
+        TickSchedulerComponent.getComponentType();
 
     @Nonnull
     @SuppressWarnings("null")
@@ -66,19 +65,19 @@ public class TrackedEntities {
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
     @Nonnull
-    public final ArrayList<TickingEntityMetadata> ticking = new ArrayList<>();
+    public final ArrayList<TrackedBlockEntity> ticking = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TickingEntityMetadata> sleeping = new ArrayList<>();
+    private final ArrayList<TrackedBlockEntity> sleeping = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TickingEntityMetadata> comatose = new ArrayList<>();
+    private final ArrayList<TrackedBlockEntity> comatose = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TickingEntityMetadata> stopped = new ArrayList<>();
+    private final ArrayList<TrackedBlockEntity> stopped = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TickingEntityMetadata> broken = new ArrayList<>();
+    private final ArrayList<TrackedBlockEntity> broken = new ArrayList<>();
 
     public void track(
         @Nonnull final Ref<ChunkStore> ref,
@@ -121,10 +120,10 @@ public class TrackedEntities {
      * Get a cached version of the info required to tick an entity
      */
     @Nullable
-    private static TickingEntityMetadata getTickVars(
+    private static TrackedBlockEntity getTickVars(
         @Nonnull final Ref<ChunkStore> ref,
         @Nonnull final Store<ChunkStore> store,
-        @Nonnull final ArrayList<TickingEntityMetadata> area
+        @Nonnull final ArrayList<TrackedBlockEntity> area
     ) {
         // We're going to spend a bunch of extra time in onEntityAdd to cache
         // all the information we'll need when this thing is ticking
@@ -158,13 +157,13 @@ public class TrackedEntities {
 
         // lets get this all bundled up for easy re-use
         var blockId = chunk.getBlock(globalCoords);
-        var cache = new TickingEntityMetadata(world, chunk, ref, globalCoords, blockId, area);
+        var cache = new TrackedBlockEntity(world, chunk, ref, globalCoords, blockId, area);
 
         return cache;
     }
 
     @Nonnull
-    private SmartTickingInfo loadEntityTickingState(
+    private TickSchedulerComponent loadEntityTickingState(
         @Nonnull final Ref<ChunkStore> ref,
         @Nonnull final CommandBuffer<ChunkStore> commandBuffer
     ) {
@@ -188,7 +187,7 @@ public class TrackedEntities {
      * @return
      */
     @Nonnull
-    private ArrayList<TickingEntityMetadata> getOwner(TickResponse currentState) {
+    private ArrayList<TrackedBlockEntity> getOwner(TickResponse currentState) {
         // and finally, we'll store it in the right place
         if (currentState instanceof TickContinue) {
             return ticking;

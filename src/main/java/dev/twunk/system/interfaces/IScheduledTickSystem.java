@@ -1,17 +1,24 @@
 package dev.twunk.system.interfaces;
 
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.system.response.TickResponse;
-import dev.twunk.system.smart.TickingEntityMetadata;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public interface IScheduledTickSystem {
     @Nullable
     public abstract TickResponse onEntityTick(
-        @Nonnull TickingEntityMetadata state,
+        @Nonnull World world,
+        @Nonnull WorldChunk chunk,
+        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull Vector3i globalCoords,
+        int blockId,
         float dt,
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer

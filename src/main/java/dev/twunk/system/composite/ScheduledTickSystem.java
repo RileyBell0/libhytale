@@ -109,7 +109,16 @@ public class ScheduledTickSystem extends SubSystem implements ILifetimeSystem, I
         var ticker : entities.ticking) {
             // need to make it so that we check if the ref is still valid at this stage
             // (eventually)
-            var res = parent.onEntityTick(ticker, dt, store, commandBuffer);
+            var res = parent.onEntityTick(
+                ticker.world,
+                ticker.chunk,
+                ticker.ref,
+                ticker.pos,
+                ticker.blockId,
+                dt,
+                store,
+                commandBuffer
+            );
 
             // Transition to the state returned by the block
             if (res != null) {

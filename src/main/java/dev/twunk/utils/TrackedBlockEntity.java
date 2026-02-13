@@ -1,4 +1,4 @@
-package dev.twunk.system.smart;
+package dev.twunk.utils;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3i;
@@ -47,7 +47,7 @@ import javax.annotation.Nonnull;
  * }
  * </pre>
  */
-public class TickingEntityMetadata {
+public class TrackedBlockEntity {
 
     private static long nextLifetimeId = 0;
 
@@ -78,7 +78,7 @@ public class TickingEntityMetadata {
     public final Ref<ChunkStore> ref;
 
     @Nonnull
-    private ArrayList<TickingEntityMetadata> currentAreaRef;
+    private ArrayList<TrackedBlockEntity> currentAreaRef;
 
     /**
      * Block coords - global for the given world. Never stored in hytale code as
@@ -95,13 +95,13 @@ public class TickingEntityMetadata {
      */
     public final int blockId;
 
-    public TickingEntityMetadata(
+    public TrackedBlockEntity(
         @Nonnull World world,
         @Nonnull WorldChunk chunk,
         @Nonnull Ref<ChunkStore> ref,
         @Nonnull Vector3i globalCoords,
         int blockId,
-        @Nonnull ArrayList<TickingEntityMetadata> currentAreaRef
+        @Nonnull ArrayList<TrackedBlockEntity> currentAreaRef
     ) {
         this.lifetimeId = ++nextLifetimeId;
         this.pos = globalCoords;
@@ -121,8 +121,8 @@ public class TickingEntityMetadata {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof TickingEntityMetadata) {
-            return ((TickingEntityMetadata) obj).ref == this.ref;
+        if (obj instanceof TrackedBlockEntity) {
+            return ((TrackedBlockEntity) obj).ref == this.ref;
         }
         return false;
     }

@@ -1,19 +1,19 @@
-package dev.twunk.system.smart;
+package dev.twunk.component;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.system.response.TickResponse;
+import dev.twunk.utils.TrackedBlockEntity;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * Singleton-like component
- * - NOT one SmartTickInfo per server
- * - YES one SmartTickInfo per ENTITY
+ * - NOT one TickSchedulerComponent per server
+ * - YES one TickSchedulerComponent per ENTITY
  *
  * basically, this is an extension of my SmartTickSystem that i shove onto your
  * entities when you're using SmartTickSystem
@@ -23,18 +23,18 @@ import javax.annotation.Nullable;
  *
  * but to be fair, stupid stuff is fun stuff
  */
-public class SmartTickingInfo implements IRegisteredComponent {
+public class TickSchedulerComponent implements IRegisteredComponent {
 
     // serializing/deserializing your vars
     @Nonnull
-    public static final BuilderCodec<SmartTickingInfo> CODEC = BuilderCodec.builder(
-        SmartTickingInfo.class,
-        SmartTickingInfo::new
+    public static final BuilderCodec<TickSchedulerComponent> CODEC = BuilderCodec.builder(
+        TickSchedulerComponent.class,
+        TickSchedulerComponent::new
     ).build();
 
     @SuppressWarnings("null")
     @Nonnull
-    public static ComponentType<ChunkStore, SmartTickingInfo> COMPONENT_TYPE;
+    public static ComponentType<ChunkStore, TickSchedulerComponent> COMPONENT_TYPE;
 
     /**
      * The idea is to only have 1x of this component per entity, thus, since my
@@ -58,7 +58,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * not stored to disk)
      */
     @Nonnull
-    private final HashMap<String, TickingEntityMetadata> memoryLocation = new HashMap<>();
+    private final HashMap<String, TrackedBlockEntity> memoryLocation = new HashMap<>();
 
     /**
      * Store the current ticking state we've got for the given system (e.g. awake,
@@ -90,7 +90,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _setMemoryLocation(String systemId, @Nonnull TickingEntityMetadata state) {
+    public TrackedBlockEntity _setMemoryLocation(String systemId, @Nonnull TrackedBlockEntity state) {
         return memoryLocation.put(systemId, state);
     }
 
@@ -102,7 +102,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _getMemoryLocation(String systemId) {
+    public TrackedBlockEntity _getMemoryLocation(String systemId) {
         return memoryLocation.get(systemId);
     }
 
@@ -114,7 +114,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _dumpMemoryLocation(String systemId, RemoveReason reason) {
+    public TrackedBlockEntity _dumpMemoryLocation(String systemId, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
@@ -130,14 +130,14 @@ public class SmartTickingInfo implements IRegisteredComponent {
     }
 
     @Nonnull
-    public SmartTickingInfo clone() {
-        return new SmartTickingInfo();
+    public TickSchedulerComponent clone() {
+        return new TickSchedulerComponent();
     }
 
     @Nonnull
-    public static ComponentType<ChunkStore, SmartTickingInfo> getComponentType() {
-        return (ComponentType<ChunkStore, SmartTickingInfo>) IRegisteredComponent.getComponentType(
-            SmartTickingInfo.class
+    public static ComponentType<ChunkStore, TickSchedulerComponent> getComponentType() {
+        return (ComponentType<ChunkStore, TickSchedulerComponent>) IRegisteredComponent.getComponentType(
+            TickSchedulerComponent.class
         );
     }
 }
