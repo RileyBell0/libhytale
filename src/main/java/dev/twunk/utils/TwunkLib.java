@@ -1,6 +1,5 @@
 package dev.twunk.utils;
 
-import dev.twunk.component.TickSchedulerComponent;
 import dev.twunk.plugin.ModPlugin;
 import dev.twunk.system.response.TickBroken;
 import dev.twunk.system.response.TickContinue;

@@ -1,54 +1,58 @@
-package dev.twunk.system;
+package dev.twunk.system.readytouse;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
-import dev.twunk.component.ITickingComponent;
-import dev.twunk.plugin.ModPlugin;
+import dev.twunk.component.ITickableBlockComponent;
+import dev.twunk.system.SubSystemOwner;
+import dev.twunk.system.interfaces.IEntityTickSystem;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
-public class TickingComponentSystem<T extends ITickingComponent> extends EntityTickingSystem<ChunkStore> {
+/**
+ * Intended for re-use as is. Also intended for minimal usage (mainly testing etc)
+ *
+ * GOAL: Tick ALL block entities that have the provided component
+ *
+ * Marked as final since, this is really a one and done sorta deal, just clone
+ * its src and edit if you need alterations, because, then its just not this
+ * specific thing anymore.
+ */
+public final class TickableBlockComponentSystem<T extends ITickableBlockComponent>
+    extends SubSystemOwner
+    implements IEntityTickSystem
+{
 
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
-    @Nonnull
-    private final ComponentType<ChunkStore, T> tickingComponentType;
+    private final @Nonnull ComponentType<ChunkStore, T> componentType;
 
-    @Nonnull
-    private final Query<ChunkStore> query;
-
-    public TickingComponentSystem(@Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
-        var val = supplier.get();
-        if (val == null) {
-            throw new RuntimeException("HECK supplier failed");
+    public TickableBlockComponentSystem(@Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
+        super(Query.and(supplier.get()));
+        var component = supplier.get();
+        if (component == null) {
+            throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
         }
-        this.tickingComponentType = val;
-        this.query = Query.and(this.tickingComponentType);
+        this.componentType = component;
     }
 
-    public TickingComponentSystem(@Nonnull Class<T> componentClass) {
-        this.tickingComponentType = IRegisteredComponent.getComponentType(componentClass);
-        this.query = Query.and(this.tickingComponentType);
+    public TickableBlockComponentSystem(@Nonnull Class<T> componentClass) {
+        super(Query.and(IRegisteredComponent.getComponentType(componentClass)));
+        this.componentType = IRegisteredComponent.getComponentType(componentClass);
     }
 
-    public TickingComponentSystem(@Nonnull ComponentType<ChunkStore, T> tickingComponentType) {
-        this.tickingComponentType = tickingComponentType;
-        this.query = Query.and(this.tickingComponentType);
+    public TickableBlockComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
+        super(Query.and(componentType));
+        this.componentType = componentType;
     }
 
-    /**
-     * No touchy. just read. overwrite it if you need
-     */
-    @Override
-    public void tick(
+    public void onEntityTick(
         float dt,
         int index,
         @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
@@ -101,32 +105,15 @@ public class TickingComponentSystem<T extends ITickingComponent> extends EntityT
 
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = BlockUtils.getComponent(this.tickingComponentType, commandBuffer, blockRef);
+        var component = BlockUtils.getComponent(this.componentType, commandBuffer, blockRef);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
             // easy things easy. and i'm all for that
-            component.onTick(
-                world,
-                worldChunk,
-                commandBuffer,
-                coords.x,
-                coords.y,
-                coords.z,
-                worldChunk.getBlock(coords)
-            );
+            component.onBlockEntityTick(world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
         } catch (Throwable e) {
             console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
             return;
         }
-    }
-
-    @Override
-    public Query<ChunkStore> getQuery() {
-        return this.query;
-    }
-
-    public void registerTo(ModPlugin plugin) {
-        plugin.getChunkStoreRegistry().registerSystem(this);
     }
 }

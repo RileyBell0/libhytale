@@ -1,21 +1,13 @@
-package dev.twunk.component;
+package dev.twunk.utils;
 
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
-// "BlockType": {
-//   "TickProcedure": {
-//     "Type": "InherentTickProcedure"
-//   },
-//   ...
-// }
-// ^^ the above is an option. I dont like it but it's an option
-
-public interface ITickingComponent extends IRegisteredComponent {
+public interface ITickableBlockEntity {
     /**
      * Ticking a block? Just need some damn code to run in game while testing? put
      * it in here!
@@ -29,17 +21,11 @@ public interface ITickingComponent extends IRegisteredComponent {
      * instead of "i want my component to tick", nah, you want a SYSTEM that
      * queries just your component to tick
      */
-    public default void onTick(
+    public void onBlockEntityTick(
         @Nonnull World world,
         @Nonnull WorldChunk wc,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-        int worldX,
-        int worldY,
-        int worldZ,
+        @Nonnull Vector3i worldCoords,
         int blockId
-    ) {
-        HytaleLogger.forEnclosingClass()
-            .atInfo()
-            .log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " )");
-    }
+    );
 }

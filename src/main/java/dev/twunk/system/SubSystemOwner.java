@@ -9,7 +9,16 @@ import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class SubSystem implements QuerySystem<ChunkStore> {
+/**
+ * Nice-to-have wrapper for making a system OR composite subsystem
+ *
+ * Makes it easy to register sub systems to it, and then easy to register the
+ * overall parent itself (assuming the parent is just a regular class)
+ *
+ * Forces the parent to provide a `query` that its subsystems will use. That's
+ * the most handy part honestly
+ */
+public abstract class SubSystemOwner implements QuerySystem<ChunkStore> {
 
     @Nonnull
     private final ArrayList<ISubSystem> subSystems = new ArrayList<>();
@@ -17,7 +26,7 @@ public abstract class SubSystem implements QuerySystem<ChunkStore> {
     @Nonnull
     private final Query<ChunkStore> query;
 
-    public SubSystem(@Nonnull Query<ChunkStore> query) {
+    public SubSystemOwner(@Nonnull Query<ChunkStore> query) {
         this.query = query;
     }
 

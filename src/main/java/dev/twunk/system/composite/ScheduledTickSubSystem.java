@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.SubSystem;
+import dev.twunk.system.SubSystemOwner;
 import dev.twunk.system.base.GlobalTickSubSystem;
 import dev.twunk.system.base.LifetimeSubSystem;
 import dev.twunk.system.interfaces.IGlobalTickSystem;
@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class ScheduledTickSubSystem extends SubSystem implements ILifetimeSystem, IGlobalTickSystem {
+public class ScheduledTickSubSystem extends SubSystemOwner implements ILifetimeSystem, IGlobalTickSystem {
 
     @Nonnull
     private final TrackedEntities entities;

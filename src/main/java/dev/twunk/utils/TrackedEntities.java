@@ -10,7 +10,6 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.TickSchedulerComponent;
 import dev.twunk.system.response.TickContinue;
 import dev.twunk.system.response.TickResponse;
 import dev.twunk.system.response.TickSleep;
