@@ -67,8 +67,8 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * Returns the previously set state (if one was already there)
      */
     @Nullable
-    public TickResponse setTickingInfo(@Nonnull SchedulableTickSystem system, @Nonnull TickResponse state) {
-        return this.tickingState.put(system.id, state);
+    public TickResponse setTickingInfo(int systemId, @Nonnull TickResponse state) {
+        return this.tickingState.put(systemId, state);
     }
 
     /**
@@ -76,8 +76,8 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * currently awake and ticking, or asleep until ___ etc etc)
      */
     @Nullable
-    public TickResponse getTickingInfo(@Nonnull SchedulableTickSystem system) {
-        return this.tickingState.get(system.id);
+    public TickResponse getTickingInfo(int systemId) {
+        return this.tickingState.get(systemId);
     }
 
     /**
@@ -90,11 +90,8 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _setMemoryLocation(
-        @Nonnull SchedulableTickSystem system,
-        @Nonnull TickingEntityMetadata state
-    ) {
-        return memoryLocation.put(system.id, state);
+    public TickingEntityMetadata _setMemoryLocation(int systemId, @Nonnull TickingEntityMetadata state) {
+        return memoryLocation.put(systemId, state);
     }
 
     /**
@@ -105,8 +102,8 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _getMemoryLocation(@Nonnull SchedulableTickSystem system) {
-        return memoryLocation.get(system.id);
+    public TickingEntityMetadata _getMemoryLocation(int systemId) {
+        return memoryLocation.get(systemId);
     }
 
     /**
@@ -117,18 +114,18 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _dumpMemoryLocation(@Nonnull SchedulableTickSystem system, RemoveReason reason) {
+    public TickingEntityMetadata _dumpMemoryLocation(int systemId, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
-            this.tickingState.remove(system.id);
+            this.tickingState.remove(systemId);
         }
-        return memoryLocation.remove(system.id);
+        return memoryLocation.remove(systemId);
     }
 
-    public void drop(@Nonnull SchedulableTickSystem system, @Nonnull RemoveReason reason) {
+    public void drop(int systemId, @Nonnull RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
-            this.tickingState.remove(system.id);
+            this.tickingState.remove(systemId);
         }
-        var cache = memoryLocation.remove(system.id);
+        var cache = memoryLocation.remove(systemId);
         cache.drop();
     }
 
