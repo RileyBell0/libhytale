@@ -24,12 +24,12 @@ import javax.annotation.Nullable;
  * PRODUCES:
  * - ILifetimeSystem runner
  */
-public class LifetimeSystem extends RefSystem<ChunkStore> implements ISubSystem {
+public class LifetimeSubSystem extends RefSystem<ChunkStore> implements ISubSystem {
 
     private final @Nonnull ILifetimeSystem parent;
     private final @Nullable Query<ChunkStore> query;
 
-    public LifetimeSystem(@Nonnull ILifetimeSystem parent) {
+    public LifetimeSubSystem(@Nonnull ILifetimeSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

@@ -1,53 +1,47 @@
 package dev.twunk.system.base;
 
+import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.interfaces.IGlobalTickSystem;
+import dev.twunk.system.interfaces.IEntityTickSystem;
 import dev.twunk.system.interfaces.ISubSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Subsystem for calling `onSystemTick` on the parent system every tick
+ * Subsystem for calling `onEntityTick` on the parent system every tick
  *
- * GOAL: run code ONCE per tick globally. not per element, just, run this once per tick
+ * GOAL: run code on entities every tick
  *
  * REQUIRES:
  * - N/A (this is a leaf)
  * PRODUCES:
- * - IGlobalTickSystem runner
+ * - IEntityTickSystem runner
  */
-public class GlobalTickSystem extends ArchetypeTickingSystem<ChunkStore> implements ISubSystem {
+public class EntityTickSubSystem extends ChunkBlockTickSystem.Ticking implements ISubSystem {
 
-    private final @Nonnull IGlobalTickSystem parent;
+    private final @Nonnull IEntityTickSystem parent;
     private final @Nullable Query<ChunkStore> query;
 
-    public GlobalTickSystem(@Nonnull IGlobalTickSystem parent) {
+    public EntityTickSubSystem(@Nonnull IEntityTickSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }
 
-    /**
-     * tick method that gets called by the `store`
-     * this is pretty much just a shim to get into my code, as i don't want to touch
-     * theirs wherever possible
-     */
-    @Override
     public void tick(
         float dt,
+        int index,
         @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
         @Nonnull Store<ChunkStore> store,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        parent.onSystemTick(dt, archetypeChunk, store, commandBuffer);
+        parent.onEntityTick(dt, index, archetypeChunk, store, commandBuffer);
     }
 
     @Override
-    @Nullable
     public Query<ChunkStore> getQuery() {
         return this.query;
     }
