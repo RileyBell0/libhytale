@@ -67,7 +67,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * Returns the previously set state (if one was already there)
      */
     @Nullable
-    public TickResponse setTickingInfo(@Nonnull SmartTickSystem system, @Nonnull TickResponse state) {
+    public TickResponse setTickingInfo(@Nonnull SchedulableTickSystem system, @Nonnull TickResponse state) {
         return this.tickingState.put(system.id, state);
     }
 
@@ -76,7 +76,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * currently awake and ticking, or asleep until ___ etc etc)
      */
     @Nullable
-    public TickResponse getTickingInfo(@Nonnull SmartTickSystem system) {
+    public TickResponse getTickingInfo(@Nonnull SchedulableTickSystem system) {
         return this.tickingState.get(system.id);
     }
 
@@ -91,7 +91,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      */
     @Nullable
     public TickingEntityMetadata _setMemoryLocation(
-        @Nonnull SmartTickSystem system,
+        @Nonnull SchedulableTickSystem system,
         @Nonnull TickingEntityMetadata state
     ) {
         return memoryLocation.put(system.id, state);
@@ -105,7 +105,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _getMemoryLocation(@Nonnull SmartTickSystem system) {
+    public TickingEntityMetadata _getMemoryLocation(@Nonnull SchedulableTickSystem system) {
         return memoryLocation.get(system.id);
     }
 
@@ -117,14 +117,14 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _dumpMemoryLocation(@Nonnull SmartTickSystem system, RemoveReason reason) {
+    public TickingEntityMetadata _dumpMemoryLocation(@Nonnull SchedulableTickSystem system, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(system.id);
         }
         return memoryLocation.remove(system.id);
     }
 
-    public void drop(@Nonnull SmartTickSystem system, @Nonnull RemoveReason reason) {
+    public void drop(@Nonnull SchedulableTickSystem system, @Nonnull RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(system.id);
         }

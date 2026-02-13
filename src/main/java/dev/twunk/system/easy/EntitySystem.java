@@ -13,6 +13,7 @@ import com.hypixel.hytale.component.dependency.Order;
 import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
+import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.component.ITickingComponent;
@@ -20,17 +21,26 @@ import dev.twunk.plugin.ModPlugin;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+/**
+ * Lets say you need to do multiple things over the lifetime of an entity and DONT want
+ * a billion systems to handle it.
+ *
+ * check it -> just use this. it does the two most common things i need in my code so far
+ * -> lifecycle management
+ * -> ticking (always)
+ */
 public abstract class EntitySystem<T extends ITickingComponent> {
 
     @Nonnull
     private final LifetimeSystem lifetimeSystem = new LifetimeSystem();
 
     @Nonnull
-    private final TickSystem tickSystem = new TickSystem();
+    private final EntityTickSystem tickSystem = new EntityTickSystem();
 
     @Nonnull
-    private final ComponentType<ChunkStore, T> tickingComponentType;
+    private final GlobalTickSystem globalTickSystem = new GlobalTickSystem();
 
     @Nonnull
     private final Query<ChunkStore> query;
@@ -63,18 +73,16 @@ public abstract class EntitySystem<T extends ITickingComponent> {
         if (val == null) {
             throw new RuntimeException("HECK supplier failed");
         }
-        this.tickingComponentType = val;
-        this.query = Query.and(this.tickingComponentType);
+        this.query = Query.and(val);
     }
 
     public EntitySystem(@Nonnull Class<T> componentClass) {
-        this.tickingComponentType = IRegisteredComponent.getComponentType(componentClass);
-        this.query = Query.and(this.tickingComponentType);
+        var tickingComponentType = IRegisteredComponent.getComponentType(componentClass);
+        this.query = Query.and(tickingComponentType);
     }
 
     public EntitySystem(@Nonnull ComponentType<ChunkStore, T> tickingComponentType) {
-        this.tickingComponentType = tickingComponentType;
-        this.query = Query.and(this.tickingComponentType);
+        this.query = Query.and(tickingComponentType);
     }
 
     /**
@@ -116,10 +124,17 @@ public abstract class EntitySystem<T extends ITickingComponent> {
         @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {}
 
+    protected void onSystemTick(
+        float dt,
+        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+        @Nonnull Store<ChunkStore> store,
+        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+    ) {}
+
     /**
-     * No touchy. just read. overwrite it if you need
+     * ticks ur stuff. yup. that simple.
      */
-    protected void tick(
+    protected void onEntityTick(
         float dt,
         int index,
         @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
@@ -133,7 +148,7 @@ public abstract class EntitySystem<T extends ITickingComponent> {
      * Subscribes to the query defined in the parent EntitySystem and listens for
      * onEntiyAdd and remove events
      */
-    public class LifetimeSystem extends RefSystem<ChunkStore> {
+    private class LifetimeSystem extends RefSystem<ChunkStore> {
 
         public LifetimeSystem() {
             EntitySystem.this.onInit();
@@ -172,7 +187,7 @@ public abstract class EntitySystem<T extends ITickingComponent> {
      * Subscribes to the query defined in the parent EntitySystem (the abstract class this class is defined in)
      * and runs every tick on that query
      */
-    public class TickSystem extends ChunkBlockTickSystem.Ticking {
+    private class EntityTickSystem extends ChunkBlockTickSystem.Ticking {
 
         @SuppressWarnings({ "null", "rawtypes", "unchecked" })
         @Nonnull
@@ -201,7 +216,7 @@ public abstract class EntitySystem<T extends ITickingComponent> {
             @Nonnull Store<ChunkStore> store,
             @Nonnull CommandBuffer<ChunkStore> commandBuffer
         ) {
-            EntitySystem.this.tick(dt, index, archetypeChunk, store, commandBuffer);
+            EntitySystem.this.onEntityTick(dt, index, archetypeChunk, store, commandBuffer);
         }
 
         @Override
@@ -219,8 +234,51 @@ public abstract class EntitySystem<T extends ITickingComponent> {
         }
     }
 
+    // TODO when making the builder make
+    // Set<Dependency<ChunkStore>>
+    // the argument, basically in what order this should run, but really just "after" x
+    private class GlobalTickSystem extends ArchetypeTickingSystem<ChunkStore> {
+
+        @SuppressWarnings({ "null", "rawtypes", "unchecked" })
+        @Nonnull
+        private final Set<Dependency<ChunkStore>> DEPENDENCIES = Set.of(
+            new SystemDependency(Order.AFTER, lifetimeSystem.getClass())
+        );
+
+        /**
+         * tick method that gets called by the `store`
+         * this is pretty much just a shim to get into my code, as i don't want to touch
+         * theirs wherever possible
+         */
+        @Override
+        public void tick(
+            float dt,
+            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        ) {
+            EntitySystem.this.onSystemTick(dt, archetypeChunk, store, commandBuffer);
+        }
+
+        @Override
+        @Nullable
+        public Query<ChunkStore> getQuery() {
+            return EntitySystem.this.query;
+        }
+
+        /**
+         * must run AFTER the its own entity register system
+         */
+        @Nonnull
+        @Override
+        public Set<Dependency<ChunkStore>> getDependencies() {
+            return DEPENDENCIES;
+        }
+    }
+
     public void registerTo(ModPlugin plugin) {
         plugin.getChunkStoreRegistry().registerSystem(lifetimeSystem);
         plugin.getChunkStoreRegistry().registerSystem(tickSystem);
+        plugin.getChunkStoreRegistry().registerSystem(globalTickSystem);
     }
 }
