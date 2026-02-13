@@ -1,4 +1,4 @@
-package dev.twunk.system.easy;
+package dev.twunk.system.base;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -8,6 +8,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.system.interfaces.ILifetimeSystem;
+import dev.twunk.system.interfaces.ISubSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -16,13 +18,18 @@ import javax.annotation.Nullable;
  * that match our parent's query
  *
  * GOAL: Need to know when entities load/unload (and optionally why they got added/removed)
+ *
+ * REQUIRES:
+ * - N/A (this is a leaf)
+ * PRODUCES:
+ * - ILifetimeSystem runner
  */
-public class LifetimeSystem extends RefSystem<ChunkStore> implements ISubSystem, IEntityLifetimeSystem {
+public class LifetimeSystem extends RefSystem<ChunkStore> implements ISubSystem {
 
-    private final @Nonnull IEntityLifetimeSystem parent;
+    private final @Nonnull ILifetimeSystem parent;
     private final @Nullable Query<ChunkStore> query;
 
-    public LifetimeSystem(@Nonnull IEntityLifetimeSystem parent) {
+    public LifetimeSystem(@Nonnull ILifetimeSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

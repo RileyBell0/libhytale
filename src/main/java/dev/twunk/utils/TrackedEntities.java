@@ -32,9 +32,18 @@ import javax.annotation.Nullable;
 // the world and chunk its in, etc)
 public class TrackedEntities {
 
-    private final int id;
+    // A unique and STABLE identifier for the system. you cannot change this.
+    // once you decide on an ID your players REQUIRE it to be stable (or everything
+    // in their worlds will break)
+    //
+    // This is what is used for entities to "remember" if they're sleeping, ticking etc
+    // in your system when they're loaded back in.
+    //
+    // hence, if you change this ID all entities will still store but forever forget
+    // what state they held
+    private final String id;
 
-    public TrackedEntities(final int id) {
+    public TrackedEntities(final String id) {
         this.id = id;
     }
 

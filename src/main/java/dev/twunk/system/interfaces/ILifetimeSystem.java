@@ -1,4 +1,4 @@
-package dev.twunk.system.easy;
+package dev.twunk.system.interfaces;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,7 +9,7 @@ import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
-public interface IEntityLifetimeSystem extends QuerySystem<ChunkStore> {
+public interface ILifetimeSystem extends QuerySystem<ChunkStore> {
     public void onEntityAdded(
         @Nonnull Ref<ChunkStore> ref,
         @Nonnull AddReason reason,

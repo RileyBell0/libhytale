@@ -1,4 +1,4 @@
-package dev.twunk.system.easy;
+package dev.twunk.system.base;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -6,6 +6,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.system.interfaces.IEntityTickSystem;
+import dev.twunk.system.interfaces.ISubSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -13,6 +15,11 @@ import javax.annotation.Nullable;
  * Subsystem for calling `onEntityTick` on the parent system every tick
  *
  * GOAL: run code on entities every tick
+ *
+ * REQUIRES:
+ * - N/A (this is a leaf)
+ * PRODUCES:
+ * - IEntityTickSystem runner
  */
 public class EntityTickSystem extends ChunkBlockTickSystem.Ticking implements ISubSystem {
 

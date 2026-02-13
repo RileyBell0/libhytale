@@ -6,7 +6,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.system.response.TickResponse;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -51,14 +51,14 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and god knows, block games really have alot of blocks
      */
     @Nonnull
-    private final Int2ObjectOpenHashMap<TickResponse> tickingState = new Int2ObjectOpenHashMap<>();
+    private final HashMap<String, TickResponse> tickingState = new HashMap<>();
 
     /**
      * Map from SystemID to locations where the item is stored (memory only,
      * not stored to disk)
      */
     @Nonnull
-    private final Int2ObjectOpenHashMap<TickingEntityMetadata> memoryLocation = new Int2ObjectOpenHashMap<>();
+    private final HashMap<String, TickingEntityMetadata> memoryLocation = new HashMap<>();
 
     /**
      * Store the current ticking state we've got for the given system (e.g. awake,
@@ -67,7 +67,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * Returns the previously set state (if one was already there)
      */
     @Nullable
-    public TickResponse setTickingInfo(int systemId, @Nonnull TickResponse state) {
+    public TickResponse setTickingInfo(String systemId, @Nonnull TickResponse state) {
         return this.tickingState.put(systemId, state);
     }
 
@@ -76,7 +76,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * currently awake and ticking, or asleep until ___ etc etc)
      */
     @Nullable
-    public TickResponse getTickingInfo(int systemId) {
+    public TickResponse getTickingInfo(String systemId) {
         return this.tickingState.get(systemId);
     }
 
@@ -90,7 +90,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _setMemoryLocation(int systemId, @Nonnull TickingEntityMetadata state) {
+    public TickingEntityMetadata _setMemoryLocation(String systemId, @Nonnull TickingEntityMetadata state) {
         return memoryLocation.put(systemId, state);
     }
 
@@ -102,7 +102,7 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _getMemoryLocation(int systemId) {
+    public TickingEntityMetadata _getMemoryLocation(String systemId) {
         return memoryLocation.get(systemId);
     }
 
@@ -114,14 +114,14 @@ public class SmartTickingInfo implements IRegisteredComponent {
      * and *not* tick it anymore
      */
     @Nullable
-    public TickingEntityMetadata _dumpMemoryLocation(int systemId, RemoveReason reason) {
+    public TickingEntityMetadata _dumpMemoryLocation(String systemId, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
         return memoryLocation.remove(systemId);
     }
 
-    public void drop(int systemId, @Nonnull RemoveReason reason) {
+    public void drop(String systemId, @Nonnull RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
