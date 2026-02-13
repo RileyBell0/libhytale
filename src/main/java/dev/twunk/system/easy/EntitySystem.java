@@ -42,7 +42,7 @@ import javax.annotation.Nullable;
  * -> lifecycle management
  * -> ticking (always)
  */
-public abstract class EntitySystem<T extends ITickingComponent> {
+public abstract class EntitySystem<T extends ITickingComponent> implements ISubSystem {
 
     @Nonnull
     private final LifetimeSystem lifetimeSystem = new LifetimeSystem();
@@ -159,7 +159,7 @@ public abstract class EntitySystem<T extends ITickingComponent> {
      * Subscribes to the query defined in the parent EntitySystem and listens for
      * onEntiyAdd and remove events
      */
-    private class LifetimeSystem extends RefSystem<ChunkStore> {
+    private class LifetimeSystem extends RefSystem<ChunkStore> implements ISubSystem {
 
         public LifetimeSystem() {
             EntitySystem.this.onInit();
@@ -189,6 +189,10 @@ public abstract class EntitySystem<T extends ITickingComponent> {
         public Query<ChunkStore> getQuery() {
             return EntitySystem.this.query;
         }
+
+        public void registerTo(ModPlugin plugin) {
+            plugin.getChunkStoreRegistry().registerSystem(this);
+        }
     }
 
     /**
@@ -198,7 +202,7 @@ public abstract class EntitySystem<T extends ITickingComponent> {
      * Subscribes to the query defined in the parent EntitySystem (the abstract class this class is defined in)
      * and runs every tick on that query
      */
-    private class EntityTickSystem extends ChunkBlockTickSystem.Ticking {
+    private class EntityTickSystem extends ChunkBlockTickSystem.Ticking implements ISubSystem {
 
         @SuppressWarnings({ "null", "rawtypes", "unchecked" })
         @Nonnull
@@ -242,6 +246,10 @@ public abstract class EntitySystem<T extends ITickingComponent> {
         @Override
         public Set<Dependency<ChunkStore>> getDependencies() {
             return DEPENDENCIES;
+        }
+
+        public void registerTo(ModPlugin plugin) {
+            plugin.getChunkStoreRegistry().registerSystem(this);
         }
     }
 
@@ -287,7 +295,7 @@ public abstract class EntitySystem<T extends ITickingComponent> {
         }
     }
 
-    public abstract class ScheduledEntityTickSystem {
+    public abstract class ScheduledEntityTickSystem implements ISubSystem {
 
         private static int nextId = 0;
 
