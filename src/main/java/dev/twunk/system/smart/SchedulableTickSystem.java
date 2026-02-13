@@ -32,6 +32,10 @@ public abstract class SchedulableTickSystem {
 
     private static int nextId = 0;
 
+    // at some point i need a better method -> you'll have to provide an ID and
+    // i'll mangle it into a format for me that guarnatees uniqueness
+    // cause, i need a way to know WHICH system owned the stored data from a block
+    // when we reload stuff in potentially different orders
     public final int id;
 
     @Nonnull
@@ -79,6 +83,10 @@ public abstract class SchedulableTickSystem {
     // OH and responsible for finding the block info when they're loaded (coords,
     // the world and chunk its in, etc)
     private class TrackedEntities {
+
+        // TODO make a heap kinda thing with constant time access by assigning
+        // and freeing IDs for for entities. why? i forget, knew i needed something
+        // like that ages ago
 
         @Nonnull
         public static final ComponentType<ChunkStore, SmartTickingInfo> TICK_STATE_COMPONENT =
@@ -221,7 +229,7 @@ public abstract class SchedulableTickSystem {
          * @return
          */
         @Nonnull
-        public ArrayList<TickingEntityMetadata> getOwner(TickResponse currentState) {
+        private ArrayList<TickingEntityMetadata> getOwner(TickResponse currentState) {
             // and finally, we'll store it in the right place
             if (currentState instanceof TickContinue) {
                 return ticking;
