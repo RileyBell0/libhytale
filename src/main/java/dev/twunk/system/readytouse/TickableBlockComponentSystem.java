@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.component.ITickableBlockComponent;
 import dev.twunk.system.SubSystemOwner;
+import dev.twunk.system.base.EntityTickSubSystem;
 import dev.twunk.system.interfaces.IEntityTickSystem;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
@@ -40,16 +41,19 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
             throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
         }
         this.componentType = component;
+        this.appendSubSystem(new EntityTickSubSystem(this));
     }
 
     public TickableBlockComponentSystem(@Nonnull Class<T> componentClass) {
         super(Query.and(IRegisteredComponent.getComponentType(componentClass)));
         this.componentType = IRegisteredComponent.getComponentType(componentClass);
+        this.appendSubSystem(new EntityTickSubSystem(this));
     }
 
     public TickableBlockComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
+        this.appendSubSystem(new EntityTickSubSystem(this));
     }
 
     public void onEntityTick(

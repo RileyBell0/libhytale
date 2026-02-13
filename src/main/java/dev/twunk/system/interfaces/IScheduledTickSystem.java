@@ -11,6 +11,16 @@ import dev.twunk.system.response.TickResponse;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Gives your system the event handler function it needs to run code for every entity
+ * that matches your system, AND for that entity to be able to sleep etc (and remember
+ * if it was awake/sleeping etc when it loads back in)
+ *
+ * When you want your system to benefit from ScheduledTickSubSystem
+ * - implement IScheduledTickSystem on your system
+ * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
+ * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
+ */
 public interface IScheduledTickSystem {
     @Nullable
     public abstract TickResponse onEntityTick(
