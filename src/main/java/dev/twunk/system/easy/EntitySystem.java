@@ -159,7 +159,7 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
      * Subscribes to the query defined in the parent EntitySystem and listens for
      * onEntiyAdd and remove events
      */
-    private class LifetimeSystem extends RefSystem<ChunkStore> implements ISubSystem {
+    private class LifetimeSystem extends RefSystem<ChunkStore> implements ISubSystem, IEntityLifetime {
 
         public LifetimeSystem() {
             EntitySystem.this.onInit();
@@ -189,10 +189,6 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
         public Query<ChunkStore> getQuery() {
             return EntitySystem.this.query;
         }
-
-        public void registerTo(ModPlugin plugin) {
-            plugin.getChunkStoreRegistry().registerSystem(this);
-        }
     }
 
     /**
@@ -202,7 +198,7 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
      * Subscribes to the query defined in the parent EntitySystem (the abstract class this class is defined in)
      * and runs every tick on that query
      */
-    private class EntityTickSystem extends ChunkBlockTickSystem.Ticking implements ISubSystem {
+    private class EntityTickSystem extends ChunkBlockTickSystem.Ticking implements ISubSystem, IEntityTick {
 
         @SuppressWarnings({ "null", "rawtypes", "unchecked" })
         @Nonnull
@@ -247,16 +243,12 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
         public Set<Dependency<ChunkStore>> getDependencies() {
             return DEPENDENCIES;
         }
-
-        public void registerTo(ModPlugin plugin) {
-            plugin.getChunkStoreRegistry().registerSystem(this);
-        }
     }
 
     // TODO when making the builder make
     // Set<Dependency<ChunkStore>>
     // the argument, basically in what order this should run, but really just "after" x
-    private class GlobalTickSystem extends ArchetypeTickingSystem<ChunkStore> {
+    private class GlobalTickSystem extends ArchetypeTickingSystem<ChunkStore> implements ISubSystem, IGlobalTick {
 
         @SuppressWarnings({ "null", "rawtypes", "unchecked" })
         @Nonnull
@@ -295,7 +287,7 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
         }
     }
 
-    public abstract class ScheduledEntityTickSystem implements ISubSystem {
+    public abstract class ScheduledEntityTickSystem implements ISubSystem, IScheduledEntityTick {
 
         private static int nextId = 0;
 
@@ -528,7 +520,7 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
          * query every tick, and can instead track ther life ourselves so we ONLY run
          * the entities that are ticking (with minimal mutations to components etc)
          */
-        private class LifetimeSystem extends RefSystem<ChunkStore> {
+        private class LifetimeSystem extends RefSystem<ChunkStore> implements ISubSystem, IEntityLifetime {
 
             /**
              * When an entity is added to the world that matches our query, we figure out
@@ -585,8 +577,11 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
          * - ticks all awake entities that match the query
          * - handles the return from the ticking entities to put them to sleep etc (if
          * need be. really just to change their state if requested)
+         *
+         * NOTE: This one does NOT have a tick method for you to call, it makes no sense on its own without
+         * considering the parent ScheduledEntityTickSystem
          */
-        private class TickSystem extends ArchetypeTickingSystem<ChunkStore> {
+        private class TickSystem extends ArchetypeTickingSystem<ChunkStore> implements ISubSystem, IGlobalTick {
 
             @SuppressWarnings({ "null", "rawtypes", "unchecked" })
             @Nonnull
@@ -645,15 +640,19 @@ public abstract class EntitySystem<T extends ITickingComponent> implements ISubS
             }
         }
 
+        // Custom register for our ScheduledEntityTickSystem
+        //
+        // why?
+        // because it's not one system, it's two working in conjunction
         public void registerTo(ModPlugin plugin) {
-            plugin.getChunkStoreRegistry().registerSystem(lifetimeSystem);
-            plugin.getChunkStoreRegistry().registerSystem(entityTickSystem);
+            lifetimeSystem.registerTo(plugin);
+            entityTickSystem.registerTo(plugin);
         }
     }
 
     public void registerTo(ModPlugin plugin) {
-        plugin.getChunkStoreRegistry().registerSystem(lifetimeSystem);
-        plugin.getChunkStoreRegistry().registerSystem(tickSystem);
-        plugin.getChunkStoreRegistry().registerSystem(globalTickSystem);
+        lifetimeSystem.registerTo(plugin);
+        tickSystem.registerTo(plugin);
+        globalTickSystem.registerTo(plugin);
     }
 }
