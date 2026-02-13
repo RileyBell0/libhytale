@@ -1,11 +1,11 @@
 package dev.twunk.system.easy;
 
-import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
@@ -15,7 +15,7 @@ import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
-public class TickingComponentSystem<T extends ITickingComponent> extends ChunkBlockTickSystem.Ticking {
+public class TickingComponentSystem<T extends ITickingComponent> extends EntityTickingSystem<ChunkStore> {
 
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 

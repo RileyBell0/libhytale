@@ -5,9 +5,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.response.TickResponse;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 // "BlockType": {
 //   "TickProcedure": {
@@ -31,8 +29,7 @@ public interface ITickingComponent extends IRegisteredComponent {
      * instead of "i want my component to tick", nah, you want a SYSTEM that
      * queries just your component to tick
      */
-    @Nullable
-    public default TickResponse onTick(
+    public default void onTick(
         @Nonnull World world,
         @Nonnull WorldChunk wc,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
@@ -44,6 +41,5 @@ public interface ITickingComponent extends IRegisteredComponent {
         HytaleLogger.forEnclosingClass()
             .atInfo()
             .log("Ticked block at (" + worldX + ", " + worldY + ", " + worldZ + " )");
-        return null;
     }
 }
