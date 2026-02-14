@@ -4,13 +4,16 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.plugin.ModPlugin;
-import dev.twunk.system.interfaces.ISubSystem;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * Nice-to-have wrapper for making a system OR composite subsystem
+ *
+ * You don't need to use this to utilise the subsystems, but, you probably
+ * should, or at least read it to see how i do stuff (and to understand WHY
+ * if you choose to make your own)
  *
  * Makes it easy to register sub systems to it, and then easy to register the
  * overall parent itself (assuming the parent is just a regular class)

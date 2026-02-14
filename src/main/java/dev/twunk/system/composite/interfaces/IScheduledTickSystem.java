@@ -1,4 +1,4 @@
-package dev.twunk.system.composite;
+package dev.twunk.system.composite.interfaces;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;

@@ -8,7 +8,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.interfaces.ISubSystem;
+import dev.twunk.system.ISubSystem;
+import dev.twunk.system.base.interfaces.IEntityLifetimeSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

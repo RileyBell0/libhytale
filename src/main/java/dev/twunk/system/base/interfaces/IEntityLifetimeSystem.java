@@ -1,4 +1,4 @@
-package dev.twunk.system.base;
+package dev.twunk.system.base.interfaces;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
