@@ -24,6 +24,10 @@ import javax.annotation.Nonnull;
  * Marked as final since, this is really a one and done sorta deal, just clone
  * its src and edit if you need alterations, because, then its just not this
  * specific thing anymore.
+ *
+ * How to use:
+ * - create a new instance `new TickableBlockComponent<YourComponent>(YourComponentType)`
+ * - register the instance to your plugin
  */
 public final class TickableBlockComponentSystem<T extends ITickableBlockComponent>
     extends SubSystemOwner
