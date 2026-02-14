@@ -8,7 +8,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.interfaces.ILifetimeSystem;
 import dev.twunk.system.interfaces.ISubSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,12 +23,12 @@ import javax.annotation.Nullable;
  * PRODUCES:
  * - ILifetimeSystem runner
  */
-public class LifetimeSubSystem extends RefSystem<ChunkStore> implements ISubSystem {
+public class EntityLifetimeSubSystem extends RefSystem<ChunkStore> implements ISubSystem {
 
-    private final @Nonnull ILifetimeSystem parent;
+    private final @Nonnull IEntityLifetimeSystem parent;
     private final @Nullable Query<ChunkStore> query;
 
-    public LifetimeSubSystem(@Nonnull ILifetimeSystem parent) {
+    public EntityLifetimeSubSystem(@Nonnull IEntityLifetimeSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

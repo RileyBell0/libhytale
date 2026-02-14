@@ -6,7 +6,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.interfaces.IGlobalTickSystem;
 import dev.twunk.system.interfaces.ISubSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

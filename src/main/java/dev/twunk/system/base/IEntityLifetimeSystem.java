@@ -1,4 +1,4 @@
-package dev.twunk.system.interfaces;
+package dev.twunk.system.base;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface ILifetimeSystem extends QuerySystem<ChunkStore> {
+public interface IEntityLifetimeSystem extends QuerySystem<ChunkStore> {
     public void onEntityAdded(
         @Nonnull Ref<ChunkStore> ref,
         @Nonnull AddReason reason,

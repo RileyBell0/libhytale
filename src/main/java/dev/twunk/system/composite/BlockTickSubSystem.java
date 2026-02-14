@@ -9,8 +9,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.system.SubSystemOwner;
 import dev.twunk.system.base.EntityTickSubSystem;
-import dev.twunk.system.interfaces.IEntityTickSystem;
-import dev.twunk.system.interfaces.IQueryTickingSystem;
+import dev.twunk.system.base.IEntityTickSystem;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -26,18 +25,18 @@ import javax.annotation.Nonnull;
  * PRODUCES:
  * - IQueryTickingSystem runner
  */
-public class QueryTickingSubSystem extends SubSystemOwner implements IEntityTickSystem {
+public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSystem {
 
-    private final @Nonnull IQueryTickingSystem parent;
+    private final @Nonnull IBlockTickSystem parent;
 
-    public QueryTickingSubSystem(@Nonnull final IQueryTickingSystem parent, @Nonnull final Query<ChunkStore> query) {
+    public BlockTickSubSystem(@Nonnull final IBlockTickSystem parent, @Nonnull final Query<ChunkStore> query) {
         super(query);
         this.appendSubSystem(new EntityTickSubSystem(this));
         this.parent = parent;
     }
 
-    public QueryTickingSubSystem(
-        @Nonnull final IQueryTickingSystem parent,
+    public BlockTickSubSystem(
+        @Nonnull final IBlockTickSystem parent,
         @Nonnull Supplier<ComponentType<ChunkStore, ? extends IRegisteredComponent>> supplier
     ) {
         super(Query.and(supplier.get()));
@@ -45,8 +44,8 @@ public class QueryTickingSubSystem extends SubSystemOwner implements IEntityTick
         this.parent = parent;
     }
 
-    public QueryTickingSubSystem(
-        @Nonnull final IQueryTickingSystem parent,
+    public BlockTickSubSystem(
+        @Nonnull final IBlockTickSystem parent,
         @Nonnull Class<? extends IRegisteredComponent> componentClass
     ) {
         super(Query.and(IRegisteredComponent.getComponentType(componentClass)));
@@ -54,8 +53,8 @@ public class QueryTickingSubSystem extends SubSystemOwner implements IEntityTick
         this.parent = parent;
     }
 
-    public QueryTickingSubSystem(
-        @Nonnull final IQueryTickingSystem parent,
+    public BlockTickSubSystem(
+        @Nonnull final IBlockTickSystem parent,
         @Nonnull ComponentType<ChunkStore, ? extends IRegisteredComponent> tickingComponentType
     ) {
         super(Query.and(tickingComponentType));

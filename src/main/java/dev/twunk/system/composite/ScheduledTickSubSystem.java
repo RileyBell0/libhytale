@@ -9,11 +9,10 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.system.SubSystemOwner;
+import dev.twunk.system.base.EntityLifetimeSubSystem;
 import dev.twunk.system.base.GlobalTickSubSystem;
-import dev.twunk.system.base.LifetimeSubSystem;
-import dev.twunk.system.interfaces.IGlobalTickSystem;
-import dev.twunk.system.interfaces.ILifetimeSystem;
-import dev.twunk.system.interfaces.IScheduledTickSystem;
+import dev.twunk.system.base.IEntityLifetimeSystem;
+import dev.twunk.system.base.IGlobalTickSystem;
 import dev.twunk.system.response.TickResponse;
 import dev.twunk.utils.TrackedEntities;
 import javax.annotation.Nonnull;
@@ -33,7 +32,7 @@ import javax.annotation.Nonnull;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class ScheduledTickSubSystem extends SubSystemOwner implements ILifetimeSystem, IGlobalTickSystem {
+public class ScheduledTickSubSystem extends SubSystemOwner implements IEntityLifetimeSystem, IGlobalTickSystem {
 
     @Nonnull
     private final TrackedEntities entities;
@@ -50,7 +49,7 @@ public class ScheduledTickSubSystem extends SubSystemOwner implements ILifetimeS
         this.entities = new TrackedEntities(parent.getId());
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(new LifetimeSubSystem(this));
+        this.appendSubSystem(new EntityLifetimeSubSystem(this));
         this.appendSubSystem(new GlobalTickSubSystem(this));
     }
 

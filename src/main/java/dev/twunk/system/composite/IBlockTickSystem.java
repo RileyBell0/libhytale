@@ -1,4 +1,4 @@
-package dev.twunk.system.interfaces;
+package dev.twunk.system.composite;
 
 import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
@@ -20,4 +20,4 @@ import dev.twunk.utils.ITickableBlockEntity;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IQueryTickingSystem extends QuerySystem<ChunkStore>, ITickableBlockEntity {}
+public interface IBlockTickSystem extends QuerySystem<ChunkStore>, ITickableBlockEntity {}

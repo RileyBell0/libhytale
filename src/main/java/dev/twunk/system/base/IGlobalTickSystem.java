@@ -1,4 +1,4 @@
-package dev.twunk.system.interfaces;
+package dev.twunk.system.base;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
