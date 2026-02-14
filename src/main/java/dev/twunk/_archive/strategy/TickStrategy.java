@@ -1,4 +1,4 @@
-package dev.twunk.utils.strategy;
+package dev.twunk._archive.strategy;
 
 import javax.annotation.Nonnull;
 
