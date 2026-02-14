@@ -1,4 +1,4 @@
-package dev.twunk.system.base;
+package dev.twunk.subsystem.base;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -8,8 +8,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.ISubSystem;
-import dev.twunk.system.base.interfaces.IEntityLifetimeSystem;
+import dev.twunk.subsystem.ISubSystem;
+import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

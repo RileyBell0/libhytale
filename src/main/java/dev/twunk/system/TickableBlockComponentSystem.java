@@ -1,4 +1,4 @@
-package dev.twunk.system.readytouse;
+package dev.twunk.system;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,9 +9,9 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.component.ITickableBlockComponent;
-import dev.twunk.system.SubSystemOwner;
-import dev.twunk.system.base.EntityTickSubSystem;
-import dev.twunk.system.base.interfaces.IEntityTickSystem;
+import dev.twunk.subsystem.SubSystemOwner;
+import dev.twunk.subsystem.base.EntityTickSubSystem;
+import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import dev.twunk.utils.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;

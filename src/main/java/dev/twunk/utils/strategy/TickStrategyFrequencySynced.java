@@ -1,4 +1,4 @@
-package dev.twunk.system.strategy;
+package dev.twunk.utils.strategy;
 
 public class TickStrategyFrequencySynced extends TickStrategy {
 

@@ -1,4 +1,4 @@
-package dev.twunk.system;
+package dev.twunk.subsystem;
 
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.QuerySystem;

@@ -1,4 +1,4 @@
-package dev.twunk.system.base;
+package dev.twunk.subsystem.base;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -6,8 +6,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.ISubSystem;
-import dev.twunk.system.base.interfaces.IEntityTickSystem;
+import dev.twunk.subsystem.ISubSystem;
+import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

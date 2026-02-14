@@ -1,4 +1,4 @@
-package dev.twunk.system.composite.interfaces;
+package dev.twunk.subsystem.composite.interfaces;
 
 import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;

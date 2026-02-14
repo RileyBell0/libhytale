@@ -1,4 +1,4 @@
-package dev.twunk.system.composite;
+package dev.twunk.subsystem.composite;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -8,13 +8,12 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.system.SubSystemOwner;
-import dev.twunk.system.base.EntityLifetimeSubSystem;
-import dev.twunk.system.base.GlobalTickSubSystem;
-import dev.twunk.system.base.interfaces.IEntityLifetimeSystem;
-import dev.twunk.system.base.interfaces.IGlobalTickSystem;
-import dev.twunk.system.composite.interfaces.IScheduledTickSystem;
-import dev.twunk.system.response.TickResponse;
+import dev.twunk.subsystem.SubSystemOwner;
+import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
+import dev.twunk.subsystem.base.GlobalTickSubSystem;
+import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
+import dev.twunk.subsystem.base.interfaces.IGlobalTickSystem;
+import dev.twunk.subsystem.composite.interfaces.IScheduledTickSystem;
 import dev.twunk.utils.TrackedEntities;
 import javax.annotation.Nonnull;
 
@@ -123,9 +122,9 @@ public class ScheduledTickSubSystem extends SubSystemOwner implements IEntityLif
             // Transition to the state returned by the block
             if (res != null) {
                 switch (res.getType()) {
-                    case TickResponse.TYPE_BROKEN:
-                    case TickResponse.TYPE_SLEEP:
-                    case TickResponse.TYPE_STOP:
+                    case _EntityScheduledTickStateComponent.TYPE_BROKEN:
+                    case _EntityScheduledTickStateComponent.TYPE_SLEEP:
+                    case _EntityScheduledTickStateComponent.TYPE_STOP:
                     default:
                         break;
                 }
