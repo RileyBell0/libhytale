@@ -14,7 +14,7 @@ import dev.twunk.subsystem.base.GlobalTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
 import dev.twunk.subsystem.base.interfaces.IGlobalTickSystem;
 import dev.twunk.subsystem.composite.interfaces.IScheduledTickSystem;
-import dev.twunk.utils.TrackedEntities;
+import dev.twunk.utils.lifetime.TrackedEntities;
 import javax.annotation.Nonnull;
 
 /**

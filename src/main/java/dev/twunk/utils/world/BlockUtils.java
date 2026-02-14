@@ -1,4 +1,4 @@
-package dev.twunk.utils;
+package dev.twunk.utils.world;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;

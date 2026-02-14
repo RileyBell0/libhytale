@@ -2,6 +2,7 @@ package dev.twunk.utils;
 
 import dev.twunk.plugin.ModPlugin;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
+import dev.twunk.utils.tick.TickSchedulerComponent;
 
 public abstract class TwunkLib {
 

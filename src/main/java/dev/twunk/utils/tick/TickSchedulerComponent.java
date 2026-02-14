@@ -1,4 +1,4 @@
-package dev.twunk.utils;
+package dev.twunk.utils.tick;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
@@ -6,6 +6,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
+import dev.twunk.utils.lifetime.TrackedBlockEntity;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

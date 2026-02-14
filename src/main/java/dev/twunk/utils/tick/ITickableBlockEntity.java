@@ -1,4 +1,4 @@
-package dev.twunk.utils;
+package dev.twunk.utils.tick;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.math.vector.Vector3i;

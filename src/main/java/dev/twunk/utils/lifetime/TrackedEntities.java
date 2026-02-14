@@ -1,4 +1,4 @@
-package dev.twunk.utils;
+package dev.twunk.utils.lifetime;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
+import dev.twunk.utils.tick.TickSchedulerComponent;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

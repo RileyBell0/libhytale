@@ -11,7 +11,7 @@ import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import dev.twunk.subsystem.composite.interfaces.IBlockTickSystem;
-import dev.twunk.utils.BlockUtils;
+import dev.twunk.utils.world.BlockUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
