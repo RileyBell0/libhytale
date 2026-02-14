@@ -86,32 +86,6 @@ import javax.annotation.Nullable;
 //     }
 // }
 
-// public static void setTickingSurrounding(
-//     @Nonnull FluidTicker.Accessor accessor,
-//     BlockSection blockSection,
-//     int worldX,
-//     int worldY,
-//     int worldZ
-// ) {
-//     for (int y = -1; y <= 1; y++) {
-//         for (int z = -1; z <= 1; z++) {
-//             for (int x = -1; x <= 1; x++) {
-//                 int bx = worldX + x;
-//                 int by = worldY + y;
-//                 int bz = worldZ + z;
-//                 // RILEY READ THIS TODO TOOD
-//                 // TODO READ THIS RILEY
-//                 BlockSection chunk = ChunkUtil.isSameChunkSection(worldX, worldY, worldZ, bx, by, bz)
-//                     ? blockSection
-//                     : accessor.getBlockSectionByBlock(bx, by, bz);
-//                 if (chunk != null) {
-//                     chunk.setTicking(bx, by, bz, true);
-//                 }
-//             }
-//         }
-//     }
-// }
-
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
 public class BlockUtils {
