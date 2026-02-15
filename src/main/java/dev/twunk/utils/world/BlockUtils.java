@@ -4,12 +4,14 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.accessor.BlockAccessor;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
@@ -389,26 +391,188 @@ public class BlockUtils {
 
     public abstract static class Chunk {
 
-        // get the chunk for a given block
+        // #region getWorldChunk
+
         @Nullable
-        public static WorldChunk blockToWorldChunk(@Nonnull Ref<ChunkStore> blockRef) {
+        public static WorldChunk getWorldChunkFromChunkRef(@Nonnull Ref<ChunkStore> chunkRef) {
+            return BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
+        }
+
+        @Nullable
+        public static WorldChunk getWorldChunkFromBlockRef(@Nonnull Ref<ChunkStore> blockRef) {
             var info = Info.get(blockRef);
             if (info == null) {
                 return null;
             }
 
-            return Chunk.getWorldChunk(info.getChunkRef());
+            return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
+        }
+
+        // BlockStateInfo is your friend. All block entities have it.
+        // - If you want to get the world a block is in
+        // - If you want to get the CHUNK a block is in
+        // - If you want to get OTHER blocks
+        //
+        // All of those ^^ are gotten THROUGH BlockStateInfo
+        // effectively, BlockStateInfo + Ref to your block => your dream come true
+
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull Ref<ChunkStore> ref) {
+            // Potential 1: The ref you passed me is a CHUNK ref. slay. thats the good shit.
+            var maybeChunk = BlockComponent.getComponent(ref, WORLD_CHUNK_COMPONENT);
+            if (maybeChunk != null) {
+                return maybeChunk;
+            }
+
+            // Potential 2: the ref you passed me is a BLOCK ref. GOOD.
+            var info = Info.get(ref);
+            if (info == null) {
+                return null;
+            }
+
+            return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
         @Nullable
         public static WorldChunk getWorldChunk(@Nonnull BlockStateInfo info) {
-            return getWorldChunk(info.getChunkRef());
+            return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
+        // ====================================================================
+        // the below methods all assume
+        // - you have a way to access components in a given world
+        // - you also have some identifying about the chunk you want
+        // ====================================================================
+
+        /**
+         * does NOT get the chunk that the info is in, it USES the info to get
+         * the world.
+         *
+         * Then uses the world to get the WorldChunk at the coords provided
+         */
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull Ref<ChunkStore> chunkRef) {
-            return BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
+        public static WorldChunk getWorldChunk(@Nonnull BlockStateInfo info, int chunkX, int chunkZ) {
+            throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
+            // return info
+            //     .getChunkRef()
+            //     .getStore()
+            //     .getExternalData()
+            //     .getChunkComponent(ChunkUtil.indexChunk(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
+            // ALT VERSION: use the ref as above in the single ref param version of this function to figure out if we're a block ref or a chunk ref and get the right store based on that
         }
+
+        /**
+         * does NOT get the chunk that the info is in, it USES the info to get
+         * the world.
+         *
+         * Then uses the world to get the WorldChunk at the coords provided
+         */
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull BlockStateInfo info, long chunkIndex) {
+            throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
+            // return info.getChunkRef().getStore().getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
+            // ALT VERSION: use the ref as above in the single ref param version of this function to figure out if we're a block ref or a chunk ref and get the right store based on that
+        }
+
+        /**
+         * does NOT get the chunk that the info is in, it USES the ref to get
+         * more global data.
+         *
+         * Then uses the world to get the WorldChunk at the coords provided
+         */
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull Ref<ChunkStore> ref, int chunkX, int chunkZ) {
+            throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
+            // return ref
+            //     .getStore()
+            //     .getExternalData()
+            //     .getChunkComponent(ChunkUtil.indexChunk(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
+            // ALT VERSION: use the ref as above in the single ref param version of this function to figure out if we're a block ref or a chunk ref and get the right store based on that
+        }
+
+        /**
+         * does NOT get the chunk that the info is in, it USES the ref to get
+         * more global data.
+         *
+         * Then uses the world to get the WorldChunk at the coords provided
+         */
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull Ref<ChunkStore> ref, long chunkIndex) {
+            throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
+            // return ref.getStore().getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
+            // ALT VERSION: use the ref as above in the single ref param version of this function to figure out if we're a block ref or a chunk ref and get the right store based on that
+        }
+
+        // UNTESTED (most methods are untested, or, kind of half tested. some i'm pretty sure work, some i've got no idea, at some point i'll go through and verify them all)
+        @Nullable
+        public static WorldChunk getWorldChunk(
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
+            @Nonnull BlockChunk blockChunk
+        ) {
+            // but regardless we don't need the world to get the world chunk
+            return getWorldChunk(commandBuffer.getExternalData(), blockChunk);
+        }
+
+        // UNTESTED
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull Store<ChunkStore> store, @Nonnull BlockChunk blockChunk) {
+            return getWorldChunk(store.getExternalData(), blockChunk);
+        }
+
+        // UNTESTED
+        // NOTE: ChunkStore IS a world provider, but, there's seemingly other easier ways to get the world chunk component? maybe? cause otherwise we'd have to do
+        // `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull ChunkStore chunkStore, @Nonnull BlockChunk blockChunk) {
+            // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
+            return chunkStore.getChunkComponent(blockChunk.getIndex(), WORLD_CHUNK_COMPONENT);
+        }
+
+        // ====================================================================
+        // the below methods all assume
+        // - you have some way of accessing the world
+        // - you also have some identifying about the chunk you want
+        // ====================================================================
+
+        // not sure if there's a way to get a ref from a block chunk directly, need
+        // some way to tie it to a world.
+        // UNTESTED
+        @Nullable
+        public static WorldChunk getWorldChunk(
+            @Nonnull World world, // well, it is the world, sooo
+            @Nonnull BlockChunk blockChunk
+        ) {
+            return world.getChunk(blockChunk.getIndex());
+        }
+
+        // not sure if there's a way to get a ref from a block chunk directly, need
+        // some way to tie it to a world.
+        // UNTESTED
+        @Nullable
+        public static WorldChunk getWorldChunk(
+            @Nonnull World world, // well, it is the world, sooo
+            long chunkIndex
+        ) {
+            return world.getChunk(chunkIndex);
+        }
+
+        // WorldProvider can be
+        // - World
+        // - ChunkStore
+        // - idk, probably other stuff too
+        // UNTESTED
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull WorldProvider worldProvider, @Nonnull BlockChunk blockChunk) {
+            return worldProvider.getWorld().getChunk(blockChunk.getIndex());
+        }
+
+        // UNTESTED
+        @Nullable
+        public static WorldChunk getWorldChunk(@Nonnull WorldProvider worldProvider, long chunkIndex) {
+            return worldProvider.getWorld().getChunk(chunkIndex);
+        }
+
+        // #endregion getWorldChunk
 
         // #region getChunkRef
         // lets say you don't have a chunk ref, but you KNOW you have the information required to find one.
