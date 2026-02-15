@@ -457,39 +457,25 @@ public class BlockUtils {
 
     public abstract static class TickProcedure {
 
-        public static boolean setTicking(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref
-        ) {
-            return setTicking(commandBuffer, ref, true);
+        public static boolean setTicking(@Nonnull Ref<ChunkStore> ref) {
+            return setTicking(ref, true);
         }
 
-        public static boolean setTicking(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Ref<ChunkStore> ref,
-            boolean ticking
-        ) {
+        public static boolean setTicking(@Nonnull Ref<ChunkStore> ref, boolean ticking) {
             var info = Info.get(ref);
             if (info == null) {
                 console.log("Info was null");
                 return false;
             }
 
-            return setTicking(commandBuffer, info, ticking);
+            return setTicking(info, ticking);
         }
 
-        public static boolean setTicking(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockModule.BlockStateInfo info
-        ) {
-            return setTicking(commandBuffer, info, true);
+        public static boolean setTicking(@Nonnull BlockModule.BlockStateInfo info) {
+            return setTicking(info, true);
         }
 
-        public static boolean setTicking(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockModule.BlockStateInfo info,
-            boolean ticking
-        ) {
+        public static boolean setTicking(@Nonnull BlockModule.BlockStateInfo info, boolean ticking) {
             var worldChunk = Chunk.getWorldChunk(info);
             if (worldChunk == null) {
                 console.log("World chunk was null");
@@ -535,7 +521,6 @@ public class BlockUtils {
 
         public static <T extends Component<ChunkStore>> T getComponent(
             @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull BlockComponentChunk chunk,
             int localX,
             int localY,
@@ -550,33 +535,30 @@ public class BlockUtils {
                 return null;
             }
 
-            return commandBuffer.getComponent(ref, componentType);
+            return ref.getStore().getComponent(ref, componentType);
         }
 
         public static <T extends Component<ChunkStore>> T getComponent(
             @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull Ref<ChunkStore> ref
         ) {
             var componentType = getComponentType.get();
             if (componentType == null) {
                 return null;
             }
-            return commandBuffer.getComponent(ref, componentType);
+            return ref.getStore().getComponent(ref, componentType);
         }
 
         public static <T extends Component<ChunkStore>> T getComponent(
             @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull Ref<ChunkStore> ref
         ) {
-            return commandBuffer.getComponent(ref, componentType);
+            return ref.getStore().getComponent(ref, componentType);
         }
 
         @Nullable
         public static <T extends Component<ChunkStore>> T getComponent(
             @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull BlockComponentChunk chunk,
             int localX,
             int localY,
@@ -586,12 +568,11 @@ public class BlockUtils {
             if (ref == null) {
                 return null;
             }
-            return commandBuffer.getComponent(ref, componentType);
+            return ref.getStore().getComponent(ref, componentType);
         }
 
         public static <T extends Component<ChunkStore>> boolean hasComponent(
             @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull Ref<ChunkStore> ref
         ) {
             var componentType = getComponentType.get();
@@ -599,15 +580,14 @@ public class BlockUtils {
                 return false;
             }
 
-            return hasComponent(componentType, commandBuffer, ref);
+            return hasComponent(componentType, ref);
         }
 
         public static <T extends Component<ChunkStore>> boolean hasComponent(
             @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull Ref<ChunkStore> ref
         ) {
-            return (T) commandBuffer.getComponent(ref, componentType) != null;
+            return (T) ref.getStore().getComponent(ref, componentType) != null;
         }
     }
 
