@@ -40,7 +40,8 @@ public abstract class ModPlugin extends JavaPlugin {
     @Nonnull
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerComponent(BuilderCodec<T> codec) {
         var myClass = codec.getInnerClass();
-        var defaultId = myClass.getSimpleName();
+        var defaultId = myClass.getName();
+        console.log("Adding component " + defaultId + " -- from class " + myClass);
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }

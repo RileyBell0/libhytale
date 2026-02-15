@@ -214,43 +214,75 @@ public class BlockUtils {
         return new Vector3i(index & 31, (index >> 10) & 31, (index >> 5) & 31);
     }
 
-    // public static Ref<ChunkStore> get(@Nonnull World world, int globalX, int
-    // globalY, int globalZ) {
-    // var worldChunk = world.getChunkAsync(ChunkUtil.indexChunkFromBlock(globalX,
-    // globalZ));
-    // var blockRef = worldChunk.thenApply(chunk ->
-    // chunk.getBlockComponentEntity(globalX, globalY, globalZ));
+    /**
+     * Gets the block entity at the given coords if one exists.
+     *
+     * NOTE: not all blocks are block entities. Thus, there can exist a block there without it
+     * being a block entity.
+     *
+     * This does not for example check if there's a grass block. if there is, it will still return
+     * null as grass is not a block entity.
+     *
+     * However, if there's a chest etc it WILL return a ref
+     */
+    public static Ref<ChunkStore> getBlockEntityAt(CommandBuffer<ChunkStore> commandBuffer, int x, int y, int z) {
+        var worldChunkComponentType = WorldChunk.getComponentType();
+        if (worldChunkComponentType == null) {
+            console.log("WORLD CHUNK COMPONENT WAS NULL");
+            return null;
+        }
 
-    // return blockRef;
-    // }
+        var ref = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
+        if (ref == null) {
+            console.log("REF COMPONENT WAS NULL");
+            return null;
+        }
 
-    // public static CompletableFuture<Ref<ChunkStore>[]> getTouching(@Nonnull World
-    // world, int x, int y, int z) {
-    // var future = new CompletableFuture<Ref<ChunkStore>[]>();
+        var blockComponentChunk = commandBuffer.getComponent(ref, worldChunkComponentType).getBlockComponentChunk();
+        if (blockComponentChunk == null) {
+            console.log("BLOCK CHUNK COMPONENT WAS NULL");
+            return null;
+        }
 
-    // @SuppressWarnings("unchecked")
-    // Ref<ChunkStore>[] items = new Ref[6];
+        console.log("Block component chunk " + blockComponentChunk);
 
-    // var block0 = get(world, x, y, z + 1);
-    // var block1 = get(world, x, y, z - 1);
-    // var block2 = get(world, x, y + 1, z);
-    // var block3 = get(world, x, y - 1, z);
-    // var block4 = get(world, x + 1, y, z);
-    // var block5 = get(world, x - 1, y, z);
-    // CompletableFuture.allOf(block0, block1, block2, block3, block4,
-    // block5).thenRun(() -> {
-    // items[0] = block0.join();
-    // items[1] = block1.join();
-    // items[2] = block2.join();
-    // items[3] = block3.join();
-    // items[4] = block4.join();
-    // items[5] = block5.join();
+        return blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
+    }
 
-    // future.complete(items);
-    // });
+    /**
+     * Gets the block entity at the given coords if one exists.
+     *
+     * NOTE: not all blocks are block entities. Thus, there can exist a block there without it
+     * being a block entity.
+     *
+     * This does not for example check if there's a grass block. if there is, it will still return
+     * null as grass is not a block entity.
+     *
+     * However, if there's a chest etc it WILL return a ref
+     */
+    public static Ref<ChunkStore> getBlockEntityAt(CommandBuffer<ChunkStore> commandBuffer, @Nonnull Vector3i coords) {
+        var worldChunkComponentType = WorldChunk.getComponentType();
+        if (worldChunkComponentType == null) {
+            console.log("WORLD CHUNK COMPONENT WAS NULL");
+            return null;
+        }
 
-    // return future;
-    // }
+        var ref = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
+        if (ref == null) {
+            console.log("REF COMPONENT WAS NULL");
+            return null;
+        }
+
+        var blockComponentChunk = commandBuffer.getComponent(ref, worldChunkComponentType).getBlockComponentChunk();
+        if (blockComponentChunk == null) {
+            console.log("BLOCK CHUNK COMPONENT WAS NULL");
+            return null;
+        }
+
+        console.log("Block component chunk " + blockComponentChunk);
+
+        return blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
+    }
 
     public static boolean setTicking(@Nonnull CommandBuffer<ChunkStore> commandBuffer, @Nonnull Ref<ChunkStore> ref) {
         return setTicking(commandBuffer, ref, true);

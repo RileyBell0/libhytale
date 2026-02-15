@@ -146,15 +146,15 @@ public class TrackedEntities {
         // using some magic I found in the depths of the hytale source code
         // split across a couple files
         var indexInChunk = info.getIndex();
-        var globalCoords = new Vector3i(
+        var coords = new Vector3i(
             (chunk.getX() << 5) | (indexInChunk & 31),
             (indexInChunk >> 10) & ChunkUtil.HEIGHT_MASK,
             (chunk.getZ() << 5) | ((indexInChunk >> 5) & 31)
         );
 
         // lets get this all bundled up for easy re-use
-        var blockId = chunk.getBlock(globalCoords);
-        var cache = new TrackedBlockEntity(world, chunk, ref, globalCoords, blockId, area);
+        var blockId = chunk.getBlock(coords);
+        var cache = new TrackedBlockEntity(world, chunk, ref, coords, blockId, area);
 
         return cache;
     }

@@ -26,14 +26,13 @@ public abstract class SubSystemOwner implements QuerySystem<ChunkStore> {
     @Nonnull
     private final ArrayList<ISubSystem> subSystems = new ArrayList<>();
 
-    @Nonnull
     private final Query<ChunkStore> query;
 
-    public SubSystemOwner(@Nonnull Query<ChunkStore> query) {
+    public SubSystemOwner(Query<ChunkStore> query) {
         this.query = query;
     }
 
-    public void appendSubSystem(ISubSystem system) {
+    protected void appendSubSystem(ISubSystem system) {
         this.subSystems.add(system);
     }
 

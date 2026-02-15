@@ -6,8 +6,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
 import dev.twunk.subsystem.base.GlobalTickSubSystem;
@@ -32,7 +32,10 @@ import javax.annotation.Nonnull;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class ScheduledTickSubSystem extends SubSystemOwner implements IEntityLifetimeSystem, IGlobalTickSystem {
+public class ScheduledTickSubSystem
+    extends SubSystemOwner
+    implements IEntityLifetimeSystem, IGlobalTickSystem, ISubSystem
+{
 
     @Nonnull
     private final TrackedEntities entities;
@@ -40,8 +43,8 @@ public class ScheduledTickSubSystem extends SubSystemOwner implements IEntityLif
     @Nonnull
     private final IScheduledTickSystem parent;
 
-    public ScheduledTickSubSystem(@Nonnull final IScheduledTickSystem parent, @Nonnull final Query<ChunkStore> query) {
-        super(query);
+    public ScheduledTickSubSystem(@Nonnull final IScheduledTickSystem parent) {
+        super(parent.getQuery());
         this.parent = parent;
 
         // Init our module for tracking and persisting how our entities are

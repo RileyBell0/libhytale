@@ -2,17 +2,14 @@ package dev.twunk.subsystem.composite;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.IRegisteredComponent;
+import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import dev.twunk.subsystem.composite.interfaces.IBlockTickSystem;
 import dev.twunk.utils.world.BlockUtils;
-import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 /**
@@ -26,39 +23,12 @@ import javax.annotation.Nonnull;
  * PRODUCES:
  * - IQueryTickingSystem runner
  */
-public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSystem {
+public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSystem, ISubSystem {
 
     private final @Nonnull IBlockTickSystem parent;
 
-    public BlockTickSubSystem(@Nonnull final IBlockTickSystem parent, @Nonnull final Query<ChunkStore> query) {
-        super(query);
-        this.appendSubSystem(new EntityTickSubSystem(this));
-        this.parent = parent;
-    }
-
-    public BlockTickSubSystem(
-        @Nonnull final IBlockTickSystem parent,
-        @Nonnull Supplier<ComponentType<ChunkStore, ? extends IRegisteredComponent>> supplier
-    ) {
-        super(Query.and(supplier.get()));
-        this.appendSubSystem(new EntityTickSubSystem(this));
-        this.parent = parent;
-    }
-
-    public BlockTickSubSystem(
-        @Nonnull final IBlockTickSystem parent,
-        @Nonnull Class<? extends IRegisteredComponent> componentClass
-    ) {
-        super(Query.and(IRegisteredComponent.getComponentType(componentClass)));
-        this.appendSubSystem(new EntityTickSubSystem(this));
-        this.parent = parent;
-    }
-
-    public BlockTickSubSystem(
-        @Nonnull final IBlockTickSystem parent,
-        @Nonnull ComponentType<ChunkStore, ? extends IRegisteredComponent> tickingComponentType
-    ) {
-        super(Query.and(tickingComponentType));
+    public BlockTickSubSystem(@Nonnull final IBlockTickSystem parent) {
+        super(parent.getQuery());
         this.appendSubSystem(new EntityTickSubSystem(this));
         this.parent = parent;
     }

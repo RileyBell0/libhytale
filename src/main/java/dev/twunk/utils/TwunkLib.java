@@ -13,10 +13,11 @@ public abstract class TwunkLib {
         registerTickComponents(plugin);
     }
 
-    public static void registerTickComponents(ModPlugin plugin) {
+    private static void registerTickComponents(ModPlugin plugin) {
         if (hasRegisteredTickComponents) {
             return;
         }
+        hasRegisteredTickComponents = true;
 
         // per-system ticking
         TickSchedulerComponent.COMPONENT_TYPE = plugin.registerComponent(TickSchedulerComponent.CODEC);
@@ -25,14 +26,14 @@ public abstract class TwunkLib {
         _EntityScheduledTickStateComponent.Active.COMPONENT_TYPE = plugin.registerComponent(
             _EntityScheduledTickStateComponent.Active.CODEC
         );
+        _EntityScheduledTickStateComponent.Sleeping.COMPONENT_TYPE = plugin.registerComponent(
+            _EntityScheduledTickStateComponent.Sleeping.CODEC
+        );
         _EntityScheduledTickStateComponent.Stopped.COMPONENT_TYPE = plugin.registerComponent(
             _EntityScheduledTickStateComponent.Stopped.CODEC
         );
         _EntityScheduledTickStateComponent.Unknown.COMPONENT_TYPE = plugin.registerComponent(
             _EntityScheduledTickStateComponent.Unknown.CODEC
-        );
-        _EntityScheduledTickStateComponent.Sleeping.COMPONENT_TYPE = plugin.registerComponent(
-            _EntityScheduledTickStateComponent.Sleeping.CODEC
         );
         hasRegisteredTickComponents = true;
     }

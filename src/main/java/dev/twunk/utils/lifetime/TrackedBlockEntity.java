@@ -99,12 +99,12 @@ public class TrackedBlockEntity {
         @Nonnull World world,
         @Nonnull WorldChunk chunk,
         @Nonnull Ref<ChunkStore> ref,
-        @Nonnull Vector3i globalCoords,
+        @Nonnull Vector3i coords,
         int blockId,
         @Nonnull ArrayList<TrackedBlockEntity> currentAreaRef
     ) {
         this.lifetimeId = ++nextLifetimeId;
-        this.pos = globalCoords;
+        this.pos = coords;
         this.world = world;
         this.chunk = chunk;
         this.ref = ref;
