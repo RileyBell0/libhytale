@@ -10,6 +10,7 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.accessor.BlockAccessor;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
@@ -77,6 +78,7 @@ public class BlockUtils {
     // Grouped functions together
     // ==================================================
 
+    // DONE
     public abstract static class Entity {
 
         // #region getRef
@@ -256,27 +258,43 @@ public class BlockUtils {
         // - Ref to the block itself
 
         // Get the local coords of the block in its chunk
-        @Nonnull
-        public static Vector3i getLocalCoords(@Nonnull BlockStateInfo info) {
-            var indexInChunk = info.getIndex();
-            int x = ChunkUtil.xFromBlockInColumn(indexInChunk);
-            int y = ChunkUtil.yFromBlockInColumn(indexInChunk);
-            int z = ChunkUtil.zFromBlockInColumn(indexInChunk);
+        @Nullable
+        public static Vector3i getLocalCoords(@Nonnull Ref<ChunkStore> blockRef) {
+            var info = Info.get(blockRef);
+            if (info == null) {
+                return null;
+            }
 
-            return new Vector3i(x, y, z);
+            return getLocalCoords(info.getIndex());
         }
 
         @Nonnull
-        public static Vector3i getLocalCoords(@Nonnull Ref<ChunkStore> ref) {
-            var index = ref.getIndex();
-            return new Vector3i(index & 31, (index >> 10) & 31, (index >> 5) & 31);
+        public static Vector3i getLocalCoords(@Nonnull BlockStateInfo info) {
+            return getLocalCoords(info.getIndex());
+        }
+
+        // remember kids: multidimensional arrays are like birds - a lie
+        @Nonnull
+        public static Vector3i getLocalCoords(int index) {
+            int x = ChunkUtil.xFromBlockInColumn(index);
+            int y = ChunkUtil.yFromBlockInColumn(index);
+            int z = ChunkUtil.zFromBlockInColumn(index);
+
+            return new Vector3i(x, y, z);
         }
 
         // #endregion getLocalCoords
 
         // #region getGlobalCoords
-        // Function: From various information I can get you the global coordinates of a block
+        // Function: Get the coordinates of a block from any one of the following
+        // - blockRef                    << reference to the block itself
+        // - BlockStateInfo              << the info about the block (the way we actually get its local coords)
+        // - BlockChunk AND info         << chunk gives us the transform from local to global coords
+        // - WorldChunk AND info         << chunk gives us the transform from local to global coords
+        // - [BlockAccessor] AND info    << chunk gives us the transform from local to global coords
 
+        // Block ref isn't useful on its own. We grab the "info" and handball over
+        // to an actual entrypoint for getting the coords
         @Nullable
         public static Vector3i getGlobalCoords(@Nonnull Ref<ChunkStore> blockRef) {
             var info = Info.get(blockRef);
@@ -284,41 +302,89 @@ public class BlockUtils {
                 return null;
             }
 
-            return Coords.getGlobalCoords(info);
+            return getGlobalCoords(info);
         }
 
+        // Info IS useful on its own, just, apparently it can fail to get the chunk??
+        // anyway, we simply grab the chunk, and return the coords
+        //
+        // The second we have the chunk, it's non-nullable
         @Nullable
         public static Vector3i getGlobalCoords(@Nonnull BlockStateInfo info) {
-            var chunkRef = info.getChunkRef();
-            var chunk = Chunk.getWorldChunk(chunkRef);
+            var chunk = Chunk.getWorldChunk(info);
             if (chunk == null) {
                 return null;
             }
 
-            return Coords.getGlobalCoords(chunk, info);
+            return getGlobalCoords(chunk, info);
         }
 
+        // Info                      => coordinates of the block relative to its chunk
+        // WorldChunk/BlockAccessor  => coordinates of the chunk
+        //
+        // local coords + chunk offset = global coords
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull BlockStateInfo info) {
+        public static Vector3i getGlobalCoords(@Nonnull BlockAccessor chunk, @Nonnull BlockStateInfo info) {
             var localCoords = Coords.getLocalCoords(info);
+            return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
+        }
 
-            return Coords.getGlobalCoords(chunk, localCoords);
+        // block index               => if i understand right, hytale is using that classic
+        //                              CS idea of "a multidimensional array is secretly just
+        //                              a really big array", so index is the same as coordinates
+        //                              when using cool maths.
+        //                              Thus, if we have the index, we already have the local coordinates
+        // WorldChunk/BlockAccessor  => coordinates of the chunk
+        //
+        // local coords + chunk offset = global coords
+        @Nonnull
+        public static Vector3i getGlobalCoords(@Nonnull BlockAccessor chunk, int blockIndex) {
+            var localCoords = Coords.getLocalCoords(blockIndex);
+            return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
+        }
+
+        // Local coords              => coordinates of the block WITHIN the chunk
+        // WorldChunk/BlockAccessor  => coordinates of the chunk
+        //
+        // local coords + chunk offset = global coords
+        @Nonnull
+        public static Vector3i getGlobalCoords(@Nonnull BlockAccessor chunk, @Nonnull Vector3i localCoords) {
+            return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
+        }
+
+        // #region blockChunk
+        // SPECIAL CASE: BlockChunk
+        // For some reason "BlockChunk" isn't a block accessor, but World chunk is (and world chunk USES block chunk, so, ??)
+        // so, the code is identical, but hey, fuck it, if it works, it works.
+
+        @Nonnull
+        public static Vector3i getGlobalCoords(@Nonnull BlockChunk chunk, @Nonnull BlockStateInfo info) {
+            return getGlobalCoords(chunk, Coords.getLocalCoords(info));
         }
 
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull WorldChunk chunk, @Nonnull Vector3i localCoords) {
-            return Coords.getGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
+        public static Vector3i getGlobalCoords(@Nonnull BlockChunk chunk, @Nonnull Vector3i localCoords) {
+            return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
         }
 
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull WorldChunk chunk, int localX, int localY, int localZ) {
+        public static Vector3i toGlobalCoords(@Nonnull BlockChunk chunk, int localX, int localY, int localZ) {
             int globalX = localX + (chunk.getX() * 32);
             int globalZ = localZ + (chunk.getZ() * 32);
 
             return new Vector3i(globalX, localY, globalZ);
         }
 
+        // #endregion blockChunk
         // #endregion getGlobalCoords
+
+        @Nonnull
+        public static Vector3i toGlobalCoords(@Nonnull BlockAccessor chunk, int localX, int localY, int localZ) {
+            int globalX = localX + (chunk.getX() * 32);
+            int globalZ = localZ + (chunk.getZ() * 32);
+
+            return new Vector3i(globalX, localY, globalZ);
+        }
     }
 
     public abstract static class Chunk {
