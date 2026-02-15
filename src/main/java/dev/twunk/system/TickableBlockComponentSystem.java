@@ -86,7 +86,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = BlockUtils.getInfo(commandBuffer, blockRef);
+        var blockInfo = BlockUtils.Info.get(commandBuffer, blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -96,7 +96,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = BlockUtils.getWorldChunk(commandBuffer, blockInfo);
+        var worldChunk = BlockUtils.Chunk.getWorldChunk(commandBuffer, blockInfo);
         if (worldChunk == null) {
             return;
         }
@@ -109,11 +109,11 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         if (world == null) {
             return;
         }
-        var coords = BlockUtils.getGlobalCoords(worldChunk, blockInfo);
+        var coords = BlockUtils.Coords.getGlobalCoords(worldChunk, blockInfo);
 
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = BlockUtils.getComponent(this.componentType, commandBuffer, blockRef);
+        var component = BlockUtils.BlockComponent.getComponent(this.componentType, commandBuffer, blockRef);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing

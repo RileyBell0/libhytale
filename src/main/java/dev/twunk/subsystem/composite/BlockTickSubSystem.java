@@ -59,7 +59,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = BlockUtils.getInfo(commandBuffer, blockRef);
+        var blockInfo = BlockUtils.Info.get(commandBuffer, blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -69,7 +69,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = BlockUtils.getWorldChunk(commandBuffer, blockInfo);
+        var worldChunk = BlockUtils.Chunk.getWorldChunk(commandBuffer, blockInfo);
         if (worldChunk == null) {
             return;
         }
@@ -82,7 +82,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         if (world == null) {
             return;
         }
-        var coords = BlockUtils.getGlobalCoords(worldChunk, blockInfo);
+        var coords = BlockUtils.Coords.getGlobalCoords(worldChunk, blockInfo);
 
         parent.onBlockEntityTick(world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
     }
