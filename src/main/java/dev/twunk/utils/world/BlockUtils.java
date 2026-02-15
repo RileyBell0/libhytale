@@ -147,12 +147,7 @@ public class BlockUtils {
             return null;
         }
 
-        var chunkComponentType = WorldChunk.getComponentType();
-        if (chunkComponentType == null) {
-            return null;
-        }
-
-        return commandBuffer.getComponent(info.getChunkRef(), chunkComponentType);
+        return commandBuffer.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
     }
 
     // get the chunk for a given block
@@ -161,12 +156,7 @@ public class BlockUtils {
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
         @Nonnull BlockModule.BlockStateInfo info
     ) {
-        var chunkComponentType = WorldChunk.getComponentType();
-        if (chunkComponentType == null) {
-            return null;
-        }
-
-        return commandBuffer.getComponent(info.getChunkRef(), chunkComponentType);
+        return commandBuffer.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
     }
 
     // Get the local coords of the block in its chunk
@@ -246,6 +236,31 @@ public class BlockUtils {
         return blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
     }
 
+    /**
+     * Gets the block entity at the given coords if one exists.
+     *
+     * NOTE: not all blocks are block entities. Thus, there can exist a block there without it
+     * being a block entity.
+     *
+     * This does not for example check if there's a grass block. if there is, it will still return
+     * null as grass is not a block entity.
+     *
+     * However, if there's a chest etc it WILL return a ref
+     */
+    public static Ref<ChunkStore> getBlockEntityAt(CommandBuffer<ChunkStore> commandBuffer, @Nonnull Vector3i coords) {
+        var ref = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
+        if (ref == null) {
+            return null;
+        }
+
+        var blockComponentChunk = commandBuffer.getComponent(ref, WORLD_CHUNK_COMPONENT).getBlockComponentChunk();
+        if (blockComponentChunk == null) {
+            return null;
+        }
+
+        return blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
+    }
+
     @Nullable
     public static Integer getBlockIdAt(CommandBuffer<ChunkStore> commandBuffer, int x, int y, int z) {
         var ref = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
@@ -259,41 +274,6 @@ public class BlockUtils {
         }
 
         return worldChunk.getBlock(x, y, z);
-    }
-
-    /**
-     * Gets the block entity at the given coords if one exists.
-     *
-     * NOTE: not all blocks are block entities. Thus, there can exist a block there without it
-     * being a block entity.
-     *
-     * This does not for example check if there's a grass block. if there is, it will still return
-     * null as grass is not a block entity.
-     *
-     * However, if there's a chest etc it WILL return a ref
-     */
-    public static Ref<ChunkStore> getBlockEntityAt(CommandBuffer<ChunkStore> commandBuffer, @Nonnull Vector3i coords) {
-        var worldChunkComponentType = WorldChunk.getComponentType();
-        if (worldChunkComponentType == null) {
-            console.log("WORLD CHUNK COMPONENT WAS NULL");
-            return null;
-        }
-
-        var ref = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
-        if (ref == null) {
-            console.log("REF COMPONENT WAS NULL");
-            return null;
-        }
-
-        var blockComponentChunk = commandBuffer.getComponent(ref, worldChunkComponentType).getBlockComponentChunk();
-        if (blockComponentChunk == null) {
-            console.log("BLOCK CHUNK COMPONENT WAS NULL");
-            return null;
-        }
-
-        console.log("Block component chunk " + blockComponentChunk);
-
-        return blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
     }
 
     public static boolean setTicking(@Nonnull CommandBuffer<ChunkStore> commandBuffer, @Nonnull Ref<ChunkStore> ref) {
