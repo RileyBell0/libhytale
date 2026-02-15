@@ -90,6 +90,10 @@ import javax.annotation.Nullable;
 // NOTE - its current state is broken
 public class BlockUtils {
 
+    @Nonnull
+    @SuppressWarnings("null")
+    private static final ComponentType<ChunkStore, WorldChunk> WORLD_CHUNK_COMPONENT = WorldChunk.getComponentType();
+
     // This is a constant i need for checking if something its touching is a
     // container
     @SuppressWarnings("removal")
@@ -226,27 +230,35 @@ public class BlockUtils {
      * However, if there's a chest etc it WILL return a ref
      */
     public static Ref<ChunkStore> getBlockEntityAt(CommandBuffer<ChunkStore> commandBuffer, int x, int y, int z) {
-        var worldChunkComponentType = WorldChunk.getComponentType();
-        if (worldChunkComponentType == null) {
-            console.log("WORLD CHUNK COMPONENT WAS NULL");
+        var chunkRef = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
+        if (chunkRef == null) {
             return null;
         }
 
-        var ref = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
-        if (ref == null) {
-            console.log("REF COMPONENT WAS NULL");
-            return null;
-        }
-
-        var blockComponentChunk = commandBuffer.getComponent(ref, worldChunkComponentType).getBlockComponentChunk();
+        var blockComponentChunk = chunkRef
+            .getStore()
+            .getComponent(chunkRef, WORLD_CHUNK_COMPONENT)
+            .getBlockComponentChunk();
         if (blockComponentChunk == null) {
-            console.log("BLOCK CHUNK COMPONENT WAS NULL");
             return null;
         }
-
-        console.log("Block component chunk " + blockComponentChunk);
 
         return blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
+    }
+
+    @Nullable
+    public static Integer getBlockIdAt(CommandBuffer<ChunkStore> commandBuffer, int x, int y, int z) {
+        var ref = commandBuffer.getExternalData().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
+        if (ref == null) {
+            return null;
+        }
+
+        var worldChunk = ref.getStore().getComponent(ref, WORLD_CHUNK_COMPONENT);
+        if (worldChunk == null) {
+            return null;
+        }
+
+        return worldChunk.getBlock(x, y, z);
     }
 
     /**
