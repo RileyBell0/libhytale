@@ -1,0 +1,64 @@
+need to fix up
+- _EntityScheduledTickStateComponent
+    - need this to be a better shorter name, not tickresponse but something like that
+    - or at least some sort of version of this component or idea so that an onTick function
+      can return something that's not internal
+    - consider: keep that as an internal type and make the tick simply return a simplified enum? idk. i need to think Ore_Thorium_Stone
+- ScheduledTickSubSystem
+    - need to add handler for making entities SLEEP and wake from sleep. need to make a heap
+      so that i can always (every tick) look at the top entity and see if we're ready to wake one up
+    - need to make sure that this stuff saves to disk and back off disk
+    - also want to add in that tick strategy stuff
+- BlockTickSubSystem
+    - need to add "TickStrategy" to it, and other systems, but basically i need to support ticking every X ticks (or seconds? maybe?)
+- BlockUtils
+    - finish grouping everything up, fixing up old functions
+
+Look over
+- TrackedBlockEntity
+- TrackedEntities
+- TickSchedulerComponent
+
+Come up with an idea for ways to have a consistent ID
+
+maybe make a tiny web app where you literally just tick the boxes for what you WANT your system to have events for, and i populate it with methods and subsystems.
+- could let you drag it in different orders too to change how it executes with an explanation below of HOW it works
+
+Tests
+- need to add tests, make a little test runner or something where i can run stuff
+  in a given context. idk, maybe a test command? or a test block? didn't hytale say
+  they had a test engine in the works or already released??
+
+Custom Blocks
+- I want to make a tool (or at least make their tool better) that shows you how to make custom blocks
+
+TickProcedure
+- what is this, do i need to consider adding in a subsystem for this? i should. i really should find a way to get tick procedures natural
+
+Need to figure out how interactions work and how to code them up, cause, there's still the overall question of
+- how do i get a UI to show up
+- how do i customise a UI
+- how do i get interactions for stuff like a chest to work
+     - how do you choose the text that's going to appear?
+     - how do you choose what interactions are there?
+     - how about clicking/etc WITHIN a UI menu?
+     - is there a way i can get my dev tools in game? maybe you have a dev stick that when you right click on a block
+       it gives you debug information about it in the system? like where it is, what it is, what components it has? that kinda thing?
+
+
+MOD IDEA
+- dev tools. cause, yeah, theirs are GOOD but they can be better. You should be able to click on a block in game and for it to tell you all about
+  the components that it has, and all the systems that reference it, the interactions it has, and for it to really just spew the right bits of
+  code at you. especially, like, working with chests, how the fuck they work?? i mean i get the simple inventory thing but like, theres
+  some other magic going on there.
+    - equally, i want to spew logs from plugins into different areas, so that you can actually view and sort them a bit easier, like dumping them into a per-run SQLite DB
+    - yeah i really like the SQLite db idea cause i can fill that sucker up and make a cool UI for querying it too, so you can filter by plugin, by all that stuff
+    - yeah done. sqlite db and a web UI that can read it live? yeah. cause its so hard to know if my systems eminate errors. and its really annoying to find out what errors in
+      the code while im developing.
+
+ALSO i want to make a view into the tick scheduler, some UI that i can show that says "here's what's sleeping, etc etc"
+AND i want to be able to slow it down, which means i really want it to slow down the simulation speed of the game so that
+the ticks occur WAY spaced out. surely there's a way to do that? mainly i want the GAME to slow down or pause (debugger mode)
+AND to be able to step through 1x tick etc AND to view the state before and after (probably by individually clicking on a block and saying "track this bastard" and then i just clone it and store it)
+
+so, iirc there's a way to get HTML into hytale, if i can do that, i can do anything
