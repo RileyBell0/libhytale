@@ -806,7 +806,7 @@ public final class BlockUtils {
             @Nonnull final Ref<ChunkStore> chunkRef,
             @Nonnull final Vector3i coords
         ) {
-            final var worldChunk = Chunk.getWorldChunkFromChunkRef(chunkRef);
+            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -821,7 +821,7 @@ public final class BlockUtils {
             final int y,
             final int z
         ) {
-            final var worldChunk = Chunk.getWorldChunkFromChunkRef(chunkRef);
+            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -831,7 +831,7 @@ public final class BlockUtils {
 
         @Nullable
         public static final Vector3i getGlobalCoords(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
-            final var worldChunk = Chunk.getWorldChunkFromChunkRef(chunkRef);
+            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -979,12 +979,12 @@ public final class BlockUtils {
         // #region getWorldChunk
 
         @Nullable
-        public static final WorldChunk getWorldChunkFromChunkRef(@Nonnull final Ref<ChunkStore> chunkRef) {
+        public static final WorldChunk getWorldChunkFromChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
             return BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
         }
 
         @Nullable
-        public static final WorldChunk getWorldChunkFromBlockRef(@Nonnull final Ref<ChunkStore> blockRef) {
+        public static final WorldChunk getWorldChunkFromBlock(@Nonnull final Ref<ChunkStore> blockRef) {
             final var info = Info.getInfo(blockRef);
             if (info == null) {
                 return null;
@@ -1017,20 +1017,20 @@ public final class BlockUtils {
             return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
-        // ||====================================================================
         // || Get an unrelated chunk in a world USING something that can get us that world
         // || - you have a way to access components in a given world
         // || - you also have some identifying about the chunk you want
         // ||====================================================================
 
-        // ====================================================================
-        // WorldProvider
-        // ====================================================================
+        //   #region WorldProvider
+        //   ==================================================================
+        //   WorldProvider        -> WorldChunk
+        //   ==================================================================
+        //   WorldProvider can be
+        //   - World
+        //   - ChunkStore
+        //   - idk, probably other stuff too
 
-        // WorldProvider can be
-        // - World
-        // - ChunkStore
-        // - idk, probably other stuff too
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final WorldProvider worldProvider,
@@ -1059,22 +1059,17 @@ public final class BlockUtils {
         @Nullable
         public static final WorldChunk getWorldChunkFromBlock(
             @Nonnull final WorldProvider worldProvider,
-            final int blockX,
-            final int blockZ
+            final int globalX,
+            final int globalY
         ) {
-            return worldProvider.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(blockX, blockZ));
+            return worldProvider.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(globalX, globalY));
         }
 
-        @Nullable
-        public static final WorldChunk getWorldChunk(@Nonnull final WorldProvider worldProvider, final int blockIndex) {
-            final int x = blockIndex & 31; // keep 5
-            final int z = (blockIndex >> 5) & 31; // shift 5 then keep 5
-            return worldProvider.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(x, z));
-        }
-
-        // ====================================================================
-        // World
-        // ====================================================================
+        //   #endregion WorldProvider
+        //   #region World
+        //   ==================================================================
+        //   World                -> WorldChunk
+        //   ==================================================================
 
         @Nullable
         public static final WorldChunk getWorldChunk(@Nonnull final World world, @Nonnull final BlockChunk blockChunk) {
@@ -1100,9 +1095,11 @@ public final class BlockUtils {
             return world.getChunk(ChunkUtil.indexChunkFromBlock(globalX, globalZ));
         }
 
-        //   ====================================================================
-        //   From: Ref<ChunkStore>
-        //   ====================================================================
+        //   #endregion World
+        //   #region Ref<ChunkStore>
+        //   ==================================================================
+        //   Ref<ChunkStore>      -> WorldChunk
+        //   ==================================================================
 
         @Nullable
         public static final WorldChunk getWorldChunk(
@@ -1141,9 +1138,11 @@ public final class BlockUtils {
                 .getChunkComponent(ChunkUtil.indexChunkFromBlock(globalX, globalZ), WORLD_CHUNK_COMPONENT);
         }
 
-        //   ====================================================================
-        //   From: BlockStateInfo
-        //   ====================================================================
+        //   #endregion WorldChunk
+        //   #region BlockStateInfo
+        //   ==================================================================
+        //   BlockStateInfo       -> WorldChunk
+        //   ==================================================================
 
         @Nullable
         public static final WorldChunk getWorldChunk(
@@ -1200,11 +1199,12 @@ public final class BlockUtils {
                 .getChunkComponent(ChunkUtil.indexChunkFromBlock(globalX, globalZ), WORLD_CHUNK_COMPONENT);
         }
 
-        //   ====================================================================
-        //   From: CommandBuffer & ChunkInfo
-        //   ====================================================================
+        //   #endregion BlockStateInfo
+        //   #region CommandBuffer
+        //   ==================================================================
+        //   CommandBuffer        -> WorldChunk
+        //   ==================================================================
 
-        // UNTESTED (most methods are untested, or, kind of half tested. some i'm pretty sure work, some i've got no idea, at some point i'll go through and verify them all)
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
@@ -1214,7 +1214,6 @@ public final class BlockUtils {
             return commandBuffer.getExternalData().getChunkComponent(blockChunk.getIndex(), WORLD_CHUNK_COMPONENT);
         }
 
-        // UNTESTED (most methods are untested, or, kind of half tested. some i'm pretty sure work, some i've got no idea, at some point i'll go through and verify them all)
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
@@ -1227,7 +1226,6 @@ public final class BlockUtils {
                 .getChunkComponent(ChunkUtil.indexChunk(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
         }
 
-        // UNTESTED (most methods are untested, or, kind of half tested. some i'm pretty sure work, some i've got no idea, at some point i'll go through and verify them all)
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
@@ -1248,11 +1246,12 @@ public final class BlockUtils {
                 .getChunkComponent(ChunkUtil.indexChunkFromBlock(globalX, globalZ), WORLD_CHUNK_COMPONENT);
         }
 
-        //   ====================================================================
-        //   From: Store<ChunkStore> & ChunkInfo
-        //   ====================================================================
+        //   #endregion CommandBuffer
+        //   #region Store<ChunkStore>
+        //   ==================================================================
+        //   Store<ChunkStore>    -> WorldChunk
+        //   ==================================================================
 
-        // UNTESTED
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final Store<ChunkStore> store,
@@ -1261,8 +1260,6 @@ public final class BlockUtils {
             return store.getExternalData().getChunkComponent(blockChunk.getIndex(), WORLD_CHUNK_COMPONENT);
         }
 
-        // UNTESTED
-        // TODO swap these over to use blockX and the other ChunkUtil thing that works for blocks
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final Store<ChunkStore> store,
@@ -1274,7 +1271,6 @@ public final class BlockUtils {
                 .getChunkComponent(ChunkUtil.indexChunk(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
         }
 
-        // UNTESTED
         @Nullable
         public static final WorldChunk getWorldChunk(@Nonnull final Store<ChunkStore> store, final long chunkIndex) {
             return store.getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
@@ -1291,13 +1287,14 @@ public final class BlockUtils {
                 .getChunkComponent(ChunkUtil.indexChunkFromBlock(globalX, globalZ), WORLD_CHUNK_COMPONENT);
         }
 
-        //   ====================================================================
-        //   From: ChunkStore & ChunkInfo
-        //   ====================================================================
-
-        // UNTESTED
+        //   #endregion Store<ChunkStore>
+        //   #region ChunkStore
+        //   ==================================================================
+        //   ChunkStore           -> WorldChunk
+        //   ==================================================================
         // NOTE: ChunkStore IS a world provider, but, there's seemingly other easier ways to get the world chunk component? maybe? cause otherwise we'd have to do
         // `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
+
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final ChunkStore chunkStore,
@@ -1307,9 +1304,6 @@ public final class BlockUtils {
             return chunkStore.getChunkComponent(blockChunk.getIndex(), WORLD_CHUNK_COMPONENT);
         }
 
-        // UNTESTED
-        // NOTE: ChunkStore IS a world provider, but, there's seemingly other easier ways to get the world chunk component? maybe? cause otherwise we'd have to do
-        // `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
         @Nullable
         public static final WorldChunk getWorldChunk(
             @Nonnull final ChunkStore chunkStore,
@@ -1320,9 +1314,6 @@ public final class BlockUtils {
             return chunkStore.getChunkComponent(ChunkUtil.indexChunk(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
         }
 
-        // UNTESTED
-        // NOTE: ChunkStore IS a world provider, but, there's seemingly other easier ways to get the world chunk component? maybe? cause otherwise we'd have to do
-        // `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
         @Nullable
         public static final WorldChunk getWorldChunk(@Nonnull final ChunkStore chunkStore, final long chunkIndex) {
             // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
@@ -1338,6 +1329,7 @@ public final class BlockUtils {
             return chunkStore.getChunkComponent(ChunkUtil.indexChunkFromBlock(globalX, globalZ), WORLD_CHUNK_COMPONENT);
         }
 
+        //   #endregion ChunkStore
         // #endregion getWorldChunk
 
         // #region getChunkRef
