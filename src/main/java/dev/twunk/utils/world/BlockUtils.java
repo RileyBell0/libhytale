@@ -689,50 +689,61 @@ public final class BlockUtils {
             return getLocalCoords(info.getIndex());
         }
 
+        // ====================================================================
+        // Global coords to local coords
+        // ====================================================================
+
         @Nonnull
         public static final Vector3i getLocalCoords(@Nonnull final Vector3i coords) {
-            return getLocalCoords(coords.x, coords.y, coords.z);
+            return new Vector3i(coords.x & 31, coords.y, coords.z & 31);
         }
 
-        // TODO riley come back and test this. ah yes, this is that moment we all dream
-        // of, writing a "todo" or "fixme" that really may never be seen again. I mean, before
-        // i release this (if i do) i'll do a quick check for TODOs i guess so eh nah
-        // this'll be fine, i'll come back.
+        // You're telling me i can get local coordinates from coordinates?
+        // yeah, cause, well, if you're calling this its definitely with global coords
+        //
+        // thus, all we need to do is do is keep x % 32, y, z % 32
+        //
+        // notably, 32 = 2^5, thus we only need to keep the 5 lowest bits
         @Nonnull
         public static final Vector3i getLocalCoords(final int x, final int y, final int z) {
-            // => blockIndex
-            // TODO not sure if this works, haven't tested
-            var _index = ChunkUtil.indexBlock(x, y, z);
-            var _coord = new Vector3i(
-                ChunkUtil.xFromBlockInColumn(_index),
-                ChunkUtil.yFromBlockInColumn(_index),
-                ChunkUtil.zFromBlockInColumn(_index)
-            );
-            var coord = new Vector3i(x % 32, y % 32, z % 32);
-            var index = ChunkUtil.indexBlock(coord.x, coord.y, coord.z);
-            if (_index != index || !coord.equals(_coord)) {
-                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
-                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
-                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
-                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
-                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
-                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
-            }
-            assert _index == index;
-            assert coord.equals(coord);
-            return coord;
+            return new Vector3i(x & 31, y, z & 31);
         }
 
         // ====================================================================
         // index -> this is how we actually get coords of a block throughout their system
         // ====================================================================
 
-        // remember kids: multidimensional arrays are like birds - a lie
         @Nonnull
         public static final Vector3i getLocalCoords(final int blockIndex) {
-            final int x = ChunkUtil.xFromBlockInColumn(blockIndex);
-            final int y = ChunkUtil.yFromBlockInColumn(blockIndex);
-            final int z = ChunkUtil.zFromBlockInColumn(blockIndex);
+            // bits are as follows (assumes 32bit integers)
+            //  1  2  3  4  5
+            //  x  x  x  x  x
+            //
+            //  6  7  8  9  10
+            //  z  z  z  z  z
+            //
+            // 11 12 13 14 15 16 17 18 19
+            //  y  y  y  y  y  y  y  y  y
+            //
+            // bits 20-32 are assumed to be unused at this stage
+            //
+            // meaning:
+            //  x: [0, 32)   | x can represent 32 different positions
+            //  y: [0, 512)  | y can represent 512 different positions
+            //  z: [0, 32)   | z can represent 32 different positions
+            // thus, from this we can conclude (but also we just kind of know) that
+            // chunks in hytale are 32x, 512y, 32z -> a really tall rectangular prism
+
+            // tidbit on block coordinates
+            // - local coordinates are the position within the chunk for the block
+            // - this can be represented within 19 bits
+            // - thus, every blockIndex is unique ONLY to the chunk its within
+            // - thus, with just the first 19 bits we can figure out the local coordinates
+            //   of any block given its index within its chunk
+
+            final int x = blockIndex & 31; // keep 5
+            final int y = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // shift 10 then keep 9
+            final int z = (blockIndex >> 5) & 31; // shift 5 then keep 5
 
             return new Vector3i(x, y, z);
         }
@@ -746,9 +757,6 @@ public final class BlockUtils {
         //
         // Purpose:   Getting the GLOBAL coordinates of the block in its world
         // Requires:  THE CHUNK your block is in AND the local coordinates of your block (or some way i can get its local coords)
-        // TODO riley these should really technically accept anything with local coords from getRef and getInfo
-        // and maybe more? idk. not sure.
-        // oh yeah it just needs a chunk
 
         //   #region block
         //   ====================================================================
@@ -763,16 +771,12 @@ public final class BlockUtils {
                 return null;
             }
 
-            final var localCoords = getLocalCoords(info);
-
-            return getGlobalCoords(info.getChunkRef(), localCoords.x, localCoords.y, localCoords.z);
+            return getGlobalCoords(info.getChunkRef(), info.getIndex());
         }
 
         @Nullable
         public static final Vector3i getGlobalCoords(@Nonnull final BlockStateInfo info) {
-            final var localCoords = Coords.getLocalCoords(info);
-
-            return getGlobalCoords(info.getChunkRef(), localCoords.x, localCoords.y, localCoords.z);
+            return getGlobalCoords(info.getChunkRef(), info.getIndex());
         }
 
         //   #endregion block
@@ -785,8 +789,21 @@ public final class BlockUtils {
 
         //     #region chunkRef
         //     |=================================================================
-        //     | BlockAccessor
+        //     | Ref<ChunkStore> (ChunkRef)
         //     |=================================================================
+
+        @Nullable
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final Ref<ChunkStore> chunkRef,
+            @Nonnull final Vector3i coords
+        ) {
+            final var worldChunk = Chunk.getWorldChunkFromChunkRef(chunkRef);
+            if (worldChunk == null) {
+                return null;
+            }
+
+            return getGlobalCoords(worldChunk.getX(), worldChunk.getZ(), coords);
+        }
 
         @Nullable
         public static final Vector3i getGlobalCoords(
@@ -800,7 +817,7 @@ public final class BlockUtils {
                 return null;
             }
 
-            return getGlobalCoords(worldChunk, ChunkUtil.indexBlock(x, y, z));
+            return getGlobalCoords(worldChunk.getX(), worldChunk.getZ(), x, y, z);
         }
 
         @Nullable
@@ -810,40 +827,21 @@ public final class BlockUtils {
                 return null;
             }
 
-            return getGlobalCoords(worldChunk, blockIndex);
+            return getGlobalCoords(worldChunk.getX(), worldChunk.getZ(), blockIndex);
         }
 
-        @Nullable
-        public static final Vector3i getGlobalCoords(@Nonnull final Ref<ChunkStore> chunkRef, final Vector3i coords) {
-            final var worldChunk = Chunk.getWorldChunkFromChunkRef(chunkRef);
-            if (worldChunk == null) {
-                return null;
-            }
-
-            return getGlobalCoords(worldChunk, ChunkUtil.indexBlock(coords.x, coords.y, coords.z));
-        }
-
-        //     #region chunkRef
+        //     #endregion chunkRef
         //     #region BlockAccessor
         //     |=================================================================
         //     | BlockAccessor OR WorldChunk
         //     |=================================================================
 
         @Nonnull
-        public static final Vector3i getGlobalCoords(@Nonnull final BlockAccessor chunk, final Vector3i coords) {
-            return getGlobalCoords(chunk, coords.x, coords.y, coords.z);
-        }
-
-        @Nonnull
-        public static final Vector3i getGlobalCoords(@Nonnull final BlockAccessor chunk, final int blockIndex) {
-            // TODO come back and kill the instancing of a new vector3i here
-            final var localCoords = getLocalCoords(blockIndex);
-
-            final int globalX = localCoords.x + (chunk.getX() * 32);
-            final int globalY = localCoords.y; // TODO pretty sure << isn't right
-            final int globalZ = localCoords.z + (chunk.getZ() * 32);
-
-            return new Vector3i(globalX, globalY, globalZ);
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final BlockAccessor chunk,
+            @Nonnull final Vector3i coords
+        ) {
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), coords);
         }
 
         @Nonnull
@@ -853,11 +851,12 @@ public final class BlockUtils {
             final int y,
             final int z
         ) {
-            final int globalX = x + (chunk.getX() * 32);
-            final int globalY = y; // TODO pretty sure << isn't right
-            final int globalZ = z + (chunk.getZ() * 32);
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), x, y, z);
+        }
 
-            return new Vector3i(globalX, globalY, globalZ);
+        @Nonnull
+        public static final Vector3i getGlobalCoords(@Nonnull final BlockAccessor chunk, final int blockIndex) {
+            return new Vector3i(chunk.getX(), chunk.getZ(), blockIndex);
         }
 
         //     #endregion BlockAccessor
@@ -871,19 +870,12 @@ public final class BlockUtils {
             @Nonnull final BlockChunk chunk,
             @Nonnull final Vector3i localCoords
         ) {
-            return getGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), localCoords);
         }
 
         @Nonnull
         public static final Vector3i getGlobalCoords(@Nonnull final BlockChunk chunk, final int blockIndex) {
-            // TODO come back and kill the instancing of a new vector3i here
-            final var localCoords = getLocalCoords(blockIndex);
-
-            final int globalX = localCoords.x + (chunk.getX() * 32);
-            final int globalY = localCoords.y; // TODO pretty sure << isn't right
-            final int globalZ = localCoords.z + (chunk.getZ() * 32);
-
-            return new Vector3i(globalX, globalY, globalZ);
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), blockIndex);
         }
 
         @Nonnull
@@ -893,21 +885,84 @@ public final class BlockUtils {
             final int y,
             final int z
         ) {
-            final int globalX = x + (chunk.getX() * 32);
-            final int globalY = y; // TODO pretty sure << isn't right
-            final int globalZ = z + (chunk.getZ() * 32);
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), x, y, z);
+        }
+
+        //     #endregion BlockChunk
+        //     #region done
+        //     |=================================================================
+        //     | Done!
+        //     |=================================================================
+
+        // Chunk Coords AND Block Coords
+        @Nonnull
+        public static final Vector3i getGlobalCoords(
+            final int chunkX,
+            final int chunkZ,
+            @Nonnull final Vector3i blockCoords
+        ) {
+            return new Vector3i(blockCoords.x + (chunkX << 5), blockCoords.y, blockCoords.z + (chunkZ << 5));
+        }
+
+        // Chunk Coords AND Block Coords
+        @Nonnull
+        public static final Vector3i getGlobalCoords(
+            final int chunkX,
+            final int chunkZ,
+            final int x,
+            final int y,
+            final int z
+        ) {
+            return new Vector3i(x + (chunkX << 5), y, z + (chunkZ << 5));
+        }
+
+        // Chunk coords AND Block Index
+        @Nonnull
+        public static final Vector3i getGlobalCoords(final int chunkX, final int chunkZ, final int blockIndex) {
+            // remember: 5 bits -> 32
+            final int globalX = (blockIndex & 31) + (chunkX << 5); // globalX = local X + 32 * chunkX (chunk is 32x32 for x,z)
+            final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // same as local y, there is no distinction between the two
+            final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5); // globalX = local z + 32 * chunkZ (chunk is 32x32 for x,z)
 
             return new Vector3i(globalX, globalY, globalZ);
         }
 
-        //     #endregion BlockChunk
-        //     #region Ref<ChunkStore>
-        //     |=================================================================
-        //     | Ref<ChunkStore> (ChunkRef)
-        //     |=================================================================
+        // Chunk Coords AND Block Coords
+        @Nonnull
+        public static final Vector3i getGlobalCoords(final long chunkIndex, @Nonnull final Vector3i blockCoords) {
+            final int chunkX = (int) (chunkIndex >> 32);
+            final int chunkZ = (int) (chunkIndex);
 
-        //     #endregion Ref<ChunkStore>
+            return new Vector3i(blockCoords.x + (chunkX << 5), blockCoords.y, blockCoords.z + (chunkZ << 5));
+        }
+
+        // Chunk Coords AND Block Coords
+        @Nonnull
+        public static final Vector3i getGlobalCoords(final long chunkIndex, final int x, final int y, final int z) {
+            final int chunkX = (int) (chunkIndex >> 32);
+            final int chunkZ = (int) (chunkIndex);
+
+            return new Vector3i(x + (chunkX << 5), y, z + (chunkZ << 5));
+        }
+
+        // Chunk coords AND Block Index
+        @Nonnull
+        public static final Vector3i getGlobalCoords(final long chunkIndex, final int blockIndex) {
+            // our chunk X coord is in the 33-64 bits (inclusive) of chunkIndex. We want that part, multiplied by 32, thus we must drop the first 32 bits of chunkIndex, then later shift it back 5 bits to "multiply" it by 32
+            final int chunkX = (int) (chunkIndex >> 32);
+            // our chunk z coord is in the first 32 bits, so we'll cast it to an int (just keeps first 32 bits) then later shift it back 5 bits to "multiply" it by 32
+            final int chunkZ = (int) (chunkIndex);
+
+            final int globalX = (blockIndex & 31) + (chunkX << 5);
+            final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK;
+            final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5);
+
+            return new Vector3i(globalX, globalY, globalZ);
+        }
+
+        //     #endregion done
         //   #endregion chunkNLocal
+
         // #endregion getGlobalCoords
     }
 
