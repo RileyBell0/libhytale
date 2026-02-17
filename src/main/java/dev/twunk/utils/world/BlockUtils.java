@@ -84,18 +84,12 @@ public final class BlockUtils {
     public static final class Entity {
 
         // #region getRef
-        // Function to get a reference to a block entity at given coordinates
-        // can use any of the following
-        // - param 1:
-        //   * World
-        //   * CommandBuffer<ChunkStore>
-        //   * ChunkStore
-        //   * Ref<ChunkStore> << to your CHUNK
-        //   * BlockComponentChunk
-        // param2:
-        //   * global coords: x, y, z
-        //   * Vector3i
-        //   * index
+        // ====================================================================
+        // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        // ====================================================================
+        //
+        // Purpose:   Getting a Ref (`Ref<ChunkStore>`) for a given block
+        // Requires:  A method of accessing blocks in a world, AND coordinates of the block (or its index and the chunks index etc)
 
         // #region WorldProvider
         // ====================================================================
@@ -404,6 +398,10 @@ public final class BlockUtils {
             BlockStateInfo.getComponentType();
 
         // #region getInfo
+        // ====================================================================
+        // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        // ====================================================================
+        //
         // Purpose:   Getting the `BlockStateInfo` component for a block specified block
         // Requires:  A ref to the block (or a way to get a ref to the block)
 
@@ -666,9 +664,12 @@ public final class BlockUtils {
     public static final class Coords {
 
         // #region getLocalCoords
-        // Function: given some aspect of a block and i'll find a way to get the coords of it.
-        // - BlockStateInfo => (coords inbuilt, but, i make it easier to access)
-        // - Ref to the block itself
+        // ====================================================================
+        // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        // ====================================================================
+        //
+        // Purpose:   Getting the local coordinates of the block (within its chunk)
+        // Requires:  BlockStateInfo component of the relevant block (or a method of getting this -> see Info.getInfo() and thus -> Entity.getRef)
 
         // Get the local coords of the block in its chunk
         @Nullable
@@ -699,15 +700,13 @@ public final class BlockUtils {
         // #endregion getLocalCoords
 
         // #region getGlobalCoords
-        // Function: Get the coordinates of a block from any one of the following
-        // - blockRef                    << reference to the block itself
-        // - BlockStateInfo              << the info about the block (the way we actually get its local coords)
-        // - BlockChunk AND info         << chunk gives us the transform from local to global coords
-        // - WorldChunk AND info         << chunk gives us the transform from local to global coords
-        // - [BlockAccessor] AND info    << chunk gives us the transform from local to global coords
+        // ====================================================================
+        // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        // ====================================================================
+        //
+        // Purpose:   Getting the GLOBAL coordinates of the block in its world
+        // Requires:  Your block AND the chunk it's in (local coords + chunk coords)
 
-        // Block ref isn't useful on its own. We grab the "info" and handball over
-        // to an actual entrypoint for getting the coords
         @Nullable
         public static final Vector3i getGlobalCoords(@Nonnull final Ref<ChunkStore> blockRef) {
             final var info = Info.getInfo(blockRef);
@@ -718,10 +717,6 @@ public final class BlockUtils {
             return getGlobalCoords(info);
         }
 
-        // Info IS useful on its own, just, apparently it can fail to get the chunk??
-        // anyway, we simply grab the chunk, and return the coords
-        //
-        // The second we have the chunk, it's non-nullable
         @Nullable
         public static final Vector3i getGlobalCoords(@Nonnull final BlockStateInfo info) {
             final var chunk = Chunk.getWorldChunk(info);
@@ -732,10 +727,6 @@ public final class BlockUtils {
             return getGlobalCoords(chunk, info);
         }
 
-        // Info                      => coordinates of the block relative to its chunk
-        // WorldChunk/BlockAccessor  => coordinates of the chunk
-        //
-        // local coords + chunk offset = global coords
         @Nonnull
         public static final Vector3i getGlobalCoords(
             @Nonnull final BlockAccessor chunk,
@@ -745,24 +736,12 @@ public final class BlockUtils {
             return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
         }
 
-        // block index               => if i understand right, hytale is using that classic
-        //                              CS idea of "a multidimensional array is secretly just
-        //                              a really big array", so index is the same as coordinates
-        //                              when using cool maths.
-        //                              Thus, if we have the index, we already have the local coordinates
-        // WorldChunk/BlockAccessor  => coordinates of the chunk
-        //
-        // local coords + chunk offset = global coords
         @Nonnull
         public static final Vector3i getGlobalCoords(@Nonnull final BlockAccessor chunk, final int blockIndex) {
             final var localCoords = Coords.getLocalCoords(blockIndex);
             return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
         }
 
-        // Local coords              => coordinates of the block WITHIN the chunk
-        // WorldChunk/BlockAccessor  => coordinates of the chunk
-        //
-        // local coords + chunk offset = global coords
         @Nonnull
         public static final Vector3i getGlobalCoords(
             @Nonnull final BlockAccessor chunk,
