@@ -89,7 +89,7 @@ public final class BlockUtils {
     // ==================================================
 
     // DONE
-    public static final class Entity {
+    public static final class BlockRef {
 
         // #region getRef
         // ====================================================================
@@ -114,7 +114,7 @@ public final class BlockUtils {
             final var blockIndex = ChunkUtil.indexBlock(coords.x, coords.y, coords.z);
 
             // => (ChunkStore, chunkIndex, blockIndex)
-            return Entity.getRef(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
+            return BlockRef.getRef(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
         }
 
         @Nullable
@@ -425,7 +425,7 @@ public final class BlockUtils {
             @Nonnull final Vector3i pos
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(worldProvider, pos));
+            return getInfo(BlockRef.getRef(worldProvider, pos));
         }
 
         @Nullable
@@ -436,7 +436,7 @@ public final class BlockUtils {
             final int z
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(worldProvider, x, y, z));
+            return getInfo(BlockRef.getRef(worldProvider, x, y, z));
         }
 
         @Nullable
@@ -446,7 +446,7 @@ public final class BlockUtils {
             final int blockIndex
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(worldProvider, chunkIndex, blockIndex));
+            return getInfo(BlockRef.getRef(worldProvider, chunkIndex, blockIndex));
         }
 
         // #endregion WorldProvider
@@ -459,13 +459,13 @@ public final class BlockUtils {
         @Nullable
         public static final BlockStateInfo getInfo(@Nonnull final World world, @Nonnull final Vector3i pos) {
             // => BlockRef
-            return getInfo(Entity.getRef(world, pos));
+            return getInfo(BlockRef.getRef(world, pos));
         }
 
         @Nullable
         public static final BlockStateInfo getInfo(@Nonnull final World world, final int x, final int y, final int z) {
             // => BlockRef
-            return getInfo(Entity.getRef(world, x, y, z));
+            return getInfo(BlockRef.getRef(world, x, y, z));
         }
 
         @Nullable
@@ -475,7 +475,7 @@ public final class BlockUtils {
             final int blockIndex
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(world, chunkIndex, blockIndex));
+            return getInfo(BlockRef.getRef(world, chunkIndex, blockIndex));
         }
 
         // #endregion World
@@ -491,7 +491,7 @@ public final class BlockUtils {
             @Nonnull final Vector3i pos
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(commandBuffer, pos));
+            return getInfo(BlockRef.getRef(commandBuffer, pos));
         }
 
         @Nullable
@@ -502,7 +502,7 @@ public final class BlockUtils {
             final int z
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(commandBuffer, x, y, z));
+            return getInfo(BlockRef.getRef(commandBuffer, x, y, z));
         }
 
         @Nullable
@@ -512,7 +512,7 @@ public final class BlockUtils {
             final int blockIndex
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(commandBuffer, chunkIndex, blockIndex));
+            return getInfo(BlockRef.getRef(commandBuffer, chunkIndex, blockIndex));
         }
 
         // #endregion CommandBuffer
@@ -528,7 +528,7 @@ public final class BlockUtils {
             @Nonnull final Vector3i pos
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunkStore, pos));
+            return getInfo(BlockRef.getRef(chunkStore, pos));
         }
 
         @Nullable
@@ -539,7 +539,7 @@ public final class BlockUtils {
             final int z
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunkStore, x, y, z));
+            return getInfo(BlockRef.getRef(chunkStore, x, y, z));
         }
 
         @Nullable
@@ -549,7 +549,7 @@ public final class BlockUtils {
             final int blockIndex
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunkStore, chunkIndex, blockIndex));
+            return getInfo(BlockRef.getRef(chunkStore, chunkIndex, blockIndex));
         }
 
         // #endregion Store<ChunkStore>
@@ -562,7 +562,7 @@ public final class BlockUtils {
         @Nullable
         public static final BlockStateInfo getInfo(@Nonnull final ChunkStore chunkStore, @Nonnull final Vector3i pos) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunkStore, pos));
+            return getInfo(BlockRef.getRef(chunkStore, pos));
         }
 
         @Nullable
@@ -573,7 +573,7 @@ public final class BlockUtils {
             final int z
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunkStore, x, y, z));
+            return getInfo(BlockRef.getRef(chunkStore, x, y, z));
         }
 
         @Nullable
@@ -583,7 +583,7 @@ public final class BlockUtils {
             final int blockIndex
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunkStore, chunkIndex, blockIndex));
+            return getInfo(BlockRef.getRef(chunkStore, chunkIndex, blockIndex));
         }
 
         // #endregion ChunkStore
@@ -598,7 +598,7 @@ public final class BlockUtils {
             @Nonnull final Ref<ChunkStore> chunkRef,
             @Nonnull final Vector3i coords
         ) {
-            return getInfo(Entity.getRef(chunkRef, coords));
+            return getInfo(BlockRef.getRef(chunkRef, coords));
         }
 
         @Nullable
@@ -608,12 +608,12 @@ public final class BlockUtils {
             final int y,
             final int z
         ) {
-            return getInfo(Entity.getRef(chunkRef, x, y, z));
+            return getInfo(BlockRef.getRef(chunkRef, x, y, z));
         }
 
         @Nullable
         public static final BlockStateInfo getInfo(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
-            return getInfo(Entity.getRef(chunkRef, blockIndex));
+            return getInfo(BlockRef.getRef(chunkRef, blockIndex));
         }
 
         // #endregion Ref<ChunkStore>
@@ -629,7 +629,7 @@ public final class BlockUtils {
             @Nonnull final Vector3i coords
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunk, coords));
+            return getInfo(BlockRef.getRef(chunk, coords));
         }
 
         @Nullable
@@ -640,13 +640,13 @@ public final class BlockUtils {
             final int z
         ) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunk, x, y, z));
+            return getInfo(BlockRef.getRef(chunk, x, y, z));
         }
 
         @Nullable
         public static final BlockStateInfo getInfo(@Nonnull final BlockComponentChunk chunk, final int blockIndex) {
             // => BlockRef
-            return getInfo(Entity.getRef(chunk, blockIndex));
+            return getInfo(BlockRef.getRef(chunk, blockIndex));
         }
 
         // #endregion BlockComponentChunk
@@ -1336,6 +1336,11 @@ public final class BlockUtils {
 
     public static final class ChunkRef {
 
+        // what i need to get a chunk ref
+        // - anything that could get a block ref
+        // - anything that could get a chunk
+        // - anything that could get
+
         // #region getChunkRef
         // lets say you don't have a chunk ref, but you KNOW you have the information required to find one.
         // well, good news. that's the entire point of this section. if you wanna see how i get a chunk
@@ -1593,7 +1598,7 @@ public final class BlockUtils {
             final int localY,
             final int localZ
         ) {
-            final var ref = Entity.getRef(chunk, localX, localY, localZ);
+            final var ref = BlockRef.getRef(chunk, localX, localY, localZ);
             if (ref == null) {
                 return null;
             }
@@ -1631,7 +1636,7 @@ public final class BlockUtils {
             final int localY,
             final int localZ
         ) {
-            final var ref = Entity.getRef(chunk, localX, localY, localZ);
+            final var ref = BlockRef.getRef(chunk, localX, localY, localZ);
             if (ref == null) {
                 return null;
             }
