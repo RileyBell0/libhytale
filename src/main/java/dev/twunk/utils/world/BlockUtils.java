@@ -403,11 +403,9 @@ public final class BlockUtils {
         private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT =
             BlockStateInfo.getComponentType();
 
-        // #region get
-        // Function to get `BlockStateInfo` component for a block. You can provide
-        // - a ref to the block
-        // - the local coordinates of the block and the chunk it's in
-        // - the global coordinates of the block #TODO
+        // #region getInfo
+        // Purpose:   Getting the `BlockStateInfo` component for a block specified block
+        // Requires:  A ref to the block (or a way to get a ref to the block)
 
         // #region WorldProvider
         // ====================================================================
@@ -662,7 +660,7 @@ public final class BlockUtils {
         }
         // #endregion BlockRef
 
-        // #endregion get
+        // #endregion getInfo
     }
 
     public static final class Coords {
