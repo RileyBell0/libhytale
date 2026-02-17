@@ -670,8 +670,8 @@ public final class BlockUtils {
         //
         // Purpose:   Getting the local coordinates of the block (within its chunk)
         // Requires:  BlockStateInfo component of the relevant block (or a method of getting this -> see Info.getInfo() and thus -> Entity.getRef)
+        // importantly, most methods of getInfo are pointless, as usually these require the coordinates of a block (and if you have that, you don't need this)
 
-        // Get the local coords of the block in its chunk
         @Nullable
         public static final Vector3i getLocalCoords(@Nonnull final Ref<ChunkStore> blockRef) {
             final var info = Info.getInfo(blockRef);
@@ -679,20 +679,60 @@ public final class BlockUtils {
                 return null;
             }
 
+            // => blockIndex
             return getLocalCoords(info.getIndex());
         }
 
         @Nonnull
         public static final Vector3i getLocalCoords(@Nonnull final BlockStateInfo info) {
+            // => blockIndex
             return getLocalCoords(info.getIndex());
         }
 
+        @Nonnull
+        public static final Vector3i getLocalCoords(@Nonnull final Vector3i coords) {
+            return getLocalCoords(coords.x, coords.y, coords.z);
+        }
+
+        // TODO riley come back and test this. ah yes, this is that moment we all dream
+        // of, writing a "todo" or "fixme" that really may never be seen again. I mean, before
+        // i release this (if i do) i'll do a quick check for TODOs i guess so eh nah
+        // this'll be fine, i'll come back.
+        @Nonnull
+        public static final Vector3i getLocalCoords(final int x, final int y, final int z) {
+            // => blockIndex
+            // TODO not sure if this works, haven't tested
+            var _index = ChunkUtil.indexBlock(x, y, z);
+            var _coord = new Vector3i(
+                ChunkUtil.xFromBlockInColumn(_index),
+                ChunkUtil.yFromBlockInColumn(_index),
+                ChunkUtil.zFromBlockInColumn(_index)
+            );
+            var coord = new Vector3i(x % 32, y % 32, z % 32);
+            var index = ChunkUtil.indexBlock(coord.x, coord.y, coord.z);
+            if (_index != index || !coord.equals(_coord)) {
+                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
+                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
+                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
+                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
+                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
+                console.log("AAAH FUCK RILEY COME BACK AND FIX THIS");
+            }
+            assert _index == index;
+            assert coord.equals(coord);
+            return coord;
+        }
+
+        // ====================================================================
+        // index -> this is how we actually get coords of a block throughout their system
+        // ====================================================================
+
         // remember kids: multidimensional arrays are like birds - a lie
         @Nonnull
-        public static final Vector3i getLocalCoords(final int index) {
-            final int x = ChunkUtil.xFromBlockInColumn(index);
-            final int y = ChunkUtil.yFromBlockInColumn(index);
-            final int z = ChunkUtil.zFromBlockInColumn(index);
+        public static final Vector3i getLocalCoords(final int blockIndex) {
+            final int x = ChunkUtil.xFromBlockInColumn(blockIndex);
+            final int y = ChunkUtil.yFromBlockInColumn(blockIndex);
+            final int z = ChunkUtil.zFromBlockInColumn(blockIndex);
 
             return new Vector3i(x, y, z);
         }
