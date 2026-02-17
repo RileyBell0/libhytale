@@ -274,7 +274,7 @@ public final class BlockUtils {
             @Nonnull final ChunkStore chunkStore,
             @Nonnull final Vector3i coords
         ) {
-            final var chunkRef = Chunk.getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
+            final var chunkRef = ChunkRef.getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
             if (chunkRef == null) {
                 return null;
             }
@@ -289,7 +289,7 @@ public final class BlockUtils {
             final int y,
             final int z
         ) {
-            final var chunkRef = Chunk.getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(x, z));
+            final var chunkRef = ChunkRef.getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(x, z));
             if (chunkRef == null) {
                 return null;
             }
@@ -303,7 +303,7 @@ public final class BlockUtils {
             final long chunkIndex,
             final int blockIndex
         ) {
-            final var chunkRef = Chunk.getChunkRef(chunkStore, chunkIndex);
+            final var chunkRef = ChunkRef.getChunkRef(chunkStore, chunkIndex);
             if (chunkRef == null) {
                 return null;
             }
@@ -974,9 +974,9 @@ public final class BlockUtils {
         // #endregion getGlobalCoords
     }
 
+    // DONE
     public static final class Chunk {
 
-        // DONE
         // #region getWorldChunk
 
         @Nullable
@@ -1332,6 +1332,9 @@ public final class BlockUtils {
 
         //   #endregion ChunkStore
         // #endregion getWorldChunk
+    }
+
+    public static final class ChunkRef {
 
         // #region getChunkRef
         // lets say you don't have a chunk ref, but you KNOW you have the information required to find one.
@@ -1434,7 +1437,7 @@ public final class BlockUtils {
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull final Vector3i coords
         ) {
-            final var chunkRef = Chunk.getChunkRef(commandBuffer, coords.x, coords.z);
+            final var chunkRef = ChunkRef.getChunkRef(commandBuffer, coords.x, coords.z);
             if (chunkRef == null) {
                 return null;
             }
@@ -1454,7 +1457,7 @@ public final class BlockUtils {
             final int y,
             final int z
         ) {
-            final var chunkRef = Chunk.getChunkRef(commandBuffer, x, z);
+            final var chunkRef = ChunkRef.getChunkRef(commandBuffer, x, z);
             if (chunkRef == null) {
                 return null;
             }
