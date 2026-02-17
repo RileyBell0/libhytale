@@ -86,7 +86,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = BlockUtils.Info.get(blockRef);
+        var blockInfo = BlockUtils.Info.getInfo(blockRef);
         if (blockInfo == null) {
             return;
         }

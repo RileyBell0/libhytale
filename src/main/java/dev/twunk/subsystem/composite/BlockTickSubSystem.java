@@ -59,7 +59,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = BlockUtils.Info.get(blockRef);
+        var blockInfo = BlockUtils.Info.getInfo(blockRef);
         if (blockInfo == null) {
             return;
         }
