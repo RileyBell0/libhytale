@@ -52,7 +52,7 @@ import javax.annotation.Nullable;
 
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
-public class BlockUtils {
+public abstract class BlockUtils {
 
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
@@ -81,7 +81,7 @@ public class BlockUtils {
     // ==================================================
 
     // DONE
-    public abstract static class Entity {
+    public static final class Entity {
 
         // #region getRef
         // Function to get a reference to a block entity at given coordinates
@@ -215,7 +215,7 @@ public class BlockUtils {
         // #endregion getRef
     }
 
-    public abstract static class Info {
+    public static final class Info {
 
         @Nonnull
         @SuppressWarnings("null")
@@ -229,7 +229,13 @@ public class BlockUtils {
         // - the global coordinates of the block #TODO
 
         @Nullable
-        public static BlockStateInfo get(@Nonnull BlockComponentChunk chunk, int localX, int localY, int localZ) {
+        public static final BlockStateInfo get(
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+            @Nonnull BlockComponentChunk chunk,
+            int localX,
+            int localY,
+            int localZ
+        ) {
             var ref = Entity.getRef(chunk, localX, localY, localZ);
             if (ref == null) {
                 return null;
@@ -246,7 +252,7 @@ public class BlockUtils {
         // #endregion get
     }
 
-    public abstract static class Coords {
+    public static final class Coords {
 
         // #region getLocalCoords
         // Function: given some aspect of a block and i'll find a way to get the coords of it.
@@ -383,7 +389,7 @@ public class BlockUtils {
         }
     }
 
-    public abstract static class Chunk {
+    public static final class Chunk {
 
         // #region getWorldChunk
 
@@ -640,7 +646,7 @@ public class BlockUtils {
         // #endregion getChunkRef
     }
 
-    public abstract static class BlockId {
+    public static final class BlockId {
 
         // ====================================================================
         // Option 1: Getting the ID of a block by its coords
@@ -694,7 +700,7 @@ public class BlockUtils {
         }
     }
 
-    public abstract static class TickProcedure {
+    public static final class TickProcedure {
 
         public static boolean setTicking(@Nonnull Ref<ChunkStore> ref) {
             return setTicking(ref, true);
@@ -747,7 +753,7 @@ public class BlockUtils {
         }
     }
 
-    public abstract static class BlockComponent {
+    public static final class BlockComponent {
 
         @Nullable
         public <T extends Component<ChunkStore>> T getComponent(
@@ -853,7 +859,7 @@ public class BlockUtils {
         }
     }
 
-    public abstract static class Type {
+    public static final class Type {
 
         /**
          * Gets the "BlockType" for a block with the given Id.
