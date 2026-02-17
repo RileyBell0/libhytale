@@ -661,6 +661,7 @@ public final class BlockUtils {
         // #endregion getInfo
     }
 
+    // DONE
     public static final class Coords {
 
         // #region getLocalCoords
@@ -962,7 +963,6 @@ public final class BlockUtils {
 
         //     #endregion done
         //   #endregion chunkNLocal
-
         // #endregion getGlobalCoords
     }
 
