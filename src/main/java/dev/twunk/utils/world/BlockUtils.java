@@ -52,7 +52,7 @@ import javax.annotation.Nullable;
 
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
-public abstract class BlockUtils {
+public final class BlockUtils {
 
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
@@ -103,27 +103,47 @@ public abstract class BlockUtils {
         // ====================================================================
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull World world, int x, int y, int z) {
+        public static final Ref<ChunkStore> getRef(@Nonnull final World world, final int x, final int y, final int z) {
             return Entity.getRef(world.getChunkStore(), ChunkUtil.indexBlockInColumn(x, y, z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull CommandBuffer<ChunkStore> commandBuffer, int x, int y, int z) {
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final int x,
+            final int y,
+            final int z
+        ) {
             return Entity.getRef(commandBuffer.getExternalData(), ChunkUtil.indexBlockInColumn(x, y, z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull ChunkStore chunkStore, int x, int y, int z) {
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final ChunkStore chunkStore,
+            final int x,
+            final int y,
+            final int z
+        ) {
             return Entity.getRef(chunkStore, ChunkUtil.indexBlockInColumn(x, y, z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull Ref<ChunkStore> chunkRef, int x, int y, int z) {
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final Ref<ChunkStore> chunkRef,
+            final int x,
+            final int y,
+            final int z
+        ) {
             return Entity.getRef(chunkRef, ChunkUtil.indexBlockInColumn(x, y, z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull BlockComponentChunk blockComponentChunk, int x, int y, int z) {
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final BlockComponentChunk blockComponentChunk,
+            final int x,
+            final int y,
+            final int z
+        ) {
             return Entity.getRef(blockComponentChunk, ChunkUtil.indexBlockInColumn(x, y, z));
         }
 
@@ -134,32 +154,38 @@ public abstract class BlockUtils {
         // GET REF: from seperate vector coords -> redirects to index version
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull World world, @Nonnull Vector3i coords) {
+        public static final Ref<ChunkStore> getRef(@Nonnull final World world, @Nonnull final Vector3i coords) {
             return Entity.getRef(world, ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull Vector3i coords
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            @Nonnull final Vector3i coords
         ) {
             return Entity.getRef(commandBuffer, ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull ChunkStore chunkStore, @Nonnull Vector3i coords) {
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final ChunkStore chunkStore,
+            @Nonnull final Vector3i coords
+        ) {
             return Entity.getRef(chunkStore, ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull Ref<ChunkStore> chunkRef, @Nonnull Vector3i coords) {
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final Ref<ChunkStore> chunkRef,
+            @Nonnull final Vector3i coords
+        ) {
             return Entity.getRef(chunkRef, ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(
-            @Nonnull BlockComponentChunk blockComponentChunk,
-            @Nonnull Vector3i coords
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final BlockComponentChunk blockComponentChunk,
+            @Nonnull final Vector3i coords
         ) {
             return Entity.getRef(blockComponentChunk, ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z));
         }
@@ -173,18 +199,21 @@ public abstract class BlockUtils {
         // ====================================================================
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull World world, int blockIndex) {
+        public static final Ref<ChunkStore> getRef(@Nonnull final World world, final int blockIndex) {
             return Entity.getRef(world.getChunkStore(), blockIndex);
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull CommandBuffer<ChunkStore> commandBuffer, int blockIndex) {
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final int blockIndex
+        ) {
             return Entity.getRef(commandBuffer.getExternalData(), blockIndex);
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull ChunkStore chunkStore, int blockIndex) {
-            var chunkRef = Chunk.getChunkRef(chunkStore, blockIndex);
+        public static final Ref<ChunkStore> getRef(@Nonnull final ChunkStore chunkStore, final int blockIndex) {
+            final var chunkRef = Chunk.getChunkRef(chunkStore, blockIndex);
             if (chunkRef == null) {
                 return null;
             }
@@ -193,8 +222,8 @@ public abstract class BlockUtils {
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull Ref<ChunkStore> chunkRef, int blockIndex) {
-            var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
+        public static final Ref<ChunkStore> getRef(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
+            final var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
             if (blockComponentChunk == null) {
                 return null;
             }
@@ -203,8 +232,11 @@ public abstract class BlockUtils {
         }
 
         @Nullable
-        public static Ref<ChunkStore> getRef(@Nonnull BlockComponentChunk blockComponentChunk, int blockIndex) {
-            var blockRef = blockComponentChunk.getEntityReference(blockIndex);
+        public static final Ref<ChunkStore> getRef(
+            @Nonnull final BlockComponentChunk blockComponentChunk,
+            final int blockIndex
+        ) {
+            final var blockRef = blockComponentChunk.getEntityReference(blockIndex);
             if (blockRef == null || !blockRef.isValid()) {
                 return null;
             }
@@ -229,8 +261,13 @@ public abstract class BlockUtils {
         // - the global coordinates of the block #TODO
 
         @Nullable
-        public static final BlockStateInfo get(@Nonnull BlockComponentChunk chunk, int localX, int localY, int localZ) {
-            var ref = Entity.getRef(chunk, localX, localY, localZ);
+        public static final BlockStateInfo get(
+            @Nonnull final BlockComponentChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
+        ) {
+            final var ref = Entity.getRef(chunk, localX, localY, localZ);
             if (ref == null) {
                 return null;
             }
@@ -239,7 +276,7 @@ public abstract class BlockUtils {
         }
 
         @Nullable
-        public static BlockStateInfo get(@Nonnull Ref<ChunkStore> blockRef) {
+        public static final BlockStateInfo get(@Nonnull final Ref<ChunkStore> blockRef) {
             return BlockComponent.getComponent(blockRef, BLOCK_STATE_INFO_COMPONENT);
         }
 
@@ -255,8 +292,8 @@ public abstract class BlockUtils {
 
         // Get the local coords of the block in its chunk
         @Nullable
-        public static Vector3i getLocalCoords(@Nonnull Ref<ChunkStore> blockRef) {
-            var info = Info.get(blockRef);
+        public static final Vector3i getLocalCoords(@Nonnull final Ref<ChunkStore> blockRef) {
+            final var info = Info.get(blockRef);
             if (info == null) {
                 return null;
             }
@@ -265,16 +302,16 @@ public abstract class BlockUtils {
         }
 
         @Nonnull
-        public static Vector3i getLocalCoords(@Nonnull BlockStateInfo info) {
+        public static final Vector3i getLocalCoords(@Nonnull final BlockStateInfo info) {
             return getLocalCoords(info.getIndex());
         }
 
         // remember kids: multidimensional arrays are like birds - a lie
         @Nonnull
-        public static Vector3i getLocalCoords(int index) {
-            int x = ChunkUtil.xFromBlockInColumn(index);
-            int y = ChunkUtil.yFromBlockInColumn(index);
-            int z = ChunkUtil.zFromBlockInColumn(index);
+        public static final Vector3i getLocalCoords(final int index) {
+            final int x = ChunkUtil.xFromBlockInColumn(index);
+            final int y = ChunkUtil.yFromBlockInColumn(index);
+            final int z = ChunkUtil.zFromBlockInColumn(index);
 
             return new Vector3i(x, y, z);
         }
@@ -292,8 +329,8 @@ public abstract class BlockUtils {
         // Block ref isn't useful on its own. We grab the "info" and handball over
         // to an actual entrypoint for getting the coords
         @Nullable
-        public static Vector3i getGlobalCoords(@Nonnull Ref<ChunkStore> blockRef) {
-            var info = Info.get(blockRef);
+        public static final Vector3i getGlobalCoords(@Nonnull final Ref<ChunkStore> blockRef) {
+            final var info = Info.get(blockRef);
             if (info == null) {
                 return null;
             }
@@ -306,8 +343,8 @@ public abstract class BlockUtils {
         //
         // The second we have the chunk, it's non-nullable
         @Nullable
-        public static Vector3i getGlobalCoords(@Nonnull BlockStateInfo info) {
-            var chunk = Chunk.getWorldChunk(info);
+        public static final Vector3i getGlobalCoords(@Nonnull final BlockStateInfo info) {
+            final var chunk = Chunk.getWorldChunk(info);
             if (chunk == null) {
                 return null;
             }
@@ -320,8 +357,11 @@ public abstract class BlockUtils {
         //
         // local coords + chunk offset = global coords
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull BlockAccessor chunk, @Nonnull BlockStateInfo info) {
-            var localCoords = Coords.getLocalCoords(info);
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final BlockAccessor chunk,
+            @Nonnull final BlockStateInfo info
+        ) {
+            final var localCoords = Coords.getLocalCoords(info);
             return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
         }
 
@@ -334,8 +374,8 @@ public abstract class BlockUtils {
         //
         // local coords + chunk offset = global coords
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull BlockAccessor chunk, int blockIndex) {
-            var localCoords = Coords.getLocalCoords(blockIndex);
+        public static final Vector3i getGlobalCoords(@Nonnull final BlockAccessor chunk, final int blockIndex) {
+            final var localCoords = Coords.getLocalCoords(blockIndex);
             return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
         }
 
@@ -344,7 +384,10 @@ public abstract class BlockUtils {
         //
         // local coords + chunk offset = global coords
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull BlockAccessor chunk, @Nonnull Vector3i localCoords) {
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final BlockAccessor chunk,
+            @Nonnull final Vector3i localCoords
+        ) {
             return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
         }
 
@@ -354,19 +397,30 @@ public abstract class BlockUtils {
         // so, the code is identical, but hey, fuck it, if it works, it works.
 
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull BlockChunk chunk, @Nonnull BlockStateInfo info) {
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final BlockChunk chunk,
+            @Nonnull final BlockStateInfo info
+        ) {
             return getGlobalCoords(chunk, Coords.getLocalCoords(info));
         }
 
         @Nonnull
-        public static Vector3i getGlobalCoords(@Nonnull BlockChunk chunk, @Nonnull Vector3i localCoords) {
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final BlockChunk chunk,
+            @Nonnull final Vector3i localCoords
+        ) {
             return toGlobalCoords(chunk, localCoords.x, localCoords.y, localCoords.z);
         }
 
         @Nonnull
-        public static Vector3i toGlobalCoords(@Nonnull BlockChunk chunk, int localX, int localY, int localZ) {
-            int globalX = localX + (chunk.getX() * 32);
-            int globalZ = localZ + (chunk.getZ() * 32);
+        public static final Vector3i toGlobalCoords(
+            @Nonnull final BlockChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
+        ) {
+            final int globalX = localX + (chunk.getX() * 32);
+            final int globalZ = localZ + (chunk.getZ() * 32);
 
             return new Vector3i(globalX, localY, globalZ);
         }
@@ -375,9 +429,14 @@ public abstract class BlockUtils {
         // #endregion getGlobalCoords
 
         @Nonnull
-        public static Vector3i toGlobalCoords(@Nonnull BlockAccessor chunk, int localX, int localY, int localZ) {
-            int globalX = localX + (chunk.getX() * 32);
-            int globalZ = localZ + (chunk.getZ() * 32);
+        public static final Vector3i toGlobalCoords(
+            @Nonnull final BlockAccessor chunk,
+            final int localX,
+            final int localY,
+            final int localZ
+        ) {
+            final int globalX = localX + (chunk.getX() * 32);
+            final int globalZ = localZ + (chunk.getZ() * 32);
 
             return new Vector3i(globalX, localY, globalZ);
         }
@@ -388,13 +447,13 @@ public abstract class BlockUtils {
         // #region getWorldChunk
 
         @Nullable
-        public static WorldChunk getWorldChunkFromChunkRef(@Nonnull Ref<ChunkStore> chunkRef) {
+        public static final WorldChunk getWorldChunkFromChunkRef(@Nonnull final Ref<ChunkStore> chunkRef) {
             return BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
         }
 
         @Nullable
-        public static WorldChunk getWorldChunkFromBlockRef(@Nonnull Ref<ChunkStore> blockRef) {
-            var info = Info.get(blockRef);
+        public static final WorldChunk getWorldChunkFromBlockRef(@Nonnull final Ref<ChunkStore> blockRef) {
+            final var info = Info.get(blockRef);
             if (info == null) {
                 return null;
             }
@@ -411,15 +470,15 @@ public abstract class BlockUtils {
         // effectively, BlockStateInfo + Ref to your block => your dream come true
 
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull Ref<ChunkStore> ref) {
+        public static final WorldChunk getWorldChunk(@Nonnull final Ref<ChunkStore> ref) {
             // Potential 1: The ref you passed me is a CHUNK ref. slay. thats the good shit.
-            var maybeChunk = BlockComponent.getComponent(ref, WORLD_CHUNK_COMPONENT);
+            final var maybeChunk = BlockComponent.getComponent(ref, WORLD_CHUNK_COMPONENT);
             if (maybeChunk != null) {
                 return maybeChunk;
             }
 
             // Potential 2: the ref you passed me is a BLOCK ref. GOOD.
-            var info = Info.get(ref);
+            final var info = Info.get(ref);
             if (info == null) {
                 return null;
             }
@@ -428,7 +487,7 @@ public abstract class BlockUtils {
         }
 
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull BlockStateInfo info) {
+        public static final WorldChunk getWorldChunk(@Nonnull final BlockStateInfo info) {
             return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
@@ -445,7 +504,11 @@ public abstract class BlockUtils {
          * Then uses the world to get the WorldChunk at the coords provided
          */
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull BlockStateInfo info, int chunkX, int chunkZ) {
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final BlockStateInfo info,
+            final int chunkX,
+            final int chunkZ
+        ) {
             throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
             // return info
             //     .getChunkRef()
@@ -462,7 +525,7 @@ public abstract class BlockUtils {
          * Then uses the world to get the WorldChunk at the coords provided
          */
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull BlockStateInfo info, long chunkIndex) {
+        public static final WorldChunk getWorldChunk(@Nonnull final BlockStateInfo info, final long chunkIndex) {
             throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
             // return info.getChunkRef().getStore().getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
             // ALT VERSION: use the ref as above in the single ref param version of this function to figure out if we're a block ref or a chunk ref and get the right store based on that
@@ -475,7 +538,11 @@ public abstract class BlockUtils {
          * Then uses the world to get the WorldChunk at the coords provided
          */
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull Ref<ChunkStore> ref, int chunkX, int chunkZ) {
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final Ref<ChunkStore> ref,
+            final int chunkX,
+            final int chunkZ
+        ) {
             throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
             // return ref
             //     .getStore()
@@ -491,7 +558,7 @@ public abstract class BlockUtils {
          * Then uses the world to get the WorldChunk at the coords provided
          */
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull Ref<ChunkStore> ref, long chunkIndex) {
+        public static final WorldChunk getWorldChunk(@Nonnull final Ref<ChunkStore> ref, final long chunkIndex) {
             throw new RuntimeException("ERROR: Riley you need to TEST THIS FUNCTION. Remove me if intentional.");
             // return ref.getStore().getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
             // ALT VERSION: use the ref as above in the single ref param version of this function to figure out if we're a block ref or a chunk ref and get the right store based on that
@@ -499,9 +566,9 @@ public abstract class BlockUtils {
 
         // UNTESTED (most methods are untested, or, kind of half tested. some i'm pretty sure work, some i've got no idea, at some point i'll go through and verify them all)
         @Nullable
-        public static WorldChunk getWorldChunk(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
-            @Nonnull BlockChunk blockChunk
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
+            @Nonnull final BlockChunk blockChunk
         ) {
             // but regardless we don't need the world to get the world chunk
             return getWorldChunk(commandBuffer.getExternalData(), blockChunk);
@@ -509,7 +576,10 @@ public abstract class BlockUtils {
 
         // UNTESTED
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull Store<ChunkStore> store, @Nonnull BlockChunk blockChunk) {
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final Store<ChunkStore> store,
+            @Nonnull final BlockChunk blockChunk
+        ) {
             return getWorldChunk(store.getExternalData(), blockChunk);
         }
 
@@ -517,7 +587,10 @@ public abstract class BlockUtils {
         // NOTE: ChunkStore IS a world provider, but, there's seemingly other easier ways to get the world chunk component? maybe? cause otherwise we'd have to do
         // `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull ChunkStore chunkStore, @Nonnull BlockChunk blockChunk) {
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final ChunkStore chunkStore,
+            @Nonnull final BlockChunk blockChunk
+        ) {
             // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
             return chunkStore.getChunkComponent(blockChunk.getIndex(), WORLD_CHUNK_COMPONENT);
         }
@@ -532,9 +605,9 @@ public abstract class BlockUtils {
         // some way to tie it to a world.
         // UNTESTED
         @Nullable
-        public static WorldChunk getWorldChunk(
-            @Nonnull World world, // well, it is the world, sooo
-            @Nonnull BlockChunk blockChunk
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final World world, // well, it is the world, sooo
+            @Nonnull final BlockChunk blockChunk
         ) {
             return world.getChunk(blockChunk.getIndex());
         }
@@ -543,9 +616,9 @@ public abstract class BlockUtils {
         // some way to tie it to a world.
         // UNTESTED
         @Nullable
-        public static WorldChunk getWorldChunk(
-            @Nonnull World world, // well, it is the world, sooo
-            long chunkIndex
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final World world, // well, it is the world, sooo
+            final long chunkIndex
         ) {
             return world.getChunk(chunkIndex);
         }
@@ -556,13 +629,19 @@ public abstract class BlockUtils {
         // - idk, probably other stuff too
         // UNTESTED
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull WorldProvider worldProvider, @Nonnull BlockChunk blockChunk) {
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final WorldProvider worldProvider,
+            @Nonnull final BlockChunk blockChunk
+        ) {
             return worldProvider.getWorld().getChunk(blockChunk.getIndex());
         }
 
         // UNTESTED
         @Nullable
-        public static WorldChunk getWorldChunk(@Nonnull WorldProvider worldProvider, long chunkIndex) {
+        public static final WorldChunk getWorldChunk(
+            @Nonnull final WorldProvider worldProvider,
+            final long chunkIndex
+        ) {
             return worldProvider.getWorld().getChunk(chunkIndex);
         }
 
@@ -576,29 +655,35 @@ public abstract class BlockUtils {
 
         // With position vector -> redirects to the chunk index version
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull CommandBuffer<ChunkStore> commandBuffer, Vector3i coords) {
+        public static final Ref<ChunkStore> getChunkRef(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final Vector3i coords
+        ) {
             return getChunkRef(commandBuffer.getExternalData(), ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull World world, Vector3i coords) {
+        public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final Vector3i coords) {
             return getChunkRef(world, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull ChunkStore chunkStore, @Nonnull Vector3i coords) {
+        public static final Ref<ChunkStore> getChunkRef(
+            @Nonnull final ChunkStore chunkStore,
+            @Nonnull final Vector3i coords
+        ) {
             return getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
         }
 
         // please don't use this one.. just here for completeness so you know you CAN get the chunk ref out of info - in fact, that's (in my understanding) the preferred way
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull BlockStateInfo info) {
+        public static final Ref<ChunkStore> getChunkRef(@Nonnull final BlockStateInfo info) {
             return info.getChunkRef();
         }
 
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull Ref<ChunkStore> blockRef) {
-            var info = Info.get(blockRef);
+        public static final Ref<ChunkStore> getChunkRef(@Nonnull final Ref<ChunkStore> blockRef) {
+            final var info = Info.get(blockRef);
             if (info == null) {
                 return null;
             }
@@ -607,33 +692,44 @@ public abstract class BlockUtils {
 
         // With coords (x, z) -> redirects to the chunk index version
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull CommandBuffer<ChunkStore> commandBuffer, int x, int z) {
+        public static final Ref<ChunkStore> getChunkRef(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final int x,
+            final int z
+        ) {
             return getChunkRef(commandBuffer.getExternalData(), ChunkUtil.indexChunkFromBlock(x, z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull ChunkStore chunkStore, int x, int z) {
+        public static final Ref<ChunkStore> getChunkRef(
+            @Nonnull final ChunkStore chunkStore,
+            final int x,
+            final int z
+        ) {
             return getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(x, z));
         }
 
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull World world, int x, int z) {
+        public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final int x, final int z) {
             return getChunkRef(world, ChunkUtil.indexChunkFromBlock(x, z));
         }
 
         // With chunk index
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull CommandBuffer<ChunkStore> commandBuffer, long chunkIndex) {
+        public static final Ref<ChunkStore> getChunkRef(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final long chunkIndex
+        ) {
             return getChunkRef(commandBuffer.getExternalData(), chunkIndex);
         }
 
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull World world, long chunkIndex) {
+        public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final long chunkIndex) {
             return getChunkRef(world.getChunkStore(), chunkIndex);
         }
 
         @Nullable
-        public static Ref<ChunkStore> getChunkRef(@Nonnull ChunkStore chunkStore, long chunkIndex) {
+        public static final Ref<ChunkStore> getChunkRef(@Nonnull final ChunkStore chunkStore, final long chunkIndex) {
             return chunkStore.getChunkReference(chunkIndex);
         }
 
@@ -648,13 +744,16 @@ public abstract class BlockUtils {
         //   to know what type of block it is (its ID)
         // ====================================================================
         @Nullable
-        public static Integer getBlockId(@Nonnull CommandBuffer<ChunkStore> commandBuffer, @Nonnull Vector3i coords) {
-            var chunkRef = Chunk.getChunkRef(commandBuffer, coords.x, coords.z);
+        public static final Integer getBlockId(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            @Nonnull final Vector3i coords
+        ) {
+            final var chunkRef = Chunk.getChunkRef(commandBuffer, coords.x, coords.z);
             if (chunkRef == null) {
                 return null;
             }
 
-            var worldChunk = Chunk.getWorldChunk(chunkRef);
+            final var worldChunk = Chunk.getWorldChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -663,13 +762,18 @@ public abstract class BlockUtils {
         }
 
         @Nullable
-        public static Integer getBlockId(@Nonnull CommandBuffer<ChunkStore> commandBuffer, int x, int y, int z) {
-            var chunkRef = Chunk.getChunkRef(commandBuffer, x, z);
+        public static final Integer getBlockId(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final int x,
+            final int y,
+            final int z
+        ) {
+            final var chunkRef = Chunk.getChunkRef(commandBuffer, x, z);
             if (chunkRef == null) {
                 return null;
             }
 
-            var worldChunk = BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
+            final var worldChunk = BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
             if (worldChunk == null) {
                 return null;
             }
@@ -689,19 +793,19 @@ public abstract class BlockUtils {
          * @param blockId
          * @return
          */
-        public static int getBlockId(@Nonnull String blockId) {
+        public static final int getBlockId(@Nonnull final String blockId) {
             return BlockType.getAssetMap().getIndex(blockId);
         }
     }
 
     public static final class TickProcedure {
 
-        public static boolean setTicking(@Nonnull Ref<ChunkStore> ref) {
+        public static final boolean setTicking(@Nonnull final Ref<ChunkStore> ref) {
             return setTicking(ref, true);
         }
 
-        public static boolean setTicking(@Nonnull Ref<ChunkStore> ref, boolean ticking) {
-            var info = Info.get(ref);
+        public static final boolean setTicking(@Nonnull final Ref<ChunkStore> ref, final boolean ticking) {
+            final var info = Info.get(ref);
             if (info == null) {
                 console.log("Info was null");
                 return false;
@@ -710,39 +814,51 @@ public abstract class BlockUtils {
             return setTicking(info, ticking);
         }
 
-        public static boolean setTicking(@Nonnull BlockStateInfo info) {
+        public static final boolean setTicking(@Nonnull final BlockStateInfo info) {
             return setTicking(info, true);
         }
 
-        public static boolean setTicking(@Nonnull BlockStateInfo info, boolean ticking) {
-            var worldChunk = Chunk.getWorldChunk(info);
+        public static final boolean setTicking(@Nonnull final BlockStateInfo info, final boolean ticking) {
+            final var worldChunk = Chunk.getWorldChunk(info);
             if (worldChunk == null) {
                 console.log("World chunk was null");
                 return false;
             }
 
-            var coords = Coords.getLocalCoords(info);
+            final var coords = Coords.getLocalCoords(info);
             return setTicking(worldChunk, coords, ticking);
         }
 
-        public static boolean setTicking(@Nonnull WorldChunk worldChunk, @Nonnull Vector3i coords) {
+        public static final boolean setTicking(@Nonnull final WorldChunk worldChunk, @Nonnull final Vector3i coords) {
             return setTicking(worldChunk, coords, true);
         }
 
-        public static boolean setTicking(@Nonnull WorldChunk worldChunk, @Nonnull Vector3i coords, boolean ticking) {
+        public static final boolean setTicking(
+            @Nonnull final WorldChunk worldChunk,
+            @Nonnull final Vector3i coords,
+            final boolean ticking
+        ) {
             return worldChunk.setTicking(coords.x, coords.y, coords.z, ticking);
         }
 
-        public static boolean setTicking(@Nonnull BlockChunk chunk, @Nonnull BlockStateInfo info, boolean ticking) {
-            var coords = Coords.getLocalCoords(info);
+        public static final boolean setTicking(
+            @Nonnull final BlockChunk chunk,
+            @Nonnull final BlockStateInfo info,
+            final boolean ticking
+        ) {
+            final var coords = Coords.getLocalCoords(info);
             return chunk.setTicking(coords.x, coords.y, coords.z, ticking);
         }
 
-        public static boolean setTicking(@Nonnull BlockChunk chunk, @Nonnull Vector3i coords) {
+        public static final boolean setTicking(@Nonnull final BlockChunk chunk, @Nonnull final Vector3i coords) {
             return chunk.setTicking(coords.x, coords.y, coords.z, true);
         }
 
-        public static boolean setTicking(@Nonnull BlockChunk chunk, @Nonnull Vector3i coords, boolean ticking) {
+        public static final boolean setTicking(
+            @Nonnull final BlockChunk chunk,
+            @Nonnull final Vector3i coords,
+            final boolean ticking
+        ) {
             return chunk.setTicking(coords.x, coords.y, coords.z, ticking);
         }
     }
@@ -750,25 +866,25 @@ public abstract class BlockUtils {
     public static final class BlockComponent {
 
         @Nullable
-        public <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull World world,
-            int x,
-            int y,
-            int z
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final World world,
+            final int x,
+            final int y,
+            final int z
         ) {
-            var chunkRef = world.getChunkStore().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
+            final var chunkRef = world.getChunkStore().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
             if (chunkRef == null) {
                 return null;
             }
 
-            var chunkStore = world.getChunkStore().getStore();
-            var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
+            final var chunkStore = world.getChunkStore().getStore();
+            final var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
             if (blockComponentChunk == null) {
                 return null;
             }
 
-            var blockRef = blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
+            final var blockRef = blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
             if (blockRef == null || !blockRef.isValid()) {
                 return null;
             }
@@ -777,22 +893,22 @@ public abstract class BlockUtils {
         }
 
         @Nullable
-        public static BlockComponentChunk getBlockComponentChunk(@Nonnull Ref<ChunkStore> chunkRef) {
+        public static final BlockComponentChunk getBlockComponentChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
             return chunkRef.getStore().getComponent(chunkRef, BLOCK_COMPONENT_CHUNK);
         }
 
-        public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull BlockComponentChunk chunk,
-            int localX,
-            int localY,
-            int localZ
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
+            @Nonnull final BlockComponentChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
         ) {
-            var ref = Entity.getRef(chunk, localX, localY, localZ);
+            final var ref = Entity.getRef(chunk, localX, localY, localZ);
             if (ref == null) {
                 return null;
             }
-            var componentType = getComponentType.get();
+            final var componentType = getComponentType.get();
             if (componentType == null) {
                 return null;
             }
@@ -800,44 +916,44 @@ public abstract class BlockUtils {
             return ref.getStore().getComponent(ref, componentType);
         }
 
-        public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull Ref<ChunkStore> ref,
-            @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType
         ) {
-            var componentType = getComponentType.get();
+            final var componentType = getComponentType.get();
             if (componentType == null) {
                 return null;
             }
             return ref.getStore().getComponent(ref, componentType);
         }
 
-        public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull Ref<ChunkStore> ref,
-            @Nonnull ComponentType<ChunkStore, T> componentType
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final ComponentType<ChunkStore, T> componentType
         ) {
             return ref.getStore().getComponent(ref, componentType);
         }
 
         @Nullable
-        public static <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull BlockComponentChunk chunk,
-            int localX,
-            int localY,
-            int localZ
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final BlockComponentChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
         ) {
-            var ref = Entity.getRef(chunk, localX, localY, localZ);
+            final var ref = Entity.getRef(chunk, localX, localY, localZ);
             if (ref == null) {
                 return null;
             }
             return ref.getStore().getComponent(ref, componentType);
         }
 
-        public static <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull Ref<ChunkStore> ref
+        public static final <T extends Component<ChunkStore>> boolean hasComponent(
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
+            @Nonnull final Ref<ChunkStore> ref
         ) {
-            var componentType = getComponentType.get();
+            final var componentType = getComponentType.get();
             if (componentType == null) {
                 return false;
             }
@@ -845,9 +961,9 @@ public abstract class BlockUtils {
             return hasComponent(componentType, ref);
         }
 
-        public static <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull ComponentType<ChunkStore, T> componentType,
-            @Nonnull Ref<ChunkStore> ref
+        public static final <T extends Component<ChunkStore>> boolean hasComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final Ref<ChunkStore> ref
         ) {
             return (T) ref.getStore().getComponent(ref, componentType) != null;
         }
@@ -865,7 +981,7 @@ public abstract class BlockUtils {
          * @param blockId The stringy ID you chose for your BLOCK asset in the
          *                `resources/Server/Item/Items/<>.json` file
          */
-        public static BlockType getBlockType(@Nonnull String blockId) {
+        public static final BlockType getBlockType(@Nonnull final String blockId) {
             return BlockType.getAssetMap().getAsset(blockId);
         }
     }
