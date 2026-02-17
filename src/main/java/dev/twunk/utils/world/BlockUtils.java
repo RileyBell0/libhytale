@@ -229,13 +229,7 @@ public class BlockUtils {
         // - the global coordinates of the block #TODO
 
         @Nullable
-        public static BlockStateInfo get(
-            @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull BlockComponentChunk chunk,
-            int localX,
-            int localY,
-            int localZ
-        ) {
+        public static BlockStateInfo get(@Nonnull BlockComponentChunk chunk, int localX, int localY, int localZ) {
             var ref = Entity.getRef(chunk, localX, localY, localZ);
             if (ref == null) {
                 return null;
