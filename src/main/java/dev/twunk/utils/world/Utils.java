@@ -740,12 +740,7 @@ public final class Utils {
                 final int y,
                 final int z
             ) {
-                final var chunkRef = Chunk.Ref_.getChunkRef(commandBuffer, x, z);
-                if (chunkRef == null) {
-                    return null;
-                }
-
-                final var worldChunk = Component_.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(commandBuffer, x, z);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -759,12 +754,7 @@ public final class Utils {
                 final long chunkIndex,
                 final int blockIndex
             ) {
-                final var chunkRef = Chunk.Ref_.getChunkRef(commandBuffer, chunkIndex);
-                if (chunkRef == null) {
-                    return null;
-                }
-
-                final var worldChunk = Component_.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(commandBuffer, chunkIndex);
                 if (worldChunk == null) {
                     return null;
                 }
