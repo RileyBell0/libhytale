@@ -89,6 +89,7 @@ public final class Utils {
     // Grouped functions together
     // ==================================================
 
+    // DONE
     public static final class Block {
 
         /// -> get Ref<ChunkStore>  (BlockRef)
@@ -997,7 +998,8 @@ public final class Utils {
             }
         }
 
-        // TODO
+        // DONE
+        // Not even sure what BlockType is or what i was using it for
         public static final class Type {
 
             /**
