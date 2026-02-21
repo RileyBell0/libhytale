@@ -107,6 +107,10 @@ public final class Utils {
             //
             // Purpose:   Getting a Ref (`Ref<ChunkStore>`) for a given block
             // Requires:  A method of accessing blocks in a world, AND coordinates of the block (or its index and the chunks index etc)
+            //
+            // NOTE: I don't support every combination. If you believe your
+            //       refs/etc are enough to identify a chunk, look at methods
+            //       within here that use similar data and just, copy+paste
 
             //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
             // TODO Blocks I believe operate under a different chunk store to
@@ -671,7 +675,7 @@ public final class Utils {
             // #endregion getRef
         }
 
-        // DONE
+        // DONE 2 electric boogaloo
         public static final class Info {
 
             @Nonnull
@@ -687,11 +691,16 @@ public final class Utils {
             // Purpose:   Getting the `BlockStateInfo` component for a block specified block
             // Requires:  A ref to the block (or a way to get a ref to the block)
 
+            //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
+            // These ARE the chunk store to your world
+            // -> they can easily get the chunk your block is in
+            //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
+            //
+            // All require global coords for your block (either global block coords
+            // or chunk identification and then local block coords/index)
+            //
+
             // #region WorldProvider
-            // ====================================================================
-            // WorldProvider
-            // + Global coords
-            // ====================================================================
 
             @Nullable
             public static final BlockStateInfo getInfo(
