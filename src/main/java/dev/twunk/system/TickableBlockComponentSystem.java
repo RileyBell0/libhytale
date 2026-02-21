@@ -12,7 +12,7 @@ import dev.twunk.component.ITickableBlockComponent;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.utils.world.BlockUtils;
+import dev.twunk.utils.world.Utils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
@@ -86,7 +86,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = BlockUtils.Info.getInfo(blockRef);
+        var blockInfo = Utils.BlockInfo.getInfo(blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -96,7 +96,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = BlockUtils.Chunk.getWorldChunk(blockInfo);
+        var worldChunk = Utils.Chunk.getWorldChunk(blockInfo);
         if (worldChunk == null) {
             return;
         }
@@ -109,11 +109,11 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         if (world == null) {
             return;
         }
-        var coords = BlockUtils.Coords.getGlobalCoords(worldChunk, blockInfo);
+        var coords = Utils.Coords.getGlobalCoords(worldChunk, blockInfo);
 
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = BlockUtils.BlockComponent.getComponent(blockRef, this.componentType);
+        var component = Utils.BlockComponent.getComponent(blockRef, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing

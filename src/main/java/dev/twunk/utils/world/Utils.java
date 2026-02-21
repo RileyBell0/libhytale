@@ -60,7 +60,7 @@ import javax.annotation.Nullable;
 
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
-public final class BlockUtils {
+public final class Utils {
 
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
@@ -398,7 +398,7 @@ public final class BlockUtils {
     }
 
     // DONE
-    public static final class Info {
+    public static final class BlockInfo {
 
         @Nonnull
         @SuppressWarnings("null")
@@ -683,7 +683,7 @@ public final class BlockUtils {
 
         @Nullable
         public static final Vector3i getLocalCoords(@Nonnull final Ref<ChunkStore> blockRef) {
-            final var info = Info.getInfo(blockRef);
+            final var info = BlockInfo.getInfo(blockRef);
             if (info == null) {
                 return null;
             }
@@ -775,7 +775,7 @@ public final class BlockUtils {
 
         @Nullable
         public static final Vector3i getGlobalCoords(@Nonnull final Ref<ChunkStore> blockRef) {
-            final var info = Info.getInfo(blockRef);
+            final var info = BlockInfo.getInfo(blockRef);
             if (info == null) {
                 return null;
             }
@@ -1083,7 +1083,7 @@ public final class BlockUtils {
 
         @Nullable
         public static final WorldChunk getWorldChunkFromBlock(@Nonnull final Ref<ChunkStore> blockRef) {
-            final var info = Info.getInfo(blockRef);
+            final var info = BlockInfo.getInfo(blockRef);
             if (info == null) {
                 return null;
             }
@@ -1101,7 +1101,7 @@ public final class BlockUtils {
             }
 
             // Potential 2: the ref you passed me is a BLOCK ref. GOOD.
-            final var info = Info.getInfo(ref);
+            final var info = BlockInfo.getInfo(ref);
             if (info == null) {
                 return null;
             }
@@ -1474,7 +1474,7 @@ public final class BlockUtils {
 
         @Nullable
         public static final Ref<ChunkStore> getChunkRef(@Nonnull final Ref<ChunkStore> blockRef) {
-            final var info = Info.getInfo(blockRef);
+            final var info = BlockInfo.getInfo(blockRef);
             if (info == null) {
                 return null;
             }
@@ -1596,7 +1596,7 @@ public final class BlockUtils {
         }
 
         public static final boolean setTicking(@Nonnull final Ref<ChunkStore> ref, final boolean ticking) {
-            final var info = Info.getInfo(ref);
+            final var info = BlockInfo.getInfo(ref);
             if (info == null) {
                 console.log("Info was null");
                 return false;

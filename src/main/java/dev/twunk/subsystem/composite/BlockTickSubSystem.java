@@ -9,7 +9,7 @@ import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import dev.twunk.subsystem.composite.interfaces.IBlockTickSystem;
-import dev.twunk.utils.world.BlockUtils;
+import dev.twunk.utils.world.Utils;
 import javax.annotation.Nonnull;
 
 /**
@@ -59,7 +59,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = BlockUtils.Info.getInfo(blockRef);
+        var blockInfo = Utils.BlockInfo.getInfo(blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -69,7 +69,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = BlockUtils.Chunk.getWorldChunk(blockInfo);
+        var worldChunk = Utils.Chunk.getWorldChunk(blockInfo);
         if (worldChunk == null) {
             return;
         }
@@ -82,7 +82,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         if (world == null) {
             return;
         }
-        var coords = BlockUtils.Coords.getGlobalCoords(worldChunk, blockInfo);
+        var coords = Utils.Coords.getGlobalCoords(worldChunk, blockInfo);
 
         parent.onBlockEntityTick(world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
     }
