@@ -119,8 +119,8 @@ public final class Utils {
                 @Nonnull final WorldProvider worldProvider,
                 @Nonnull final Vector3i coords
             ) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(coords.x, coords.z);
-                final var blockIndex = ChunkUtil.indexBlock(coords.x, coords.y, coords.z);
+                final var chunkIndex = Coords.getChunkIndex(coords);
+                final var blockIndex = Coords.getLocalIndex(coords);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return Ref_.getRef(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
@@ -129,12 +129,12 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getRef(
                 @Nonnull final WorldProvider worldProvider,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(x, z);
-                final var blockIndex = ChunkUtil.indexBlock(x, y, z);
+                final var chunkIndex = Coords.getChunkIndex(blockX, blockZ);
+                final var blockIndex = Coords.getLocalIndex(blockX, blockY, blockZ);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return getRef(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
@@ -159,8 +159,8 @@ public final class Utils {
 
             @Nullable
             public static final Ref<ChunkStore> getRef(@Nonnull final World world, @Nonnull final Vector3i coords) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(coords.x, coords.z);
-                final var blockIndex = ChunkUtil.indexBlock(coords.x, coords.y, coords.z);
+                final var chunkIndex = Coords.getChunkIndex(coords);
+                final var blockIndex = Coords.getLocalIndex(coords);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return getRef(world.getChunkStore(), chunkIndex, blockIndex);
@@ -169,12 +169,12 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getRef(
                 @Nonnull final World world,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(x, z);
-                final var blockIndex = ChunkUtil.indexBlock(x, y, z);
+                final var chunkIndex = Coords.getChunkIndex(blockX, blockZ);
+                final var blockIndex = Coords.getLocalIndex(blockX, blockY, blockZ);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return getRef(world.getChunkStore(), chunkIndex, blockIndex);
@@ -202,8 +202,8 @@ public final class Utils {
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
                 @Nonnull final Vector3i coords
             ) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(coords.x, coords.z);
-                final var blockIndex = ChunkUtil.indexBlock(coords.x, coords.y, coords.z);
+                final var chunkIndex = Coords.getChunkIndex(coords);
+                final var blockIndex = Coords.getLocalIndex(coords);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return getRef(commandBuffer.getExternalData(), chunkIndex, blockIndex);
@@ -212,12 +212,12 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getRef(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(x, z);
-                final var blockIndex = ChunkUtil.indexBlock(x, y, z);
+                final var chunkIndex = Coords.getChunkIndex(blockX, blockZ);
+                final var blockIndex = Coords.getLocalIndex(blockX, blockY, blockZ);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return getRef(commandBuffer.getExternalData(), chunkIndex, blockIndex);
@@ -245,8 +245,8 @@ public final class Utils {
                 @Nonnull final Store<ChunkStore> chunkStore,
                 @Nonnull final Vector3i coords
             ) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(coords.x, coords.z);
-                final var blockIndex = ChunkUtil.indexBlock(coords.x, coords.y, coords.z);
+                final var chunkIndex = Coords.getChunkIndex(coords);
+                final var blockIndex = Coords.getLocalIndex(coords);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return getRef(chunkStore.getExternalData(), chunkIndex, blockIndex);
@@ -255,12 +255,12 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getRef(
                 @Nonnull final Store<ChunkStore> chunkStore,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var chunkIndex = ChunkUtil.indexChunkFromBlock(x, z);
-                final var blockIndex = ChunkUtil.indexBlock(x, y, z);
+                final var chunkIndex = Coords.getChunkIndex(blockX, blockZ);
+                final var blockIndex = Coords.getLocalIndex(blockX, blockY, blockZ);
 
                 // => (ChunkStore, chunkIndex, blockIndex)
                 return getRef(chunkStore.getExternalData(), chunkIndex, blockIndex);
