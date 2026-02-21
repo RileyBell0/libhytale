@@ -839,6 +839,53 @@ public final class BlockUtils {
             return getGlobalCoords(worldChunk.getX(), worldChunk.getZ(), blockIndex);
         }
 
+        @Nullable
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final Ref<ChunkStore> chunkRef,
+            @Nonnull final BlockStateInfo info
+        ) {
+            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
+            if (worldChunk == null) {
+                return null;
+            }
+
+            return getGlobalCoords(worldChunk.getX(), worldChunk.getZ(), info.getIndex());
+        }
+
+        //     #endregion chunkRef
+        //     #region BlockAccessor
+        //     |=================================================================
+        //     | BlockAccessor OR WorldChunk
+        //     |=================================================================
+
+        @Nonnull
+        public static final Vector3i getGlobalCoords(@Nonnull final WorldChunk chunk, @Nonnull final Vector3i coords) {
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), coords);
+        }
+
+        @Nonnull
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final WorldChunk chunk,
+            final int x,
+            final int y,
+            final int z
+        ) {
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), x, y, z);
+        }
+
+        @Nonnull
+        public static final Vector3i getGlobalCoords(@Nonnull final WorldChunk chunk, final int blockIndex) {
+            return new Vector3i(chunk.getX(), chunk.getZ(), blockIndex);
+        }
+
+        @Nonnull
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final WorldChunk chunk,
+            @Nonnull final BlockStateInfo info
+        ) {
+            return new Vector3i(chunk.getX(), chunk.getZ(), info.getIndex());
+        }
+
         //     #endregion chunkRef
         //     #region BlockAccessor
         //     |=================================================================
@@ -868,6 +915,14 @@ public final class BlockUtils {
             return new Vector3i(chunk.getX(), chunk.getZ(), blockIndex);
         }
 
+        @Nonnull
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final BlockAccessor chunk,
+            @Nonnull final BlockStateInfo info
+        ) {
+            return new Vector3i(chunk.getX(), chunk.getZ(), info.getIndex());
+        }
+
         //     #endregion BlockAccessor
         //     #region BlockChunk
         //     |=================================================================
@@ -885,6 +940,14 @@ public final class BlockUtils {
         @Nonnull
         public static final Vector3i getGlobalCoords(@Nonnull final BlockChunk chunk, final int blockIndex) {
             return getGlobalCoords(chunk.getX(), chunk.getZ(), blockIndex);
+        }
+
+        @Nonnull
+        public static final Vector3i getGlobalCoords(
+            @Nonnull final BlockChunk chunk,
+            @Nonnull final BlockStateInfo info
+        ) {
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), info.getIndex());
         }
 
         @Nonnull
@@ -936,6 +999,23 @@ public final class BlockUtils {
             return new Vector3i(globalX, globalY, globalZ);
         }
 
+        // Chunk coords AND Block Index
+        @Nonnull
+        public static final Vector3i getGlobalCoords(
+            final int chunkX,
+            final int chunkZ,
+            @Nonnull final BlockStateInfo info
+        ) {
+            final var blockIndex = info.getIndex();
+
+            // remember: 5 bits -> 32
+            final int globalX = (blockIndex & 31) + (chunkX << 5); // globalX = local X + 32 * chunkX (chunk is 32x32 for x,z)
+            final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // same as local y, there is no distinction between the two
+            final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5); // globalX = local z + 32 * chunkZ (chunk is 32x32 for x,z)
+
+            return new Vector3i(globalX, globalY, globalZ);
+        }
+
         // Chunk Coords AND Block Coords
         @Nonnull
         public static final Vector3i getGlobalCoords(final long chunkIndex, @Nonnull final Vector3i blockCoords) {
@@ -957,6 +1037,23 @@ public final class BlockUtils {
         // Chunk coords AND Block Index
         @Nonnull
         public static final Vector3i getGlobalCoords(final long chunkIndex, final int blockIndex) {
+            // our chunk X coord is in the 33-64 bits (inclusive) of chunkIndex. We want that part, multiplied by 32, thus we must drop the first 32 bits of chunkIndex, then later shift it back 5 bits to "multiply" it by 32
+            final int chunkX = (int) (chunkIndex >> 32);
+            // our chunk z coord is in the first 32 bits, so we'll cast it to an int (just keeps first 32 bits) then later shift it back 5 bits to "multiply" it by 32
+            final int chunkZ = (int) (chunkIndex);
+
+            final int globalX = (blockIndex & 31) + (chunkX << 5);
+            final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK;
+            final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5);
+
+            return new Vector3i(globalX, globalY, globalZ);
+        }
+
+        // Chunk coords AND Block Index
+        @Nonnull
+        public static final Vector3i getGlobalCoords(final long chunkIndex, @Nonnull final BlockStateInfo info) {
+            final var blockIndex = info.getIndex();
+
             // our chunk X coord is in the 33-64 bits (inclusive) of chunkIndex. We want that part, multiplied by 32, thus we must drop the first 32 bits of chunkIndex, then later shift it back 5 bits to "multiply" it by 32
             final int chunkX = (int) (chunkIndex >> 32);
             // our chunk z coord is in the first 32 bits, so we'll cast it to an int (just keeps first 32 bits) then later shift it back 5 bits to "multiply" it by 32
