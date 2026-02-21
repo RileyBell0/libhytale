@@ -69,7 +69,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = Utils.Chunk.getWorldChunk(blockInfo);
+        var worldChunk = Utils.WorldChunk_.getWorldChunk(blockInfo);
         if (worldChunk == null) {
             return;
         }

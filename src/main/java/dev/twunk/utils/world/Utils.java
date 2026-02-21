@@ -323,7 +323,7 @@ public final class Utils {
             @Nonnull final Ref<ChunkStore> chunkRef,
             @Nonnull final Vector3i coords
         ) {
-            final var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
+            final var blockComponentChunk = Component_.getBlockComponentChunk(chunkRef);
             if (blockComponentChunk == null) {
                 return null;
             }
@@ -338,7 +338,7 @@ public final class Utils {
             final int y,
             final int z
         ) {
-            final var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
+            final var blockComponentChunk = Component_.getBlockComponentChunk(chunkRef);
             if (blockComponentChunk == null) {
                 return null;
             }
@@ -348,7 +348,7 @@ public final class Utils {
 
         @Nullable
         public static final Ref<ChunkStore> getRef(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
-            final var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
+            final var blockComponentChunk = Component_.getBlockComponentChunk(chunkRef);
             if (blockComponentChunk == null) {
                 return null;
             }
@@ -662,11 +662,196 @@ public final class Utils {
                 return null;
             }
 
-            return BlockComponent.getComponent(blockRef, BLOCK_STATE_INFO_COMPONENT);
+            return Component_.getComponent(blockRef, BLOCK_STATE_INFO_COMPONENT);
         }
         // #endregion BlockRef
 
         // #endregion getInfo
+    }
+
+    public static final class BlockId {
+
+        // ====================================================================
+        // Option 1: Getting the ID of a block by its coords
+        // - there's a certain coordinate at which exists a block. You want
+        //   to know what type of block it is (its ID)
+        // ====================================================================
+        @Nullable
+        public static final Integer getBlockId(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            @Nonnull final Vector3i coords
+        ) {
+            final var chunkRef = ChunkRef.getChunkRef(commandBuffer, coords.x, coords.z);
+            if (chunkRef == null) {
+                return null;
+            }
+
+            final var worldChunk = WorldChunk_.getWorldChunk(chunkRef);
+            if (worldChunk == null) {
+                return null;
+            }
+
+            return worldChunk.getBlock(coords.x, coords.y, coords.z);
+        }
+
+        @Nullable
+        public static final Integer getBlockId(
+            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final int x,
+            final int y,
+            final int z
+        ) {
+            final var chunkRef = ChunkRef.getChunkRef(commandBuffer, x, z);
+            if (chunkRef == null) {
+                return null;
+            }
+
+            final var worldChunk = Component_.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
+            if (worldChunk == null) {
+                return null;
+            }
+
+            return worldChunk.getBlock(x, y, z);
+        }
+
+        // ====================================================================
+        // Option 2: Getting the ID of a block by its type
+        //  - if you know the string ID of the block (you decided
+        //    this when naming your block) then you can get it by that string
+        // ====================================================================
+
+        /**
+         * Get the integer ID for a block by its string ID
+         *
+         * @param blockId
+         * @return
+         */
+        public static final int getBlockId(@Nonnull final String blockId) {
+            return BlockType.getAssetMap().getIndex(blockId);
+        }
+    }
+
+    public static final class BlockType_ {
+
+        /**
+         * Gets the "BlockType" for a block with the given Id.
+         *
+         * Note that the required `blockId` is the ID of the block that YOU SET in your
+         * `resources/Server/Item/Items/RileysBlock.json` in the `Id` at the base of
+         * the json object
+         *
+         * @param blockId The stringy ID you chose for your BLOCK asset in the
+         *                `resources/Server/Item/Items/<>.json` file
+         */
+        public static final BlockType getBlockType(@Nonnull final String blockId) {
+            return BlockType.getAssetMap().getAsset(blockId);
+        }
+    }
+
+    public static final class Component_ {
+
+        @Nullable
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final World world,
+            final int x,
+            final int y,
+            final int z
+        ) {
+            final var chunkRef = world.getChunkStore().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
+            if (chunkRef == null) {
+                return null;
+            }
+
+            final var chunkStore = world.getChunkStore().getStore();
+            final var blockComponentChunk = Component_.getBlockComponentChunk(chunkRef);
+            if (blockComponentChunk == null) {
+                return null;
+            }
+
+            final var blockRef = blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
+            if (blockRef == null || !blockRef.isValid()) {
+                return null;
+            }
+
+            return chunkStore.getComponent(blockRef, componentType);
+        }
+
+        @Nullable
+        public static final BlockComponentChunk getBlockComponentChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
+            return chunkRef.getStore().getComponent(chunkRef, BLOCK_COMPONENT_CHUNK);
+        }
+
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
+            @Nonnull final BlockComponentChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
+        ) {
+            final var ref = BlockRef.getRef(chunk, localX, localY, localZ);
+            if (ref == null) {
+                return null;
+            }
+            final var componentType = getComponentType.get();
+            if (componentType == null) {
+                return null;
+            }
+
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType
+        ) {
+            final var componentType = getComponentType.get();
+            if (componentType == null) {
+                return null;
+            }
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final ComponentType<ChunkStore, T> componentType
+        ) {
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        @Nullable
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final BlockComponentChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
+        ) {
+            final var ref = BlockRef.getRef(chunk, localX, localY, localZ);
+            if (ref == null) {
+                return null;
+            }
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        public static final <T extends Component<ChunkStore>> boolean hasComponent(
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
+            @Nonnull final Ref<ChunkStore> ref
+        ) {
+            final var componentType = getComponentType.get();
+            if (componentType == null) {
+                return false;
+            }
+
+            return hasComponent(componentType, ref);
+        }
+
+        public static final <T extends Component<ChunkStore>> boolean hasComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final Ref<ChunkStore> ref
+        ) {
+            return (T) ref.getStore().getComponent(ref, componentType) != null;
+        }
     }
 
     // DONE
@@ -806,7 +991,7 @@ public final class Utils {
             @Nonnull final Ref<ChunkStore> chunkRef,
             @Nonnull final Vector3i coords
         ) {
-            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
+            final var worldChunk = WorldChunk_.getWorldChunkFromChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -821,7 +1006,7 @@ public final class Utils {
             final int y,
             final int z
         ) {
-            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
+            final var worldChunk = WorldChunk_.getWorldChunkFromChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -831,7 +1016,7 @@ public final class Utils {
 
         @Nullable
         public static final Vector3i getGlobalCoords(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
-            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
+            final var worldChunk = WorldChunk_.getWorldChunkFromChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -844,7 +1029,7 @@ public final class Utils {
             @Nonnull final Ref<ChunkStore> chunkRef,
             @Nonnull final BlockStateInfo info
         ) {
-            final var worldChunk = Chunk.getWorldChunkFromChunk(chunkRef);
+            final var worldChunk = WorldChunk_.getWorldChunkFromChunk(chunkRef);
             if (worldChunk == null) {
                 return null;
             }
@@ -1072,13 +1257,13 @@ public final class Utils {
     }
 
     // DONE
-    public static final class Chunk {
+    public static final class WorldChunk_ {
 
         // #region getWorldChunk
 
         @Nullable
         public static final WorldChunk getWorldChunkFromChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
-            return BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
+            return Component_.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
         }
 
         @Nullable
@@ -1088,13 +1273,13 @@ public final class Utils {
                 return null;
             }
 
-            return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
+            return Component_.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
         @Nullable
         public static final WorldChunk getWorldChunk(@Nonnull final Ref<ChunkStore> ref) {
             // Potential 1: The ref you passed me is a CHUNK ref. slay. thats the good shit. that's what we're after
-            final var maybeChunk = BlockComponent.getComponent(ref, WORLD_CHUNK_COMPONENT);
+            final var maybeChunk = Component_.getComponent(ref, WORLD_CHUNK_COMPONENT);
             if (maybeChunk != null) {
                 console.log("You gave me a chunk ref!");
                 return maybeChunk;
@@ -1107,12 +1292,12 @@ public final class Utils {
             }
             console.log("You gave me a block ref!");
 
-            return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
+            return Component_.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
         @Nullable
         public static final WorldChunk getWorldChunk(@Nonnull final BlockStateInfo info) {
-            return BlockComponent.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
+            return Component_.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
         // || Get an unrelated chunk in a world USING something that can get us that world
@@ -1527,68 +1712,6 @@ public final class Utils {
         // #endregion getChunkRef
     }
 
-    public static final class BlockId {
-
-        // ====================================================================
-        // Option 1: Getting the ID of a block by its coords
-        // - there's a certain coordinate at which exists a block. You want
-        //   to know what type of block it is (its ID)
-        // ====================================================================
-        @Nullable
-        public static final Integer getBlockId(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull final Vector3i coords
-        ) {
-            final var chunkRef = ChunkRef.getChunkRef(commandBuffer, coords.x, coords.z);
-            if (chunkRef == null) {
-                return null;
-            }
-
-            final var worldChunk = Chunk.getWorldChunk(chunkRef);
-            if (worldChunk == null) {
-                return null;
-            }
-
-            return worldChunk.getBlock(coords.x, coords.y, coords.z);
-        }
-
-        @Nullable
-        public static final Integer getBlockId(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-            final int x,
-            final int y,
-            final int z
-        ) {
-            final var chunkRef = ChunkRef.getChunkRef(commandBuffer, x, z);
-            if (chunkRef == null) {
-                return null;
-            }
-
-            final var worldChunk = BlockComponent.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
-            if (worldChunk == null) {
-                return null;
-            }
-
-            return worldChunk.getBlock(x, y, z);
-        }
-
-        // ====================================================================
-        // Option 2: Getting the ID of a block by its type
-        //  - if you know the string ID of the block (you decided
-        //    this when naming your block) then you can get it by that string
-        // ====================================================================
-
-        /**
-         * Get the integer ID for a block by its string ID
-         *
-         * @param blockId
-         * @return
-         */
-        public static final int getBlockId(@Nonnull final String blockId) {
-            return BlockType.getAssetMap().getIndex(blockId);
-        }
-    }
-
     public static final class TickProcedure {
 
         public static final boolean setTicking(@Nonnull final Ref<ChunkStore> ref) {
@@ -1610,7 +1733,7 @@ public final class Utils {
         }
 
         public static final boolean setTicking(@Nonnull final BlockStateInfo info, final boolean ticking) {
-            final var worldChunk = Chunk.getWorldChunk(info);
+            final var worldChunk = WorldChunk_.getWorldChunk(info);
             if (worldChunk == null) {
                 console.log("World chunk was null");
                 return false;
@@ -1651,129 +1774,6 @@ public final class Utils {
             final boolean ticking
         ) {
             return chunk.setTicking(coords.x, coords.y, coords.z, ticking);
-        }
-    }
-
-    public static final class BlockComponent {
-
-        @Nullable
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final World world,
-            final int x,
-            final int y,
-            final int z
-        ) {
-            final var chunkRef = world.getChunkStore().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
-            if (chunkRef == null) {
-                return null;
-            }
-
-            final var chunkStore = world.getChunkStore().getStore();
-            final var blockComponentChunk = BlockComponent.getBlockComponentChunk(chunkRef);
-            if (blockComponentChunk == null) {
-                return null;
-            }
-
-            final var blockRef = blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
-            if (blockRef == null || !blockRef.isValid()) {
-                return null;
-            }
-
-            return chunkStore.getComponent(blockRef, componentType);
-        }
-
-        @Nullable
-        public static final BlockComponentChunk getBlockComponentChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
-            return chunkRef.getStore().getComponent(chunkRef, BLOCK_COMPONENT_CHUNK);
-        }
-
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull final BlockComponentChunk chunk,
-            final int localX,
-            final int localY,
-            final int localZ
-        ) {
-            final var ref = BlockRef.getRef(chunk, localX, localY, localZ);
-            if (ref == null) {
-                return null;
-            }
-            final var componentType = getComponentType.get();
-            if (componentType == null) {
-                return null;
-            }
-
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final Ref<ChunkStore> ref,
-            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType
-        ) {
-            final var componentType = getComponentType.get();
-            if (componentType == null) {
-                return null;
-            }
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final Ref<ChunkStore> ref,
-            @Nonnull final ComponentType<ChunkStore, T> componentType
-        ) {
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        @Nullable
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final BlockComponentChunk chunk,
-            final int localX,
-            final int localY,
-            final int localZ
-        ) {
-            final var ref = BlockRef.getRef(chunk, localX, localY, localZ);
-            if (ref == null) {
-                return null;
-            }
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        public static final <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull final Ref<ChunkStore> ref
-        ) {
-            final var componentType = getComponentType.get();
-            if (componentType == null) {
-                return false;
-            }
-
-            return hasComponent(componentType, ref);
-        }
-
-        public static final <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final Ref<ChunkStore> ref
-        ) {
-            return (T) ref.getStore().getComponent(ref, componentType) != null;
-        }
-    }
-
-    public static final class Type {
-
-        /**
-         * Gets the "BlockType" for a block with the given Id.
-         *
-         * Note that the required `blockId` is the ID of the block that YOU SET in your
-         * `resources/Server/Item/Items/RileysBlock.json` in the `Id` at the base of
-         * the json object
-         *
-         * @param blockId The stringy ID you chose for your BLOCK asset in the
-         *                `resources/Server/Item/Items/<>.json` file
-         */
-        public static final BlockType getBlockType(@Nonnull final String blockId) {
-            return BlockType.getAssetMap().getAsset(blockId);
         }
     }
 }
