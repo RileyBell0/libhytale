@@ -90,6 +90,11 @@ public final class Utils {
 
     public static final class Block {
 
+        /// -> get Ref<ChunkStore>  (BlockRef)
+        /// -> get BlockStateInfo
+        /// -> get ID               (int)
+        /// -> get BlockType
+
         // DONE
         public static final class Ref_ {
 
@@ -405,6 +410,7 @@ public final class Utils {
             }
 
             // #endregion BlockComponentChunk
+            // #endregion getRef
         }
 
         // DONE
@@ -695,7 +701,7 @@ public final class Utils {
             //   to know what type of block it is (its ID)
             // ====================================================================
             @Nullable
-            public static final Integer getBlockId(
+            public static final Integer getId(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
                 @Nonnull final Vector3i coords
             ) {
@@ -713,7 +719,7 @@ public final class Utils {
             }
 
             @Nullable
-            public static final Integer getBlockId(
+            public static final Integer getId(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
                 final int x,
                 final int y,
@@ -744,7 +750,7 @@ public final class Utils {
              * @param blockId
              * @return
              */
-            public static final int getBlockId(@Nonnull final String blockId) {
+            public static final int getId(@Nonnull final String blockId) {
                 return BlockType.getAssetMap().getIndex(blockId);
             }
         }
@@ -761,115 +767,9 @@ public final class Utils {
              * @param blockId The stringy ID you chose for your BLOCK asset in the
              *                `resources/Server/Item/Items/<>.json` file
              */
-            public static final BlockType getBlockType(@Nonnull final String blockId) {
+            public static final BlockType getType(@Nonnull final String blockId) {
                 return BlockType.getAssetMap().getAsset(blockId);
             }
-        }
-    }
-
-    public static final class Component_ {
-
-        @Nullable
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final World world,
-            final int x,
-            final int y,
-            final int z
-        ) {
-            final var chunkRef = world.getChunkStore().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
-            if (chunkRef == null) {
-                return null;
-            }
-
-            final var chunkStore = world.getChunkStore().getStore();
-            final var blockComponentChunk = Component_.getBlockComponentChunk(chunkRef);
-            if (blockComponentChunk == null) {
-                return null;
-            }
-
-            final var blockRef = blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
-            if (blockRef == null || !blockRef.isValid()) {
-                return null;
-            }
-
-            return chunkStore.getComponent(blockRef, componentType);
-        }
-
-        @Nullable
-        public static final BlockComponentChunk getBlockComponentChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
-            return chunkRef.getStore().getComponent(chunkRef, BLOCK_COMPONENT_CHUNK);
-        }
-
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull final BlockComponentChunk chunk,
-            final int localX,
-            final int localY,
-            final int localZ
-        ) {
-            final var ref = Block.Ref_.getRef(chunk, localX, localY, localZ);
-            if (ref == null) {
-                return null;
-            }
-            final var componentType = getComponentType.get();
-            if (componentType == null) {
-                return null;
-            }
-
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final Ref<ChunkStore> ref,
-            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType
-        ) {
-            final var componentType = getComponentType.get();
-            if (componentType == null) {
-                return null;
-            }
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final Ref<ChunkStore> ref,
-            @Nonnull final ComponentType<ChunkStore, T> componentType
-        ) {
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        @Nullable
-        public static final <T extends Component<ChunkStore>> T getComponent(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final BlockComponentChunk chunk,
-            final int localX,
-            final int localY,
-            final int localZ
-        ) {
-            final var ref = Block.Ref_.getRef(chunk, localX, localY, localZ);
-            if (ref == null) {
-                return null;
-            }
-            return ref.getStore().getComponent(ref, componentType);
-        }
-
-        public static final <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
-            @Nonnull final Ref<ChunkStore> ref
-        ) {
-            final var componentType = getComponentType.get();
-            if (componentType == null) {
-                return false;
-            }
-
-            return hasComponent(componentType, ref);
-        }
-
-        public static final <T extends Component<ChunkStore>> boolean hasComponent(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final Ref<ChunkStore> ref
-        ) {
-            return (T) ref.getStore().getComponent(ref, componentType) != null;
         }
     }
 
@@ -1349,6 +1249,114 @@ public final class Utils {
             }
 
             // #endregion getChunkRef
+        }
+    }
+
+    public static final class Component_ {
+
+        /// -> get ? extends Component<ChunkStore>    < works for blocks, chunks
+
+        @Nullable
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final World world,
+            final int x,
+            final int y,
+            final int z
+        ) {
+            final var chunkRef = world.getChunkStore().getChunkReference(ChunkUtil.indexChunkFromBlock(x, z));
+            if (chunkRef == null) {
+                return null;
+            }
+
+            final var chunkStore = world.getChunkStore().getStore();
+            final var blockComponentChunk = Component_.getBlockComponentChunk(chunkRef);
+            if (blockComponentChunk == null) {
+                return null;
+            }
+
+            final var blockRef = blockComponentChunk.getEntityReference(ChunkUtil.indexBlockInColumn(x, y, z));
+            if (blockRef == null || !blockRef.isValid()) {
+                return null;
+            }
+
+            return chunkStore.getComponent(blockRef, componentType);
+        }
+
+        @Nullable
+        public static final BlockComponentChunk getBlockComponentChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
+            return chunkRef.getStore().getComponent(chunkRef, BLOCK_COMPONENT_CHUNK);
+        }
+
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
+            @Nonnull final BlockComponentChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
+        ) {
+            final var ref = Block.Ref_.getRef(chunk, localX, localY, localZ);
+            if (ref == null) {
+                return null;
+            }
+            final var componentType = getComponentType.get();
+            if (componentType == null) {
+                return null;
+            }
+
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType
+        ) {
+            final var componentType = getComponentType.get();
+            if (componentType == null) {
+                return null;
+            }
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final Ref<ChunkStore> ref,
+            @Nonnull final ComponentType<ChunkStore, T> componentType
+        ) {
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        @Nullable
+        public static final <T extends Component<ChunkStore>> T getComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final BlockComponentChunk chunk,
+            final int localX,
+            final int localY,
+            final int localZ
+        ) {
+            final var ref = Block.Ref_.getRef(chunk, localX, localY, localZ);
+            if (ref == null) {
+                return null;
+            }
+            return ref.getStore().getComponent(ref, componentType);
+        }
+
+        public static final <T extends Component<ChunkStore>> boolean hasComponent(
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
+            @Nonnull final Ref<ChunkStore> ref
+        ) {
+            final var componentType = getComponentType.get();
+            if (componentType == null) {
+                return false;
+            }
+
+            return hasComponent(componentType, ref);
+        }
+
+        public static final <T extends Component<ChunkStore>> boolean hasComponent(
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
+            @Nonnull final Ref<ChunkStore> ref
+        ) {
+            return (T) ref.getStore().getComponent(ref, componentType) != null;
         }
     }
 
