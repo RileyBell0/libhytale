@@ -775,6 +775,9 @@ public final class Utils {
 
     public static final class Chunk {
 
+        /// -> get WorldChunk
+        /// -> get Ref<ChunkStore>  (ChunkRef)
+
         // DONE
         public static final class WorldChunk_ {
 
@@ -1363,6 +1366,10 @@ public final class Utils {
     // DONE
     public static final class Coords {
 
+        /// -> get LOCAL coordinates within chunk    (Vector3i)
+        /// -> get LOCAL index                       (int | Integer) (returns Integer so it can be nullable on method that can fail)
+        /// -> get GLOBAL coordinates                (Vector3i)
+
         // #region getLocalCoords
         // ====================================================================
         // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
@@ -1449,7 +1456,38 @@ public final class Utils {
         }
 
         // #endregion getLocalCoords
+        // #region getLocalIndex
 
+        // Integer cause, nullable
+        @Nullable
+        public static final Integer getLocalIndex(@Nonnull final Ref<ChunkStore> blockRef) {
+            final var info = Block.Info.getInfo(blockRef);
+            if (info == null) {
+                return null;
+            }
+
+            // => blockIndex
+            return info.getIndex();
+        }
+
+        /**
+         * IMPORTANT: don't use this, just call `getIndex()` on the info component....
+         *
+         * i mean, fr.
+         */
+        public static final int getLocalIndex(@Nonnull final BlockStateInfo info) {
+            return info.getIndex();
+        }
+
+        public static final int getLocalIndex(@Nonnull final Vector3i coords) {
+            return ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z);
+        }
+
+        public static final int getLocalIndex(final int x, final int y, final int z) {
+            return ChunkUtil.indexBlockInColumn(x, y, z);
+        }
+
+        // #endregion getLocalIndex
         // #region getGlobalCoords
         // ====================================================================
         // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
