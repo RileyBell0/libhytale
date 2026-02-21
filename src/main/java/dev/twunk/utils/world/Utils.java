@@ -1259,6 +1259,10 @@ public final class Utils {
 
         /// -> get ? extends Component<ChunkStore>    < works for blocks, chunks
 
+        // ====================================================================
+        // Get a component from a block at the given coords
+        // ====================================================================
+
         @Nullable
         public static final <T extends Component<ChunkStore>> T getComponent(
             @Nonnull final ComponentType<ChunkStore, T> componentType,
@@ -1800,6 +1804,12 @@ public final class Utils {
         // #endregion getGlobalCoords
     }
 
+    /**
+     * @deprecated I don't plan to use tick procedure stuff, so I'm not maintaining a billion
+     * methods rn. mainly, i dont want to go through and make all the millions of methods.
+     *
+     * SO, this stuff is fine to use, but, yeah...
+     */
     public static final class TickProcedure {
 
         public static final boolean setTicking(@Nonnull final Ref<ChunkStore> ref) {
