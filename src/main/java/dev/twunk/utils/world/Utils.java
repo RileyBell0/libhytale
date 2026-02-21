@@ -697,27 +697,102 @@ public final class Utils {
         // TODO
         public static final class Id {
 
-            // #region WorldProvider
-            // #endregion WorldProvider
-            // #region World
-            // #endregion World
-            // #region CommandBuffer
-            // #endregion CommandBuffer
-            // #region Store<ChunkStore>
-            // #endregion Store<ChunkStore>
-            // #region ChunkStore
-            // #endregion ChunkStore
-            // #region Ref<ChunkStore> (ChunkRef)
-            // #endregion Ref<ChunkStore> (ChunkRef)
-            // #region BlockComponentChunk
-            // #endregion BlockComponentChunk
-            // #region BlockRef
-            // #endregion BlockRef
-
             // ====================================================================
             // Option 1: Getting the ID of a block by its coords
             // - there's a certain coordinate at which exists a block. You want
             //   to know what type of block it is (its ID)
+            // ====================================================================
+
+            // #region WorldProvider
+            // ====================================================================
+            // WorldProvider  =>  ChunkStore
+            // + GlobalCoords
+            // ====================================================================
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final WorldProvider worldProvider,
+                @Nonnull final Vector3i coords
+            ) {
+                final var worldChunk = worldProvider.getWorld().getChunk(Coords.getChunkIndex(coords));
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(coords);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final WorldProvider worldProvider,
+                final int x,
+                final int y,
+                final int z
+            ) {
+                final var worldChunk = worldProvider.getWorld().getChunk(Coords.getChunkIndex(x, z));
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(x, y, z);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final WorldProvider worldProvider,
+                final long chunkIndex,
+                final int blockIndex
+            ) {
+                final var worldChunk = worldProvider.getWorld().getChunk(chunkIndex);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(Coords.getLocalCoords(blockIndex));
+            }
+
+            // #endregion WorldProvider
+            // #region World
+            // ====================================================================
+            // World  =>  ChunkStore
+            // + Global coords
+            // ====================================================================
+
+            @Nullable
+            public static final Integer getId(@Nonnull final World world, @Nonnull final Vector3i coords) {
+                final var worldChunk = world.getChunk(Coords.getChunkIndex(coords));
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(coords);
+            }
+
+            @Nullable
+            public static final Integer getId(@Nonnull final World world, final int x, final int y, final int z) {
+                final var worldChunk = world.getChunk(Coords.getChunkIndex(x, z));
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(x, y, z);
+            }
+
+            @Nullable
+            public static final Integer getId(@Nonnull final World world, final long chunkIndex, final int blockIndex) {
+                final var worldChunk = world.getChunk(chunkIndex);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(Coords.getLocalCoords(blockIndex));
+            }
+
+            // #endregion World
+            // #region CommandBuffer
+            // ====================================================================
+            // CommandBuffer  =>  ChunkStore
+            // + Global coords
             // ====================================================================
 
             @Nullable
@@ -761,6 +836,149 @@ public final class Utils {
 
                 return worldChunk.getBlock(Coords.getLocalCoords(blockIndex));
             }
+
+            // #endregion CommandBuffer
+            // #region Store<ChunkStore>
+            // ====================================================================
+            // Store<ChunkStore>  =>  ChunkStore
+            // + Global coords
+            // ====================================================================
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final Store<ChunkStore> chunkStore,
+                @Nonnull final Vector3i coords
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, coords);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(coords);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final Store<ChunkStore> chunkStore,
+                final int x,
+                final int y,
+                final int z
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, x, z);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(x, y, z);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final Store<ChunkStore> chunkStore,
+                final long chunkIndex,
+                final int blockIndex
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, chunkIndex);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(Coords.getLocalCoords(blockIndex));
+            }
+
+            // #endregion Store<ChunkStore>
+            // #region ChunkStore
+            // ====================================================================
+            // ChunkStore  =>  ChunkRef
+            // + Global coords OR Chunk Coords
+            // ====================================================================
+
+            @Nullable
+            public static final Integer getId(@Nonnull final ChunkStore chunkStore, @Nonnull final Vector3i coords) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, coords);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(coords);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final ChunkStore chunkStore,
+                final int x,
+                final int y,
+                final int z
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, x, z);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(x, y, z);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final ChunkStore chunkStore,
+                final long chunkIndex,
+                final int blockIndex
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, chunkIndex);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(Coords.getLocalCoords(blockIndex));
+            }
+
+            // #endregion ChunkStore
+            // #region Ref<ChunkStore>
+            // ====================================================================
+            // Ref<ChunkStore> (ChunkRef)  =>  BlockComponentChunk
+            // + Global OR Local coords
+            // ====================================================================
+
+            @Nullable
+            public static final Integer getId(@Nonnull final Ref<ChunkStore> chunkRef, @Nonnull final Vector3i coords) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkRef, coords);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(coords);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final Ref<ChunkStore> chunkRef,
+                final int x,
+                final int y,
+                final int z
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkRef, x, z);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(x, y, z);
+            }
+
+            @Nullable
+            public static final Integer getId(
+                @Nonnull final Ref<ChunkStore> chunkRef,
+                final long chunkIndex,
+                final int blockIndex
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkRef, chunkIndex);
+                if (worldChunk == null) {
+                    return null;
+                }
+
+                return worldChunk.getBlock(Coords.getLocalCoords(blockIndex));
+            }
+
+            // #endregion Ref<ChunkStore>
 
             // ====================================================================
             // Option 2: Getting the ID of a block by its type
