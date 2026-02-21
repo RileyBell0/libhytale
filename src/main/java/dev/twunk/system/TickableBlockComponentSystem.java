@@ -86,7 +86,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = Utils.BlockInfo.getInfo(blockRef);
+        var blockInfo = Utils.Block.Info.getInfo(blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -96,7 +96,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = Utils.WorldChunk_.getWorldChunk(blockInfo);
+        var worldChunk = Utils.Chunk.WorldChunk_.getWorldChunk(blockInfo);
         if (worldChunk == null) {
             return;
         }
