@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
+import com.hypixel.hytale.math.vector.Vector2i;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
@@ -1157,6 +1158,39 @@ public final class Utils {
 
         public static final class Ref_ {
 
+            /**
+             * What do we need to get a chunk ref?
+             * - Really, this is just stuff that can uniquely identify a chunk, MEANING we need both
+             *   - The world the chunk is in
+             *   - Coordinates (e.g. x+z, chunk index, etc)
+             *
+             * ## The world the chunk is in
+             * Notably, the world can be found in various ways,
+             * - A ref to a block in the same world you want a chunk for, a command buffer,
+             *   the world, etc
+             * - If you want the chunk that a block is in, this is WAY easy, since
+             *   a block contains not only its coordinates, but the world it's in too
+             *   THUS, going from a block to the chunk it's in, is actually pretty easy
+             * - Of course, you don't have to use the block to get the chunk it's in, you
+             *   can absolutely get any chunk from the WORLD it's in
+             *
+             * ChunkRef -> Other ChunkRef
+             * - of course, a chunk knows what world it's in, so you can use the
+             *   chunk to get other chunks in the same world pretty easy
+             *
+             * ## Coordinates
+             * Easy enough. Chunks can be identified by
+             * - Coordinates of a block (easy to convert -> we just divide the x and z of the block by 32 ish)
+             * - Chunk coordinates (x and z of a chunk itsef)
+             *
+             * NOTE
+             * - a chunk is from the base of the world to the top, and it's 32x32 wide
+             * - there ARE older ideas in hytales codebase for chunks -> i forget what they're
+             *   called but they're like ChunkSections or something, please don't use them,
+             *   for my sake. I think they're used in the farming systems (that are deprecated i believe,
+             *   oh and the fluid systems too i think??)
+             */
+
             // what i need to get a chunk ref
             // - anything that could get a block ref
             // - anything that could get a chunk
@@ -1168,6 +1202,11 @@ public final class Utils {
             // ref out of your components follow the path through from your inputs and shit should start making
             // more sense over time
 
+            // #region CommandBuffer
+            // ====================================================================
+            // CommandBuffer
+            // ====================================================================
+
             // With position vector -> redirects to the chunk index version
             @Nullable
             public static final Ref<ChunkStore> getChunkRef(
@@ -1175,58 +1214,6 @@ public final class Utils {
                 final Vector3i coords
             ) {
                 return getChunkRef(commandBuffer.getExternalData(), ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
-            }
-
-            @Nullable
-            public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final Vector3i coords) {
-                return getChunkRef(world, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
-            }
-
-            @Nullable
-            public static final Ref<ChunkStore> getChunkRef(
-                @Nonnull final ChunkStore chunkStore,
-                @Nonnull final Vector3i coords
-            ) {
-                return getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
-            }
-
-            // please don't use this one.. just here for completeness so you know you CAN get the chunk ref out of info - in fact, that's (in my understanding) the preferred way
-            @Nullable
-            public static final Ref<ChunkStore> getChunkRef(@Nonnull final BlockStateInfo info) {
-                return info.getChunkRef();
-            }
-
-            @Nullable
-            public static final Ref<ChunkStore> getChunkRef(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var info = Block.Info.getInfo(blockRef);
-                if (info == null) {
-                    return null;
-                }
-                return info.getChunkRef();
-            }
-
-            // With coords (x, z) -> redirects to the chunk index version
-            @Nullable
-            public static final Ref<ChunkStore> getChunkRef(
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                final int x,
-                final int z
-            ) {
-                return getChunkRef(commandBuffer.getExternalData(), ChunkUtil.indexChunkFromBlock(x, z));
-            }
-
-            @Nullable
-            public static final Ref<ChunkStore> getChunkRef(
-                @Nonnull final ChunkStore chunkStore,
-                final int x,
-                final int z
-            ) {
-                return getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(x, z));
-            }
-
-            @Nullable
-            public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final int x, final int z) {
-                return getChunkRef(world, ChunkUtil.indexChunkFromBlock(x, z));
             }
 
             // With chunk index
@@ -1238,9 +1225,85 @@ public final class Utils {
                 return getChunkRef(commandBuffer.getExternalData(), chunkIndex);
             }
 
+            // With coords (x, z) -> redirects to the chunk index version
+            @Nullable
+            public static final Ref<ChunkStore> getChunkRef(
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                final int chunkX,
+                final int chunkZ
+            ) {
+                return getChunkRef(commandBuffer.getExternalData(), chunkX, chunkZ);
+            }
+
+            // #endregion CommandBuffer
+            // #region World
+            // ====================================================================
+            // World
+            // ====================================================================
+
+            @Nullable
+            public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final Vector3i coords) {
+                return getChunkRef(world, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
+            }
+
+            @Nullable
+            public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final int x, final int z) {
+                return getChunkRef(world, ChunkUtil.indexChunkFromBlock(x, z));
+            }
+
             @Nullable
             public static final Ref<ChunkStore> getChunkRef(@Nonnull final World world, final long chunkIndex) {
                 return getChunkRef(world.getChunkStore(), chunkIndex);
+            }
+
+            // #endregion World
+            // #region ChunkStore
+            // ====================================================================
+            // ChunkStore
+            // ====================================================================
+
+            @Nullable
+            public static final Ref<ChunkStore> getChunkRef(
+                @Nonnull final ChunkStore chunkStore,
+                @Nonnull final Vector3i coords
+            ) {
+                return getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(coords.x, coords.z));
+            }
+
+            @Nullable
+            public static final Ref<ChunkStore> getChunkRef(
+                @Nonnull final ChunkStore chunkStore,
+                final int x,
+                final int z
+            ) {
+                return getChunkRef(chunkStore, ChunkUtil.indexChunkFromBlock(x, z));
+            }
+
+            // #endregion ChunkStore
+            // #region BlockStateInfo
+            // ====================================================================
+            // BlockStateInfo
+            // ====================================================================
+
+            // please don't use this one.. just here for completeness so you know you CAN get the chunk ref out of info - in fact, that's (in my understanding) the preferred way
+            @Nullable
+            public static final Ref<ChunkStore> getChunkRef(@Nonnull final BlockStateInfo info) {
+                return info.getChunkRef();
+            }
+
+            // #endregion BlockStateInfo
+            // #region BlockRef
+            // ====================================================================
+            // BlockRef
+            // ====================================================================
+
+            @Nullable
+            public static final Ref<ChunkStore> getChunkRef(@Nonnull final Ref<ChunkStore> blockRef) {
+                final var info = Block.Info.getInfo(blockRef);
+                if (info == null) {
+                    return null;
+                }
+                return info.getChunkRef();
             }
 
             @Nullable
@@ -1251,6 +1314,7 @@ public final class Utils {
                 return chunkStore.getChunkReference(chunkIndex);
             }
 
+            // #endregion BlockRef
             // #endregion getChunkRef
         }
     }
@@ -1373,6 +1437,7 @@ public final class Utils {
         /// -> get LOCAL coordinates within chunk    (Vector3i)
         /// -> get LOCAL index                       (int | Integer) (returns Integer so it can be nullable on method that can fail)
         /// -> get GLOBAL coordinates                (Vector3i)
+        /// -> get CHUNK coordinates                 (long | Vector2i | ChunkCoordinates)
 
         // #region getLocalCoords
         // ====================================================================
@@ -1802,6 +1867,95 @@ public final class Utils {
         //     #endregion done
         //   #endregion chunkNLocal
         // #endregion getGlobalCoords
+        // #region getChunkCoords
+        // ====================================================================
+        // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        // ====================================================================
+        //
+        // Purpose:   Getting chunk coordinates within a world
+        // Requires:  BlockStateInfo component of the relevant block (or a method of getting this -> see Info.getInfo() and thus -> Entity.getRef)
+        // importantly, most methods of getInfo are pointless, as usually these require the coordinates of a block (and if you have that, you don't need this)
+
+        // ====================================================================
+        // Chunk Coordinates FROM block coordinates
+        // ====================================================================
+
+        // With GLOBAL block coords
+        @Nonnull
+        public static final ChunkCoordinates getChunkCoords(final int blockX, final int blockZ) {
+            // see ChunkUtil.chunkCoordinate
+            return new ChunkCoordinates(blockX >> 5, blockZ >> 5);
+        }
+
+        // With GLOBAL block coords
+        @Nonnull
+        public static final ChunkCoordinates getChunkCoords(@Nonnull final Vector3i blockCoords) {
+            // see ChunkUtil.chunkCoordinate
+            return new ChunkCoordinates(blockCoords.x >> 5, blockCoords.z >> 5);
+        }
+
+        /**
+         * With GLOBAL block coords
+         *
+         * returned "y" in vector is actually the chunk's "z" coordinate
+         */
+        @Nonnull
+        public static final Vector2i getChunkCoordsVec(final int blockX, final int blockZ) {
+            // see ChunkUtil.chunkCoordinate
+            return new Vector2i(blockX >> 5, blockZ >> 5);
+        }
+
+        /**
+         * With GLOBAL block coords
+         *
+         * returned "y" in vector is actually the chunk's "z" coordinate
+         */
+        @Nonnull
+        public static final Vector2i getChunkCoordsVec(@Nonnull final Vector3i blockCoords) {
+            // see ChunkUtil.chunkCoordinate
+            return new Vector2i(blockCoords.x >> 5, blockCoords.z >> 5);
+        }
+
+        // ====================================================================
+        // Chunk Index (index is interchangable with coordinates) FROM block coordinates
+        // ====================================================================
+
+        /**
+         * a `long` is just a bit-packed version of chunk coords.
+         * int: 32 bits
+         * long: 64 bits
+         *
+         * hence, a long is basically 2 ints back to back
+         */
+        public static final long getChunkIndex(final int blockX, final int blockZ) {
+            // see ChunkUtil.indexChunkFromBlock
+            return ((long) (blockX >> 5) << 32) | ((long) (blockZ >> 5) & 4294967295L);
+        }
+
+        public static final long getChunkIndex(@Nonnull final Vector3i blockCoords) {
+            // see ChunkUtil.indexChunkFromBlock
+            return ((long) (blockCoords.x >> 5) << 32) | ((long) (blockCoords.z >> 5) & 4294967295L);
+        }
+
+        public static final long getChunkIndexFromChunkCoords(final int chunkX, final int chunkZ) {
+            // see ChunkUtil.indexChunkFromBlock
+            return ((long) chunkX << 32) | ((long) chunkZ & 4294967295L);
+        }
+
+        public static final long getChunkIndexFromChunkCoords(@Nonnull final ChunkCoordinates coords) {
+            // see ChunkUtil.indexChunkFromBlock
+            return ((long) coords.x << 32) | ((long) coords.z & 4294967295L);
+        }
+
+        /**
+         * WARNING: the `y` value MUST be the `z` value for the chunk
+         */
+        public static final long getChunkIndexFromChunkCoords(@Nonnull final Vector2i coords) {
+            // see ChunkUtil.indexChunkFromBlock
+            return ((long) coords.x << 32) | ((long) coords.y & 4294967295L);
+        }
+
+        // #endregion getChunkCoords
     }
 
     /**
