@@ -20,6 +20,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import java.util.ArrayList;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -99,6 +100,87 @@ public final class Utils {
 
         // DONE 2 electric boogaloo
         public static final class Ref_ {
+
+            @Nonnull
+            public static final ArrayList<Ref<ChunkStore>> test(
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+            ) {
+                final var blockX = 0;
+                final var blockY = 0;
+                final var blockZ = 0;
+                final var index = Coords.getLocalIndex(blockX, blockY, blockZ);
+                final var localCoords = Coords.getLocalCoords(index);
+                final var coords = new Vector3i(blockX, blockY, blockZ);
+                final var chunkIndex = Coords.getChunkIndex(coords);
+
+                final var test = new TestUtil(commandBuffer, coords);
+                // functions to test
+                final ArrayList<Ref<ChunkStore>> refs = new ArrayList<>();
+
+                // WorldProvider
+                refs.add(getRef(test.worldProvider, coords));
+                refs.add(getRef(test.worldProvider, blockX, blockY, blockZ));
+                refs.add(getRef(test.worldProvider, chunkIndex, index));
+
+                // World
+                refs.add(getRef(test.world, coords));
+                refs.add(getRef(test.world, blockX, blockY, blockZ));
+                refs.add(getRef(test.world, chunkIndex, index));
+
+                // CommandBuffer
+                refs.add(getRef(test.commandBuffer, coords));
+                refs.add(getRef(test.commandBuffer, blockX, blockY, blockZ));
+                refs.add(getRef(test.commandBuffer, chunkIndex, index));
+
+                // BlockStateInfo
+                refs.add(getRef(test.info, coords));
+                refs.add(getRef(test.info, blockX, blockY, blockZ));
+                refs.add(getRef(test.info, chunkIndex, index));
+
+                // ChunkRef (global)
+                refs.add(getRef_ChunkRef(test.chunkRef, coords));
+                refs.add(getRef_ChunkRef(test.chunkRef, blockX, blockY, blockZ));
+                refs.add(getRef_ChunkRef(test.chunkRef, chunkIndex, index));
+                // ChunkRef (local)
+                refs.add(getLocalRef(test.chunkRef, coords));
+                refs.add(getLocalRef(test.chunkRef, localCoords));
+                refs.add(getLocalRef(test.chunkRef, blockX, blockY, blockZ));
+                refs.add(getLocalRef(test.chunkRef, localCoords.x, localCoords.y, localCoords.z));
+                refs.add(getLocalRef(test.chunkRef, index));
+
+                // Store
+                refs.add(getRef(test.store, coords));
+                refs.add(getRef(test.store, blockX, blockY, blockZ));
+                refs.add(getRef(test.store, chunkIndex, index));
+
+                // ChunkStore
+                refs.add(getRef(test.chunkStore, coords));
+                refs.add(getRef(test.chunkStore, blockX, blockY, blockZ));
+                refs.add(getRef(test.chunkStore, chunkIndex, index));
+
+                // BlockRef
+                refs.add(getRef(test.blockRef, coords));
+                refs.add(getRef(test.blockRef, blockX, blockY, blockZ));
+                refs.add(getRef(test.blockRef, chunkIndex, index));
+
+                // WorldChunk
+                refs.add(getRef(test.worldChunk, coords));
+                refs.add(getRef(test.worldChunk, blockX, blockY, blockZ));
+                refs.add(getRef(test.worldChunk, chunkIndex, index));
+                refs.add(getLocalRef(test.worldChunk, coords));
+                refs.add(getLocalRef(test.worldChunk, blockX, blockY, blockZ));
+                refs.add(getLocalRef(test.worldChunk, index));
+
+                // BlockComponentChunk
+                refs.add(getRef(test.blockChunk, coords));
+                refs.add(getLocalRef(test.blockChunk, coords));
+                refs.add(getRef(test.blockChunk, blockX, blockY, blockZ));
+                refs.add(getLocalRef(test.blockChunk, blockX, blockY, blockZ));
+                refs.add(getRef(test.blockChunk, index));
+                refs.add(getLocalRef(test.blockChunk, index));
+
+                return refs;
+            }
 
             // #region getRef
             // ====================================================================
@@ -195,11 +277,15 @@ public final class Utils {
                 @Nonnull final WorldProvider worldProvider,
                 @Nonnull final Vector3i coords
             ) {
-                return getRef2(
-                    worldProvider.getWorld().getChunkStore(),
-                    Coords.getChunkIndex(coords),
-                    Coords.getLocalIndex(coords)
-                );
+                return worldProvider
+                    .getWorld()
+                    .getChunk(Coords.getChunkIndex(coords))
+                    .getBlockComponentEntity(coords.x, coords.y, coords.z);
+                // return getRef2(
+                //     worldProvider.getWorld().getChunkStore(),
+                //     Coords.getChunkIndex(coords),
+                //     Coords.getLocalIndex(coords)
+                // );
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -210,11 +296,15 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                return getRef2(
-                    worldProvider.getWorld().getChunkStore(),
-                    Coords.getChunkIndex(blockX, blockZ),
-                    Coords.getLocalIndex(blockX, blockY, blockZ)
-                );
+                return worldProvider
+                    .getWorld()
+                    .getChunk(Coords.getChunkIndex(blockX, blockZ))
+                    .getBlockComponentEntity(blockX, blockY, blockZ);
+                // return getRef2(
+                //     worldProvider.getWorld().getChunkStore(),
+                //     Coords.getChunkIndex(blockX, blockZ),
+                //     Coords.getLocalIndex(blockX, blockY, blockZ)
+                // );
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -224,7 +314,12 @@ public final class Utils {
                 final long chunkIndex,
                 final int blockIndex
             ) {
-                return getRef2(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
+                final var localCoords = Coords.getLocalCoords(blockIndex);
+                return worldProvider
+                    .getWorld()
+                    .getChunk(chunkIndex)
+                    .getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
+                // return getRef2(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
             }
 
             // #endregion WorldProvider
@@ -233,7 +328,10 @@ public final class Utils {
             // => (ChunkStore, chunkIndex, blockIndex)
             @Nullable
             public static final Ref<ChunkStore> getRef(@Nonnull final World world, @Nonnull final Vector3i coords) {
-                return getRef2(world.getChunkStore(), Coords.getChunkIndex(coords), Coords.getLocalIndex(coords));
+                return world
+                    .getChunk(Coords.getChunkIndex(coords))
+                    .getBlockComponentEntity(coords.x, coords.y, coords.z);
+                // return getRef2(world.getChunkStore(), Coords.getChunkIndex(coords), Coords.getLocalIndex(coords));
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -244,11 +342,14 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                return getRef2(
-                    world.getChunkStore(),
-                    Coords.getChunkIndex(blockX, blockZ),
-                    Coords.getLocalIndex(blockX, blockY, blockZ)
-                );
+                return world
+                    .getChunk(Coords.getChunkIndex(blockX, blockZ))
+                    .getBlockComponentEntity(blockX, blockY, blockZ);
+                // return getRef2(
+                //     world.getChunkStore(),
+                //     Coords.getChunkIndex(blockX, blockZ),
+                //     Coords.getLocalIndex(blockX, blockY, blockZ)
+                // );
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -258,7 +359,9 @@ public final class Utils {
                 final long chunkIndex,
                 final int blockIndex
             ) {
-                return getRef2(world.getChunkStore(), chunkIndex, blockIndex);
+                final var localCoords = Coords.getLocalCoords(blockIndex);
+                return world.getChunk(chunkIndex).getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
+                // return getRef2(world.getChunkStore(), chunkIndex, blockIndex);
             }
 
             // #endregion World
@@ -631,6 +734,77 @@ public final class Utils {
             }
 
             // #endregion localBlockStateInfo
+            // #region WorldChunk
+
+            @Nullable
+            public static final Ref<ChunkStore> getRef(
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final Vector3i blockCoords
+            ) {
+                return worldChunk
+                    .getWorld()
+                    .getChunk(Coords.getChunkIndex(blockCoords))
+                    .getBlockComponentEntity(blockCoords.x, blockCoords.y, blockCoords.z);
+            }
+
+            /** SHOULD REALLY BE CALLED GET LOCAL REF */
+            // component ON the chunk itself => block ref in the chunk
+            @Nullable
+            public static final Ref<ChunkStore> getRef(
+                @Nonnull final WorldChunk worldChunk,
+                final int blockX,
+                final int blockY,
+                final int blockZ
+            ) {
+                return worldChunk
+                    .getWorld()
+                    .getChunk(Coords.getChunkIndex(blockX, blockZ))
+                    .getBlockComponentEntity(blockX, blockY, blockZ);
+            }
+
+            @Nullable
+            public static final Ref<ChunkStore> getRef(
+                @Nonnull final WorldChunk worldChunk,
+                final long chunkIndex,
+                final int blockIndex
+            ) {
+                final var localCoords = Coords.getLocalCoords(blockIndex);
+                return worldChunk
+                    .getWorld()
+                    .getChunk(chunkIndex)
+                    .getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
+            }
+
+            @Nullable
+            public static final Ref<ChunkStore> getLocalRef(
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final Vector3i blockCoords
+            ) {
+                return worldChunk.getBlockComponentEntity(blockCoords.x, blockCoords.y, blockCoords.z);
+            }
+
+            /** SHOULD REALLY BE CALLED GET LOCAL REF */
+            // component ON the chunk itself => block ref in the chunk
+            @Nullable
+            public static final Ref<ChunkStore> getLocalRef(
+                @Nonnull final WorldChunk worldChunk,
+                final int blockX,
+                final int blockY,
+                final int blockZ
+            ) {
+                return worldChunk.getBlockComponentEntity(blockX, blockY, blockZ);
+            }
+
+            @Nullable
+            public static final Ref<ChunkStore> getLocalRef(
+                @Nonnull final WorldChunk worldChunk,
+                final int blockIndex
+            ) {
+                final var localCoords = Coords.getLocalCoords(blockIndex);
+                return worldChunk.getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
+            }
+
+            // #endregion WorldChunk
             // #region BlockComponentChunk
 
             /** SHOULD REALLY BE CALLED GET LOCAL REF */
@@ -1076,28 +1250,34 @@ public final class Utils {
 
             @Nullable
             public static final BlockStateInfo getInfo(
-                @Nonnull final BlockComponentChunk chunk,
+                @Nonnull final BlockComponentChunk blockChunk,
                 @Nonnull final Vector3i coords
             ) {
                 // => BlockRef
-                return getInfo0(Ref_.getRef(chunk, coords));
+                return blockChunk.getComponent(Coords.getLocalIndex(coords), BLOCK_STATE_INFO_COMPONENT);
             }
 
             @Nullable
             public static final BlockStateInfo getInfo(
-                @Nonnull final BlockComponentChunk chunk,
-                final int x,
-                final int y,
-                final int z
+                @Nonnull final BlockComponentChunk blockChunk,
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
                 // => BlockRef
-                return getInfo0(Ref_.getRef(chunk, x, y, z));
+                return blockChunk.getComponent(
+                    Coords.getLocalIndex(blockX, blockY, blockZ),
+                    BLOCK_STATE_INFO_COMPONENT
+                );
             }
 
             @Nullable
-            public static final BlockStateInfo getInfo(@Nonnull final BlockComponentChunk chunk, final int blockIndex) {
+            public static final BlockStateInfo getInfo(
+                @Nonnull final BlockComponentChunk blockChunk,
+                final int blockIndex
+            ) {
                 // => BlockRef
-                return getInfo0(Ref_.getRef(chunk, blockIndex));
+                return blockChunk.getComponent(blockIndex, BLOCK_STATE_INFO_COMPONENT);
             }
 
             // #endregion BlockComponentChunk
@@ -1138,6 +1318,10 @@ public final class Utils {
                 return Component_.getComponent(blockRef, BLOCK_STATE_INFO_COMPONENT);
             }
             // #endregion BlockRef
+
+            // TODO multiple endpoints:
+            // - blockRef + store => store gets OTHER component on entity with ref blockRef
+            // - blockChunk -> gets the componnet on a block (doesn't require a ref!!, just the local coords of the block)
 
             // #endregion getInfo
         }
