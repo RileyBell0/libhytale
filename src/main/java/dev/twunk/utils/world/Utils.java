@@ -103,17 +103,20 @@ public final class Utils {
 
             @Nonnull
             public static final ArrayList<Ref<ChunkStore>> test(
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+                @Nonnull final Ref<ChunkStore> blockRef,
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                @Nonnull final Vector3i providedCoords
             ) {
-                final var blockX = 0;
-                final var blockY = 0;
-                final var blockZ = 0;
+                final var blockX = providedCoords.x;
+                final var blockY = providedCoords.y - 1;
+                final var blockZ = providedCoords.z;
                 final var index = Coords.getLocalIndex(blockX, blockY, blockZ);
                 final var localCoords = Coords.getLocalCoords(index);
                 final var coords = new Vector3i(blockX, blockY, blockZ);
                 final var chunkIndex = Coords.getChunkIndex(coords);
 
-                final var test = new TestUtil(commandBuffer, coords);
+                final var test = new TestUtil(blockRef, worldChunk, commandBuffer, coords);
                 // functions to test
                 final ArrayList<Ref<ChunkStore>> refs = new ArrayList<>();
 
@@ -178,6 +181,16 @@ public final class Utils {
                 refs.add(getLocalRef(test.blockChunk, blockX, blockY, blockZ));
                 refs.add(getRef(test.blockChunk, index));
                 refs.add(getLocalRef(test.blockChunk, index));
+
+                var i = 0;
+                for (var e : refs) {
+                    if (e == null) {
+                        console.log("" + i + ") null");
+                    } else {
+                        console.log("" + i + ") " + e);
+                    }
+                    i++;
+                }
 
                 return refs;
             }
@@ -277,15 +290,15 @@ public final class Utils {
                 @Nonnull final WorldProvider worldProvider,
                 @Nonnull final Vector3i coords
             ) {
-                return worldProvider
-                    .getWorld()
-                    .getChunk(Coords.getChunkIndex(coords))
-                    .getBlockComponentEntity(coords.x, coords.y, coords.z);
-                // return getRef2(
-                //     worldProvider.getWorld().getChunkStore(),
-                //     Coords.getChunkIndex(coords),
-                //     Coords.getLocalIndex(coords)
-                // );
+                // return worldProvider
+                //     .getWorld()
+                //     .getChunk(Coords.getChunkIndex(coords))
+                //     .getBlockComponentEntity(coords.x, coords.y, coords.z);
+                return getRef2(
+                    worldProvider.getWorld().getChunkStore(),
+                    Coords.getChunkIndex(coords),
+                    Coords.getLocalIndex(coords)
+                );
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -296,15 +309,11 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                return worldProvider
-                    .getWorld()
-                    .getChunk(Coords.getChunkIndex(blockX, blockZ))
-                    .getBlockComponentEntity(blockX, blockY, blockZ);
-                // return getRef2(
-                //     worldProvider.getWorld().getChunkStore(),
-                //     Coords.getChunkIndex(blockX, blockZ),
-                //     Coords.getLocalIndex(blockX, blockY, blockZ)
-                // );
+                return getRef2(
+                    worldProvider.getWorld().getChunkStore(),
+                    Coords.getChunkIndex(blockX, blockZ),
+                    Coords.getLocalIndex(blockX, blockY, blockZ)
+                );
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -314,12 +323,12 @@ public final class Utils {
                 final long chunkIndex,
                 final int blockIndex
             ) {
-                final var localCoords = Coords.getLocalCoords(blockIndex);
-                return worldProvider
-                    .getWorld()
-                    .getChunk(chunkIndex)
-                    .getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
-                // return getRef2(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
+                // final var localCoords = Coords.getLocalCoords(blockIndex);
+                // return worldProvider
+                //     .getWorld()
+                //     .getChunk(chunkIndex)
+                //     .getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
+                return getRef2(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
             }
 
             // #endregion WorldProvider
@@ -328,10 +337,10 @@ public final class Utils {
             // => (ChunkStore, chunkIndex, blockIndex)
             @Nullable
             public static final Ref<ChunkStore> getRef(@Nonnull final World world, @Nonnull final Vector3i coords) {
-                return world
-                    .getChunk(Coords.getChunkIndex(coords))
-                    .getBlockComponentEntity(coords.x, coords.y, coords.z);
-                // return getRef2(world.getChunkStore(), Coords.getChunkIndex(coords), Coords.getLocalIndex(coords));
+                // return world
+                //     .getChunk(Coords.getChunkIndex(coords))
+                //     .getBlockComponentEntity(coords.x, coords.y, coords.z);
+                return getRef2(world.getChunkStore(), Coords.getChunkIndex(coords), Coords.getLocalIndex(coords));
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -342,14 +351,14 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                return world
-                    .getChunk(Coords.getChunkIndex(blockX, blockZ))
-                    .getBlockComponentEntity(blockX, blockY, blockZ);
-                // return getRef2(
-                //     world.getChunkStore(),
-                //     Coords.getChunkIndex(blockX, blockZ),
-                //     Coords.getLocalIndex(blockX, blockY, blockZ)
-                // );
+                // return world
+                //     .getChunk(Coords.getChunkIndex(blockX, blockZ))
+                //     .getBlockComponentEntity(blockX, blockY, blockZ);
+                return getRef2(
+                    world.getChunkStore(),
+                    Coords.getChunkIndex(blockX, blockZ),
+                    Coords.getLocalIndex(blockX, blockY, blockZ)
+                );
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -359,9 +368,9 @@ public final class Utils {
                 final long chunkIndex,
                 final int blockIndex
             ) {
-                final var localCoords = Coords.getLocalCoords(blockIndex);
-                return world.getChunk(chunkIndex).getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
-                // return getRef2(world.getChunkStore(), chunkIndex, blockIndex);
+                // final var localCoords = Coords.getLocalCoords(blockIndex);
+                // return world.getChunk(chunkIndex).getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
+                return getRef2(world.getChunkStore(), chunkIndex, blockIndex);
             }
 
             // #endregion World
@@ -741,10 +750,11 @@ public final class Utils {
                 @Nonnull final WorldChunk worldChunk,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return worldChunk
-                    .getWorld()
-                    .getChunk(Coords.getChunkIndex(blockCoords))
-                    .getBlockComponentEntity(blockCoords.x, blockCoords.y, blockCoords.z);
+                return getRef2(
+                    worldChunk.getReference().getStore().getExternalData(),
+                    Coords.getChunkIndex(blockCoords),
+                    Coords.getLocalIndex(blockCoords)
+                );
             }
 
             /** SHOULD REALLY BE CALLED GET LOCAL REF */
@@ -756,10 +766,11 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                return worldChunk
-                    .getWorld()
-                    .getChunk(Coords.getChunkIndex(blockX, blockZ))
-                    .getBlockComponentEntity(blockX, blockY, blockZ);
+                return getRef2(
+                    worldChunk.getReference().getStore().getExternalData(),
+                    Coords.getChunkIndex(blockX, blockZ),
+                    Coords.getLocalIndex(blockX, blockY, blockZ)
+                );
             }
 
             @Nullable
@@ -768,11 +779,7 @@ public final class Utils {
                 final long chunkIndex,
                 final int blockIndex
             ) {
-                final var localCoords = Coords.getLocalCoords(blockIndex);
-                return worldChunk
-                    .getWorld()
-                    .getChunk(chunkIndex)
-                    .getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
+                return getRef2(worldChunk.getReference().getStore().getExternalData(), chunkIndex, blockIndex);
             }
 
             @Nullable
@@ -2770,7 +2777,7 @@ public final class Utils {
 
         @Nonnull
         public static final Vector3i getGlobalCoords(@Nonnull final WorldChunk chunk, final int blockIndex) {
-            return new Vector3i(chunk.getX(), chunk.getZ(), blockIndex);
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), blockIndex);
         }
 
         @Nonnull
@@ -2778,7 +2785,7 @@ public final class Utils {
             @Nonnull final WorldChunk chunk,
             @Nonnull final BlockStateInfo info
         ) {
-            return new Vector3i(chunk.getX(), chunk.getZ(), info.getIndex());
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), info.getIndex());
         }
 
         //     #endregion chunkRef
@@ -2807,7 +2814,7 @@ public final class Utils {
 
         @Nonnull
         public static final Vector3i getGlobalCoords(@Nonnull final BlockAccessor chunk, final int blockIndex) {
-            return new Vector3i(chunk.getX(), chunk.getZ(), blockIndex);
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), blockIndex);
         }
 
         @Nonnull
@@ -2815,7 +2822,7 @@ public final class Utils {
             @Nonnull final BlockAccessor chunk,
             @Nonnull final BlockStateInfo info
         ) {
-            return new Vector3i(chunk.getX(), chunk.getZ(), info.getIndex());
+            return getGlobalCoords(chunk.getX(), chunk.getZ(), info.getIndex());
         }
 
         //     #endregion BlockAccessor

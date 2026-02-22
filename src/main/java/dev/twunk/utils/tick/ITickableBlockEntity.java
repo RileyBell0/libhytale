@@ -1,6 +1,7 @@
 package dev.twunk.utils.tick;
 
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
@@ -22,6 +23,7 @@ public interface ITickableBlockEntity {
      * queries just your component to tick
      */
     public void onBlockEntityTick(
+        @Nonnull Ref<ChunkStore> blockRef,
         @Nonnull World world,
         @Nonnull WorldChunk wc,
         @Nonnull CommandBuffer<ChunkStore> commandBuffer,
