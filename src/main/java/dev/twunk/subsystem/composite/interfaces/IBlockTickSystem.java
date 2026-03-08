@@ -2,7 +2,7 @@ package dev.twunk.subsystem.composite.interfaces;
 
 import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.utils.tick.IBlockTick;
+import dev.twunk.common.IBlockTick;
 
 /**
  * Gives your system the event handler function it needs to run code for ticking

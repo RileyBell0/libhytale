@@ -1,4 +1,4 @@
-package dev.twunk.utils.tick;
+package dev.twunk.common;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -8,20 +8,17 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
+/**
+ * Means: I've got a method that can be called for ticking blocks.
+ *
+ * Good for
+ * - auto-ticking block components
+ * - systems that tick blocks
+ * - etc
+ *
+ * just giving a consistent interface for interfacing with block entities
+ */
 public interface IBlockTick {
-    /**
-     * Ticking a block? Just need some damn code to run in game while testing? put
-     * it in here!
-     *
-     * NOTE: once you're done testing, move this across into a System to handle
-     * this the way we're actually meant to be handling this
-     *
-     * remember: components don't tick, systems do, and systems "just so happen"
-     * to be able to filter themselves down to entites with your component
-     *
-     * instead of "i want my component to tick", nah, you want a SYSTEM that
-     * queries just your component to tick
-     */
     public void onBlockTick(
         @Nonnull Ref<ChunkStore> blockRef,
         @Nonnull World world,
