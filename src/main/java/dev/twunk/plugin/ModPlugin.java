@@ -9,7 +9,6 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.IAutoTickingBlockComponent;
-import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.system.TickableBlockComponentSystem;
 import dev.twunk.utils.TwunkLib;
 import javax.annotation.Nonnull;
@@ -65,7 +64,7 @@ public abstract class ModPlugin extends JavaPlugin {
         );
 
         // Store our component in the global register
-        IRegisteredComponent.registerComponentType(myClass, component);
+        TwunkLib.registerComponentType(myClass, component);
 
         if (IAutoTickingBlockComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...

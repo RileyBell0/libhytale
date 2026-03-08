@@ -1,11 +1,12 @@
 package dev.twunk.utils.tick;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
+import dev.twunk.utils.TwunkLib;
 import dev.twunk.utils.lifetime.TrackedBlockEntity;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
@@ -24,7 +25,7 @@ import javax.annotation.Nullable;
  *
  * but to be fair, stupid stuff is fun stuff
  */
-public class TickSchedulerComponent implements IRegisteredComponent {
+public class TickSchedulerComponent implements Component<ChunkStore> {
 
     // serializing/deserializing your vars
     @Nonnull
@@ -140,7 +141,7 @@ public class TickSchedulerComponent implements IRegisteredComponent {
 
     @Nonnull
     public static ComponentType<ChunkStore, TickSchedulerComponent> getComponentType() {
-        return (ComponentType<ChunkStore, TickSchedulerComponent>) IRegisteredComponent.getComponentType(
+        return (ComponentType<ChunkStore, TickSchedulerComponent>) TwunkLib.getComponentType(
             TickSchedulerComponent.class
         );
     }

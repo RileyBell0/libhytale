@@ -1,7 +1,10 @@
 package dev.twunk.component;
 
 /**
- * Same as ITickableBlockComponent except if you implement THIS version on a component it'll
- * automatically get a system generated for it when you register your component that has this attached
+ * A component that has an onBlockTick method that when registered will AUTOMATICALLY
+ * have a system registered for it
+ *
+ * TLDR: Put this on your block, and it'll have its onBlockTick method called
+ * automatically every tick with zero configuration
  */
 public interface IAutoTickingBlockComponent extends ITickableBlockComponent {}

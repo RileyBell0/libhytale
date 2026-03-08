@@ -7,11 +7,11 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.IRegisteredComponent;
 import dev.twunk.component.ITickableBlockComponent;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
+import dev.twunk.utils.TwunkLib;
 import dev.twunk.utils.world.Utils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -49,8 +49,8 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
     }
 
     public TickableBlockComponentSystem(@Nonnull Class<T> componentClass) {
-        super(Query.and(IRegisteredComponent.getComponentType(componentClass)));
-        this.componentType = IRegisteredComponent.getComponentType(componentClass);
+        super(Query.and(TwunkLib.getComponentType(componentClass)));
+        this.componentType = TwunkLib.getComponentType(componentClass);
         this.appendSubSystem(new EntityTickSubSystem(this));
     }
 

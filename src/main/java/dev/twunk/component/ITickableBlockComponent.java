@@ -1,5 +1,10 @@
 package dev.twunk.component;
 
+import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.utils.tick.ITickableBlockEntity;
 
-public interface ITickableBlockComponent extends ITickableBlockEntity, IRegisteredComponent {}
+/**
+ * A component that has an onBlockTick method
+ */
+public interface ITickableBlockComponent extends ITickableBlockEntity, Component<ChunkStore> {}
