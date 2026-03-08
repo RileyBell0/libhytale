@@ -1655,6 +1655,32 @@ public final class Utils {
                 return BlockType.getAssetMap().getAsset(blockId);
             }
         }
+
+        public static final boolean set(final @Nonnull World world, final @Nonnull Vector3i coords, int blockId) {
+            var chunk = Chunk.WorldChunk_.getWorldChunk(world, coords);
+            if (chunk == null) {
+                return false;
+            }
+
+            return set0(chunk, coords, blockId);
+        }
+
+        public static final boolean set0(final @Nonnull WorldChunk chunk, final @Nonnull Vector3i coords, int blockId) {
+            return chunk.setBlock(coords.x, coords.y, coords.z, blockId);
+        }
+
+        public static final int get(final @Nonnull World world, final @Nonnull Vector3i coords) {
+            var chunk = Chunk.WorldChunk_.getWorldChunk(world, coords);
+            if (chunk == null) {
+                return -1;
+            }
+
+            return get0(chunk, coords);
+        }
+
+        public static final int get0(final @Nonnull WorldChunk chunk, final @Nonnull Vector3i coords) {
+            return chunk.getBlock(coords);
+        }
     }
 
     public static final class Chunk {
