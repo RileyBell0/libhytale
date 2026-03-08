@@ -118,14 +118,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
             // easy things easy. and i'm all for that
-            component.onBlockEntityTick(
-                blockRef,
-                world,
-                worldChunk,
-                commandBuffer,
-                coords,
-                worldChunk.getBlock(coords)
-            );
+            component.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
         } catch (Throwable e) {
             console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
             return;

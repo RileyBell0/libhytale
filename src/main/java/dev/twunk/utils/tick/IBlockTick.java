@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
-public interface ITickableBlockEntity {
+public interface IBlockTick {
     /**
      * Ticking a block? Just need some damn code to run in game while testing? put
      * it in here!
@@ -22,7 +22,7 @@ public interface ITickableBlockEntity {
      * instead of "i want my component to tick", nah, you want a SYSTEM that
      * queries just your component to tick
      */
-    public void onBlockEntityTick(
+    public void onBlockTick(
         @Nonnull Ref<ChunkStore> blockRef,
         @Nonnull World world,
         @Nonnull WorldChunk wc,
