@@ -4,7 +4,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.IRegisteredComponent;
+import dev.twunk.utils.TwunkLib;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -59,7 +59,7 @@ public interface _EntityScheduledTickStateComponent extends Component<ChunkStore
             if (COMPONENT_TYPE != null) {
                 return COMPONENT_TYPE;
             }
-            COMPONENT_TYPE = IRegisteredComponent.getComponentType(Active.class);
+            COMPONENT_TYPE = TwunkLib.getComponentType(Active.class);
             return COMPONENT_TYPE;
         }
 
@@ -132,7 +132,7 @@ public interface _EntityScheduledTickStateComponent extends Component<ChunkStore
             if (COMPONENT_TYPE != null) {
                 return COMPONENT_TYPE;
             }
-            COMPONENT_TYPE = IRegisteredComponent.getComponentType(Sleeping.class);
+            COMPONENT_TYPE = TwunkLib.getComponentType(Sleeping.class);
             return COMPONENT_TYPE;
         }
 
@@ -167,7 +167,7 @@ public interface _EntityScheduledTickStateComponent extends Component<ChunkStore
             if (COMPONENT_TYPE != null) {
                 return COMPONENT_TYPE;
             }
-            COMPONENT_TYPE = IRegisteredComponent.getComponentType(Stopped.class);
+            COMPONENT_TYPE = TwunkLib.getComponentType(Stopped.class);
             return COMPONENT_TYPE;
         }
 
@@ -208,7 +208,7 @@ public interface _EntityScheduledTickStateComponent extends Component<ChunkStore
             if (COMPONENT_TYPE != null) {
                 return COMPONENT_TYPE;
             }
-            COMPONENT_TYPE = IRegisteredComponent.getComponentType(Unknown.class);
+            COMPONENT_TYPE = TwunkLib.getComponentType(Unknown.class);
             return COMPONENT_TYPE;
         }
 
