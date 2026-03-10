@@ -102,6 +102,60 @@ public final class Utils {
         // DONE 2 electric boogaloo
         public static final class Ref_ {
 
+            /**
+             * figured out how to
+             * - break blocks (depends on if they're block entities or not on how you can do
+             *     it, both can be done the same way if you do world.execute(()->world.breakBlock)
+             *     BUT, if it's NOT a block entity you can just call breakBlock
+             * - get block
+             * - get block type
+             * - get chunk (in various methods)
+             */
+            public static void testWorldMethods(@Nonnull World world, Vector3i coords) {
+                try {
+                    /**
+                     * world.breakBlock -> not allowed to call on blocks of your own store, well, rather you're
+                     * not allowed to call it on BLOCK ENTITIES, so no chests etc
+                     *
+                     * or, seems like they only call it on non-ticking chunks?? nah just not allowed to kill a block entity that might run
+                     */
+                    // this works
+                    // var ref = Ref_.getRef(cmd, coords.x, coords.y - 1, coords.z);
+
+                    /** We're allowed to call break block if it's not also a block entity, otherwise it says the store
+                     * is currently running some code and tells us NO BAD #illegal
+                     *
+                     * so, generally, just "execute" break block through world
+                     */
+                    // if (ref == null) {
+                    //     world.breakBlock(coords.x, coords.y - 1, coords.z, 0);
+                    // } else {
+                    //     world.execute(() -> world.breakBlock(coords.x, coords.y - 1, coords.z, 0));
+                    // }
+                    world.execute(() -> world.breakBlock(coords.x, coords.y - 1, coords.z, 0));
+
+                    /**
+                     * These five work as is
+                     */
+                    world.getBlock(coords.x, coords.y, coords.z);
+                    world.getBlockType(coords);
+                    world.getChunkIfInMemory(Utils.Coords.getChunkIndex(coords));
+                    world.getChunkIfLoaded(Utils.Coords.getChunkIndex(coords));
+                    world.getChunk(Utils.Coords.getChunkIndex(coords));
+
+                    /**
+                     * get chunk if non ticking seems to be of no value
+                     * idk how to get it to not-fail, always fails for me
+                     */
+                    // var c = world.getChunkIfNonTicking(Utils.Coords.getChunkIndex(coords));
+                    // if (c == null) {
+                    //     console.log("getChunkIfNonTicking failed");
+                    // }
+                } catch (Exception e) {
+                    console.log("ERROR! " + e);
+                }
+            }
+
             @Nonnull
             public static final ArrayList<Ref<ChunkStore>> test(
                 @Nonnull final Ref<ChunkStore> blockRef,
@@ -109,8 +163,20 @@ public final class Utils {
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
                 @Nonnull final Vector3i providedCoords
             ) {
+                /**
+                 * worldChunk.getWorld() is allowed, that works
+                 *
+                 * and the following 4 also work
+                 *
+                 * so basically the world is working fine now
+                 */
+                testWorldMethods(worldChunk.getWorld(), providedCoords);
+                testWorldMethods(commandBuffer.getExternalData().getWorld(), providedCoords);
+                testWorldMethods(commandBuffer.getStore().getExternalData().getWorld(), providedCoords);
+                testWorldMethods(blockRef.getStore().getExternalData().getWorld(), providedCoords);
+
                 final var blockX = providedCoords.x;
-                final var blockY = providedCoords.y - 1;
+                final var blockY = providedCoords.y;
                 final var blockZ = providedCoords.z;
                 final var index = Coords.getLocalIndex(blockX, blockY, blockZ);
                 final var localCoords = Coords.getLocalCoords(index);
@@ -183,15 +249,15 @@ public final class Utils {
                 refs.add(getRef(test.blockChunk, index));
                 refs.add(getLocalRef(test.blockChunk, index));
 
-                var i = 0;
-                for (var e : refs) {
-                    if (e == null) {
-                        console.log("" + i + ") null");
-                    } else {
-                        console.log("" + i + ") " + e);
-                    }
-                    i++;
-                }
+                // var i = 0;
+                // for (var e : refs) {
+                //     if (e == null) {
+                //         console.log("" + i + ") null");
+                //     } else {
+                //         console.log("" + i + ") " + e);
+                //     }
+                //     i++;
+                // }
 
                 return refs;
             }
@@ -1713,7 +1779,6 @@ public final class Utils {
                 // Potential 1: The ref you passed me is a CHUNK ref. slay. thats the good shit. that's what we're after
                 final var maybeChunk = Component_.getComponent(ref, WORLD_CHUNK_COMPONENT);
                 if (maybeChunk != null) {
-                    console.log("You gave me a chunk ref!");
                     return maybeChunk;
                 }
 
@@ -1722,7 +1787,6 @@ public final class Utils {
                 if (info == null) {
                     return null;
                 }
-                console.log("You gave me a block ref!");
 
                 return Component_.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
             }

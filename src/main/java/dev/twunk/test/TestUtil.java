@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.utils.world.Utils;
 import javax.annotation.Nonnull;
 
 public final class TestUtil {
@@ -51,19 +52,28 @@ public final class TestUtil {
     @Nonnull
     public final BlockComponentChunk blockChunk;
 
+    @SuppressWarnings("unused")
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     public TestUtil(
         @Nonnull final Ref<ChunkStore> blockRef,
         @Nonnull final WorldChunk worldChunk,
         @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-        @Nonnull final Vector3i blockCoods
+        @Nonnull final Vector3i blockCoords
     ) {
         this.commandBuffer = commandBuffer;
-        this.store = commandBuffer.getStore();
-        this.chunkStore = commandBuffer.getExternalData();
-        this.worldProvider = chunkStore;
+
+        this.store = commandBuffer.getStore(); //  this works too
+        // this.store = blockRef.getStore();
+
+        this.chunkStore = commandBuffer.getExternalData(); // this one works too
+        // this.chunkStore = blockRef.getStore().getExternalData();
+
+        this.worldProvider = this.chunkStore;
+
         this.world = commandBuffer.getExternalData().getWorld();
+        // this.world = blockRef.getStore().getExternalData().getWorld(); // this works too
+
         this.worldChunk = worldChunk;
 
         var blockChunk = worldChunk.getBlockComponentChunk();
@@ -74,6 +84,8 @@ public final class TestUtil {
         this.blockChunk = blockChunk;
 
         this.blockRef = blockRef;
+        // this.blockRef = Utils.Block.Ref_.getRef(commandBuffer, blockCoords); // this works too
+
         var chunkRef = worldChunk.getReference();
         if (chunkRef == null) {
             throw new RuntimeException("ERROR: chunk ref was null!!");
@@ -85,8 +97,22 @@ public final class TestUtil {
             throw new RuntimeException("ERROR: info was null");
         }
 
-        this.info = info;
+        // this works
+        var wlrdChunk = Utils.Chunk.WorldChunk_.getWorldChunk(info);
+        if (wlrdChunk == null) {
+            throw new RuntimeException("ERROR: wlrdChunk was null");
+        }
 
-        console.log(this.toString());
+
+        /** this works too */
+        if (Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) == null) {
+            throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) was null");
+        }
+
+        // sick, stuff seems to be working now?? weird
+        if (Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) == null) {
+            throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) was null");
+        }
+        this.info = info;
     }
 }
