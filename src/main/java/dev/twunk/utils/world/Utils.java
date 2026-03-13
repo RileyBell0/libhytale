@@ -170,7 +170,11 @@ public final class Utils {
                  *
                  * so basically the world is working fine now
                  */
-                testWorldMethods(worldChunk.getWorld(), providedCoords);
+                final var testWorld = worldChunk.getWorld();
+                if (testWorld == null) {
+                    throw new RuntimeException("ERROR: world was null in test func 12351h9fovasbidlv");
+                }
+                testWorldMethods(testWorld, providedCoords);
                 testWorldMethods(commandBuffer.getExternalData().getWorld(), providedCoords);
                 testWorldMethods(commandBuffer.getStore().getExternalData().getWorld(), providedCoords);
                 testWorldMethods(blockRef.getStore().getExternalData().getWorld(), providedCoords);
@@ -183,7 +187,7 @@ public final class Utils {
                 final var coords = new Vector3i(blockX, blockY, blockZ);
                 final var chunkIndex = Coords.getChunkIndex(coords);
 
-                final var test = new TestUtil(blockRef, worldChunk, commandBuffer, coords);
+                final var test = new TestUtil(commandBuffer, coords);
                 // functions to test
                 final ArrayList<Ref<ChunkStore>> refs = new ArrayList<>();
 
