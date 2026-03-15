@@ -52,7 +52,7 @@ public class ScheduledTickSubSystem
         this.entities = new TrackedEntities(parent.getId());
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(new EntityLifetimeSubSystem(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
         this.appendSubSystem(new GlobalTickSubSystem(this));
     }
 

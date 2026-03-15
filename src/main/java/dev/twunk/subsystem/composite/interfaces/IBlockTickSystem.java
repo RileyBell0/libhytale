@@ -1,8 +1,7 @@
 package dev.twunk.subsystem.composite.interfaces;
 
-import com.hypixel.hytale.component.system.QuerySystem;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.common.IBlockTick;
+import dev.twunk.common.IQuery;
 
 /**
  * Gives your system the event handler function it needs to run code for ticking
@@ -20,4 +19,4 @@ import dev.twunk.common.IBlockTick;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IBlockTickSystem extends QuerySystem<ChunkStore>, IBlockTick {}
+public interface IBlockTickSystem extends IQuery, IBlockTick {}

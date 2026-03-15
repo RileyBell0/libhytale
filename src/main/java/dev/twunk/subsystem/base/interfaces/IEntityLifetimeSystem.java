@@ -1,8 +1,7 @@
 package dev.twunk.subsystem.base.interfaces;
 
-import com.hypixel.hytale.component.system.QuerySystem;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.common.IEntityLifetime;
+import dev.twunk.common.IQuery;
 
 /**
  * Gives your system the event handler function it needs to listen/react to
@@ -13,4 +12,4 @@ import dev.twunk.common.IEntityLifetime;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IEntityLifetimeSystem extends IEntityLifetime, QuerySystem<ChunkStore> {}
+public interface IEntityLifetimeSystem extends IEntityLifetime, IQuery {}

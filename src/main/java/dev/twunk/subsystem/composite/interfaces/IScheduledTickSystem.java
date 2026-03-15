@@ -3,11 +3,11 @@ package dev.twunk.subsystem.composite.interfaces;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.common.IQuery;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IScheduledTickSystem extends QuerySystem<ChunkStore> {
+public interface IScheduledTickSystem extends IQuery {
     @Nullable
     public abstract _EntityScheduledTickStateComponent onEntityTick(
         @Nonnull World world,

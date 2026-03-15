@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
  * - create a new instance `new TickableBlockComponent<YourComponent>(YourComponentType)`
  * - register the instance to your plugin
  */
-public final class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
+public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
     extends SubSystemOwner
     implements IEntityLifetimeSystem
 {
@@ -47,19 +47,19 @@ public final class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponen
             throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
         }
         this.componentType = component;
-        this.appendSubSystem(new EntityLifetimeSubSystem(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
     }
 
     public BlockLifetimeComponentSystem(@Nonnull Class<T> componentClass) {
         super(Query.and(TwunkLib.getComponentType(componentClass)));
         this.componentType = TwunkLib.getComponentType(componentClass);
-        this.appendSubSystem(new EntityLifetimeSubSystem(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
     }
 
     public BlockLifetimeComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
-        this.appendSubSystem(new EntityLifetimeSubSystem(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
     }
 
     @Override

@@ -1,12 +1,11 @@
 package dev.twunk.subsystem;
 
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.common.IQuery;
 import dev.twunk.plugin.ModPlugin;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Nice-to-have wrapper for making a system OR composite subsystem
@@ -21,14 +20,15 @@ import javax.annotation.Nullable;
  * Forces the parent to provide a `query` that its subsystems will use. That's
  * the most handy part honestly
  */
-public abstract class SubSystemOwner implements QuerySystem<ChunkStore> {
+public abstract class SubSystemOwner implements IQuery {
 
     @Nonnull
     private final ArrayList<ISubSystem> subSystems = new ArrayList<>();
 
+    @Nonnull
     private final Query<ChunkStore> query;
 
-    public SubSystemOwner(Query<ChunkStore> query) {
+    public SubSystemOwner(@Nonnull final Query<ChunkStore> query) {
         this.query = query;
     }
 
@@ -43,7 +43,7 @@ public abstract class SubSystemOwner implements QuerySystem<ChunkStore> {
     }
 
     @Override
-    @Nullable
+    @Nonnull
     public Query<ChunkStore> getQuery() {
         return this.query;
     }

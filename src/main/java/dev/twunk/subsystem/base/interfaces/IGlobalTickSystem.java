@@ -3,8 +3,8 @@ package dev.twunk.subsystem.base.interfaces;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.system.QuerySystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.common.IQuery;
 import javax.annotation.Nonnull;
 
 /**
@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IGlobalTickSystem extends QuerySystem<ChunkStore> {
+public interface IGlobalTickSystem extends IQuery {
     public void onSystemTick(
         float dt,
         @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
