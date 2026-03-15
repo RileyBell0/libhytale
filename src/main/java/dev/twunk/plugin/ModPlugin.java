@@ -8,7 +8,9 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.component.IAutoBlockLifetimeComponent;
 import dev.twunk.component.IAutoTickingBlockComponent;
+import dev.twunk.system.BlockLifetimeComponentSystem;
 import dev.twunk.system.TickableBlockComponentSystem;
 import dev.twunk.utils.TwunkLib;
 import javax.annotation.Nonnull;
@@ -69,6 +71,11 @@ public abstract class ModPlugin extends JavaPlugin {
         if (IAutoTickingBlockComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
             new TickableBlockComponentSystem(component).registerTo(this);
+        }
+
+        if (IAutoBlockLifetimeComponent.class.isAssignableFrom(myClass)) {
+            // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
+            new BlockLifetimeComponentSystem(component).registerTo(this);
         }
 
         return component;
