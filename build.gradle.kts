@@ -13,7 +13,8 @@ repositories {
 dependencies {
     compileOnly(files("libs/HytaleServer.jar"))
 
-    implementation("org.ow2.asm:asm:9.7")
+    // Source: https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy
+    implementation("net.bytebuddy:byte-buddy:1.18.7")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
