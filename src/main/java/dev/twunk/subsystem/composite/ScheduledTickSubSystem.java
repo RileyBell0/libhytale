@@ -50,10 +50,10 @@ public class ScheduledTickSubSystem
     public static <T extends ScheduledTickSubSystem> ScheduledTickSubSystem create(
         @Nonnull final IScheduledTickSystem parent
     ) {
-        return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, parent);
+        return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, IScheduledTickSystem.class, parent);
     }
 
-    private ScheduledTickSubSystem(@Nonnull final IScheduledTickSystem parent) {
+    protected ScheduledTickSubSystem(@Nonnull final IScheduledTickSystem parent) {
         super(parent.getQuery());
         this.parent = parent;
 

@@ -36,10 +36,10 @@ public abstract class EntityLifetimeSubSystem extends RefSystem<ChunkStore> impl
     public static <T extends EntityLifetimeSubSystem> EntityLifetimeSubSystem create(
         @Nonnull final IEntityLifetimeSystem parent
     ) {
-        return ISubSystem.__newSubSystem(EntityLifetimeSubSystem.class, parent);
+        return ISubSystem.__newSubSystem(EntityLifetimeSubSystem.class, IEntityLifetimeSystem.class, parent);
     }
 
-    private EntityLifetimeSubSystem(@Nonnull final IEntityLifetimeSystem parent) {
+    protected EntityLifetimeSubSystem(@Nonnull final IEntityLifetimeSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

@@ -31,10 +31,10 @@ public class GlobalTickSubSystem extends ArchetypeTickingSystem<ChunkStore> impl
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <T extends GlobalTickSubSystem> GlobalTickSubSystem create(@Nonnull final IGlobalTickSystem parent) {
-        return ISubSystem.__newSubSystem(GlobalTickSubSystem.class, parent);
+        return ISubSystem.__newSubSystem(GlobalTickSubSystem.class, IGlobalTickSystem.class, parent);
     }
 
-    private GlobalTickSubSystem(@Nonnull IGlobalTickSystem parent) {
+    protected GlobalTickSubSystem(@Nonnull IGlobalTickSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

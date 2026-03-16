@@ -31,10 +31,10 @@ public class EntityTickSubSystem extends ChunkBlockTickSystem.Ticking implements
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <T extends EntityTickSubSystem> EntityTickSubSystem create(@Nonnull final IEntityTickSystem parent) {
-        return ISubSystem.__newSubSystem(EntityTickSubSystem.class, parent);
+        return ISubSystem.__newSubSystem(EntityTickSubSystem.class, IEntityTickSystem.class, parent);
     }
 
-    private EntityTickSubSystem(@Nonnull IEntityTickSystem parent) {
+    protected EntityTickSubSystem(@Nonnull IEntityTickSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

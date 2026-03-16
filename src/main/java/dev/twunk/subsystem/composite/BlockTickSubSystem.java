@@ -32,10 +32,10 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <T extends BlockTickSubSystem> BlockTickSubSystem create(@Nonnull final IBlockTickSystem parent) {
-        return ISubSystem.__newSubSystem(BlockTickSubSystem.class, parent);
+        return ISubSystem.__newSubSystem(BlockTickSubSystem.class, IBlockTickSystem.class, parent);
     }
 
-    private BlockTickSubSystem(@Nonnull final IBlockTickSystem parent) {
+    protected BlockTickSubSystem(@Nonnull final IBlockTickSystem parent) {
         super(parent.getQuery());
         this.appendSubSystem(EntityTickSubSystem.create(this));
         this.parent = parent;
