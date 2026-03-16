@@ -30,7 +30,9 @@ public class GlobalTickSubSystem extends ArchetypeTickingSystem<ChunkStore> impl
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <T extends GlobalTickSubSystem> GlobalTickSubSystem create(@Nonnull final IGlobalTickSystem parent) {
+    public static <T extends GlobalTickSubSystem> GlobalTickSubSystem newSubsystemFor(
+        @Nonnull final IGlobalTickSystem parent
+    ) {
         return ISubSystem.__newSubSystem(GlobalTickSubSystem.class, IGlobalTickSystem.class, parent);
     }
 

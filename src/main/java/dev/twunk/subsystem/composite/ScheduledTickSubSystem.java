@@ -47,7 +47,7 @@ public class ScheduledTickSubSystem
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <T extends ScheduledTickSubSystem> ScheduledTickSubSystem create(
+    public static <T extends ScheduledTickSubSystem> ScheduledTickSubSystem newSubsystemFor(
         @Nonnull final IScheduledTickSystem parent
     ) {
         return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, IScheduledTickSystem.class, parent);
@@ -62,8 +62,8 @@ public class ScheduledTickSubSystem
         this.entities = new TrackedEntities(parent.getId());
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
-        this.appendSubSystem(GlobalTickSubSystem.create(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
+        this.appendSubSystem(GlobalTickSubSystem.newSubsystemFor(this));
     }
 
     /**

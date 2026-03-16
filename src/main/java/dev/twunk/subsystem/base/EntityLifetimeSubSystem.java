@@ -33,7 +33,7 @@ public abstract class EntityLifetimeSubSystem extends RefSystem<ChunkStore> impl
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <T extends EntityLifetimeSubSystem> EntityLifetimeSubSystem create(
+    public static <T extends EntityLifetimeSubSystem> EntityLifetimeSubSystem newSubsystemFor(
         @Nonnull final IEntityLifetimeSystem parent
     ) {
         return ISubSystem.__newSubSystem(EntityLifetimeSubSystem.class, IEntityLifetimeSystem.class, parent);

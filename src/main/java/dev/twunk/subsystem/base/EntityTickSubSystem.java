@@ -30,7 +30,9 @@ public class EntityTickSubSystem extends ChunkBlockTickSystem.Ticking implements
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <T extends EntityTickSubSystem> EntityTickSubSystem create(@Nonnull final IEntityTickSystem parent) {
+    public static <T extends EntityTickSubSystem> EntityTickSubSystem newSubsystemFor(
+        @Nonnull final IEntityTickSystem parent
+    ) {
         return ISubSystem.__newSubSystem(EntityTickSubSystem.class, IEntityTickSystem.class, parent);
     }
 

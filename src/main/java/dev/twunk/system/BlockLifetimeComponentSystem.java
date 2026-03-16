@@ -47,19 +47,19 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
             throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
         }
         this.componentType = component;
-        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
     public BlockLifetimeComponentSystem(@Nonnull Class<T> componentClass) {
         super(Query.and(TwunkLib.getComponentType(componentClass)));
         this.componentType = TwunkLib.getComponentType(componentClass);
-        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
     public BlockLifetimeComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
-        this.appendSubSystem(EntityLifetimeSubSystem.create(this));
+        this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
     @Override
