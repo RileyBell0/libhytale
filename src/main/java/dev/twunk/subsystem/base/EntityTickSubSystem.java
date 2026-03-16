@@ -26,7 +26,15 @@ public class EntityTickSubSystem extends ChunkBlockTickSystem.Ticking implements
     private final @Nonnull IEntityTickSystem parent;
     private final @Nullable Query<ChunkStore> query;
 
-    public EntityTickSubSystem(@Nonnull IEntityTickSystem parent) {
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     */
+    public static <T extends EntityTickSubSystem> EntityTickSubSystem create(@Nonnull final IEntityTickSystem parent) {
+        return ISubSystem.__newSubSystem(EntityTickSubSystem.class, parent);
+    }
+
+    private EntityTickSubSystem(@Nonnull IEntityTickSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

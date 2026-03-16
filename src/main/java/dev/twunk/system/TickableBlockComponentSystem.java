@@ -45,19 +45,19 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
             throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
         }
         this.componentType = component;
-        this.appendSubSystem(new EntityTickSubSystem(this));
+        this.appendSubSystem(EntityTickSubSystem.create(this));
     }
 
     public TickableBlockComponentSystem(@Nonnull Class<T> componentClass) {
         super(Query.and(TwunkLib.getComponentType(componentClass)));
         this.componentType = TwunkLib.getComponentType(componentClass);
-        this.appendSubSystem(new EntityTickSubSystem(this));
+        this.appendSubSystem(EntityTickSubSystem.create(this));
     }
 
     public TickableBlockComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
-        this.appendSubSystem(new EntityTickSubSystem(this));
+        this.appendSubSystem(EntityTickSubSystem.create(this));
     }
 
     public void onEntityTick(

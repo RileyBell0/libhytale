@@ -27,9 +27,17 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
 
     private final @Nonnull IBlockTickSystem parent;
 
-    public BlockTickSubSystem(@Nonnull final IBlockTickSystem parent) {
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     */
+    public static <T extends BlockTickSubSystem> BlockTickSubSystem create(@Nonnull final IBlockTickSystem parent) {
+        return ISubSystem.__newSubSystem(BlockTickSubSystem.class, parent);
+    }
+
+    private BlockTickSubSystem(@Nonnull final IBlockTickSystem parent) {
         super(parent.getQuery());
-        this.appendSubSystem(new EntityTickSubSystem(this));
+        this.appendSubSystem(EntityTickSubSystem.create(this));
         this.parent = parent;
     }
 

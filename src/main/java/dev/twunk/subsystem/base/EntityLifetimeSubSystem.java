@@ -10,12 +10,8 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
-import java.lang.invoke.MethodHandles;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy;
 
 /**
  * Tiny Subsystem to simply tell our parent system when we added/removed entities
@@ -33,34 +29,17 @@ public abstract class EntityLifetimeSubSystem extends RefSystem<ChunkStore> impl
     private final @Nonnull IEntityLifetimeSystem parent;
     private final @Nullable Query<ChunkStore> query;
 
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     */
     public static <T extends EntityLifetimeSubSystem> EntityLifetimeSubSystem create(
         @Nonnull final IEntityLifetimeSystem parent
     ) {
-        final Class<? extends EntityLifetimeSubSystem> clazz = new ByteBuddy()
-            .subclass(EntityLifetimeSubSystem.class, ConstructorStrategy.Default.IMITATE_SUPER_CLASS)
-            .make()
-            .load(
-                EntityLifetimeSubSystem.class.getClassLoader(),
-                ClassLoadingStrategy.UsingLookup.of(MethodHandles.lookup())
-            )
-            .getLoaded();
-
-        try {
-            var constructor = clazz.getDeclaredConstructor(IEntityLifetimeSystem.class);
-            return constructor.newInstance(parent);
-        } catch (Exception e) {
-            throw new RuntimeException(
-                "RILEY, you called a constructor that doesnt exist for " +
-                    EntityLifetimeSubSystem.class +
-                    " | " +
-                    parent +
-                    " | " +
-                    e
-            );
-        }
+        return ISubSystem.__newSubSystem(EntityLifetimeSubSystem.class, parent);
     }
 
-    EntityLifetimeSubSystem(@Nonnull final IEntityLifetimeSystem parent) {
+    private EntityLifetimeSubSystem(@Nonnull final IEntityLifetimeSystem parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }
