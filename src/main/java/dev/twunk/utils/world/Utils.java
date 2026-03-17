@@ -1818,6 +1818,63 @@ public final class Utils {
         // DONE
         public static final class Id {
 
+            /**
+             * Tests all methods i've defined for getId
+             */
+            @Nonnull
+            public static final ArrayList<Integer> test(
+                @Nonnull final Ref<ChunkStore> blockRef,
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                @Nonnull final Vector3i providedCoords
+            ) {
+                final var blockX = providedCoords.x;
+                final var blockY = providedCoords.y;
+                final var blockZ = providedCoords.z;
+                final var localIndex = Coords.getLocalIndex(blockX, blockY, blockZ);
+                final var blockIndex = localIndex;
+                final var coords = new Vector3i(blockX, blockY, blockZ);
+                final var chunkIndex = Coords.getChunkIndex(coords);
+
+                final var test = new TestUtil(commandBuffer, coords);
+
+                // functions to test
+                final ArrayList<Integer> refs = new ArrayList<>();
+
+                // WorldProvider
+                refs.add(Utils.Block.Id.getId(test.worldProvider, coords));
+                refs.add(Utils.Block.Id.getId(test.worldProvider, coords.x, coords.y, coords.z));
+                refs.add(Utils.Block.Id.getId(test.worldProvider, chunkIndex, blockIndex));
+
+                //  World
+                refs.add(Utils.Block.Id.getId(test.world, coords));
+                refs.add(Utils.Block.Id.getId(test.world, coords.x, coords.y, coords.z));
+                refs.add(Utils.Block.Id.getId(test.world, chunkIndex, blockIndex));
+
+                //  CommandBuffer
+                refs.add(Utils.Block.Id.getId(test.commandBuffer, coords));
+                refs.add(Utils.Block.Id.getId(test.commandBuffer, coords.x, coords.y, coords.z)); // test 7 failed
+                refs.add(Utils.Block.Id.getId(test.commandBuffer, chunkIndex, blockIndex));
+
+                //  Store<ChunkStore>
+                refs.add(Utils.Block.Id.getId(test.store, coords));
+                refs.add(Utils.Block.Id.getId(test.store, coords.x, coords.y, coords.z)); // test 10 failed
+                refs.add(Utils.Block.Id.getId(test.store, chunkIndex, blockIndex));
+
+                //  ChunkStore
+                refs.add(Utils.Block.Id.getId(test.chunkStore, coords));
+                refs.add(Utils.Block.Id.getId(test.chunkStore, coords.x, coords.y, coords.z)); // test 13 failed
+                refs.add(Utils.Block.Id.getId(test.chunkStore, chunkIndex, blockIndex));
+
+                //  Ref<ChunkStore>
+                refs.add(Utils.Block.Id.getId(test.chunkRef, coords));
+                refs.add(Utils.Block.Id.getId(test.chunkRef, coords.x, coords.y, coords.z)); // test 16 failed
+                refs.add(Utils.Block.Id.getId(test.chunkRef, chunkIndex, blockIndex));
+                refs.add(Utils.Block.Id.getId("TEST_BlockId"));
+
+                return refs;
+            }
+
             // ====================================================================
             // Option 1: Getting the ID of a block by its coords
             // - there's a certain coordinate at which exists a block. You want
@@ -1833,29 +1890,29 @@ public final class Utils {
             @Nullable
             public static final Integer getId(
                 @Nonnull final WorldProvider worldProvider,
-                @Nonnull final Vector3i coords
+                @Nonnull final Vector3i blockCoords
             ) {
-                final var worldChunk = worldProvider.getWorld().getChunk(Coords.getChunkIndex(coords));
+                final var worldChunk = worldProvider.getWorld().getChunk(Coords.getChunkIndex(blockCoords));
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(coords);
+                return worldChunk.getBlock(blockCoords);
             }
 
             @Nullable
             public static final Integer getId(
                 @Nonnull final WorldProvider worldProvider,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var worldChunk = worldProvider.getWorld().getChunk(Coords.getChunkIndex(x, z));
+                final var worldChunk = worldProvider.getWorld().getChunk(Coords.getChunkIndex(blockX, blockZ));
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(x, y, z);
+                return worldChunk.getBlock(blockX, blockY, blockZ);
             }
 
             @Nullable
@@ -1880,23 +1937,28 @@ public final class Utils {
             // ====================================================================
 
             @Nullable
-            public static final Integer getId(@Nonnull final World world, @Nonnull final Vector3i coords) {
-                final var worldChunk = world.getChunk(Coords.getChunkIndex(coords));
+            public static final Integer getId(@Nonnull final World world, @Nonnull final Vector3i blockCoords) {
+                final var worldChunk = world.getChunk(Coords.getChunkIndex(blockCoords));
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(coords);
+                return worldChunk.getBlock(blockCoords);
             }
 
             @Nullable
-            public static final Integer getId(@Nonnull final World world, final int x, final int y, final int z) {
-                final var worldChunk = world.getChunk(Coords.getChunkIndex(x, z));
+            public static final Integer getId(
+                @Nonnull final World world,
+                final int blockX,
+                final int blockY,
+                final int blockZ
+            ) {
+                final var worldChunk = world.getChunk(Coords.getChunkIndex(blockX, blockZ));
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(x, y, z);
+                return worldChunk.getBlock(blockX, blockY, blockZ);
             }
 
             @Nullable
@@ -1919,29 +1981,29 @@ public final class Utils {
             @Nullable
             public static final Integer getId(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i coords
+                @Nonnull final Vector3i blockCoords
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(commandBuffer, coords);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(commandBuffer, blockCoords);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(coords);
+                return worldChunk.getBlock(blockCoords);
             }
 
             @Nullable
             public static final Integer getId(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(commandBuffer, x, z);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(commandBuffer, blockX, blockZ);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(x, y, z);
+                return worldChunk.getBlock(blockX, blockY, blockZ);
             }
 
             @Nullable
@@ -1967,39 +2029,39 @@ public final class Utils {
 
             @Nullable
             public static final Integer getId(
-                @Nonnull final Store<ChunkStore> chunkStore,
-                @Nonnull final Vector3i coords
+                @Nonnull final Store<ChunkStore> store,
+                @Nonnull final Vector3i blockCoords
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, coords);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(store, blockCoords);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(coords);
+                return worldChunk.getBlock(blockCoords);
             }
 
             @Nullable
             public static final Integer getId(
-                @Nonnull final Store<ChunkStore> chunkStore,
-                final int x,
-                final int y,
-                final int z
+                @Nonnull final Store<ChunkStore> store,
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, x, z);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(store, blockX, blockZ);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(x, y, z);
+                return worldChunk.getBlock(blockX, blockY, blockZ);
             }
 
             @Nullable
             public static final Integer getId(
-                @Nonnull final Store<ChunkStore> chunkStore,
+                @Nonnull final Store<ChunkStore> store,
                 final long chunkIndex,
                 final int blockIndex
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, chunkIndex);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(store, chunkIndex);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -2015,28 +2077,31 @@ public final class Utils {
             // ====================================================================
 
             @Nullable
-            public static final Integer getId(@Nonnull final ChunkStore chunkStore, @Nonnull final Vector3i coords) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, coords);
+            public static final Integer getId(
+                @Nonnull final ChunkStore chunkStore,
+                @Nonnull final Vector3i blockCoords
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, blockCoords);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(coords);
+                return worldChunk.getBlock(blockCoords);
             }
 
             @Nullable
             public static final Integer getId(
                 @Nonnull final ChunkStore chunkStore,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, x, z);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkStore, blockX, blockZ);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(x, y, z);
+                return worldChunk.getBlock(blockX, blockY, blockZ);
             }
 
             @Nullable
@@ -2061,28 +2126,31 @@ public final class Utils {
             // ====================================================================
 
             @Nullable
-            public static final Integer getId(@Nonnull final Ref<ChunkStore> chunkRef, @Nonnull final Vector3i coords) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkRef, coords);
+            public static final Integer getId(
+                @Nonnull final Ref<ChunkStore> chunkRef,
+                @Nonnull final Vector3i blockCoords
+            ) {
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkRef, blockCoords);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(coords);
+                return worldChunk.getBlock(blockCoords);
             }
 
             @Nullable
             public static final Integer getId(
                 @Nonnull final Ref<ChunkStore> chunkRef,
-                final int x,
-                final int y,
-                final int z
+                final int blockX,
+                final int blockY,
+                final int blockZ
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkRef, x, z);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk(chunkRef, blockX, blockZ);
                 if (worldChunk == null) {
                     return null;
                 }
 
-                return worldChunk.getBlock(x, y, z);
+                return worldChunk.getBlock(blockX, blockY, blockZ);
             }
 
             @Nullable
@@ -2137,30 +2205,34 @@ public final class Utils {
             }
         }
 
-        public static final boolean set(final @Nonnull World world, final @Nonnull Vector3i coords, int blockId) {
-            var chunk = Chunk.WorldChunk_.getWorldChunk(world, coords);
+        public static final boolean set(final @Nonnull World world, final @Nonnull Vector3i blockCoords, int blockId) {
+            var chunk = Chunk.WorldChunk_.getWorldChunk(world, blockCoords);
             if (chunk == null) {
                 return false;
             }
 
-            return set0(chunk, coords, blockId);
+            return set0(chunk, blockCoords, blockId);
         }
 
-        public static final boolean set0(final @Nonnull WorldChunk chunk, final @Nonnull Vector3i coords, int blockId) {
-            return chunk.setBlock(coords.x, coords.y, coords.z, blockId);
+        public static final boolean set0(
+            final @Nonnull WorldChunk chunk,
+            final @Nonnull Vector3i blockCoords,
+            int blockId
+        ) {
+            return chunk.setBlock(blockCoords.x, blockCoords.y, blockCoords.z, blockId);
         }
 
-        public static final int get(final @Nonnull World world, final @Nonnull Vector3i coords) {
-            var chunk = Chunk.WorldChunk_.getWorldChunk(world, coords);
+        public static final int get(final @Nonnull World world, final @Nonnull Vector3i blockCoords) {
+            var chunk = Chunk.WorldChunk_.getWorldChunk(world, blockCoords);
             if (chunk == null) {
                 return -1;
             }
 
-            return get0(chunk, coords);
+            return get0(chunk, blockCoords);
         }
 
-        public static final int get0(final @Nonnull WorldChunk chunk, final @Nonnull Vector3i coords) {
-            return chunk.getBlock(coords);
+        public static final int get0(final @Nonnull WorldChunk chunk, final @Nonnull Vector3i blockCoords) {
+            return chunk.getBlock(blockCoords);
         }
     }
 
@@ -2236,10 +2308,10 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(
                 @Nonnull final WorldProvider worldProvider,
-                final int chunkX,
-                final int chunkZ
+                final int blockX,
+                final int blockZ
             ) {
-                return worldProvider.getWorld().getChunk(Coords.getChunkIndexFromChunkCoords(chunkX, chunkZ));
+                return worldProvider.getWorld().getChunk(Coords.getChunkIndex(blockX, blockZ));
             }
 
             @Nullable
@@ -2261,10 +2333,10 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunkFromBlock(
                 @Nonnull final WorldProvider worldProvider,
-                final int globalX,
-                final int globalY
+                final int blockX,
+                final int blockZ
             ) {
-                return worldProvider.getWorld().getChunk(Coords.getChunkIndex(globalX, globalY));
+                return worldProvider.getWorld().getChunk(Coords.getChunkIndex(blockX, blockZ));
             }
 
             //   #endregion WorldProvider
@@ -2284,10 +2356,10 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(
                 @Nonnull final World world,
-                final int chunkX,
-                final int chunkZ
+                final int blockX,
+                final int blockZ
             ) {
-                return world.getChunk(Coords.getChunkIndexFromChunkCoords(chunkX, chunkZ));
+                return world.getChunk(Coords.getChunkIndex(blockX, blockZ));
             }
 
             @Nullable
@@ -2306,10 +2378,10 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunkFromBlock(
                 @Nonnull final World world,
-                final int globalX,
-                final int globalZ
+                final int blockX,
+                final int blockZ
             ) {
-                return world.getChunk(Coords.getChunkIndex(globalX, globalZ));
+                return world.getChunk(Coords.getChunkIndex(blockX, blockZ));
             }
 
             //   #endregion World
@@ -2329,13 +2401,13 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(
                 @Nonnull final Ref<ChunkStore> ref,
-                final int chunkX,
-                final int chunkZ
+                final int blockX,
+                final int blockZ
             ) {
                 return ref
                     .getStore()
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndexFromChunkCoords(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             @Nullable
@@ -2357,13 +2429,13 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunkFromBlock(
                 @Nonnull final Ref<ChunkStore> ref,
-                final int globalX,
-                final int globalZ
+                final int blockX,
+                final int blockZ
             ) {
                 return ref
                     .getStore()
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndex(globalX, globalZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             //   #endregion WorldChunk
@@ -2393,14 +2465,14 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(
                 @Nonnull final BlockStateInfo info,
-                final int chunkX,
-                final int chunkZ
+                final int blockX,
+                final int blockZ
             ) {
                 return info
                     .getChunkRef()
                     .getStore()
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndexFromChunkCoords(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             /**
@@ -2433,14 +2505,14 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunkFromBlock(
                 @Nonnull final BlockStateInfo info,
-                final int globalX,
-                final int globalZ
+                final int blockX,
+                final int blockZ
             ) {
                 return info
                     .getChunkRef()
                     .getStore()
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndex(globalX, globalZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             //   #endregion BlockStateInfo
@@ -2461,13 +2533,13 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
-                final int chunkX,
-                final int chunkZ
+                final int blockX,
+                final int blockZ
             ) {
                 // but regardless we don't need the world to get the world chunk
                 return commandBuffer
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndexFromChunkCoords(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             @Nullable
@@ -2492,12 +2564,12 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunkFromBlock(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                final int globalX,
-                final int globalZ
+                final int blockX,
+                final int blockZ
             ) {
                 return commandBuffer
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndex(globalX, globalZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             //   #endregion CommandBuffer
@@ -2517,12 +2589,12 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(
                 @Nonnull final Store<ChunkStore> store,
-                final int chunkX,
-                final int chunkZ
+                final int blockX,
+                final int blockZ
             ) {
                 return store
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndexFromChunkCoords(chunkX, chunkZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             @Nullable
@@ -2546,12 +2618,12 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunkFromBlock(
                 @Nonnull final Store<ChunkStore> store,
-                final int globalX,
-                final int globalZ
+                final int blockX,
+                final int blockZ
             ) {
                 return store
                     .getExternalData()
-                    .getChunkComponent(Coords.getChunkIndex(globalX, globalZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             //   #endregion Store<ChunkStore>
@@ -2574,14 +2646,11 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(
                 @Nonnull final ChunkStore chunkStore,
-                final int chunkX,
-                final int chunkZ
+                final int blockX,
+                final int blockZ
             ) {
                 // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
-                return chunkStore.getChunkComponent(
-                    Coords.getChunkIndexFromChunkCoords(chunkX, chunkZ),
-                    WORLD_CHUNK_COMPONENT
-                );
+                return chunkStore.getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             @Nullable
@@ -2601,10 +2670,10 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunkFromBlock(
                 @Nonnull final ChunkStore chunkStore,
-                final int globalX,
-                final int globalZ
+                final int blockX,
+                final int blockZ
             ) {
-                return chunkStore.getChunkComponent(Coords.getChunkIndex(globalX, globalZ), WORLD_CHUNK_COMPONENT);
+                return chunkStore.getChunkComponent(Coords.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
             }
 
             //   #endregion ChunkStore
@@ -3560,9 +3629,9 @@ public final class Utils {
         /**
          * WARNING: the `y` value MUST be the `z` value for the chunk
          */
-        public static final long getChunkIndexFromChunkCoords(@Nonnull final Vector2i coords) {
+        public static final long getChunkIndexFromChunkCoords(@Nonnull final Vector2i chunkCoords) {
             // see ChunkUtil.indexChunkFromBlock
-            return ((long) coords.x << 32) | ((long) coords.y & 4294967295L);
+            return ((long) chunkCoords.x << 32) | ((long) chunkCoords.y & 4294967295L);
         }
 
         // #endregion getChunkCoords
