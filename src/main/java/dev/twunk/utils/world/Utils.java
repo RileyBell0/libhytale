@@ -98,6 +98,48 @@ public final class Utils {
 
     public static final class Block {
 
+        public static final ArrayList<Boolean> testRefDetection(@Nonnull final Ref<ChunkStore> blockRef) {
+            // functions to test
+            final ArrayList<Boolean> refs = new ArrayList<>();
+
+            final var info = Utils.Block.Info.getInfo(blockRef);
+            if (info == null) {
+                throw new RuntimeException("Error: failed to get info for test in asfiuogrt71t7o83");
+            }
+
+            final var chunkRef = info.getChunkRef();
+
+            // BLOCK ref passed to isBlockRef (expect TRUE)
+            if (isBlockRef(blockRef)) {
+                refs.add(true);
+            } else {
+                refs.add(null);
+            }
+
+            // CHUNK ref passed to isBlockRef (expect FALSE)
+            if (isBlockRef(chunkRef)) {
+                refs.add(null);
+            } else {
+                refs.add(true);
+            }
+
+            // CHUNK ref passed to isChunkRef (expect TRUE)
+            if (isChunkRef(chunkRef)) {
+                refs.add(true);
+            } else {
+                refs.add(null);
+            }
+
+            // BLOCK ref passed to isChunkRef (expect FALSE)
+            if (isChunkRef(blockRef)) {
+                refs.add(null);
+            } else {
+                refs.add(true);
+            }
+
+            return refs;
+        }
+
         public static final boolean isBlockRef(@Nonnull final Ref<ChunkStore> ref) {
             return Utils.Component_.hasComponent(BLOCK_STATE_INFO_COMPONENT_TYPE, ref);
         }
