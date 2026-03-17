@@ -140,10 +140,12 @@ public final class Utils {
             return refs;
         }
 
+        // TESTS ADDED AND VERIFIED
         public static final boolean isBlockRef(@Nonnull final Ref<ChunkStore> ref) {
             return Utils.Component_.hasComponent(BLOCK_STATE_INFO_COMPONENT_TYPE, ref);
         }
 
+        // TESTS ADDED AND VERIFIED
         public static final boolean isChunkRef(@Nonnull final Ref<ChunkStore> ref) {
             return Utils.Component_.hasComponent(WORLD_CHUNK_COMPONENT, ref);
         }
@@ -2263,6 +2265,7 @@ public final class Utils {
             }
         }
 
+        // TESTS ADDED AND VERIFIED
         public static final boolean set(final @Nonnull World world, final @Nonnull Vector3i blockCoords, int blockId) {
             var chunk = Chunk.WorldChunk_.getWorldChunk(world, blockCoords);
             if (chunk == null) {
@@ -2272,6 +2275,7 @@ public final class Utils {
             return set0(chunk, blockCoords, blockId);
         }
 
+        // TESTS ADDED AND VERIFIED
         public static final boolean set0(
             final @Nonnull WorldChunk chunk,
             final @Nonnull Vector3i blockCoords,
@@ -2280,6 +2284,7 @@ public final class Utils {
             return chunk.setBlock(blockCoords.x, blockCoords.y, blockCoords.z, blockId);
         }
 
+        // TESTS ADDED AND VERIFIED
         public static final int get(final @Nonnull World world, final @Nonnull Vector3i blockCoords) {
             var chunk = Chunk.WorldChunk_.getWorldChunk(world, blockCoords);
             if (chunk == null) {
@@ -2289,6 +2294,7 @@ public final class Utils {
             return get0(chunk, blockCoords);
         }
 
+        // TESTS ADDED AND VERIFIED
         public static final int get0(final @Nonnull WorldChunk chunk, final @Nonnull Vector3i blockCoords) {
             return chunk.getBlock(blockCoords);
         }
