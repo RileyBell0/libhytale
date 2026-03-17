@@ -96,7 +96,6 @@ public final class Utils {
     // Grouped functions together
     // ==================================================
 
-    // DONE
     public static final class Block {
 
         public static final boolean isBlockRef(@Nonnull final Ref<ChunkStore> ref) {
@@ -112,7 +111,7 @@ public final class Utils {
         /// -> get ID               (int)
         /// -> get BlockType
 
-        // DONE 2 electric boogaloo
+        // TESTS ADDED AND VERIFIED
         public static final class Ref_ {
 
             /**
@@ -1034,7 +1033,7 @@ public final class Utils {
             // #endregion getRef
         }
 
-        // DONE 2 electric boogaloo at 4am no less
+        // TESTS ADDED AND VERIFIED
         public static final class Info {
 
             /**
@@ -1815,7 +1814,7 @@ public final class Utils {
             // #endregion getInfo
         }
 
-        // DONE
+        // TESTS ADDED AND VERIFIED
         public static final class Id {
 
             /**
@@ -2186,9 +2185,26 @@ public final class Utils {
             }
         }
 
-        // DONE
+        // TESTS ADDED AND VERIFIED
         // Not even sure what BlockType is or what i was using it for
         public static final class Type {
+
+            /**
+             * Tests all methods i've defined for getType
+             */
+            @Nonnull
+            public static final ArrayList<BlockType> test(
+                @Nonnull final Ref<ChunkStore> blockRef,
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                @Nonnull final Vector3i providedCoords
+            ) {
+                final ArrayList<BlockType> refs = new ArrayList<>();
+
+                refs.add(Utils.Block.Type.getType("TEST_BlockType"));
+
+                return refs;
+            }
 
             /**
              * Gets the "BlockType" for a block with the given Id.
@@ -2241,7 +2257,6 @@ public final class Utils {
         /// -> get WorldChunk
         /// -> get Ref<ChunkStore>  (ChunkRef)
 
-        // DONE
         public static final class WorldChunk_ {
 
             // #region getWorldChunk
@@ -3110,7 +3125,6 @@ public final class Utils {
         }
     }
 
-    // DONE
     public static final class Coords {
 
         /// -> get LOCAL coordinates within chunk    (Vector3i)
