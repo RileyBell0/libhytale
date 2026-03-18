@@ -113,7 +113,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
 
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = Utils.Component_.getComponent(blockRef, this.componentType);
+        var component = Utils.Component_.get(blockRef, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing

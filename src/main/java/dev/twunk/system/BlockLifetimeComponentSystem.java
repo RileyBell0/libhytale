@@ -71,7 +71,7 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
     ) {
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = Utils.Component_.getComponent(ref, this.componentType);
+        var component = Utils.Component_.get(ref, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
@@ -92,7 +92,7 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
     ) {
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = Utils.Component_.getComponent(ref, this.componentType);
+        var component = Utils.Component_.get(ref, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
