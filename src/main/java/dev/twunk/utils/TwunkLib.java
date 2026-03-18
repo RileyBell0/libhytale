@@ -3,6 +3,7 @@ package dev.twunk.utils;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.component.TwunkDevTestComponent;
 import dev.twunk.component._TickSchedulerComponent;
 import dev.twunk.plugin.ModPlugin;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
@@ -24,6 +25,9 @@ public abstract class TwunkLib {
     // Called automatically when you load a mod plugin
     public static void init(ModPlugin plugin) {
         registerTickComponents(plugin);
+
+        // i use this to tset some stuff
+        TwunkDevTestComponent.COMPONENT_TYPE = plugin.registerComponent(TwunkDevTestComponent.CODEC);
     }
 
     private static void registerTickComponents(ModPlugin plugin) {
