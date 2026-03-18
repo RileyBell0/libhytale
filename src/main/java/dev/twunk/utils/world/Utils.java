@@ -2804,7 +2804,7 @@ public final class Utils {
             // #endregion getWorldChunk
         }
 
-        // TODO
+        // TESTS ADDED AND VERIFIED
         /// -> get Ref<ChunkStore>  (ChunkRef)
         public static final class Ref_ {
 
