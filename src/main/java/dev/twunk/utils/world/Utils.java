@@ -111,32 +111,14 @@ public final class Utils {
             final var chunkRef = info.getChunkRef();
 
             // BLOCK ref passed to isBlockRef (expect TRUE)
-            if (isBlockRef(blockRef)) {
-                refs.add(true);
-            } else {
-                refs.add(null);
-            }
-
-            // CHUNK ref passed to isBlockRef (expect FALSE)
-            if (isBlockRef(chunkRef)) {
-                refs.add(null);
-            } else {
-                refs.add(true);
-            }
+            refs.add(isBlockRef(blockRef));
+            // BLOCK ref passed to isChunkRef (expect FALSE)
+            refs.add(isChunkRef(blockRef));
 
             // CHUNK ref passed to isChunkRef (expect TRUE)
-            if (isChunkRef(chunkRef)) {
-                refs.add(true);
-            } else {
-                refs.add(null);
-            }
-
-            // BLOCK ref passed to isChunkRef (expect FALSE)
-            if (isChunkRef(blockRef)) {
-                refs.add(null);
-            } else {
-                refs.add(true);
-            }
+            refs.add(isChunkRef(chunkRef));
+            // CHUNK ref passed to isBlockRef (expect FALSE)
+            refs.add(isBlockRef(chunkRef));
 
             return refs;
         }
