@@ -3065,9 +3065,9 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getChunkRef(
                 @Nonnull final Store<ChunkStore> store,
-                @Nonnull final Vector3i coords
+                @Nonnull final Vector3i blockCoords
             ) {
-                return store.getExternalData().getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(coords));
+                return store.getExternalData().getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(blockCoords));
             }
 
             @Nullable
@@ -3107,9 +3107,9 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getChunkRef(
                 @Nonnull final ChunkStore chunkStore,
-                @Nonnull final Vector3i coords
+                @Nonnull final Vector3i blockCoords
             ) {
-                return chunkStore.getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(coords));
+                return chunkStore.getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(blockCoords));
             }
 
             @Nullable
@@ -3144,12 +3144,12 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getChunkRef(
                 @Nonnull final Ref<ChunkStore> chunkRef,
-                @Nonnull final Vector3i coords
+                @Nonnull final Vector3i blockCoords
             ) {
                 return chunkRef
                     .getStore()
                     .getExternalData()
-                    .getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(coords));
+                    .getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(blockCoords));
             }
 
             @Nullable
@@ -3193,13 +3193,13 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> getChunkRef(
                 @Nonnull final BlockStateInfo info,
-                @Nonnull final Vector3i coords
+                @Nonnull final Vector3i blockCoords
             ) {
                 return info
                     .getChunkRef()
                     .getStore()
                     .getExternalData()
-                    .getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(coords));
+                    .getChunkReference(Utils.ChunkCoords.Index.getChunkIndex(blockCoords));
             }
 
             @Nullable
@@ -3248,7 +3248,7 @@ public final class Utils {
                 return info.getChunkRef();
             }
 
-            // please don't use this one.. just here for completeness so you know you CAN get the chunk ref out of info - in fact, that's (in my understanding) the preferred way
+            // please don't use this one for getting it from info... just here for completeness so you know you CAN get the chunk ref out of info - in fact, that's (in my understanding) the preferred way
             @Nullable
             public static final Ref<ChunkStore> getChunkRef(@Nonnull final BlockStateInfo info) {
                 return info.getChunkRef();
