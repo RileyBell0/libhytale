@@ -306,10 +306,10 @@ public final class Utils {
                 refs.add(getLocalRef(test.worldChunk, index));
 
                 // BlockComponentChunk
-                refs.add(getRef(test.blockChunk, index));
-                refs.add(getLocalRef(test.blockChunk, coords));
-                refs.add(getLocalRef(test.blockChunk, blockX, blockY, blockZ));
-                refs.add(getLocalRef(test.blockChunk, index));
+                refs.add(getRef(test.blockComponentChunk, index));
+                refs.add(getLocalRef(test.blockComponentChunk, coords));
+                refs.add(getLocalRef(test.blockComponentChunk, blockX, blockY, blockZ));
+                refs.add(getLocalRef(test.blockComponentChunk, index));
 
                 // var i = 0;
                 // for (var e : refs) {
@@ -1175,10 +1175,10 @@ public final class Utils {
                 refs.add(getLocalInfo(test.worldChunk, localIndex));
 
                 // BlockComponentChunk
-                refs.add(getInfo(test.blockChunk, localIndex));
-                refs.add(getLocalInfo(test.blockChunk, coords));
-                refs.add(getLocalInfo(test.blockChunk, blockX, blockY, blockZ));
-                refs.add(getLocalInfo(test.blockChunk, localIndex));
+                refs.add(getInfo(test.blockComponentChunk, localIndex));
+                refs.add(getLocalInfo(test.blockComponentChunk, coords));
+                refs.add(getLocalInfo(test.blockComponentChunk, blockX, blockY, blockZ));
+                refs.add(getLocalInfo(test.blockComponentChunk, localIndex));
 
                 // var i = 0;
                 // for (var e : refs) {
@@ -2319,6 +2319,71 @@ public final class Utils {
         /// -> get Ref<ChunkStore>  (ChunkRef)
 
         public static final class WorldChunk_ {
+
+            /**
+             * Tests all methods i've defined for getInfo
+             */
+            @Nonnull
+            public static final ArrayList<WorldChunk> test(
+                @Nonnull final Ref<ChunkStore> blockRef,
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                @Nonnull final Vector3i providedCoords
+            ) {
+                final var blockX = providedCoords.x;
+                final var blockY = providedCoords.y;
+                final var blockZ = providedCoords.z;
+                // final var localIndex = Utils.BlockCoords.Index.getLocalIndex(blockX, blockY, blockZ);
+                // final var localCoords = Utils.BlockCoords.Local.getLocalCoords(localIndex);
+                final var coords = new Vector3i(blockX, blockY, blockZ);
+                final var chunkIndex = Utils.ChunkCoords.Index.getChunkIndex(coords);
+
+                final var test = new TestUtil(commandBuffer, coords);
+                // functions to test
+                final ArrayList<WorldChunk> refs = new ArrayList<>();
+
+                refs.add(getWorldChunkFromChunk(test.chunkRef));
+                refs.add(getWorldChunkFromBlock(test.blockRef));
+                refs.add(getWorldChunk(blockRef));
+                refs.add(getWorldChunk(test.info));
+                refs.add(getWorldChunk(test.worldProvider, test.blockChunk));
+                refs.add(getWorldChunk(test.worldProvider, blockX, blockZ));
+                refs.add(getWorldChunk(test.worldProvider, chunkIndex));
+                refs.add(getWorldChunk(test.worldProvider, coords));
+                refs.add(getWorldChunkFromBlock(test.worldProvider, blockX, blockZ));
+                refs.add(getWorldChunk(test.world, test.blockChunk));
+                refs.add(getWorldChunk(test.world, blockX, blockZ));
+                refs.add(getWorldChunk(test.world, chunkIndex));
+                refs.add(getWorldChunk(test.world, coords));
+                refs.add(getWorldChunkFromBlock(test.world, blockX, blockZ));
+                refs.add(getWorldChunk(blockRef, test.blockChunk));
+                refs.add(getWorldChunk(blockRef, blockX, blockZ));
+                refs.add(getWorldChunk(blockRef, chunkIndex));
+                refs.add(getWorldChunk(blockRef, coords));
+                refs.add(getWorldChunkFromBlock(blockRef, blockX, blockZ));
+                refs.add(getWorldChunk(test.info, test.blockChunk));
+                refs.add(getWorldChunk(test.info, blockX, blockZ));
+                refs.add(getWorldChunk(test.info, chunkIndex));
+                refs.add(getWorldChunk(test.info, coords));
+                refs.add(getWorldChunkFromBlock(test.info, blockX, blockZ));
+                refs.add(getWorldChunk(test.commandBuffer, test.blockChunk));
+                refs.add(getWorldChunk(test.commandBuffer, blockX, blockZ));
+                refs.add(getWorldChunk(test.commandBuffer, chunkIndex));
+                refs.add(getWorldChunk(test.commandBuffer, coords));
+                refs.add(getWorldChunkFromBlock(test.commandBuffer, blockX, blockZ));
+                refs.add(getWorldChunk(test.store, test.blockChunk));
+                refs.add(getWorldChunk(test.store, blockX, blockZ));
+                refs.add(getWorldChunk(test.store, chunkIndex));
+                refs.add(getWorldChunk(test.store, coords));
+                refs.add(getWorldChunkFromBlock(test.store, blockX, blockZ));
+                refs.add(getWorldChunk(test.chunkStore, test.blockChunk));
+                refs.add(getWorldChunk(test.chunkStore, blockX, blockZ));
+                refs.add(getWorldChunk(test.chunkStore, chunkIndex));
+                refs.add(getWorldChunk(test.chunkStore, coords));
+                refs.add(getWorldChunkFromBlock(test.chunkStore, blockX, blockZ));
+
+                return refs;
+            }
 
             // #region getWorldChunk
 

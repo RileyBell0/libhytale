@@ -92,7 +92,7 @@ public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSys
         if (world == null) {
             return;
         }
-        var coords = Utils.Coords.getGlobalCoords(worldChunk, blockInfo);
+        var coords = Utils.BlockCoords.Global.getGlobalCoords(worldChunk, blockInfo);
 
         parent.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
     }

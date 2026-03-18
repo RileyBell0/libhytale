@@ -9,6 +9,7 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
@@ -21,6 +22,10 @@ public final class TestUtil {
     @Nonnull
     private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_INFO_COMPONENT =
         BlockStateInfo.getComponentType();
+
+    // @SuppressWarnings("null")
+    // @Nonnull
+    // private static final ComponentType<ChunkStore, BlockChunk> BLOCK_CHUNK_COMPONENT = BlockChunk.getComponentType();
 
     @Nonnull
     public final WorldProvider worldProvider;
@@ -50,7 +55,10 @@ public final class TestUtil {
     public final WorldChunk worldChunk;
 
     @Nonnull
-    public final BlockComponentChunk blockChunk;
+    public final BlockComponentChunk blockComponentChunk;
+
+    @Nonnull
+    public final BlockChunk blockChunk;
 
     @SuppressWarnings("unused")
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
@@ -143,12 +151,12 @@ public final class TestUtil {
         }
         this.worldChunk = worldChunk;
 
-        var blockChunk = worldChunk.getBlockComponentChunk();
-        if (blockChunk == null) {
+        var blockComponentChunk = worldChunk.getBlockComponentChunk();
+        if (blockComponentChunk == null) {
             throw new RuntimeException("ERROR: BlockChunk was null!!!");
         }
 
-        this.blockChunk = blockChunk;
+        this.blockComponentChunk = blockComponentChunk;
 
         // this.blockRef = blockRef; // this works too
         var blockRef = Utils.Block.Ref_.getRef(commandBuffer, blockCoords);
@@ -173,6 +181,12 @@ public final class TestUtil {
         if (wlrdChunk == null) {
             throw new RuntimeException("ERROR: wlrdChunk was null");
         }
+
+        var blockChunk = this.worldChunk.getBlockChunk();
+        if (blockChunk == null) {
+            throw new RuntimeException("ERROR: blockChunk was null");
+        }
+        this.blockChunk = blockChunk;
 
         /** this works too */
         if (Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) == null) {
