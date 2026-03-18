@@ -189,12 +189,12 @@ public final class TestUtil {
         this.blockChunk = blockChunk;
 
         /** this works too */
-        if (Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) == null) {
+        if (Utils.Chunk.WorldChunk_.getWorldChunk_blockRef(blockRef) == null) {
             throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) was null");
         }
 
         // sick, stuff seems to be working now?? weird
-        if (Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) == null) {
+        if (Utils.Chunk.WorldChunk_.getWorldChunk_chunkRef(chunkRef) == null) {
             throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) was null");
         }
         this.info = info;

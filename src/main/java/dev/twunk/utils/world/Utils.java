@@ -2315,13 +2315,12 @@ public final class Utils {
 
     public static final class Chunk {
 
+        // TODO no tested and verified until i go through each method checking i passed it the right thing (the variable names can be dodgy in places)
         /// -> get WorldChunk
-        /// -> get Ref<ChunkStore>  (ChunkRef)
-
         public static final class WorldChunk_ {
 
             /**
-             * Tests all methods i've defined for getInfo
+             * Tests all methods i've defined for getWorldChunk
              */
             @Nonnull
             public static final ArrayList<WorldChunk> test(
@@ -2337,50 +2336,72 @@ public final class Utils {
                 // final var localCoords = Utils.BlockCoords.Local.getLocalCoords(localIndex);
                 final var coords = new Vector3i(blockX, blockY, blockZ);
                 final var chunkIndex = Utils.ChunkCoords.Index.getChunkIndex(coords);
+                final var chunkCoords = Utils.ChunkCoords.Global.getChunkCoords(coords);
+
+                console.log("BLOCK COORDS: " + coords);
+                console.log("CHUNK COORDS: " + chunkCoords);
 
                 final var test = new TestUtil(commandBuffer, coords);
                 // functions to test
                 final ArrayList<WorldChunk> refs = new ArrayList<>();
 
-                refs.add(getWorldChunkFromChunk(test.chunkRef));
-                refs.add(getWorldChunkFromBlock(test.blockRef));
+                // getWorldChunk of a given item directly (super easy minimal version)
+                refs.add(getWorldChunk_chunkRef(test.chunkRef));
+                refs.add(getWorldChunk_blockRef(test.blockRef));
+                // - with: block ref (auto)
                 refs.add(getWorldChunk(blockRef));
+                // - with: chunk ref (auto)
+                refs.add(getWorldChunk(test.chunkRef));
                 refs.add(getWorldChunk(test.info));
+
+                // WorldProvider
                 refs.add(getWorldChunk(test.worldProvider, test.blockChunk));
                 refs.add(getWorldChunk(test.worldProvider, blockX, blockZ));
                 refs.add(getWorldChunk(test.worldProvider, chunkIndex));
                 refs.add(getWorldChunk(test.worldProvider, coords));
-                refs.add(getWorldChunkFromBlock(test.worldProvider, blockX, blockZ));
+                refs.add(getWorldChunk_chunkCoords(test.worldProvider, chunkCoords.x, chunkCoords.z));
+
+                // World
                 refs.add(getWorldChunk(test.world, test.blockChunk));
                 refs.add(getWorldChunk(test.world, blockX, blockZ));
                 refs.add(getWorldChunk(test.world, chunkIndex));
                 refs.add(getWorldChunk(test.world, coords));
-                refs.add(getWorldChunkFromBlock(test.world, blockX, blockZ));
+                refs.add(getWorldChunk_chunkCoords(test.world, chunkCoords.x, chunkCoords.z));
+
+                // BlockRef
                 refs.add(getWorldChunk(blockRef, test.blockChunk));
                 refs.add(getWorldChunk(blockRef, blockX, blockZ));
                 refs.add(getWorldChunk(blockRef, chunkIndex));
                 refs.add(getWorldChunk(blockRef, coords));
-                refs.add(getWorldChunkFromBlock(blockRef, blockX, blockZ));
+                refs.add(getWorldChunk_chunkCoords(blockRef, chunkCoords.x, chunkCoords.z));
+
+                // Info
                 refs.add(getWorldChunk(test.info, test.blockChunk));
                 refs.add(getWorldChunk(test.info, blockX, blockZ));
                 refs.add(getWorldChunk(test.info, chunkIndex));
                 refs.add(getWorldChunk(test.info, coords));
-                refs.add(getWorldChunkFromBlock(test.info, blockX, blockZ));
+                refs.add(getWorldChunk_chunkCoords(test.info, chunkCoords.x, chunkCoords.z));
+
+                // CommandBuffer
                 refs.add(getWorldChunk(test.commandBuffer, test.blockChunk));
                 refs.add(getWorldChunk(test.commandBuffer, blockX, blockZ));
                 refs.add(getWorldChunk(test.commandBuffer, chunkIndex));
                 refs.add(getWorldChunk(test.commandBuffer, coords));
-                refs.add(getWorldChunkFromBlock(test.commandBuffer, blockX, blockZ));
+                refs.add(getWorldChunk_chunkCoords(test.commandBuffer, chunkCoords.x, chunkCoords.z));
+
+                // Store
                 refs.add(getWorldChunk(test.store, test.blockChunk));
                 refs.add(getWorldChunk(test.store, blockX, blockZ));
                 refs.add(getWorldChunk(test.store, chunkIndex));
                 refs.add(getWorldChunk(test.store, coords));
-                refs.add(getWorldChunkFromBlock(test.store, blockX, blockZ));
+                refs.add(getWorldChunk_chunkCoords(test.store, chunkCoords.x, chunkCoords.z));
+
+                // ChunKStore
                 refs.add(getWorldChunk(test.chunkStore, test.blockChunk));
                 refs.add(getWorldChunk(test.chunkStore, blockX, blockZ));
                 refs.add(getWorldChunk(test.chunkStore, chunkIndex));
                 refs.add(getWorldChunk(test.chunkStore, coords));
-                refs.add(getWorldChunkFromBlock(test.chunkStore, blockX, blockZ));
+                refs.add(getWorldChunk_chunkCoords(test.chunkStore, chunkCoords.x, chunkCoords.z));
 
                 return refs;
             }
@@ -2388,12 +2409,12 @@ public final class Utils {
             // #region getWorldChunk
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromChunk(@Nonnull final Ref<ChunkStore> chunkRef) {
+            public static final WorldChunk getWorldChunk_chunkRef(@Nonnull final Ref<ChunkStore> chunkRef) {
                 return Component_.getComponent(chunkRef, WORLD_CHUNK_COMPONENT);
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(@Nonnull final Ref<ChunkStore> blockRef) {
+            public static final WorldChunk getWorldChunk_blockRef(@Nonnull final Ref<ChunkStore> blockRef) {
                 final var info = Block.Info.getInfo(blockRef);
                 if (info == null) {
                     return null;
@@ -2405,18 +2426,12 @@ public final class Utils {
             @Nullable
             public static final WorldChunk getWorldChunk(@Nonnull final Ref<ChunkStore> ref) {
                 // Potential 1: The ref you passed me is a CHUNK ref. slay. thats the good shit. that's what we're after
-                final var maybeChunk = Component_.getComponent(ref, WORLD_CHUNK_COMPONENT);
-                if (maybeChunk != null) {
-                    return maybeChunk;
+                if (Utils.Block.isChunkRef(ref)) {
+                    return getWorldChunk_chunkRef(ref);
                 }
 
-                // Potential 2: the ref you passed me is a BLOCK ref. GOOD.
-                final var info = Block.Info.getInfo(ref);
-                if (info == null) {
-                    return null;
-                }
-
-                return Component_.getComponent(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
+                // Potential 2: it's a block, otherwise i've got no clue what's going on
+                return getWorldChunk_blockRef(ref);
             }
 
             @Nullable
@@ -2472,12 +2487,14 @@ public final class Utils {
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(
+            public static final WorldChunk getWorldChunk_chunkCoords(
                 @Nonnull final WorldProvider worldProvider,
-                final int blockX,
-                final int blockZ
+                final int chunkX,
+                final int chunkZ
             ) {
-                return worldProvider.getWorld().getChunk(Utils.ChunkCoords.Index.getChunkIndex(blockX, blockZ));
+                return worldProvider
+                    .getWorld()
+                    .getChunk(Utils.ChunkCoords.Index.getChunkIndexFromChunkCoords(chunkX, chunkZ));
             }
 
             //   #endregion WorldProvider
@@ -2517,12 +2534,12 @@ public final class Utils {
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(
+            public static final WorldChunk getWorldChunk_chunkCoords(
                 @Nonnull final World world,
-                final int blockX,
-                final int blockZ
+                final int chunkX,
+                final int chunkZ
             ) {
-                return world.getChunk(Utils.ChunkCoords.Index.getChunkIndex(blockX, blockZ));
+                return world.getChunk(Utils.ChunkCoords.Index.getChunkIndexFromChunkCoords(chunkX, chunkZ));
             }
 
             //   #endregion World
@@ -2536,6 +2553,7 @@ public final class Utils {
                 @Nonnull final Ref<ChunkStore> ref,
                 @Nonnull final BlockChunk blockChunk
             ) {
+                // TODO this seems really REALLY handy, why haven't i done this so far everywhere??
                 return ref.getStore().getExternalData().getChunkComponent(blockChunk.getIndex(), WORLD_CHUNK_COMPONENT);
             }
 
@@ -2568,15 +2586,18 @@ public final class Utils {
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(
+            public static final WorldChunk getWorldChunk_chunkCoords(
                 @Nonnull final Ref<ChunkStore> ref,
-                final int blockX,
-                final int blockZ
+                final int chunkX,
+                final int chunkZ
             ) {
                 return ref
                     .getStore()
                     .getExternalData()
-                    .getChunkComponent(Utils.ChunkCoords.Index.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(
+                        Utils.ChunkCoords.Index.getChunkIndexFromChunkCoords(chunkX, chunkZ),
+                        WORLD_CHUNK_COMPONENT
+                    );
             }
 
             //   #endregion WorldChunk
@@ -2644,16 +2665,19 @@ public final class Utils {
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(
+            public static final WorldChunk getWorldChunk_chunkCoords(
                 @Nonnull final BlockStateInfo info,
-                final int blockX,
-                final int blockZ
+                final int chunkX,
+                final int chunkZ
             ) {
                 return info
                     .getChunkRef()
                     .getStore()
                     .getExternalData()
-                    .getChunkComponent(Utils.ChunkCoords.Index.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(
+                        Utils.ChunkCoords.Index.getChunkIndexFromChunkCoords(chunkX, chunkZ),
+                        WORLD_CHUNK_COMPONENT
+                    );
             }
 
             //   #endregion BlockStateInfo
@@ -2703,14 +2727,17 @@ public final class Utils {
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(
+            public static final WorldChunk getWorldChunk_chunkCoords(
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                final int blockX,
-                final int blockZ
+                final int chunkX,
+                final int chunkZ
             ) {
                 return commandBuffer
                     .getExternalData()
-                    .getChunkComponent(Utils.ChunkCoords.Index.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(
+                        Utils.ChunkCoords.Index.getChunkIndexFromChunkCoords(chunkX, chunkZ),
+                        WORLD_CHUNK_COMPONENT
+                    );
             }
 
             //   #endregion CommandBuffer
@@ -2757,14 +2784,17 @@ public final class Utils {
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(
+            public static final WorldChunk getWorldChunk_chunkCoords(
                 @Nonnull final Store<ChunkStore> store,
-                final int blockX,
-                final int blockZ
+                final int chunkX,
+                final int chunkZ
             ) {
                 return store
                     .getExternalData()
-                    .getChunkComponent(Utils.ChunkCoords.Index.getChunkIndex(blockX, blockZ), WORLD_CHUNK_COMPONENT);
+                    .getChunkComponent(
+                        Utils.ChunkCoords.Index.getChunkIndexFromChunkCoords(chunkX, chunkZ),
+                        WORLD_CHUNK_COMPONENT
+                    );
             }
 
             //   #endregion Store<ChunkStore>
@@ -2815,13 +2845,13 @@ public final class Utils {
             }
 
             @Nullable
-            public static final WorldChunk getWorldChunkFromBlock(
+            public static final WorldChunk getWorldChunk_chunkCoords(
                 @Nonnull final ChunkStore chunkStore,
-                final int blockX,
-                final int blockZ
+                final int chunkX,
+                final int chunkZ
             ) {
                 return chunkStore.getChunkComponent(
-                    Utils.ChunkCoords.Index.getChunkIndex(blockX, blockZ),
+                    Utils.ChunkCoords.Index.getChunkIndexFromChunkCoords(chunkX, chunkZ),
                     WORLD_CHUNK_COMPONENT
                 );
             }
@@ -2831,6 +2861,7 @@ public final class Utils {
         }
 
         // TODO
+        /// -> get Ref<ChunkStore>  (ChunkRef)
         public static final class Ref_ {
 
             /**
@@ -3460,7 +3491,7 @@ public final class Utils {
                 @Nonnull final Ref<ChunkStore> chunkRef,
                 @Nonnull final Vector3i coords
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -3475,7 +3506,7 @@ public final class Utils {
                 final int y,
                 final int z
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -3488,7 +3519,7 @@ public final class Utils {
                 @Nonnull final Ref<ChunkStore> chunkRef,
                 final int blockIndex
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -3501,7 +3532,7 @@ public final class Utils {
                 @Nonnull final Ref<ChunkStore> chunkRef,
                 @Nonnull final BlockStateInfo info
             ) {
-                final var worldChunk = Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef);
+                final var worldChunk = Chunk.WorldChunk_.getWorldChunk_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
                 }
