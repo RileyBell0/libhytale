@@ -2338,9 +2338,6 @@ public final class Utils {
                 final var chunkIndex = Utils.ChunkCoords.Index.getChunkIndex(coords);
                 final var chunkCoords = Utils.ChunkCoords.Global.getChunkCoords(coords);
 
-                console.log("BLOCK COORDS: " + coords);
-                console.log("CHUNK COORDS: " + chunkCoords);
-
                 final var test = new TestUtil(commandBuffer, coords);
                 // functions to test
                 final ArrayList<WorldChunk> refs = new ArrayList<>();
