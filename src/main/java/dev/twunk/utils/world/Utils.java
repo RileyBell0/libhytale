@@ -2315,7 +2315,7 @@ public final class Utils {
 
     public static final class Chunk {
 
-        // TODO no tested and verified until i go through each method checking i passed it the right thing (the variable names can be dodgy in places)
+        // TESTS ADDED AND VERIFIED
         /// -> get WorldChunk
         public static final class WorldChunk_ {
 
