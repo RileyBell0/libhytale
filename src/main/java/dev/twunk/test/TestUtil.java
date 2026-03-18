@@ -145,7 +145,7 @@ public final class TestUtil {
         this.world = commandBuffer.getExternalData().getWorld();
         // this.world = blockRef.getStore().getExternalData().getWorld(); // this works too
 
-        var worldChunk = Utils.Chunk.WorldChunk_.getWorldChunk(commandBuffer, blockCoords);
+        var worldChunk = Utils.Chunk.WorldChunk_.get(commandBuffer, blockCoords);
         if (worldChunk == null) {
             throw new RuntimeException("ERROR: worldChunk was null!!!");
         }
@@ -159,7 +159,7 @@ public final class TestUtil {
         this.blockComponentChunk = blockComponentChunk;
 
         // this.blockRef = blockRef; // this works too
-        var blockRef = Utils.Block.Ref_.getRef(commandBuffer, blockCoords);
+        var blockRef = Utils.Block.Ref_.get(commandBuffer, blockCoords);
         if (blockRef == null) {
             throw new RuntimeException("ERROR: Failed to get ref for block at " + blockCoords);
         }
@@ -177,7 +177,7 @@ public final class TestUtil {
         }
 
         // this works
-        var wlrdChunk = Utils.Chunk.WorldChunk_.getWorldChunk(info);
+        var wlrdChunk = Utils.Chunk.WorldChunk_.get(info);
         if (wlrdChunk == null) {
             throw new RuntimeException("ERROR: wlrdChunk was null");
         }
@@ -189,12 +189,12 @@ public final class TestUtil {
         this.blockChunk = blockChunk;
 
         /** this works too */
-        if (Utils.Chunk.WorldChunk_.getWorldChunk_blockRef(blockRef) == null) {
+        if (Utils.Chunk.WorldChunk_.get_blockRef(blockRef) == null) {
             throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) was null");
         }
 
         // sick, stuff seems to be working now?? weird
-        if (Utils.Chunk.WorldChunk_.getWorldChunk_chunkRef(chunkRef) == null) {
+        if (Utils.Chunk.WorldChunk_.get_chunkRef(chunkRef) == null) {
             throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) was null");
         }
         this.info = info;
