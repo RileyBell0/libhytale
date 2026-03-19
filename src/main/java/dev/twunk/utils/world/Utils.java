@@ -3307,14 +3307,14 @@ public final class Utils {
                         console.log("+ All tests successful");
                     }
                     if (verbose == null) {
-                        console.log("+ (11) SUCCESS: TEST_Component_");
+                        console.log("+ (13) SUCCESS: TEST_Component_");
                     }
                 } catch (Exception e) {
                     if (verbose != null) {
                         console.log("ERROR IN TESTS" + e);
                     }
                     if (verbose == null) {
-                        console.log("- (11) FAILED:  TEST_Component_");
+                        console.log("- (13) FAILED:  TEST_Component_");
                     }
                 }
             });
@@ -4101,6 +4101,53 @@ public final class Utils {
         /// -> get CHUNK coordinates                 (long | Vector2i | ChunkCoordinates)
         public static final class Global {
 
+            public static final void test(
+                @Nonnull final Ref<ChunkStore> blockRef,
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                @Nonnull final Vector3i providedCoords
+            ) {
+                final var blockX = providedCoords.x;
+                final var blockY = providedCoords.y;
+                final var blockZ = providedCoords.z;
+                final var blockCoords = new Vector3i(blockX, blockY, blockZ);
+
+                var coords = ChunkCoords.Global.get(blockX, blockZ);
+                final var sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN =
+                    coords;
+                if (
+                    coords == null ||
+                    !coords.equals(
+                        sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN
+                    )
+                ) {
+                    throw new RuntimeException("Failed to convert blockX,blockZ to chunkCoords");
+                }
+                coords = ChunkCoords.Global.get(blockCoords);
+                if (
+                    coords == null ||
+                    !coords.equals(
+                        sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN
+                    )
+                ) {
+                    throw new RuntimeException("Failed to convert blockCoords to chunkCoords");
+                }
+
+                var coords2 = ChunkCoords.Global.getVector2i(blockX, blockZ);
+                final var myVec2 = new Vector2i(
+                    sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN.x,
+                    sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN.z
+                );
+                if (coords2 == null || !coords2.equals(myVec2)) {
+                    throw new RuntimeException("Failed to convert blockX,blockZ to chunkCoords (vector2i)");
+                }
+
+                coords2 = ChunkCoords.Global.getVector2i(blockCoords);
+                if (coords2 == null || !coords2.equals(myVec2)) {
+                    throw new RuntimeException("Failed to convert blockCoords to chunkCoords (vector2i)");
+                }
+            }
+
             // #region getChunkCoords
             // ====================================================================
             // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
@@ -4158,6 +4205,84 @@ public final class Utils {
 
         public static final class Index {
 
+            public static final void test(
+                @Nonnull final Ref<ChunkStore> blockRef,
+                @Nonnull final WorldChunk worldChunk,
+                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                @Nonnull final Vector3i providedCoords
+            ) {
+                final var blockX = providedCoords.x;
+                final var blockY = providedCoords.y;
+                final var blockZ = providedCoords.z;
+                final var blockCoords = new Vector3i(blockX, blockY, blockZ);
+                final var test = new TestUtil(commandBuffer, blockCoords);
+                final var chunkCoords = ChunkCoords.Global.get(blockX, blockZ);
+                final var chunkIndex = ChunkCoords.Index.get(blockRef); // shush, i know....
+
+                // Long get(Ref<ChunkStore> anyRef)
+                Long testIndex = ChunkCoords.Index.get(test.chunkRef);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert chunkRef (anyref) to chunkIndex");
+                }
+                testIndex = ChunkCoords.Index.get(blockRef);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert blockRef (anyref) to chunkIndex");
+                }
+                // Long get(BlockStateInfo info)
+                testIndex = ChunkCoords.Index.get(test.info);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert info to chunkIndex");
+                }
+
+                // Long get_chunkRef(Ref<ChunkStore> chunkRef)
+                testIndex = ChunkCoords.Index.get_chunkRef(test.chunkRef);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert chunkRef (specific method) to chunkIndex");
+                }
+
+                // Long get_blockRef(Ref<ChunkStore> blockRef)
+                testIndex = ChunkCoords.Index.get_blockRef(blockRef);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert blockRef (specific method) to chunkIndex");
+                }
+
+                // long get(WorldChunk worldChunk)
+                testIndex = ChunkCoords.Index.get(worldChunk);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert worldChunk to chunkIndex");
+                }
+
+                // long get(int blockX, int blockZ)
+                testIndex = ChunkCoords.Index.get(blockX, blockZ);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert blockX, blockZ to chunkIndex");
+                }
+
+                // long get(Vector3i blockCoords)
+                testIndex = ChunkCoords.Index.get(blockCoords);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert blockCoords to chunkIndex");
+                }
+
+                // long get_chunkCoords(int chunkX, int chunkZ)
+                testIndex = ChunkCoords.Index.get_chunkCoords(chunkCoords.x, chunkCoords.z);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert chunkCoords.x, chunkCoords.z to chunkIndex");
+                }
+
+                // long get_chunkCoords(ChunkCoordinates coords)
+                testIndex = ChunkCoords.Index.get_chunkCoords(chunkCoords);
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert chunkCoords to chunkIndex");
+                }
+
+                // long get_chunkCoords(Vector2i chunkCoords)
+                testIndex = ChunkCoords.Index.get_chunkCoords(new Vector2i(chunkCoords.x, chunkCoords.z));
+                if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                    throw new RuntimeException("Failed to convert chunkCoords (vector2i) to chunkIndex");
+                }
+            }
+
             // #region getChunkIndex
 
             @Nullable
@@ -4167,7 +4292,7 @@ public final class Utils {
                     return null;
                 }
 
-                return ChunkCoords.Index.get(worldChunk);
+                return worldChunk.getIndex();
             }
 
             @Nullable
@@ -4182,7 +4307,7 @@ public final class Utils {
                     return null;
                 }
 
-                return ChunkCoords.Index.get(worldChunk);
+                return worldChunk.getIndex();
             }
 
             @Nullable
@@ -4192,43 +4317,12 @@ public final class Utils {
                     return null;
                 }
 
-                return ChunkCoords.Index.get(worldChunk);
+                return worldChunk.getIndex();
             }
 
+            // TODO worldChunk.getIndex()  and      ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ()) do the same thing
             public static final long get(@Nonnull final WorldChunk worldChunk) {
-                // TODO sus if this works
-                console.log(
-                    "worldChunk index: " +
-                        worldChunk.getIndex() +
-                        " | " +
-                        ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ())
-                );
-                console.log(
-                    "worldChunk index: " +
-                        worldChunk.getIndex() +
-                        " | " +
-                        ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ())
-                );
-                console.log(
-                    "worldChunk index: " +
-                        worldChunk.getIndex() +
-                        " | " +
-                        ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ())
-                );
-                console.log(
-                    "worldChunk index: " +
-                        worldChunk.getIndex() +
-                        " | " +
-                        ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ())
-                );
-                console.log(
-                    "worldChunk index: " +
-                        worldChunk.getIndex() +
-                        " | " +
-                        ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ())
-                );
-
-                return ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ());
+                return worldChunk.getIndex();
             }
 
             /**

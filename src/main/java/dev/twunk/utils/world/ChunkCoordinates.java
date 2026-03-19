@@ -1,5 +1,7 @@
 package dev.twunk.utils.world;
 
+import java.util.Objects;
+
 public final class ChunkCoordinates {
 
     public final int x;
@@ -8,5 +10,18 @@ public final class ChunkCoordinates {
     public ChunkCoordinates(final int x, final int z) {
         this.x = x;
         this.z = z;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // self check
+        if (this == o) return true;
+        // null check
+        if (o == null) return false;
+        // type check and cast
+        if (getClass() != o.getClass()) return false;
+        ChunkCoordinates othercoordslmao = (ChunkCoordinates) o;
+        // field comparison
+        return Objects.equals(x, othercoordslmao.x) && Objects.equals(z, othercoordslmao.z);
     }
 }
