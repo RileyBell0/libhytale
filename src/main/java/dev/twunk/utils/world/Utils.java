@@ -22,7 +22,6 @@ import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerSta
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.TwunkDevTestComponent;
 import dev.twunk.test.TestUtil;
-import dev.twunk.utils.time.GameTime;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -1839,7 +1838,8 @@ public final class Utils {
                 @Nonnull final Ref<ChunkStore> blockRef,
                 @Nonnull final WorldChunk worldChunk,
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
+                @Nonnull final Vector3i providedCoords,
+                @Nonnull final String blockId
             ) {
                 final var blockX = providedCoords.x;
                 final var blockY = providedCoords.y;
@@ -1883,7 +1883,7 @@ public final class Utils {
                 refs.add(Block.Id.get(test.chunkRef, blockCoords));
                 refs.add(Block.Id.get(test.chunkRef, blockCoords.x, blockCoords.y, blockCoords.z)); // test 16 failed
                 refs.add(Block.Id.get(test.chunkRef, chunkIndex, blockIndex));
-                refs.add(Block.Id.get("TEST_BlockId"));
+                refs.add(Block.Id.get(blockId));
 
                 return refs;
             }
@@ -3101,177 +3101,221 @@ public final class Utils {
             @Nonnull final Ref<ChunkStore> blockRef,
             @Nonnull final WorldChunk worldChunk,
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull final Vector3i providedCoords
+            @Nonnull final Vector3i providedCoords,
+            Boolean verbose
         ) {
-            // final var blockX = providedCoords.x;
-            // final var blockY = providedCoords.y;
-            // final var blockZ = providedCoords.z;
-            // final var localIndex = BlockCoords.Index.get(blockX, blockY, blockZ);
-            // final var localCoords = BlockCoords.Local.get(localIndex);
-            // final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-            // final var chunkIndex = ChunkCoords.Index.get(blockCoords);
-            // final var chunkCoords = ChunkCoords.Global.get(blockCoords);
-            // final var chunkX = chunkCoords.x;
-            // final var chunkZ = chunkCoords.z;
+            final var blockX = providedCoords.x;
+            final var blockY = providedCoords.y;
+            final var blockZ = providedCoords.z;
+            final var blockCoords = new Vector3i(blockX, blockY, blockZ);
 
-            // final var test = new TestUtil(commandBuffer, blockCoords);
+            final var test = new TestUtil(commandBuffer, blockCoords);
 
-            final var chunkRef = Chunk.Ref_.get(blockRef);
-            console.log(" > Getting chunk ref");
-            if (chunkRef == null) {
-                throw new RuntimeException("ERROR - chunkRef was null in Utils.Component_.test");
-            }
+            final var chunkRef = test.chunkRef;
 
-            // we're going to verify our expected components are on our
-            // - block
-            //   - BlockStateInfo
-            console.log(" > Getting block state component");
-            if (Component_.get(blockRef, BLOCK_STATE_INFO_COMPONENT_TYPE) == null) {
-                throw new RuntimeException("Failed to get block state info from block ref");
-            }
-            // - chunk
-            //   - WorldChunk
-            console.log(" > Getting world chunk component");
-            if (Component_.get(chunkRef, WORLD_CHUNK_COMPONENT) == null) {
-                throw new RuntimeException("Failed to get world chunk component off a chunk ref");
-            }
-            //   - BlockComponentChunk
-            console.log(" > Getting Block component chunk (1)");
-            if (Component_.get(chunkRef, BLOCK_COMPONENT_CHUNK) == null) {
-                throw new RuntimeException(
-                    "Failed to get block component chunk component off a chunk ref (base method)"
-                );
-            }
-            console.log(" > Getting Block component chunk (2)");
-            if (Component_.getBlockComponentChunk(chunkRef) == null) {
-                throw new RuntimeException(
-                    "Failed to get block component chunk component off a chunk ref (higher method)"
-                );
-            }
-
-            // Step 1: validate the components AREN'T on there
-            console.log(" > checking block ref doesn't have our component yet");
-            if (
-                Component_.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
-                Component_.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) != null
-            ) {
-                throw new RuntimeException("block contained our test component before we added it??");
-            }
-            console.log(" > checking chunk ref doesn't have our component yet");
-            if (
-                Component_.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
-                Component_.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) != null
-            ) {
-                throw new RuntimeException("chunk contained our test component before we added it??");
-            }
-
-            // then we're going to add a component to a block AND to a chunk
-            // - TwunkDevTestComponent
-            console.log(" > creating our components");
             final var blockRefComponent = new TwunkDevTestComponent().setVal(1);
             final var chunkRefComponent = new TwunkDevTestComponent().setVal(2);
 
-            // no way to run code in the same tick???
-            // seems like it's designed to be run asynchronously for this kind of code...
-            // ok
+            // ensure BlockStateInfo is on the BlockRef
+            Component<ChunkStore> component;
+            component = Component_.get(blockRef, BLOCK_STATE_INFO_COMPONENT_TYPE);
+            if (component == null) {
+                throw new RuntimeException("!! No BlockStateInfo component on BlockRef");
+            }
 
-            console.log(" > cmd buffer -> putting block ref component on");
-            console.log("CURRENT TIME: " + GameTime.get(commandBuffer));
+            // Chunk should contain WorldChunk component
+            component = Component_.get(chunkRef, WORLD_CHUNK_COMPONENT);
+            if (component == null) {
+                throw new RuntimeException("!! No WorldChunk component on ChunkRef");
+            }
 
-            // adds this to the queue
+            // Chunk should contain BlockComponentChunk component
+            component = Component_.get(chunkRef, BLOCK_COMPONENT_CHUNK);
+            if (component == null) {
+                throw new RuntimeException("!! No BlockComponentChunk component on ChunkRef (base method)");
+            }
+            component = Component_.getBlockComponentChunk(chunkRef);
+            if (component == null) {
+                throw new RuntimeException("!! No BlockComponentChunk component on ChunkRef (higher level method)");
+            }
 
-            CommandSequence.start(commandBuffer, store -> {
-                console.log("Next tick?");
+            // validate the components AREN'T on there yet (BlockRef)
+            component = Component_.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
+            if (Component_.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) || component != null) {
+                throw new RuntimeException("!! ERROR: BlockRef contained TwunkDevTestComponent before we added it");
+            }
 
-                console.log("CURRENT TIME: " + GameTime.get(commandBuffer));
-                commandBuffer.putComponent(blockRef, TwunkDevTestComponent.COMPONENT_TYPE, blockRefComponent);
-                console.log(" > putting chunk ref component on");
-                chunkRef.getStore().putComponent(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE, chunkRefComponent);
-            });
+            // validate the components AREN'T on there yet (ChunkRef)
+            component = Component_.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
+            if (Component_.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) || component != null) {
+                throw new RuntimeException("!! ERROR: ChunkRef contained TwunkDevTestComponent before we added it");
+            }
 
-            commandBuffer.run(store -> {});
-            commandBuffer.run(store -> {
-                console.log("tick after??");
-                console.log("CURRENT TIME: " + GameTime.get(commandBuffer));
-                // and we'll check that it's there
-                console.log(" > getting block ref component again");
-                var blockRefComponentREFETCHED = Component_.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                console.log(" > getting chunk ref component again");
-                var chunkRefComponentREFETCHED = Component_.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                console.log(" > validating same block component was fetched");
-                if (!Component_.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE)) {
-                    throw new RuntimeException("new component wasn't on our block ref (not has)");
-                }
-                if (blockRefComponentREFETCHED == null) {
-                    throw new RuntimeException("new component wasn't on our block ref (null)");
-                }
+            // Add components
+            commandBuffer.run(componentAccessor -> {
+                try {
+                    try {
+                        componentAccessor.putComponent(
+                            blockRef,
+                            TwunkDevTestComponent.COMPONENT_TYPE,
+                            blockRefComponent
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException("!! !! ERROR: Failed to put component onto block");
+                    }
 
-                console.log(" > validating same chunk component was fetched");
-                if (
-                    !Component_.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
-                    chunkRefComponentREFETCHED == null
-                ) {
-                    throw new RuntimeException("new component wasn't on our blchunkock ref");
-                }
-                console.log(" > validating val on block component refetch");
-                if (blockRefComponent != blockRefComponentREFETCHED || blockRefComponentREFETCHED.getVal() != 1) {
-                    throw new RuntimeException("new component on our block wasn't the same one we put on there");
-                }
-                console.log(" > validating val on chunk component refetch");
-                if (chunkRefComponent != chunkRefComponentREFETCHED || chunkRefComponentREFETCHED.getVal() != 2) {
-                    throw new RuntimeException("new component on our chunk wasn't the same one we put on there");
-                }
+                    // and we'll check that it's there
+                    var blockRefComponentREFETCHED = Component_.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                    if (
+                        !Component_.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
+                        blockRefComponentREFETCHED == null
+                    ) {
+                        throw new RuntimeException("!! !! ERROR: Failed to get component we just added from blockRef");
+                    }
 
-                // we'll mutate one and validate it is mutated on the other
-                console.log(" > setting val on block ref component");
-                blockRefComponent.setVal(3);
-                console.log(" > setting val on chunk ref component");
-                chunkRefComponent.setVal(4);
-                console.log(" > validating val changes propogated on block ref");
-                if (
-                    blockRefComponent.getVal() != blockRefComponentREFETCHED.getVal() || blockRefComponent.getVal() != 3
-                ) {
-                    throw new RuntimeException("new component on our block doesn't respond to updates");
-                }
-                console.log(" > validating val changes propogated on chunk ref");
-                if (
-                    chunkRefComponent.getVal() != chunkRefComponentREFETCHED.getVal() || chunkRefComponent.getVal() != 4
-                ) {
-                    throw new RuntimeException("new component on our chunk doesn't respond to updates");
-                }
+                    if (blockRefComponent != blockRefComponentREFETCHED || blockRefComponentREFETCHED.getVal() != 1) {
+                        throw new RuntimeException(
+                            "new component on our block wasn't the same one we put on there " +
+                                blockRefComponent +
+                                " " +
+                                blockRefComponent.getVal() +
+                                " | new - " +
+                                blockRefComponentREFETCHED +
+                                " " +
+                                blockRefComponentREFETCHED.getVal()
+                        );
+                    }
 
-                // then we'll remove it from one, check its still on the other and not on the one we removed it from
-                // and then remove it from the other
-                console.log(" > removing block ref component");
-                blockRef.getStore().removeComponent(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                console.log(" > removing chunk ref component");
-                chunkRef.getStore().removeComponent(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                console.log(" > trying to get removed component from block");
-                blockRefComponentREFETCHED = Component_.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                console.log(" > trying to get removed component from chunk");
-                chunkRefComponentREFETCHED = Component_.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                console.log(" > validating removed component is gone from block");
-                if (
-                    Component_.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) || blockRefComponentREFETCHED != null
-                ) {
-                    throw new RuntimeException("failed to remove our new component from the block lmao");
-                }
-                console.log(" > validating removed component is gone from chunk");
-                if (
-                    Component_.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) || chunkRefComponentREFETCHED != null
-                ) {
-                    throw new RuntimeException("failed to remove our new component from the block lmao");
-                }
+                    try {
+                        componentAccessor
+                            .getExternalData()
+                            .getStore()
+                            .putComponent(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE, chunkRefComponent);
+                    } catch (Exception e) {
+                        throw new RuntimeException("!! !! ERROR: Failed to put component onto chunk");
+                    }
 
-                // we'll fetch it four ways each time for the block
-                // - local coords (a)
-                // - local coords (b)
-                // - block coords
-                // - on the ref itself
-                // and we'll fetch it from the chunnk in two ways
-                // - chunk ref directly
-                // - chunk ref through INFO
-                // - chunk ref through BLOCK REF and INDEX
+                    var chunkRefComponentREFETCHED = Component_.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                    if (
+                        !Component_.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
+                        chunkRefComponentREFETCHED == null
+                    ) {
+                        throw new RuntimeException("!! !! ERROR: Failed to get component we just added from chunkRef");
+                    }
+
+                    if (chunkRefComponent != chunkRefComponentREFETCHED || chunkRefComponentREFETCHED.getVal() != 2) {
+                        throw new RuntimeException(
+                            "new component on our chunk wasn't the same one we put on there " +
+                                chunkRefComponent +
+                                " " +
+                                chunkRefComponent.getVal() +
+                                " | new - " +
+                                chunkRefComponentREFETCHED +
+                                " " +
+                                chunkRefComponentREFETCHED.getVal()
+                        );
+                    }
+
+                    // we'll mutate one and validate it is mutated on the other
+                    blockRefComponent.setVal(3);
+                    chunkRefComponent.setVal(4);
+                    if (
+                        blockRefComponent.getVal() != blockRefComponentREFETCHED.getVal() ||
+                        blockRefComponent.getVal() != 3
+                    ) {
+                        throw new RuntimeException("new component on our block doesn't respond to updates");
+                    }
+                    if (
+                        chunkRefComponent.getVal() != chunkRefComponentREFETCHED.getVal() ||
+                        chunkRefComponent.getVal() != 4
+                    ) {
+                        throw new RuntimeException("new component on our chunk doesn't respond to updates");
+                    }
+
+                    var component2 = Utils.Component_.get_blockCoords(
+                        test.world,
+                        TwunkDevTestComponent.COMPONENT_TYPE,
+                        blockX,
+                        blockY,
+                        blockZ
+                    );
+                    if (component2 == null) {
+                        throw new RuntimeException("Failed to get component by block coords");
+                    }
+
+                    final var localCoords = BlockCoords.Local.get(blockCoords);
+                    var component3 = Utils.Component_.get_localCoords(
+                        test.blockComponentChunk,
+                        TwunkDevTestComponent.COMPONENT_TYPE,
+                        localCoords.x,
+                        localCoords.y,
+                        localCoords.z
+                    );
+                    if (component3 == null) {
+                        throw new RuntimeException("Failed to get component by local coords");
+                    }
+
+                    // then we'll remove it from one, check its still on the other and not on the one we removed it from
+                    // and then remove it from the other
+                    blockRef.getStore().removeComponent(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                    chunkRef.getStore().removeComponent(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                    blockRefComponentREFETCHED = Component_.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                    chunkRefComponentREFETCHED = Component_.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                    if (
+                        Component_.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
+                        blockRefComponentREFETCHED != null
+                    ) {
+                        throw new RuntimeException("failed to remove our new component from the block lmao");
+                    }
+                    if (
+                        Component_.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
+                        chunkRefComponentREFETCHED != null
+                    ) {
+                        throw new RuntimeException("failed to remove our new component from the block lmao");
+                    }
+
+                    component2 = Utils.Component_.get_blockCoords(
+                        test.world,
+                        TwunkDevTestComponent.COMPONENT_TYPE,
+                        blockX,
+                        blockY,
+                        blockZ
+                    );
+                    if (component2 != null) {
+                        throw new RuntimeException(
+                            "Should NOT have been able to get component after deleting it (from blockCoords)"
+                        );
+                    }
+
+                    component3 = Utils.Component_.get_localCoords(
+                        test.blockComponentChunk,
+                        TwunkDevTestComponent.COMPONENT_TYPE,
+                        localCoords.x,
+                        localCoords.y,
+                        localCoords.z
+                    );
+                    if (component3 != null) {
+                        throw new RuntimeException(
+                            "Should NOT have been able to get component after deleting it (from localCoords)"
+                        );
+                    }
+                    // yeah these next two logs are useless, but it helps to easily verify all my tests are working by them all having the same structure visually in their responses
+                    if (verbose != null) {
+                        console.log("Ran alot of test(s)");
+                        console.log("10/10 tests successful");
+                        console.log("+ All tests successful");
+                    }
+                    if (verbose == null) {
+                        console.log("+ (8) SUCCESS: TEST_Component_");
+                    }
+                } catch (Exception e) {
+                    if (verbose != null) {
+                        console.log("ERROR IN TESTS" + e);
+                    }
+                    if (verbose == null) {
+                        console.log("- (8) FAILED:  TEST_Component_");
+                    }
+                }
             });
         }
 
@@ -3366,8 +3410,8 @@ public final class Utils {
 
         @Nullable
         public static final <T extends Component<ChunkStore>> T get_blockCoords(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
             @Nonnull final World world,
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
             final int blockX,
             final int blockY,
             final int blockZ
@@ -3398,8 +3442,8 @@ public final class Utils {
         // ====================================================================
 
         public static final <T extends Component<ChunkStore>> T get_localCoords(
-            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
             @Nonnull final BlockComponentChunk chunk,
+            @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType,
             final int localX,
             final int localY,
             final int localZ
@@ -3418,8 +3462,8 @@ public final class Utils {
 
         @Nullable
         public static final <T extends Component<ChunkStore>> T get_localCoords(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
             @Nonnull final BlockComponentChunk chunk,
+            @Nonnull final ComponentType<ChunkStore, T> componentType,
             final int localX,
             final int localY,
             final int localZ
