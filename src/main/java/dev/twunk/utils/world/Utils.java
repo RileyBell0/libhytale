@@ -3477,9 +3477,10 @@ public final class Utils {
         }
     }
 
+    // TESTS ADDED AND VERIFIED
     public static final class BlockCoords {
 
-        /// -> get LOCAL coordinates within chunk    (Vector3i)
+        // TESTS ADDED AND VERIFIED        /// -> get LOCAL coordinates within chunk    (Vector3i)
         public static final class Local {
 
             public static final void test(
@@ -3615,6 +3616,7 @@ public final class Utils {
             // #endregion get
         }
 
+        // TESTS ADDED AND VERIFIED
         /// -> get LOCAL index                       (int | Integer) (returns Integer so it can be nullable on method that can fail)
         public static final class Index {
 
@@ -3693,6 +3695,7 @@ public final class Utils {
             // #endregion getLocalIndex}
         }
 
+        // TESTS ADDED AND VERIFIED
         /// -> get GLOBAL coordinates                (Vector3i)
         public static final class Global {
 
