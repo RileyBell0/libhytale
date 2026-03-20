@@ -35,33 +35,6 @@ import javax.annotation.Nullable;
 // All of those ^^ are gotten THROUGH BlockStateInfo
 // effectively, BlockStateInfo + Ref to your block => your dream come true
 
-// @Nullable
-// public Ref<ChunkStore> getChunkSectionReference(int x, int y, int z) {
-//     Ref<ChunkStore> ref = this.getChunkReference(ChunkUtil.indexChunk(x, z));
-//     if (ref == null) {
-//         return null;
-//     } else {
-//         ChunkColumn chunkColumnComponent = this.store.getComponent(ref, ChunkColumn.getComponentType());
-//         return chunkColumnComponent == null ? null : chunkColumnComponent.getSection(y);
-//     }
-// }
-
-// @Nullable
-// public Ref<ChunkStore> getChunkSectionReference(
-//     @Nonnull ComponentAccessor<ChunkStore> commandBuffer,
-//     int x,
-//     int y,
-//     int z
-// ) {
-//     Ref<ChunkStore> ref = this.getChunkReference(ChunkUtil.indexChunk(x, z));
-//     if (ref == null) {
-//         return null;
-//     } else {
-//         ChunkColumn chunkColumnComponent = commandBuffer.getComponent(ref, ChunkColumn.getComponentType());
-//         return chunkColumnComponent == null ? null : chunkColumnComponent.getSection(y);
-//     }
-// }
-
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
 public final class Utils {
@@ -4096,6 +4069,7 @@ public final class Utils {
         }
     }
 
+    // TESTS ADDED AND VERIFIED
     public static final class ChunkCoords {
 
         /// -> get CHUNK coordinates                 (long | Vector2i | ChunkCoordinates)
