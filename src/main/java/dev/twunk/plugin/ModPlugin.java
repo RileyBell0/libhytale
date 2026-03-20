@@ -5,8 +5,10 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.TwunkLib;
 import dev.twunk.interfaces.component.auto.IAutoBlockLifetimeComponent;
@@ -79,5 +81,18 @@ public abstract class ModPlugin extends JavaPlugin {
         }
 
         return component;
+    }
+
+    @Nonnull
+    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(BuilderCodec<T> codec) {
+        Class<T> myClass = codec.getInnerClass();
+        var defaultId = myClass.getName();
+        if (defaultId == null) {
+            throw new RuntimeException("Failed to get classname while registering interaction with codec " + codec);
+        }
+
+        console.log("Adding Interaction " + defaultId + " -- from class " + myClass);
+
+        return this.getCodecRegistry(Interaction.CODEC).register(defaultId, myClass, codec);
     }
 }
