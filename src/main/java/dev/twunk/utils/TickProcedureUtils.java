@@ -7,7 +7,7 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.utils.Block.Coords;
+import dev.twunk.utils.BlockUtils.Coords;
 import javax.annotation.Nonnull;
 
 /**
@@ -25,7 +25,7 @@ public abstract class TickProcedureUtils {
     }
 
     public static final boolean setTicking(@Nonnull final Ref<ChunkStore> ref, final boolean ticking) {
-        final var info = Block.Info.get(ref);
+        final var info = BlockUtils.Info.get(ref);
         if (info == null) {
             console.log("Info was null");
             return false;
@@ -39,7 +39,7 @@ public abstract class TickProcedureUtils {
     }
 
     public static final boolean setTicking(@Nonnull final BlockStateInfo info, final boolean ticking) {
-        final var worldChunk = Chunk.WorldChunk_.get(info);
+        final var worldChunk = ChunkUtils.WorldChunk_.get(info);
         if (worldChunk == null) {
             console.log("World chunk was null");
             return false;

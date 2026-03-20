@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.TwunkLib;
 import dev.twunk.lib.lifetime.TrackedBlockEntity;
-import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
+import dev.twunk.subsystem.composite.TickPlan;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,7 +56,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
      * and god knows, block games really have alot of blocks
      */
     @Nonnull
-    private final HashMap<String, _EntityScheduledTickStateComponent> tickingState = new HashMap<>();
+    private final HashMap<String, TickPlan> tickingState = new HashMap<>();
 
     /**
      * Map from SystemID to locations where the item is stored (memory only,
@@ -72,10 +72,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
      * Returns the previously set state (if one was already there)
      */
     @Nullable
-    public _EntityScheduledTickStateComponent setTickingInfo(
-        String systemId,
-        @Nonnull _EntityScheduledTickStateComponent state
-    ) {
+    public TickPlan setTickingInfo(String systemId, @Nonnull TickPlan state) {
         return this.tickingState.put(systemId, state);
     }
 
@@ -84,7 +81,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
      * currently awake and ticking, or asleep until ___ etc etc)
      */
     @Nullable
-    public _EntityScheduledTickStateComponent getTickingInfo(String systemId) {
+    public TickPlan getTickingInfo(String systemId) {
         return this.tickingState.get(systemId);
     }
 

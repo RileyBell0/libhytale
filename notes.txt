@@ -1,5 +1,5 @@
 need to fix up
-- _EntityScheduledTickStateComponent
+- TickPlan
     - need this to be a better shorter name, not tickresponse but something like that
     - or at least some sort of version of this component or idea so that an onTick function
       can return something that's not internal

@@ -195,7 +195,7 @@ public abstract class ComponentUtils {
                     throw new RuntimeException("Failed to get component by block coords");
                 }
 
-                final var localCoords = Block.Coords.Local.get(blockCoords);
+                final var localCoords = BlockUtils.Coords.Local.get(blockCoords);
                 var component3 = ComponentUtils.get_localCoords(
                     test.blockComponentChunk,
                     TwunkDevTestComponent.COMPONENT_TYPE,
@@ -321,10 +321,10 @@ public abstract class ComponentUtils {
         @Nonnull final Ref<ChunkStore> anyRef,
         @Nonnull final ComponentType<ChunkStore, T> componentType
     ) {
-        if (Block.isChunkRef(anyRef)) {
+        if (BlockUtils.isChunkRef(anyRef)) {
             return ComponentUtils.get(anyRef, componentType);
-        } else if (Block.isBlockRef(anyRef)) {
-            final var chunkIndex = Chunk.Coords.Index.get_blockRef(anyRef);
+        } else if (BlockUtils.isBlockRef(anyRef)) {
+            final var chunkIndex = ChunkUtils.Coords.Index.get_blockRef(anyRef);
             if (chunkIndex == null) {
                 return null;
             }
@@ -340,11 +340,11 @@ public abstract class ComponentUtils {
 
     @Nullable
     public static final BlockComponentChunk getBlockComponentChunk(@Nonnull final Ref<ChunkStore> anyRef) {
-        if (Block.isChunkRef(anyRef)) {
+        if (BlockUtils.isChunkRef(anyRef)) {
             return anyRef.getStore().getComponent(anyRef, BLOCK_COMPONENT_CHUNK);
-        } else if (Block.isBlockRef(anyRef)) {
+        } else if (BlockUtils.isBlockRef(anyRef)) {
             // get the chunkRef first
-            final var chunkRef = Chunk.Ref_.get(anyRef);
+            final var chunkRef = ChunkUtils.Ref_.get(anyRef);
             if (chunkRef == null) {
                 return null;
             }
@@ -400,7 +400,7 @@ public abstract class ComponentUtils {
         final int localY,
         final int localZ
     ) {
-        final var ref = Block.Ref_.getLocal(chunk, localX, localY, localZ);
+        final var ref = BlockUtils.Ref_.getLocal(chunk, localX, localY, localZ);
         if (ref == null) {
             return null;
         }
@@ -420,7 +420,7 @@ public abstract class ComponentUtils {
         final int localY,
         final int localZ
     ) {
-        final var ref = Block.Ref_.getLocal(chunk, localX, localY, localZ);
+        final var ref = BlockUtils.Ref_.getLocal(chunk, localX, localY, localZ);
         if (ref == null) {
             return null;
         }

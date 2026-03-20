@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
-import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
+import dev.twunk.subsystem.composite.TickPlan;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -171,7 +171,7 @@ public class TrackedEntities {
         var tickingInfo = commandBuffer.ensureAndGetComponent(ref, TICK_STATE_COMPONENT);
         var systemState = tickingInfo.getTickingInfo(this.id);
         if (systemState == null) {
-            systemState = new _EntityScheduledTickStateComponent.Active();
+            systemState = new TickPlan.Active();
             tickingInfo.setTickingInfo(this.id, systemState);
         }
 
@@ -184,17 +184,17 @@ public class TrackedEntities {
      * @return
      */
     @Nonnull
-    private ArrayList<TrackedBlockEntity> getOwner(_EntityScheduledTickStateComponent currentState) {
+    private ArrayList<TrackedBlockEntity> getOwner(TickPlan currentState) {
         // and finally, we'll store it in the right place
-        if (currentState instanceof _EntityScheduledTickStateComponent.Active) {
+        if (currentState instanceof TickPlan.Active) {
             return ticking;
-        } else if (currentState instanceof _EntityScheduledTickStateComponent.Sleeping) {
-            if (((_EntityScheduledTickStateComponent.Sleeping) currentState).isIndefinite()) {
+        } else if (currentState instanceof TickPlan.Sleeping) {
+            if (((TickPlan.Sleeping) currentState).isIndefinite()) {
                 return comatose;
             } else {
                 return sleeping;
             }
-        } else if (currentState instanceof _EntityScheduledTickStateComponent.Stopped) {
+        } else if (currentState instanceof TickPlan.Stopped) {
             return stopped;
         } else {
             return broken;

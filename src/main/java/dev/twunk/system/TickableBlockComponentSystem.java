@@ -12,7 +12,7 @@ import dev.twunk.interfaces.component.ITickableBlockComponent;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.utils.Block;
+import dev.twunk.utils.BlockUtils;
 import dev.twunk.utils.ComponentUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -87,7 +87,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = dev.twunk.utils.Block.Info.get(blockRef);
+        var blockInfo = dev.twunk.utils.BlockUtils.Info.get(blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -97,7 +97,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = dev.twunk.utils.Chunk.WorldChunk_.get(blockInfo);
+        var worldChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(blockInfo);
         if (worldChunk == null) {
             return;
         }
@@ -110,7 +110,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         if (world == null) {
             return;
         }
-        var coords = Block.Coords.Global.get(worldChunk, blockInfo);
+        var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
 
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it

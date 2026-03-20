@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.methods.IQuery;
-import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
+import dev.twunk.subsystem.composite.TickPlan;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  */
 public interface IScheduledTickSystem extends IQuery {
     @Nullable
-    public abstract _EntityScheduledTickStateComponent onEntityTick(
+    public abstract TickPlan onEntityTick(
         @Nonnull World world,
         @Nonnull WorldChunk chunk,
         @Nonnull Ref<ChunkStore> ref,

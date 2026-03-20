@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 // NOTE - its current state is broken
 
 // TESTS ADDED AND VERIFIED
-public abstract class Block {
+public abstract class BlockUtils {
 
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
@@ -54,7 +54,7 @@ public abstract class Block {
         // functions to test
         final ArrayList<Boolean> refs = new ArrayList<>();
 
-        final var info = Block.Info.get(blockRef);
+        final var info = BlockUtils.Info.get(blockRef);
         if (info == null) {
             throw new RuntimeException("Error: failed to get info for test in asfiuogrt71t7o83");
         }
@@ -62,14 +62,14 @@ public abstract class Block {
         final var chunkRef = info.getChunkRef();
 
         // BLOCK ref passed to isBlockRef (expect TRUE)
-        refs.add(Block.isBlockRef(blockRef));
+        refs.add(BlockUtils.isBlockRef(blockRef));
         // BLOCK ref passed to isChunkRef (expect FALSE)
-        refs.add(Block.isChunkRef(blockRef));
+        refs.add(BlockUtils.isChunkRef(blockRef));
 
         // CHUNK ref passed to isChunkRef (expect TRUE)
-        refs.add(Block.isChunkRef(chunkRef));
+        refs.add(BlockUtils.isChunkRef(chunkRef));
         // CHUNK ref passed to isBlockRef (expect FALSE)
-        refs.add(Block.isBlockRef(chunkRef));
+        refs.add(BlockUtils.isBlockRef(chunkRef));
 
         return refs;
     }
@@ -151,7 +151,7 @@ public abstract class Block {
 
             @Nullable
             public static final Vector3i get(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var info = Block.Info.get(blockRef);
+                final var info = BlockUtils.Info.get(blockRef);
                 if (info == null) {
                     return null;
                 }
@@ -278,7 +278,7 @@ public abstract class Block {
             // Integer cause, nullable
             @Nullable
             public static final Integer get(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var info = Block.Info.get(blockRef);
+                final var info = BlockUtils.Info.get(blockRef);
                 if (info == null) {
                     return null;
                 }
@@ -370,7 +370,7 @@ public abstract class Block {
                 if (coords == null || !coords.equals(blockCoords)) {
                     throw new RuntimeException("Failed to convert blockChunk + blockIndex to blockCoords");
                 }
-                final var chunkCoords = Chunk.Coords.Global.get(blockCoords);
+                final var chunkCoords = ChunkUtils.Coords.Global.get(blockCoords);
                 coords = Coords.Global.get(chunkCoords.x, chunkCoords.z, localCoords);
                 if (coords == null || !coords.equals(blockCoords)) {
                     throw new RuntimeException("Failed to convert chunk coords (split) + localCoords to blockCoords");
@@ -386,7 +386,7 @@ public abstract class Block {
                     throw new RuntimeException("Failed to convert chunk coords (split) + blockIndex to blockCoords");
                 }
 
-                final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
+                final var chunkIndex = ChunkUtils.Coords.Index.get(blockCoords);
                 coords = Coords.Global.get(chunkIndex, localCoords);
                 if (coords == null || !coords.equals(blockCoords)) {
                     throw new RuntimeException("Failed to convert chunkIndex + localCoords to blockCoords");
@@ -435,7 +435,7 @@ public abstract class Block {
 
             @Nullable
             public static final Vector3i get(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var info = Block.Info.get(blockRef);
+                final var info = BlockUtils.Info.get(blockRef);
                 if (info == null) {
                     return null;
                 }
@@ -466,7 +466,7 @@ public abstract class Block {
                 @Nonnull final Ref<ChunkStore> chunkRef,
                 @Nonnull final Vector3i localCoords
             ) {
-                final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
+                final var worldChunk = ChunkUtils.WorldChunk_.get_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -481,7 +481,7 @@ public abstract class Block {
                 final int localY,
                 final int localZ
             ) {
-                final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
+                final var worldChunk = ChunkUtils.WorldChunk_.get_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -491,7 +491,7 @@ public abstract class Block {
 
             @Nullable
             public static final Vector3i get(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
-                final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
+                final var worldChunk = ChunkUtils.WorldChunk_.get_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
                 }
@@ -742,9 +742,9 @@ public abstract class Block {
                  */
                 world.getBlock(coords.x, coords.y, coords.z);
                 world.getBlockType(coords);
-                world.getChunkIfInMemory(Chunk.Coords.Index.get(coords));
-                world.getChunkIfLoaded(Chunk.Coords.Index.get(coords));
-                world.getChunk(Chunk.Coords.Index.get(coords));
+                world.getChunkIfInMemory(ChunkUtils.Coords.Index.get(coords));
+                world.getChunkIfLoaded(ChunkUtils.Coords.Index.get(coords));
+                world.getChunk(ChunkUtils.Coords.Index.get(coords));
 
                 /**
                  * get chunk if non ticking seems to be of no value
@@ -780,10 +780,10 @@ public abstract class Block {
             if (testWorld == null) {
                 throw new RuntimeException("ERROR: world was null in test func 12351h9fovasbidlv");
             }
-            Block.Ref_.testWorldMethods(testWorld, providedCoords);
-            Block.Ref_.testWorldMethods(commandBuffer.getExternalData().getWorld(), providedCoords);
-            Block.Ref_.testWorldMethods(commandBuffer.getStore().getExternalData().getWorld(), providedCoords);
-            Block.Ref_.testWorldMethods(blockRef.getStore().getExternalData().getWorld(), providedCoords);
+            BlockUtils.Ref_.testWorldMethods(testWorld, providedCoords);
+            BlockUtils.Ref_.testWorldMethods(commandBuffer.getExternalData().getWorld(), providedCoords);
+            BlockUtils.Ref_.testWorldMethods(commandBuffer.getStore().getExternalData().getWorld(), providedCoords);
+            BlockUtils.Ref_.testWorldMethods(blockRef.getStore().getExternalData().getWorld(), providedCoords);
 
             final var blockX = providedCoords.x;
             final var blockY = providedCoords.y;
@@ -791,71 +791,71 @@ public abstract class Block {
             final var index = Coords.Index.get(blockX, blockY, blockZ);
             final var localCoords = Coords.Local.get(index);
             final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-            final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
+            final var chunkIndex = ChunkUtils.Coords.Index.get(blockCoords);
 
             final var test = new TestUtil(commandBuffer, blockCoords);
             // functions to test
             final ArrayList<Ref<ChunkStore>> refs = new ArrayList<>();
 
             // WorldProvider
-            refs.add(Block.Ref_.get(test.worldProvider, blockCoords));
-            refs.add(Block.Ref_.get(test.worldProvider, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get(test.worldProvider, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get(test.worldProvider, blockCoords));
+            refs.add(BlockUtils.Ref_.get(test.worldProvider, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get(test.worldProvider, chunkIndex, index));
 
             // World
-            refs.add(Block.Ref_.get(test.world, blockCoords));
-            refs.add(Block.Ref_.get(test.world, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get(test.world, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get(test.world, blockCoords));
+            refs.add(BlockUtils.Ref_.get(test.world, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get(test.world, chunkIndex, index));
 
             // CommandBuffer
-            refs.add(Block.Ref_.get(test.commandBuffer, blockCoords));
-            refs.add(Block.Ref_.get(test.commandBuffer, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get(test.commandBuffer, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get(test.commandBuffer, blockCoords));
+            refs.add(BlockUtils.Ref_.get(test.commandBuffer, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get(test.commandBuffer, chunkIndex, index));
 
             // BlockStateInfo
-            refs.add(Block.Ref_.get(test.info, blockCoords));
-            refs.add(Block.Ref_.get(test.info, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get(test.info, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get(test.info, blockCoords));
+            refs.add(BlockUtils.Ref_.get(test.info, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get(test.info, chunkIndex, index));
 
             // ChunkRef (global)
-            refs.add(Block.Ref_.get_chunkRef(test.chunkRef, blockCoords));
-            refs.add(Block.Ref_.get_chunkRef(test.chunkRef, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get_chunkRef(test.chunkRef, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get_chunkRef(test.chunkRef, blockCoords));
+            refs.add(BlockUtils.Ref_.get_chunkRef(test.chunkRef, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get_chunkRef(test.chunkRef, chunkIndex, index));
             // ChunkRef (local)
-            refs.add(Block.Ref_.getLocal(test.chunkRef, blockCoords));
-            refs.add(Block.Ref_.getLocal(test.chunkRef, localCoords));
-            refs.add(Block.Ref_.getLocal(test.chunkRef, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.getLocal(test.chunkRef, localCoords.x, localCoords.y, localCoords.z));
-            refs.add(Block.Ref_.getLocal(test.chunkRef, index));
+            refs.add(BlockUtils.Ref_.getLocal(test.chunkRef, blockCoords));
+            refs.add(BlockUtils.Ref_.getLocal(test.chunkRef, localCoords));
+            refs.add(BlockUtils.Ref_.getLocal(test.chunkRef, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.getLocal(test.chunkRef, localCoords.x, localCoords.y, localCoords.z));
+            refs.add(BlockUtils.Ref_.getLocal(test.chunkRef, index));
 
             // Store
-            refs.add(Block.Ref_.get(test.store, blockCoords));
-            refs.add(Block.Ref_.get(test.store, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get(test.store, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get(test.store, blockCoords));
+            refs.add(BlockUtils.Ref_.get(test.store, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get(test.store, chunkIndex, index));
 
             // ChunkStore
-            refs.add(Block.Ref_.get(test.chunkStore, blockCoords));
-            refs.add(Block.Ref_.get(test.chunkStore, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get(test.chunkStore, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get(test.chunkStore, blockCoords));
+            refs.add(BlockUtils.Ref_.get(test.chunkStore, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get(test.chunkStore, chunkIndex, index));
 
             // BlockRef
-            refs.add(Block.Ref_.get_blockRef(test.blockRef, blockCoords));
-            refs.add(Block.Ref_.get_blockRef(test.blockRef, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get_blockRef(test.blockRef, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.get_blockRef(test.blockRef, blockCoords));
+            refs.add(BlockUtils.Ref_.get_blockRef(test.blockRef, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get_blockRef(test.blockRef, chunkIndex, index));
 
             // WorldChunk
-            refs.add(Block.Ref_.get(test.worldChunk, blockCoords));
-            refs.add(Block.Ref_.get(test.worldChunk, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.get(test.worldChunk, chunkIndex, index));
-            refs.add(Block.Ref_.getLocal(test.worldChunk, blockCoords));
-            refs.add(Block.Ref_.getLocal(test.worldChunk, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.getLocal(test.worldChunk, index));
+            refs.add(BlockUtils.Ref_.get(test.worldChunk, blockCoords));
+            refs.add(BlockUtils.Ref_.get(test.worldChunk, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.get(test.worldChunk, chunkIndex, index));
+            refs.add(BlockUtils.Ref_.getLocal(test.worldChunk, blockCoords));
+            refs.add(BlockUtils.Ref_.getLocal(test.worldChunk, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.getLocal(test.worldChunk, index));
 
             // BlockComponentChunk
-            refs.add(Block.Ref_.get(test.blockComponentChunk, index));
-            refs.add(Block.Ref_.getLocal(test.blockComponentChunk, blockCoords));
-            refs.add(Block.Ref_.getLocal(test.blockComponentChunk, blockX, blockY, blockZ));
-            refs.add(Block.Ref_.getLocal(test.blockComponentChunk, index));
+            refs.add(BlockUtils.Ref_.get(test.blockComponentChunk, index));
+            refs.add(BlockUtils.Ref_.getLocal(test.blockComponentChunk, blockCoords));
+            refs.add(BlockUtils.Ref_.getLocal(test.blockComponentChunk, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Ref_.getLocal(test.blockComponentChunk, index));
 
             // var i = 0;
             // for (var e : refs) {
@@ -897,14 +897,14 @@ public abstract class Block {
         ) {
             // "other" because it's not necessarily THIS chunk that i'm
             // using to get a block ref for the coords `blockCoords`
-            final var otherChunkRef = Chunk.Ref_.get(blockRef);
+            final var otherChunkRef = ChunkUtils.Ref_.get(blockRef);
             if (otherChunkRef == null) {
                 return null;
             }
 
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 otherChunkRef.getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockCoords),
+                ChunkUtils.Coords.Index.get(blockCoords),
                 Coords.Index.get(blockCoords)
             );
         }
@@ -919,14 +919,14 @@ public abstract class Block {
         ) {
             // "other" because it's not necessarily THIS chunk that i'm
             // using to get a block ref for the coords `blockCoords`
-            final var otherChunkRef = Chunk.Ref_.get(blockRef);
+            final var otherChunkRef = ChunkUtils.Ref_.get(blockRef);
             if (otherChunkRef == null) {
                 return null;
             }
 
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 otherChunkRef.getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockX, blockZ),
+                ChunkUtils.Coords.Index.get(blockX, blockZ),
                 Coords.Index.get(blockX, blockY, blockZ)
             );
         }
@@ -938,12 +938,12 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            final var otherChunkRef = Chunk.Ref_.get(blockRef);
+            final var otherChunkRef = ChunkUtils.Ref_.get(blockRef);
             if (otherChunkRef == null) {
                 return null;
             }
 
-            return Block.Ref_.get2(otherChunkRef.getStore().getExternalData(), chunkIndex, blockIndex);
+            return BlockUtils.Ref_.get2(otherChunkRef.getStore().getExternalData(), chunkIndex, blockIndex);
         }
 
         // #endregion BlockRef (Ref<ChunkStore>)
@@ -969,9 +969,9 @@ public abstract class Block {
             //     .getWorld()
             //     .getChunk(Chunk.Coords.Index.getChunkIndex(coords))
             //     .getBlockComponentEntity(coords.x, coords.y, coords.z);
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 worldProvider.getWorld().getChunkStore(),
-                Chunk.Coords.Index.get(coords),
+                ChunkUtils.Coords.Index.get(coords),
                 Coords.Index.get(coords)
             );
         }
@@ -984,9 +984,9 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 worldProvider.getWorld().getChunkStore(),
-                Chunk.Coords.Index.get(blockX, blockZ),
+                ChunkUtils.Coords.Index.get(blockX, blockZ),
                 Coords.Index.get(blockX, blockY, blockZ)
             );
         }
@@ -1003,7 +1003,7 @@ public abstract class Block {
             //     .getWorld()
             //     .getChunk(chunkIndex)
             //     .getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
-            return Block.Ref_.get2(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
+            return BlockUtils.Ref_.get2(worldProvider.getWorld().getChunkStore(), chunkIndex, blockIndex);
         }
 
         // #endregion WorldProvider
@@ -1015,7 +1015,11 @@ public abstract class Block {
             // return world
             //     .getChunk(Chunk.Coords.Index.getChunkIndex(coords))
             //     .getBlockComponentEntity(coords.x, coords.y, coords.z);
-            return Block.Ref_.get2(world.getChunkStore(), Chunk.Coords.Index.get(coords), Coords.Index.get(coords));
+            return BlockUtils.Ref_.get2(
+                world.getChunkStore(),
+                ChunkUtils.Coords.Index.get(coords),
+                Coords.Index.get(coords)
+            );
         }
 
         // => (ChunkStore, chunkIndex, blockIndex)
@@ -1029,9 +1033,9 @@ public abstract class Block {
             // return world
             //     .getChunk(Chunk.Coords.Index.getChunkIndex(blockX, blockZ))
             //     .getBlockComponentEntity(blockX, blockY, blockZ);
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 world.getChunkStore(),
-                Chunk.Coords.Index.get(blockX, blockZ),
+                ChunkUtils.Coords.Index.get(blockX, blockZ),
                 Coords.Index.get(blockX, blockY, blockZ)
             );
         }
@@ -1045,7 +1049,7 @@ public abstract class Block {
         ) {
             // final var localCoords = BlockCoords.Local.get(blockIndex);
             // return world.getChunk(chunkIndex).getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
-            return Block.Ref_.get2(world.getChunkStore(), chunkIndex, blockIndex);
+            return BlockUtils.Ref_.get2(world.getChunkStore(), chunkIndex, blockIndex);
         }
 
         // #endregion World
@@ -1057,9 +1061,9 @@ public abstract class Block {
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull final Vector3i coords
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 commandBuffer.getExternalData(),
-                Chunk.Coords.Index.get(coords),
+                ChunkUtils.Coords.Index.get(coords),
                 Coords.Index.get(coords)
             );
         }
@@ -1072,9 +1076,9 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 commandBuffer.getExternalData(),
-                Chunk.Coords.Index.get(blockX, blockZ),
+                ChunkUtils.Coords.Index.get(blockX, blockZ),
                 Coords.Index.get(blockX, blockY, blockZ)
             );
         }
@@ -1086,7 +1090,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            return Block.Ref_.get2(commandBuffer.getExternalData(), chunkIndex, blockIndex);
+            return BlockUtils.Ref_.get2(commandBuffer.getExternalData(), chunkIndex, blockIndex);
         }
 
         // #endregion CommandBuffer
@@ -1097,9 +1101,9 @@ public abstract class Block {
             @Nonnull final BlockStateInfo info,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 info.getChunkRef().getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockCoords),
+                ChunkUtils.Coords.Index.get(blockCoords),
                 Coords.Index.get(blockCoords)
             );
         }
@@ -1111,9 +1115,9 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 info.getChunkRef().getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockX, blockZ),
+                ChunkUtils.Coords.Index.get(blockX, blockZ),
                 Coords.Index.get(blockX, blockY, blockZ)
             );
         }
@@ -1124,7 +1128,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            return Block.Ref_.get2(info.getChunkRef().getStore().getExternalData(), chunkIndex, blockIndex);
+            return BlockUtils.Ref_.get2(info.getChunkRef().getStore().getExternalData(), chunkIndex, blockIndex);
         }
 
         // #endregion BlockStateInfo
@@ -1142,9 +1146,9 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> otherChunkRef,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 otherChunkRef.getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockCoords),
+                ChunkUtils.Coords.Index.get(blockCoords),
                 Coords.Index.get(blockCoords)
             );
         }
@@ -1157,9 +1161,9 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 otherChunkRef.getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockX, blockZ),
+                ChunkUtils.Coords.Index.get(blockX, blockZ),
                 Coords.Index.get(blockX, blockY, blockZ)
             );
         }
@@ -1171,7 +1175,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            return Block.Ref_.get2(otherChunkRef.getStore().getExternalData(), chunkIndex, blockIndex);
+            return BlockUtils.Ref_.get2(otherChunkRef.getStore().getExternalData(), chunkIndex, blockIndex);
         }
 
         // #endregion ChunkRef (Ref<ChunkStore>)
@@ -1193,12 +1197,12 @@ public abstract class Block {
             @Nonnull final Store<ChunkStore> store,
             @Nonnull final Vector3i blockCoords
         ) {
-            final var chunkRef = store.getExternalData().getChunkReference(Chunk.Coords.Index.get(blockCoords));
+            final var chunkRef = store.getExternalData().getChunkReference(ChunkUtils.Coords.Index.get(blockCoords));
             if (chunkRef == null) {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockCoords));
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockCoords));
         }
 
         // => (ChunkStore, chunkIndex, blockIndex)
@@ -1209,12 +1213,12 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var chunkRef = store.getExternalData().getChunkReference(Chunk.Coords.Index.get(blockX, blockZ));
+            final var chunkRef = store.getExternalData().getChunkReference(ChunkUtils.Coords.Index.get(blockX, blockZ));
             if (chunkRef == null) {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockX, blockY, blockZ));
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockX, blockY, blockZ));
         }
 
         // => (ChunkStore, chunkIndex, blockIndex)
@@ -1229,7 +1233,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
         }
 
         // #endregion Store<ChunkStore>
@@ -1241,12 +1245,12 @@ public abstract class Block {
             @Nonnull final ChunkStore chunkStore,
             @Nonnull final Vector3i blockCoords
         ) {
-            final var chunkRef = chunkStore.getChunkReference(Chunk.Coords.Index.get(blockCoords));
+            final var chunkRef = chunkStore.getChunkReference(ChunkUtils.Coords.Index.get(blockCoords));
             if (chunkRef == null) {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockCoords));
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockCoords));
         }
 
         // => (ChunkStore, chunkIndex, blockIndex)
@@ -1257,12 +1261,12 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var chunkRef = chunkStore.getChunkReference(Chunk.Coords.Index.get(blockX, blockZ));
+            final var chunkRef = chunkStore.getChunkReference(ChunkUtils.Coords.Index.get(blockX, blockZ));
             if (chunkRef == null) {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockX, blockY, blockZ));
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockX, blockY, blockZ));
         }
 
         @Nullable
@@ -1276,7 +1280,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
         }
 
         @Nullable
@@ -1290,7 +1294,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
         }
 
         // #endregion ChunkStore
@@ -1314,10 +1318,10 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> ref,
             @Nonnull final Vector3i blockCoords
         ) {
-            if (Block.isBlockRef(ref)) {
-                return Block.Ref_.getLocal_blockRef(ref, blockCoords);
+            if (BlockUtils.isBlockRef(ref)) {
+                return BlockUtils.Ref_.getLocal_blockRef(ref, blockCoords);
             } else {
-                return Block.Ref_.getLocal_chunkRef(ref, blockCoords);
+                return BlockUtils.Ref_.getLocal_chunkRef(ref, blockCoords);
             }
         }
 
@@ -1328,19 +1332,19 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            if (Block.isBlockRef(ref)) {
-                return Block.Ref_.getLocal_blockRef(ref, blockX, blockY, blockZ);
+            if (BlockUtils.isBlockRef(ref)) {
+                return BlockUtils.Ref_.getLocal_blockRef(ref, blockX, blockY, blockZ);
             } else {
-                return Block.Ref_.getLocal_chunkRef(ref, blockX, blockY, blockZ);
+                return BlockUtils.Ref_.getLocal_chunkRef(ref, blockX, blockY, blockZ);
             }
         }
 
         @Nullable
         public static final Ref<ChunkStore> getLocal(@Nonnull final Ref<ChunkStore> ref, final int blockIndex) {
-            if (Block.isBlockRef(ref)) {
-                return Block.Ref_.getLocal_blockRef(ref, blockIndex);
+            if (BlockUtils.isBlockRef(ref)) {
+                return BlockUtils.Ref_.getLocal_blockRef(ref, blockIndex);
             } else {
-                return Block.Ref_.getLocal_chunkRef(ref, blockIndex);
+                return BlockUtils.Ref_.getLocal_chunkRef(ref, blockIndex);
             }
         }
 
@@ -1358,7 +1362,7 @@ public abstract class Block {
 
             var blockIndex = Coords.Index.get(blockCoords);
 
-            return Block.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
+            return BlockUtils.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
         }
 
         @Nullable
@@ -1375,7 +1379,7 @@ public abstract class Block {
 
             var blockIndex = Coords.Index.get(blockX, blockY, blockZ);
 
-            return Block.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
+            return BlockUtils.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
         }
 
         @Nullable
@@ -1388,7 +1392,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
+            return BlockUtils.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
         }
 
         // #endregion localBlockRef
@@ -1405,7 +1409,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
         }
 
         // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -1421,7 +1425,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
         }
 
         // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -1430,7 +1434,7 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> chunkRef,
             final int blockIndex
         ) {
-            return Block.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
+            return BlockUtils.Ref_.getLocal1_chunkRef(chunkRef, blockIndex);
         }
 
         @Nullable
@@ -1443,7 +1447,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal0(blockComponentChunk, blockIndex);
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, blockIndex);
         }
 
         // #endregion localChunkRef
@@ -1463,7 +1467,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
         }
 
         /**
@@ -1482,7 +1486,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
         }
 
         /**
@@ -1496,7 +1500,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Ref_.getLocal0(blockComponentChunk, blockIndex);
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, blockIndex);
         }
 
         // #endregion localBlockStateInfo
@@ -1507,9 +1511,9 @@ public abstract class Block {
             @Nonnull final WorldChunk worldChunk,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 worldChunk.getReference().getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockCoords),
+                ChunkUtils.Coords.Index.get(blockCoords),
                 Coords.Index.get(blockCoords)
             );
         }
@@ -1523,9 +1527,9 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Ref_.get2(
+            return BlockUtils.Ref_.get2(
                 worldChunk.getReference().getStore().getExternalData(),
-                Chunk.Coords.Index.get(blockX, blockZ),
+                ChunkUtils.Coords.Index.get(blockX, blockZ),
                 Coords.Index.get(blockX, blockY, blockZ)
             );
         }
@@ -1536,7 +1540,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            return Block.Ref_.get2(worldChunk.getReference().getStore().getExternalData(), chunkIndex, blockIndex);
+            return BlockUtils.Ref_.get2(worldChunk.getReference().getStore().getExternalData(), chunkIndex, blockIndex);
         }
 
         @Nullable
@@ -1572,7 +1576,7 @@ public abstract class Block {
             @Nonnull final BlockComponentChunk blockComponentChunk,
             final int blockIndex
         ) {
-            return Block.Ref_.getLocal0(blockComponentChunk, blockIndex);
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, blockIndex);
         }
 
         @Nullable
@@ -1580,7 +1584,7 @@ public abstract class Block {
             @Nonnull final BlockComponentChunk blockComponentChunk,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
         }
 
         @Nullable
@@ -1590,7 +1594,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
         }
 
         @Nullable
@@ -1598,7 +1602,7 @@ public abstract class Block {
             @Nonnull final BlockComponentChunk blockComponentChunk,
             final int blockIndex
         ) {
-            return Block.Ref_.getLocal0(blockComponentChunk, blockIndex);
+            return BlockUtils.Ref_.getLocal0(blockComponentChunk, blockIndex);
         }
 
         @Nullable
@@ -1638,80 +1642,80 @@ public abstract class Block {
             final var localIndex = Coords.Index.get(blockX, blockY, blockZ);
             final var localCoords = Coords.Local.get(localIndex);
             final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-            final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
+            final var chunkIndex = ChunkUtils.Coords.Index.get(blockCoords);
 
             final var test = new TestUtil(commandBuffer, blockCoords);
             // functions to test
             final ArrayList<BlockStateInfo> refs = new ArrayList<>();
 
             // WorldProvider
-            refs.add(Block.Info.get(test.worldProvider, blockCoords));
-            refs.add(Block.Info.get(test.worldProvider, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.worldProvider, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get(test.worldProvider, blockCoords));
+            refs.add(BlockUtils.Info.get(test.worldProvider, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.worldProvider, chunkIndex, localIndex));
 
             // World
-            refs.add(Block.Info.get(test.world, blockCoords));
-            refs.add(Block.Info.get(test.world, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.world, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get(test.world, blockCoords));
+            refs.add(BlockUtils.Info.get(test.world, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.world, chunkIndex, localIndex));
 
             // CommandBuffer
-            refs.add(Block.Info.get(test.commandBuffer, blockCoords));
-            refs.add(Block.Info.get(test.commandBuffer, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.commandBuffer, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get(test.commandBuffer, blockCoords));
+            refs.add(BlockUtils.Info.get(test.commandBuffer, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.commandBuffer, chunkIndex, localIndex));
 
             // BlockStateInfo
-            refs.add(Block.Info.get(test.info, blockCoords));
-            refs.add(Block.Info.get(test.info, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.info, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get(test.info, blockCoords));
+            refs.add(BlockUtils.Info.get(test.info, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.info, chunkIndex, localIndex));
 
             // ChunkRef (global)
             // - without specifying that it's a chunk ref we provided, letting the code figure that out
-            refs.add(Block.Info.get(test.chunkRef, blockCoords));
-            refs.add(Block.Info.get(test.chunkRef, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.chunkRef, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get(test.chunkRef, blockCoords));
+            refs.add(BlockUtils.Info.get(test.chunkRef, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.chunkRef, chunkIndex, localIndex));
             // - specifying it's a chunk ref
-            refs.add(Block.Info.get_chunkRef(test.chunkRef, blockCoords));
-            refs.add(Block.Info.get_chunkRef(test.chunkRef, blockX, blockY, blockZ));
-            refs.add(Block.Info.get_chunkRef(test.chunkRef, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get_chunkRef(test.chunkRef, blockCoords));
+            refs.add(BlockUtils.Info.get_chunkRef(test.chunkRef, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get_chunkRef(test.chunkRef, chunkIndex, localIndex));
 
             // ChunkRef (local)
             // - without specifying that it's a chunk ref we provided, letting the code figure that out
-            refs.add(Block.Info.getLocal(test.chunkRef, localCoords));
-            refs.add(Block.Info.getLocal(test.chunkRef, localCoords.x, localCoords.y, localCoords.z));
-            refs.add(Block.Info.getLocal(test.chunkRef, localIndex));
+            refs.add(BlockUtils.Info.getLocal(test.chunkRef, localCoords));
+            refs.add(BlockUtils.Info.getLocal(test.chunkRef, localCoords.x, localCoords.y, localCoords.z));
+            refs.add(BlockUtils.Info.getLocal(test.chunkRef, localIndex));
             // - specifying it's a chunk ref
-            refs.add(Block.Info.getLocal_chunkRef(test.chunkRef, localCoords));
-            refs.add(Block.Info.getLocal_chunkRef(test.chunkRef, localCoords.x, localCoords.y, localCoords.z));
-            refs.add(Block.Info.getLocal_chunkRef(test.chunkRef, localIndex));
+            refs.add(BlockUtils.Info.getLocal_chunkRef(test.chunkRef, localCoords));
+            refs.add(BlockUtils.Info.getLocal_chunkRef(test.chunkRef, localCoords.x, localCoords.y, localCoords.z));
+            refs.add(BlockUtils.Info.getLocal_chunkRef(test.chunkRef, localIndex));
 
             // Store
-            refs.add(Block.Info.get(test.store, blockCoords));
-            refs.add(Block.Info.get(test.store, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.store, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get(test.store, blockCoords));
+            refs.add(BlockUtils.Info.get(test.store, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.store, chunkIndex, localIndex));
 
             // ChunkStore
-            refs.add(Block.Info.get(test.chunkStore, blockCoords));
-            refs.add(Block.Info.get(test.chunkStore, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.chunkStore, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get(test.chunkStore, blockCoords));
+            refs.add(BlockUtils.Info.get(test.chunkStore, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.chunkStore, chunkIndex, localIndex));
 
             // BlockRef
-            refs.add(Block.Info.get_blockRef(test.blockRef, blockCoords));
-            refs.add(Block.Info.get_blockRef(test.blockRef, blockX, blockY, blockZ));
-            refs.add(Block.Info.get_chunkRef(test.blockRef, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.get_blockRef(test.blockRef, blockCoords));
+            refs.add(BlockUtils.Info.get_blockRef(test.blockRef, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get_chunkRef(test.blockRef, chunkIndex, localIndex));
 
             // WorldChunk
-            refs.add(Block.Info.get(test.worldChunk, blockCoords));
-            refs.add(Block.Info.get(test.worldChunk, blockX, blockY, blockZ));
-            refs.add(Block.Info.get(test.worldChunk, chunkIndex, localIndex));
-            refs.add(Block.Info.getLocal(test.worldChunk, blockCoords));
-            refs.add(Block.Info.getLocal(test.worldChunk, blockX, blockY, blockZ));
-            refs.add(Block.Info.getLocal(test.worldChunk, localIndex));
+            refs.add(BlockUtils.Info.get(test.worldChunk, blockCoords));
+            refs.add(BlockUtils.Info.get(test.worldChunk, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.get(test.worldChunk, chunkIndex, localIndex));
+            refs.add(BlockUtils.Info.getLocal(test.worldChunk, blockCoords));
+            refs.add(BlockUtils.Info.getLocal(test.worldChunk, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.getLocal(test.worldChunk, localIndex));
 
             // BlockComponentChunk
-            refs.add(Block.Info.get(test.blockComponentChunk, localIndex));
-            refs.add(Block.Info.getLocal(test.blockComponentChunk, blockCoords));
-            refs.add(Block.Info.getLocal(test.blockComponentChunk, blockX, blockY, blockZ));
-            refs.add(Block.Info.getLocal(test.blockComponentChunk, localIndex));
+            refs.add(BlockUtils.Info.get(test.blockComponentChunk, localIndex));
+            refs.add(BlockUtils.Info.getLocal(test.blockComponentChunk, blockCoords));
+            refs.add(BlockUtils.Info.getLocal(test.blockComponentChunk, blockX, blockY, blockZ));
+            refs.add(BlockUtils.Info.getLocal(test.blockComponentChunk, localIndex));
 
             // var i = 0;
             // for (var e : refs) {
@@ -1767,7 +1771,7 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> blockRef,
             @Nonnull final Vector3i coords
         ) {
-            return Block.Info.get0(Block.Ref_.get_blockRef(blockRef, coords));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_blockRef(blockRef, coords));
         }
 
         @Nullable
@@ -1777,7 +1781,7 @@ public abstract class Block {
             final int y,
             final int z
         ) {
-            return Block.Info.get0(Block.Ref_.get_blockRef(blockRef, x, y, z));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_blockRef(blockRef, x, y, z));
         }
 
         @Nullable
@@ -1786,12 +1790,12 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            return Block.Info.get0(Block.Ref_.get_blockRef(blockRef, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_blockRef(blockRef, chunkIndex, blockIndex));
         }
 
         @Nullable
         public static final BlockStateInfo get_blockRef(@Nonnull final Ref<ChunkStore> blockRef, final int blockIndex) {
-            return Block.Info.get0(Block.Ref_.getLocal(blockRef, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal(blockRef, blockIndex));
         }
 
         // #endregion Ref<ChunkStore> (BlockRef)
@@ -1813,7 +1817,7 @@ public abstract class Block {
             @Nonnull final Vector3i pos
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(worldProvider, pos));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(worldProvider, pos));
         }
 
         @Nullable
@@ -1824,7 +1828,7 @@ public abstract class Block {
             final int z
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(worldProvider, x, y, z));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(worldProvider, x, y, z));
         }
 
         @Nullable
@@ -1834,7 +1838,7 @@ public abstract class Block {
             final int blockIndex
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(worldProvider, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(worldProvider, chunkIndex, blockIndex));
         }
 
         // #endregion WorldProvider
@@ -1843,13 +1847,13 @@ public abstract class Block {
         @Nullable
         public static final BlockStateInfo get(@Nonnull final World world, @Nonnull final Vector3i pos) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(world, pos));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(world, pos));
         }
 
         @Nullable
         public static final BlockStateInfo get(@Nonnull final World world, final int x, final int y, final int z) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(world, x, y, z));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(world, x, y, z));
         }
 
         @Nullable
@@ -1859,7 +1863,7 @@ public abstract class Block {
             final int blockIndex
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(world, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(world, chunkIndex, blockIndex));
         }
 
         // #endregion World
@@ -1871,7 +1875,7 @@ public abstract class Block {
             @Nonnull final Vector3i pos
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(commandBuffer, pos));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(commandBuffer, pos));
         }
 
         @Nullable
@@ -1882,7 +1886,7 @@ public abstract class Block {
             final int z
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(commandBuffer, x, y, z));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(commandBuffer, x, y, z));
         }
 
         @Nullable
@@ -1892,7 +1896,7 @@ public abstract class Block {
             final int blockIndex
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(commandBuffer, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(commandBuffer, chunkIndex, blockIndex));
         }
 
         // #endregion CommandBuffer
@@ -1903,7 +1907,7 @@ public abstract class Block {
             @Nonnull final BlockStateInfo info,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Info.get0(Block.Ref_.get(info, blockCoords));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(info, blockCoords));
         }
 
         @Nullable
@@ -1913,7 +1917,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Info.get0(Block.Ref_.get(info, blockX, blockY, blockZ));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(info, blockX, blockY, blockZ));
         }
 
         @Nullable
@@ -1922,7 +1926,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            return Block.Info.get0(Block.Ref_.get(info, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(info, chunkIndex, blockIndex));
         }
 
         // #endregion BlockStateInfo
@@ -1930,7 +1934,7 @@ public abstract class Block {
         @Nullable
         public static final BlockStateInfo get(@Nonnull final Ref<ChunkStore> ref, @Nonnull final Vector3i coords) {
             // Potential: the ref you passed me is a BLOCK ref. slay. thats the good shit. that's what we're after
-            final var info = Block.Info.get(ref);
+            final var info = BlockUtils.Info.get(ref);
             if (info != null) {
                 return info;
             }
@@ -1947,13 +1951,13 @@ public abstract class Block {
             final int blockZ
         ) {
             // Potential: the ref you passed me is a BLOCK ref. slay. thats the good shit. that's what we're after
-            final var info = Block.Info.get(ref);
+            final var info = BlockUtils.Info.get(ref);
             if (info != null) {
                 return info;
             }
 
             // If there wasn't a block state info on your ref, we know its a chunk ref
-            return Block.Info.get_chunkRef(ref, blockX, blockY, blockZ);
+            return BlockUtils.Info.get_chunkRef(ref, blockX, blockY, blockZ);
         }
 
         @Nullable
@@ -1963,13 +1967,13 @@ public abstract class Block {
             final int blockIndex
         ) {
             // Potential: the ref you passed me is a BLOCK ref. slay. thats the good shit. that's what we're after
-            final var info = Block.Info.get(ref);
+            final var info = BlockUtils.Info.get(ref);
             if (info != null) {
                 return info;
             }
 
             // If there wasn't a block state info on your ref, we know its a chunk ref
-            return Block.Info.get_chunkRef(ref, chunkIndex, blockIndex);
+            return BlockUtils.Info.get_chunkRef(ref, chunkIndex, blockIndex);
         }
 
         // #endregion anyRef
@@ -1980,7 +1984,7 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> chunkRef,
             @Nonnull final Vector3i coords
         ) {
-            return Block.Info.get0(Block.Ref_.get_chunkRef(chunkRef, coords));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_chunkRef(chunkRef, coords));
         }
 
         @Nullable
@@ -1990,7 +1994,7 @@ public abstract class Block {
             final int y,
             final int z
         ) {
-            return Block.Info.get0(Block.Ref_.get_chunkRef(chunkRef, x, y, z));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_chunkRef(chunkRef, x, y, z));
         }
 
         @Nullable
@@ -1999,7 +2003,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            return Block.Info.get0(Block.Ref_.get_chunkRef(chunkRef, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_chunkRef(chunkRef, chunkIndex, blockIndex));
         }
 
         // #endregion Ref<ChunkStore>
@@ -2015,7 +2019,7 @@ public abstract class Block {
                 return null;
             }
 
-            return Block.Info.get0(Block.Ref_.get_chunkRef(chunkRef, blockCoords));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_chunkRef(chunkRef, blockCoords));
         }
 
         @Nullable
@@ -2029,7 +2033,7 @@ public abstract class Block {
             if (chunkRef == null) {
                 return null;
             }
-            return Block.Info.get0(Block.Ref_.get_chunkRef(chunkRef, blockX, blockY, blockZ));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_chunkRef(chunkRef, blockX, blockY, blockZ));
         }
 
         @Nullable
@@ -2042,7 +2046,7 @@ public abstract class Block {
             if (chunkRef == null) {
                 return null;
             }
-            return Block.Info.get0(Block.Ref_.get_chunkRef(chunkRef, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get_chunkRef(chunkRef, chunkIndex, blockIndex));
         }
 
         @Nullable
@@ -2050,7 +2054,7 @@ public abstract class Block {
             @Nonnull final WorldChunk worldChunk,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Info.get(worldChunk.getBlockComponentEntity(blockCoords.x, blockCoords.y, blockCoords.z));
+            return BlockUtils.Info.get(worldChunk.getBlockComponentEntity(blockCoords.x, blockCoords.y, blockCoords.z));
         }
 
         @Nullable
@@ -2060,13 +2064,13 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Info.get(worldChunk.getBlockComponentEntity(blockX, blockY, blockZ));
+            return BlockUtils.Info.get(worldChunk.getBlockComponentEntity(blockX, blockY, blockZ));
         }
 
         @Nullable
         public static final BlockStateInfo getLocal(@Nonnull final WorldChunk worldChunk, final int blockIndex) {
             final var localCoords = Coords.Local.get(blockIndex);
-            return Block.Info.get(worldChunk.getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z));
+            return BlockUtils.Info.get(worldChunk.getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z));
         }
 
         // #endregion WorldChunk
@@ -2124,7 +2128,7 @@ public abstract class Block {
         @Nullable
         public static final BlockStateInfo get(@Nonnull final Store<ChunkStore> store, @Nonnull final Vector3i pos) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(store, pos));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(store, pos));
         }
 
         @Nullable
@@ -2135,7 +2139,7 @@ public abstract class Block {
             final int z
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(store, x, y, z));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(store, x, y, z));
         }
 
         @Nullable
@@ -2145,7 +2149,7 @@ public abstract class Block {
             final int blockIndex
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(store, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(store, chunkIndex, blockIndex));
         }
 
         // #endregion Store<ChunkStore>
@@ -2154,7 +2158,7 @@ public abstract class Block {
         @Nullable
         public static final BlockStateInfo get(@Nonnull final ChunkStore chunkStore, @Nonnull final Vector3i pos) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(chunkStore, pos));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(chunkStore, pos));
         }
 
         @Nullable
@@ -2165,7 +2169,7 @@ public abstract class Block {
             final int z
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(chunkStore, x, y, z));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(chunkStore, x, y, z));
         }
 
         @Nullable
@@ -2175,7 +2179,7 @@ public abstract class Block {
             final int blockIndex
         ) {
             // => BlockRef
-            return Block.Info.get0(Block.Ref_.get(chunkStore, chunkIndex, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.get(chunkStore, chunkIndex, blockIndex));
         }
 
         // #endregion ChunkStore
@@ -2202,7 +2206,7 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> chunkRef,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal_chunkRef(chunkRef, blockCoords));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal_chunkRef(chunkRef, blockCoords));
         }
 
         // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -2213,7 +2217,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal_chunkRef(chunkRef, blockX, blockY, blockZ));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal_chunkRef(chunkRef, blockX, blockY, blockZ));
         }
 
         // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -2222,7 +2226,7 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> chunkRef,
             final int blockIndex
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal_chunkRef(chunkRef, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal_chunkRef(chunkRef, blockIndex));
         }
 
         // #endregion localChunkRef
@@ -2233,7 +2237,7 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> blockRef,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal_blockRef(blockRef, blockCoords));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal_blockRef(blockRef, blockCoords));
         }
 
         // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -2244,7 +2248,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal_blockRef(blockRef, blockX, blockY, blockZ));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal_blockRef(blockRef, blockX, blockY, blockZ));
         }
 
         // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -2253,7 +2257,7 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> blockRef,
             final int blockIndex
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal_blockRef(blockRef, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal_blockRef(blockRef, blockIndex));
         }
 
         // #endregion localBlockRef
@@ -2264,10 +2268,10 @@ public abstract class Block {
             @Nonnull final Ref<ChunkStore> ref,
             @Nonnull final Vector3i blockCoords
         ) {
-            if (Block.isBlockRef(ref)) {
-                return Block.Info.getLocal_blockRef(ref, blockCoords);
+            if (BlockUtils.isBlockRef(ref)) {
+                return BlockUtils.Info.getLocal_blockRef(ref, blockCoords);
             } else {
-                return Block.Info.getLocal_chunkRef(ref, blockCoords);
+                return BlockUtils.Info.getLocal_chunkRef(ref, blockCoords);
             }
         }
 
@@ -2279,20 +2283,20 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            if (Block.isBlockRef(ref)) {
-                return Block.Info.getLocal_blockRef(ref, blockX, blockY, blockZ);
+            if (BlockUtils.isBlockRef(ref)) {
+                return BlockUtils.Info.getLocal_blockRef(ref, blockX, blockY, blockZ);
             } else {
-                return Block.Info.getLocal_chunkRef(ref, blockX, blockY, blockZ);
+                return BlockUtils.Info.getLocal_chunkRef(ref, blockX, blockY, blockZ);
             }
         }
 
         // ChunkRef => component ON the chunk itself => block ref in the chunk
         @Nullable
         public static final BlockStateInfo getLocal(@Nonnull final Ref<ChunkStore> ref, final int blockIndex) {
-            if (Block.isBlockRef(ref)) {
-                return Block.Info.getLocal_blockRef(ref, blockIndex);
+            if (BlockUtils.isBlockRef(ref)) {
+                return BlockUtils.Info.getLocal_blockRef(ref, blockIndex);
             } else {
-                return Block.Info.getLocal_chunkRef(ref, blockIndex);
+                return BlockUtils.Info.getLocal_chunkRef(ref, blockIndex);
             }
         }
 
@@ -2308,7 +2312,7 @@ public abstract class Block {
             @Nonnull final BlockStateInfo info,
             @Nonnull final Vector3i blockCoords
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal(info, blockCoords));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal(info, blockCoords));
         }
 
         /**
@@ -2322,7 +2326,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            return Block.Info.get0(Block.Ref_.getLocal(info, blockX, blockY, blockZ));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal(info, blockX, blockY, blockZ));
         }
 
         /**
@@ -2331,7 +2335,7 @@ public abstract class Block {
         // BlockInfo => ChunkRef => component ON the chunk itself => block ref in the chunk
         @Nullable
         public static final BlockStateInfo getLocal(@Nonnull final BlockStateInfo info, final int blockIndex) {
-            return Block.Info.get0(Block.Ref_.getLocal(info, blockIndex));
+            return BlockUtils.Info.get0(BlockUtils.Ref_.getLocal(info, blockIndex));
         }
 
         // #endregion localBlockStateInfo
@@ -2359,7 +2363,7 @@ public abstract class Block {
         // BlockRef
         @Nullable
         public static final BlockStateInfo get(@Nullable final Ref<ChunkStore> blockRef) {
-            return Block.Info.get0(blockRef);
+            return BlockUtils.Info.get0(blockRef);
         }
 
         // BlockRef
@@ -2400,7 +2404,7 @@ public abstract class Block {
             final var localIndex = Coords.Index.get(blockX, blockY, blockZ);
             final var blockIndex = localIndex;
             final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-            final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
+            final var chunkIndex = ChunkUtils.Coords.Index.get(blockCoords);
 
             final var test = new TestUtil(commandBuffer, blockCoords);
 
@@ -2408,35 +2412,35 @@ public abstract class Block {
             final ArrayList<Integer> refs = new ArrayList<>();
 
             // WorldProvider
-            refs.add(Block.Id.get(test.worldProvider, blockCoords));
-            refs.add(Block.Id.get(test.worldProvider, blockCoords.x, blockCoords.y, blockCoords.z));
-            refs.add(Block.Id.get(test.worldProvider, chunkIndex, blockIndex));
+            refs.add(BlockUtils.Id.get(test.worldProvider, blockCoords));
+            refs.add(BlockUtils.Id.get(test.worldProvider, blockCoords.x, blockCoords.y, blockCoords.z));
+            refs.add(BlockUtils.Id.get(test.worldProvider, chunkIndex, blockIndex));
 
             //  World
-            refs.add(Block.Id.get(test.world, blockCoords));
-            refs.add(Block.Id.get(test.world, blockCoords.x, blockCoords.y, blockCoords.z));
-            refs.add(Block.Id.get(test.world, chunkIndex, blockIndex));
+            refs.add(BlockUtils.Id.get(test.world, blockCoords));
+            refs.add(BlockUtils.Id.get(test.world, blockCoords.x, blockCoords.y, blockCoords.z));
+            refs.add(BlockUtils.Id.get(test.world, chunkIndex, blockIndex));
 
             //  CommandBuffer
-            refs.add(Block.Id.get(test.commandBuffer, blockCoords));
-            refs.add(Block.Id.get(test.commandBuffer, blockCoords.x, blockCoords.y, blockCoords.z)); // test 7 failed
-            refs.add(Block.Id.get(test.commandBuffer, chunkIndex, blockIndex));
+            refs.add(BlockUtils.Id.get(test.commandBuffer, blockCoords));
+            refs.add(BlockUtils.Id.get(test.commandBuffer, blockCoords.x, blockCoords.y, blockCoords.z)); // test 7 failed
+            refs.add(BlockUtils.Id.get(test.commandBuffer, chunkIndex, blockIndex));
 
             //  Store<ChunkStore>
-            refs.add(Block.Id.get(test.store, blockCoords));
-            refs.add(Block.Id.get(test.store, blockCoords.x, blockCoords.y, blockCoords.z)); // test 10 failed
-            refs.add(Block.Id.get(test.store, chunkIndex, blockIndex));
+            refs.add(BlockUtils.Id.get(test.store, blockCoords));
+            refs.add(BlockUtils.Id.get(test.store, blockCoords.x, blockCoords.y, blockCoords.z)); // test 10 failed
+            refs.add(BlockUtils.Id.get(test.store, chunkIndex, blockIndex));
 
             //  ChunkStore
-            refs.add(Block.Id.get(test.chunkStore, blockCoords));
-            refs.add(Block.Id.get(test.chunkStore, blockCoords.x, blockCoords.y, blockCoords.z)); // test 13 failed
-            refs.add(Block.Id.get(test.chunkStore, chunkIndex, blockIndex));
+            refs.add(BlockUtils.Id.get(test.chunkStore, blockCoords));
+            refs.add(BlockUtils.Id.get(test.chunkStore, blockCoords.x, blockCoords.y, blockCoords.z)); // test 13 failed
+            refs.add(BlockUtils.Id.get(test.chunkStore, chunkIndex, blockIndex));
 
             //  Ref<ChunkStore>
-            refs.add(Block.Id.get(test.chunkRef, blockCoords));
-            refs.add(Block.Id.get(test.chunkRef, blockCoords.x, blockCoords.y, blockCoords.z)); // test 16 failed
-            refs.add(Block.Id.get(test.chunkRef, chunkIndex, blockIndex));
-            refs.add(Block.Id.get(blockId));
+            refs.add(BlockUtils.Id.get(test.chunkRef, blockCoords));
+            refs.add(BlockUtils.Id.get(test.chunkRef, blockCoords.x, blockCoords.y, blockCoords.z)); // test 16 failed
+            refs.add(BlockUtils.Id.get(test.chunkRef, chunkIndex, blockIndex));
+            refs.add(BlockUtils.Id.get(blockId));
 
             return refs;
         }
@@ -2458,7 +2462,7 @@ public abstract class Block {
             @Nonnull final WorldProvider worldProvider,
             @Nonnull final Vector3i blockCoords
         ) {
-            final var worldChunk = worldProvider.getWorld().getChunk(Chunk.Coords.Index.get(blockCoords));
+            final var worldChunk = worldProvider.getWorld().getChunk(ChunkUtils.Coords.Index.get(blockCoords));
             if (worldChunk == null) {
                 return null;
             }
@@ -2473,7 +2477,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var worldChunk = worldProvider.getWorld().getChunk(Chunk.Coords.Index.get(blockX, blockZ));
+            final var worldChunk = worldProvider.getWorld().getChunk(ChunkUtils.Coords.Index.get(blockX, blockZ));
             if (worldChunk == null) {
                 return null;
             }
@@ -2504,7 +2508,7 @@ public abstract class Block {
 
         @Nullable
         public static final Integer get(@Nonnull final World world, @Nonnull final Vector3i blockCoords) {
-            final var worldChunk = world.getChunk(Chunk.Coords.Index.get(blockCoords));
+            final var worldChunk = world.getChunk(ChunkUtils.Coords.Index.get(blockCoords));
             if (worldChunk == null) {
                 return null;
             }
@@ -2519,7 +2523,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var worldChunk = world.getChunk(Chunk.Coords.Index.get(blockX, blockZ));
+            final var worldChunk = world.getChunk(ChunkUtils.Coords.Index.get(blockX, blockZ));
             if (worldChunk == null) {
                 return null;
             }
@@ -2549,7 +2553,7 @@ public abstract class Block {
             @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
             @Nonnull final Vector3i blockCoords
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(commandBuffer, blockCoords);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(commandBuffer, blockCoords);
             if (worldChunk == null) {
                 return null;
             }
@@ -2564,7 +2568,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(commandBuffer, blockX, blockZ);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(commandBuffer, blockX, blockZ);
             if (worldChunk == null) {
                 return null;
             }
@@ -2578,7 +2582,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(commandBuffer, chunkIndex);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(commandBuffer, chunkIndex);
             if (worldChunk == null) {
                 return null;
             }
@@ -2595,7 +2599,7 @@ public abstract class Block {
 
         @Nullable
         public static final Integer get(@Nonnull final Store<ChunkStore> store, @Nonnull final Vector3i blockCoords) {
-            final var worldChunk = Chunk.WorldChunk_.get(store, blockCoords);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(store, blockCoords);
             if (worldChunk == null) {
                 return null;
             }
@@ -2610,7 +2614,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(store, blockX, blockZ);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(store, blockX, blockZ);
             if (worldChunk == null) {
                 return null;
             }
@@ -2624,7 +2628,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(store, chunkIndex);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(store, chunkIndex);
             if (worldChunk == null) {
                 return null;
             }
@@ -2641,7 +2645,7 @@ public abstract class Block {
 
         @Nullable
         public static final Integer get(@Nonnull final ChunkStore chunkStore, @Nonnull final Vector3i blockCoords) {
-            final var worldChunk = Chunk.WorldChunk_.get(chunkStore, blockCoords);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(chunkStore, blockCoords);
             if (worldChunk == null) {
                 return null;
             }
@@ -2656,7 +2660,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(chunkStore, blockX, blockZ);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(chunkStore, blockX, blockZ);
             if (worldChunk == null) {
                 return null;
             }
@@ -2670,7 +2674,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(chunkStore, chunkIndex);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(chunkStore, chunkIndex);
             if (worldChunk == null) {
                 return null;
             }
@@ -2687,7 +2691,7 @@ public abstract class Block {
 
         @Nullable
         public static final Integer get(@Nonnull final Ref<ChunkStore> chunkRef, @Nonnull final Vector3i blockCoords) {
-            final var worldChunk = Chunk.WorldChunk_.get(chunkRef, blockCoords);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(chunkRef, blockCoords);
             if (worldChunk == null) {
                 return null;
             }
@@ -2702,7 +2706,7 @@ public abstract class Block {
             final int blockY,
             final int blockZ
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(chunkRef, blockX, blockZ);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(chunkRef, blockX, blockZ);
             if (worldChunk == null) {
                 return null;
             }
@@ -2716,7 +2720,7 @@ public abstract class Block {
             final long chunkIndex,
             final int blockIndex
         ) {
-            final var worldChunk = Chunk.WorldChunk_.get(chunkRef, chunkIndex);
+            final var worldChunk = ChunkUtils.WorldChunk_.get(chunkRef, chunkIndex);
             if (worldChunk == null) {
                 return null;
             }
@@ -2759,7 +2763,7 @@ public abstract class Block {
         ) {
             final ArrayList<BlockType> refs = new ArrayList<>();
 
-            refs.add(Block.Type.get("TEST_BlockType"));
+            refs.add(BlockUtils.Type.get("TEST_BlockType"));
 
             return refs;
         }
@@ -2781,7 +2785,7 @@ public abstract class Block {
 
     // TESTS ADDED AND VERIFIED
     public static final boolean set(final @Nonnull World world, final @Nonnull Vector3i blockCoords, int blockId) {
-        var chunk = Chunk.WorldChunk_.get(world, blockCoords);
+        var chunk = ChunkUtils.WorldChunk_.get(world, blockCoords);
         if (chunk == null) {
             return false;
         }
@@ -2800,7 +2804,7 @@ public abstract class Block {
 
     // TESTS ADDED AND VERIFIED
     public static final int get(final @Nonnull World world, final @Nonnull Vector3i blockCoords) {
-        var chunk = Chunk.WorldChunk_.get(world, blockCoords);
+        var chunk = ChunkUtils.WorldChunk_.get(world, blockCoords);
         if (chunk == null) {
             return -1;
         }

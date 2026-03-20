@@ -135,9 +135,9 @@ public class ScheduledTickSubSystem
             // Transition to the state returned by the block
             if (res != null) {
                 switch (res.getType()) {
-                    case _EntityScheduledTickStateComponent.TYPE_BROKEN:
-                    case _EntityScheduledTickStateComponent.TYPE_SLEEP:
-                    case _EntityScheduledTickStateComponent.TYPE_STOP:
+                    case TickPlan.TYPE_BROKEN:
+                    case TickPlan.TYPE_SLEEP:
+                    case TickPlan.TYPE_STOP:
                     default:
                         break;
                 }
