@@ -1,4 +1,4 @@
-package dev.twunk.utils.time;
+package dev.twunk.utils;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;

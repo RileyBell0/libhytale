@@ -9,12 +9,12 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.IBlockLifetimeComponent;
+import dev.twunk.TwunkLib;
+import dev.twunk.interfaces.component.IBlockLifetimeComponent;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
-import dev.twunk.utils.TwunkLib;
-import dev.twunk.utils.world.Utils;
+import dev.twunk.utils.ComponentUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
@@ -71,7 +71,7 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
     ) {
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = Utils.Component_.get(ref, this.componentType);
+        var component = ComponentUtils.get(ref, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
@@ -92,7 +92,7 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
     ) {
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = Utils.Component_.get(ref, this.componentType);
+        var component = ComponentUtils.get(ref, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing

@@ -3,7 +3,7 @@ package dev.twunk.subsystem;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.common.IQuery;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.plugin.ModPlugin;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;

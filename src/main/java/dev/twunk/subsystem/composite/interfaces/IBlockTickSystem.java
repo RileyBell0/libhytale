@@ -1,7 +1,7 @@
 package dev.twunk.subsystem.composite.interfaces;
 
-import dev.twunk.common.IBlockTick;
-import dev.twunk.common.IQuery;
+import dev.twunk.interfaces.methods.IBlockTick;
+import dev.twunk.interfaces.methods.IQuery;
 
 /**
  * Gives your system the event handler function it needs to run code for ticking

@@ -1,4 +1,4 @@
-package dev.twunk.utils;
+package dev.twunk.lib;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import java.util.ArrayList;

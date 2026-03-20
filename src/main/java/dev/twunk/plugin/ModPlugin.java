@@ -8,11 +8,11 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.IAutoBlockLifetimeComponent;
-import dev.twunk.component.IAutoTickingBlockComponent;
+import dev.twunk.TwunkLib;
+import dev.twunk.interfaces.component.auto.IAutoBlockLifetimeComponent;
+import dev.twunk.interfaces.component.auto.IAutoTickingBlockComponent;
 import dev.twunk.system.BlockLifetimeComponentSystem;
 import dev.twunk.system.TickableBlockComponentSystem;
-import dev.twunk.utils.TwunkLib;
 import javax.annotation.Nonnull;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...

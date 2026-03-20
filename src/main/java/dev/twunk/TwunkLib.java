@@ -1,10 +1,10 @@
-package dev.twunk.utils;
+package dev.twunk;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component.TwunkDevTestComponent;
-import dev.twunk.component._TickSchedulerComponent;
+import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
+import dev.twunk.lib.component.TwunkDevTestComponent;
 import dev.twunk.plugin.ModPlugin;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
 import java.util.HashMap;
@@ -37,7 +37,9 @@ public abstract class TwunkLib {
         hasRegisteredTickComponents = true;
 
         // per-system ticking
-        _TickSchedulerComponent.COMPONENT_TYPE = plugin.registerComponent(_TickSchedulerComponent.CODEC);
+        INTERNAL_TickSchedulerComponent.COMPONENT_TYPE = plugin.registerComponent(
+            INTERNAL_TickSchedulerComponent.CODEC
+        );
 
         // component-based ticking
         _EntityScheduledTickStateComponent.Active.COMPONENT_TYPE = plugin.registerComponent(

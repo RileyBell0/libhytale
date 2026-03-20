@@ -1,13 +1,13 @@
-package dev.twunk.component;
+package dev.twunk.lib.component;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.TwunkLib;
+import dev.twunk.lib.lifetime.TrackedBlockEntity;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
-import dev.twunk.utils.TwunkLib;
-import dev.twunk.utils.lifetime.TrackedBlockEntity;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,18 +28,18 @@ import javax.annotation.Nullable;
  *
  * but to be fair, stupid stuff is fun stuff
  */
-public class _TickSchedulerComponent implements Component<ChunkStore> {
+public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
 
     // serializing/deserializing your vars
     @Nonnull
-    public static final BuilderCodec<_TickSchedulerComponent> CODEC = BuilderCodec.builder(
-        _TickSchedulerComponent.class,
-        _TickSchedulerComponent::new
+    public static final BuilderCodec<INTERNAL_TickSchedulerComponent> CODEC = BuilderCodec.builder(
+        INTERNAL_TickSchedulerComponent.class,
+        INTERNAL_TickSchedulerComponent::new
     ).build();
 
     @SuppressWarnings("null")
     @Nonnull
-    public static ComponentType<ChunkStore, _TickSchedulerComponent> COMPONENT_TYPE;
+    public static ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent> COMPONENT_TYPE;
 
     /**
      * The idea is to only have 1x of this component per entity, thus, since my
@@ -138,14 +138,14 @@ public class _TickSchedulerComponent implements Component<ChunkStore> {
     }
 
     @Nonnull
-    public _TickSchedulerComponent clone() {
-        return new _TickSchedulerComponent();
+    public INTERNAL_TickSchedulerComponent clone() {
+        return new INTERNAL_TickSchedulerComponent();
     }
 
     @Nonnull
-    public static ComponentType<ChunkStore, _TickSchedulerComponent> getComponentType() {
-        return (ComponentType<ChunkStore, _TickSchedulerComponent>) TwunkLib.getComponentType(
-            _TickSchedulerComponent.class
+    public static ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent> getComponentType() {
+        return (ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent>) TwunkLib.getComponentType(
+            INTERNAL_TickSchedulerComponent.class
         );
     }
 }

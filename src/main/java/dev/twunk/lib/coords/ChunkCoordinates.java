@@ -1,4 +1,4 @@
-package dev.twunk.utils.world;
+package dev.twunk.lib.coords;
 
 import java.util.Objects;
 

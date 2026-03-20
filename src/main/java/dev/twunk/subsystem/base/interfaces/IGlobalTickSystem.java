@@ -4,7 +4,7 @@ import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.common.IQuery;
+import dev.twunk.interfaces.methods.IQuery;
 import javax.annotation.Nonnull;
 
 /**

@@ -1,4 +1,4 @@
-package dev.twunk.test;
+package dev.twunk.lib.test;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -13,7 +13,6 @@ import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.utils.world.Utils;
 import javax.annotation.Nonnull;
 
 public final class TestUtil {
@@ -145,7 +144,7 @@ public final class TestUtil {
         this.world = commandBuffer.getExternalData().getWorld();
         // this.world = blockRef.getStore().getExternalData().getWorld(); // this works too
 
-        var worldChunk = Utils.Chunk.WorldChunk_.get(commandBuffer, blockCoords);
+        var worldChunk = dev.twunk.utils.Chunk.WorldChunk_.get(commandBuffer, blockCoords);
         if (worldChunk == null) {
             throw new RuntimeException("ERROR: worldChunk was null!!!");
         }
@@ -159,7 +158,7 @@ public final class TestUtil {
         this.blockComponentChunk = blockComponentChunk;
 
         // this.blockRef = blockRef; // this works too
-        var blockRef = Utils.Block.Ref_.get(commandBuffer, blockCoords);
+        var blockRef = dev.twunk.utils.Block.Ref_.get(commandBuffer, blockCoords);
         if (blockRef == null) {
             throw new RuntimeException("ERROR: Failed to get ref for block at " + blockCoords);
         }
@@ -177,7 +176,7 @@ public final class TestUtil {
         }
 
         // this works
-        var wlrdChunk = Utils.Chunk.WorldChunk_.get(info);
+        var wlrdChunk = dev.twunk.utils.Chunk.WorldChunk_.get(info);
         if (wlrdChunk == null) {
             throw new RuntimeException("ERROR: wlrdChunk was null");
         }
@@ -189,12 +188,12 @@ public final class TestUtil {
         this.blockChunk = blockChunk;
 
         /** this works too */
-        if (Utils.Chunk.WorldChunk_.get_blockRef(blockRef) == null) {
+        if (dev.twunk.utils.Chunk.WorldChunk_.get_blockRef(blockRef) == null) {
             throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) was null");
         }
 
         // sick, stuff seems to be working now?? weird
-        if (Utils.Chunk.WorldChunk_.get_chunkRef(chunkRef) == null) {
+        if (dev.twunk.utils.Chunk.WorldChunk_.get_chunkRef(chunkRef) == null) {
             throw new RuntimeException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) was null");
         }
         this.info = info;

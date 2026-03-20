@@ -7,7 +7,7 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.common.IQuery;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

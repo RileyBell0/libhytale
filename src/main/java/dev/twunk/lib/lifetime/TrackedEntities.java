@@ -1,4 +1,4 @@
-package dev.twunk.utils.lifetime;
+package dev.twunk.lib.lifetime;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -10,7 +10,7 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.component._TickSchedulerComponent;
+import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.subsystem.composite._EntityScheduledTickStateComponent;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
@@ -44,8 +44,8 @@ public class TrackedEntities {
     }
 
     @Nonnull
-    public static final ComponentType<ChunkStore, _TickSchedulerComponent> TICK_STATE_COMPONENT =
-        _TickSchedulerComponent.getComponentType();
+    public static final ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent> TICK_STATE_COMPONENT =
+        INTERNAL_TickSchedulerComponent.getComponentType();
 
     @Nonnull
     @SuppressWarnings("null")
@@ -160,7 +160,7 @@ public class TrackedEntities {
     }
 
     @Nonnull
-    private _TickSchedulerComponent loadEntityTickingState(
+    private INTERNAL_TickSchedulerComponent loadEntityTickingState(
         @Nonnull final Ref<ChunkStore> ref,
         @Nonnull final CommandBuffer<ChunkStore> commandBuffer
     ) {

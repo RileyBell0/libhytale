@@ -1,4 +1,6 @@
-package dev.twunk.component;
+package dev.twunk.interfaces.component.auto;
+
+import dev.twunk.interfaces.component.IBlockLifetimeComponent;
 
 /**
  * A component that has an onBlockTick method that when registered will AUTOMATICALLY

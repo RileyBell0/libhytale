@@ -1,4 +1,4 @@
-package dev.twunk.utils.lifetime;
+package dev.twunk.lib.lifetime;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3i;
