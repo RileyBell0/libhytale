@@ -18,17 +18,6 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-// BlockStateInfo is your friend. All block entities have it.
-// - If you want to get the world a block is in
-// - If you want to get the CHUNK a block is in
-// - If you want to get OTHER blocks
-//
-// All of those ^^ are gotten THROUGH BlockStateInfo
-// effectively, BlockStateInfo + Ref to your block => your dream come true
-
-// Utils for blocks. Slowly figuring out what this should look like
-// NOTE - its current state is broken
-
 // TESTS ADDED AND VERIFIED
 public abstract class ComponentUtils {
 
