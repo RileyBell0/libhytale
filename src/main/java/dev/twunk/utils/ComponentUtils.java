@@ -4,7 +4,6 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
@@ -14,14 +13,13 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.lib.component.TwunkDevTestComponent;
 import dev.twunk.lib.test.TestUtil;
+import dev.twunk.utils.message.Chat;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // TESTS ADDED AND VERIFIED
 public abstract class ComponentUtils {
-
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     // ==================================================
     // Component types (trust me bro, i swear they're not null)
@@ -242,19 +240,19 @@ public abstract class ComponentUtils {
                 }
                 // yeah these next two logs are useless, but it helps to easily verify all my tests are working by them all having the same structure visually in their responses
                 if (verbose != null) {
-                    console.log("Ran alot of test(s)");
-                    console.log("10/10 tests successful");
-                    console.log("+ All tests successful");
+                    Chat.log("Ran alot of test(s)");
+                    Chat.log("10/10 tests successful");
+                    Chat.log("+ All tests successful");
                 }
                 if (verbose == null) {
-                    console.log("+ (13) SUCCESS: TEST_Component_");
+                    Chat.log("+ (13) SUCCESS: TEST_Component_");
                 }
             } catch (Exception e) {
                 if (verbose != null) {
-                    console.log("ERROR IN TESTS" + e);
+                    Chat.log("ERROR IN TESTS" + e);
                 }
                 if (verbose == null) {
-                    console.log("- (13) FAILED:  TEST_Component_");
+                    Chat.log("- (13) FAILED:  TEST_Component_");
                 }
             }
         });
@@ -321,9 +319,9 @@ public abstract class ComponentUtils {
             return anyRef.getStore().getExternalData().getChunkComponent(chunkIndex, componentType);
         }
 
-        console.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
-        console.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
-        console.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
+        Chat.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
+        Chat.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
+        Chat.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
         return null;
     }
 

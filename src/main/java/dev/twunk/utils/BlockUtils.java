@@ -4,7 +4,6 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
@@ -17,6 +16,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.lib.test.TestUtil;
+import dev.twunk.utils.message.Chat;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,8 +34,6 @@ import javax.annotation.Nullable;
 
 // TESTS ADDED AND VERIFIED
 public abstract class BlockUtils {
-
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     // ==================================================
     // Component types (trust me bro, i swear they're not null)
@@ -755,7 +753,7 @@ public abstract class BlockUtils {
                 //     console.log("getChunkIfNonTicking failed");
                 // }
             } catch (Exception e) {
-                console.log("ERROR! " + e);
+                Chat.log("ERROR! " + e);
             }
         }
 
