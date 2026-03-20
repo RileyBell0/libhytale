@@ -22,6 +22,7 @@ import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerSta
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.component.TwunkDevTestComponent;
 import dev.twunk.test.TestUtil;
+import dev.twunk.utils.world.Utils.Block.Coords;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -113,6 +114,647 @@ public final class Utils {
         /// -> get BlockType
 
         // TESTS ADDED AND VERIFIED
+        public static final class Coords {
+
+            // TESTS ADDED AND VERIFIED        /// -> get LOCAL coordinates within chunk    (Vector3i)
+            public static final class Local {
+
+                public static final void test(
+                    @Nonnull final Ref<ChunkStore> blockRef,
+                    @Nonnull final WorldChunk worldChunk,
+                    @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                    @Nonnull final Vector3i providedCoords
+                ) {
+                    final var blockX = providedCoords.x;
+                    final var blockY = providedCoords.y;
+                    final var blockZ = providedCoords.z;
+                    final var index = Coords.Index.get(blockX, blockY, blockZ);
+                    final var localCoords = Coords.Local.get(index);
+                    final var blockCoords = new Vector3i(blockX, blockY, blockZ);
+
+                    final var test = new TestUtil(commandBuffer, blockCoords);
+
+                    var local = Coords.Local.get(test.blockRef);
+                    if (local == null || !local.equals(localCoords)) {
+                        throw new RuntimeException("Failed to convert blockRef to localCoords");
+                    }
+                    local = Coords.Local.get(test.info);
+                    if (local == null || !local.equals(localCoords)) {
+                        throw new RuntimeException("Failed to convert info to localCoords");
+                    }
+                    local = Coords.Local.get(blockCoords);
+                    if (local == null || !local.equals(localCoords)) {
+                        throw new RuntimeException("Failed to convert blockCoords to localCoords");
+                    }
+                    local = Coords.Local.get(localCoords);
+                    if (local == null || !local.equals(localCoords)) {
+                        throw new RuntimeException("Failed to convert LOCAL coords to localCoords");
+                    }
+                    local = Coords.Local.get(blockCoords.x, blockCoords.y, blockCoords.z);
+                    if (local == null || !local.equals(localCoords)) {
+                        throw new RuntimeException("Failed to convert coords (split) to localCoords");
+                    }
+                    local = Coords.Local.get(localCoords.x, localCoords.y, localCoords.z);
+                    if (local == null || !local.equals(localCoords)) {
+                        throw new RuntimeException("Failed to convert local coords (split) to localCoords");
+                    }
+                    local = Coords.Local.get(index);
+                    if (local == null || !local.equals(localCoords)) {
+                        throw new RuntimeException("Failed to convert block index to localCoords");
+                    }
+                }
+
+                // #region get
+                // ====================================================================
+                // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+                // ====================================================================
+                //
+                // Purpose:   Getting the local coordinates of the block (within its chunk)
+                // Requires:  BlockStateInfo component of the relevant block (or a method of getting this -> see Info.get() and thus -> Entity.getRef)
+                // importantly, most methods of getInfo are pointless, as usually these require the coordinates of a block (and if you have that, you don't need this)
+
+                @Nullable
+                public static final Vector3i get(@Nonnull final Ref<ChunkStore> blockRef) {
+                    final var info = Block.Info.get(blockRef);
+                    if (info == null) {
+                        return null;
+                    }
+
+                    // => blockIndex
+                    return Coords.Local.get(info.getIndex());
+                }
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final BlockStateInfo info) {
+                    // => blockIndex
+                    return Coords.Local.get(info.getIndex());
+                }
+
+                // ====================================================================
+                // Global coords to local coords
+                // ====================================================================
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final Vector3i coords) {
+                    return new Vector3i(coords.x & 31, coords.y, coords.z & 31);
+                }
+
+                // You're telling me i can get local coordinates from coordinates?
+                // yeah, cause, well, if you're calling this its definitely with global coords
+                //
+                // thus, all we need to do is do is keep x % 32, y, z % 32
+                //
+                // notably, 32 = 2^5, thus we only need to keep the 5 lowest bits
+                @Nonnull
+                public static final Vector3i get(final int x, final int y, final int z) {
+                    return new Vector3i(x & 31, y, z & 31);
+                }
+
+                // ====================================================================
+                // index -> this is how we actually get coords of a block throughout their system
+                // ====================================================================
+
+                @Nonnull
+                public static final Vector3i get(final int blockIndex) {
+                    // bits are as follows (assumes 32bit integers)
+                    //  1  2  3  4  5
+                    //  x  x  x  x  x
+                    //
+                    //  6  7  8  9  10
+                    //  z  z  z  z  z
+                    //
+                    // 11 12 13 14 15 16 17 18 19
+                    //  y  y  y  y  y  y  y  y  y
+                    //
+                    // bits 20-32 are assumed to be unused at this stage
+                    //
+                    // meaning:
+                    //  x: [0, 32)   | x can represent 32 different positions
+                    //  y: [0, 512)  | y can represent 512 different positions
+                    //  z: [0, 32)   | z can represent 32 different positions
+                    // thus, from this we can conclude (but also we just kind of know) that
+                    // chunks in hytale are 32x, 512y, 32z -> a really tall rectangular prism
+
+                    // tidbit on block coordinates
+                    // - local coordinates are the position within the chunk for the block
+                    // - this can be represented within 19 bits
+                    // - thus, every blockIndex is unique ONLY to the chunk its within
+                    // - thus, with just the first 19 bits we can figure out the local coordinates
+                    //   of any block given its index within its chunk
+
+                    final int x = blockIndex & 31; // keep 5
+                    final int y = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // shift 10 then keep 9
+                    final int z = (blockIndex >> 5) & 31; // shift 5 then keep 5
+
+                    return new Vector3i(x, y, z);
+                }
+
+                // #endregion get
+            }
+
+            // TESTS ADDED AND VERIFIED
+            /// -> get LOCAL index                       (int | Integer) (returns Integer so it can be nullable on method that can fail)
+            public static final class Index {
+
+                public static final void test(
+                    @Nonnull final Ref<ChunkStore> blockRef,
+                    @Nonnull final WorldChunk worldChunk,
+                    @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                    @Nonnull final Vector3i providedCoords
+                ) {
+                    final var blockX = providedCoords.x;
+                    final var blockY = providedCoords.y;
+                    final var blockZ = providedCoords.z;
+                    final var index = Coords.Index.get(blockX, blockY, blockZ);
+                    final var localCoords = Coords.Local.get(index);
+                    final var blockCoords = new Vector3i(blockX, blockY, blockZ);
+
+                    final var test = new TestUtil(commandBuffer, blockCoords);
+
+                    var testIndex = Coords.Index.get(test.blockRef);
+                    if (testIndex == null || !testIndex.equals(index)) {
+                        throw new RuntimeException("Failed to convert blockRef to blockIndex");
+                    }
+                    testIndex = Coords.Index.get(test.info);
+                    if (testIndex == null || !testIndex.equals(index)) {
+                        throw new RuntimeException("Failed to convert info to blockIndex");
+                    }
+                    testIndex = Coords.Index.get(blockCoords);
+                    if (testIndex == null || !testIndex.equals(index)) {
+                        throw new RuntimeException("Failed to convert blockCoords to blockIndex");
+                    }
+                    testIndex = Coords.Index.get(localCoords);
+                    if (testIndex == null || !testIndex.equals(index)) {
+                        throw new RuntimeException("Failed to convert LOCAL coords to blockIndex");
+                    }
+                    testIndex = Coords.Index.get(blockCoords.x, blockCoords.y, blockCoords.z);
+                    if (testIndex == null || !testIndex.equals(index)) {
+                        throw new RuntimeException("Failed to convert coords (split) to blockIndex");
+                    }
+                    testIndex = Coords.Index.get(localCoords.x, localCoords.y, localCoords.z);
+                    if (testIndex == null || !testIndex.equals(index)) {
+                        throw new RuntimeException("Failed to convert local coords (split) to blockIndex");
+                    }
+                }
+
+                // #region getLocalIndex
+
+                // Integer cause, nullable
+                @Nullable
+                public static final Integer get(@Nonnull final Ref<ChunkStore> blockRef) {
+                    final var info = Block.Info.get(blockRef);
+                    if (info == null) {
+                        return null;
+                    }
+
+                    // => blockIndex
+                    return info.getIndex();
+                }
+
+                /**
+                 * IMPORTANT: don't use this, just call `getIndex()` on the info component....
+                 *
+                 * i mean, fr.
+                 */
+                public static final int get(@Nonnull final BlockStateInfo info) {
+                    return info.getIndex();
+                }
+
+                public static final int get(@Nonnull final Vector3i coords) {
+                    return ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z);
+                }
+
+                public static final int get(final int x, final int y, final int z) {
+                    return ChunkUtil.indexBlockInColumn(x, y, z);
+                }
+
+                // #endregion getLocalIndex}
+            }
+
+            // TESTS ADDED AND VERIFIED
+            /// -> get GLOBAL coordinates                (Vector3i)
+            public static final class Global {
+
+                public static final void test(
+                    @Nonnull final Ref<ChunkStore> blockRef,
+                    @Nonnull final WorldChunk worldChunk,
+                    @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                    @Nonnull final Vector3i providedCoords
+                ) {
+                    final var blockX = providedCoords.x;
+                    final var blockY = providedCoords.y;
+                    final var blockZ = providedCoords.z;
+                    final var index = Coords.Index.get(blockX, blockY, blockZ);
+                    final var localCoords = Coords.Local.get(index);
+                    final var blockCoords = new Vector3i(blockX, blockY, blockZ);
+
+                    final var test = new TestUtil(commandBuffer, blockCoords);
+
+                    var coords = Coords.Global.get(test.blockRef);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert blockRef to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.info);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert info to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.chunkRef, localCoords);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert chunkRef + LOCAL coords to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.chunkRef, localCoords.x, localCoords.y, localCoords.z);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert chunkRef + LOCAL coords (split) to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.chunkRef, index);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert chunkRef + blockIndex to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.worldChunk, localCoords);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert worldChunk + LOCAL coords to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.worldChunk, localCoords.x, localCoords.y, localCoords.z);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException(
+                            "Failed to convert worldChunk + LOCAL coords (split) to blockCoords"
+                        );
+                    }
+                    coords = Coords.Global.get(test.worldChunk, index);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert worldChunk + blockIndex to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.blockChunk, localCoords);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert blockChunk + LOCAL coords to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.blockChunk, localCoords.x, localCoords.y, localCoords.z);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException(
+                            "Failed to convert blockChunk + LOCAL coords (split) to blockCoords"
+                        );
+                    }
+                    coords = Coords.Global.get(test.blockChunk, index);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert blockChunk + blockIndex to blockCoords");
+                    }
+                    final var chunkCoords = Chunk.Coords.Global.get(blockCoords);
+                    coords = Coords.Global.get(chunkCoords.x, chunkCoords.z, localCoords);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException(
+                            "Failed to convert chunk coords (split) + localCoords to blockCoords"
+                        );
+                    }
+                    coords = Coords.Global.get(
+                        chunkCoords.x,
+                        chunkCoords.z,
+                        localCoords.x,
+                        localCoords.y,
+                        localCoords.z
+                    );
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException(
+                            "Failed to convert chunk coords (split) + localCoords (split) to blockCoords"
+                        );
+                    }
+                    coords = Coords.Global.get(chunkCoords.x, chunkCoords.z, index);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException(
+                            "Failed to convert chunk coords (split) + blockIndex to blockCoords"
+                        );
+                    }
+
+                    final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
+                    coords = Coords.Global.get(chunkIndex, localCoords);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert chunkIndex + localCoords to blockCoords");
+                    }
+                    coords = Coords.Global.get(chunkIndex, localCoords.x, localCoords.y, localCoords.z);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException(
+                            "Failed to convert chunk chunkIndex + localCoords (split) to blockCoords"
+                        );
+                    }
+                    coords = Coords.Global.get(chunkIndex, index);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert chunkIndex + blockIndex to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.worldChunk, test.info);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert worldChunk + info to blockCoords");
+                    }
+                    coords = Coords.Global.get(test.blockChunk, test.info);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert blockChunk + info to blockCoords");
+                    }
+                    coords = Coords.Global.get(chunkCoords.x, chunkCoords.z, test.info);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert chunkCoords (split) + info to blockCoords");
+                    }
+                    coords = Coords.Global.get(chunkIndex, test.info);
+                    if (coords == null || !coords.equals(blockCoords)) {
+                        throw new RuntimeException("Failed to convert chunkIndex + info to blockCoords");
+                    }
+                }
+
+                // #region getGlobalCoords
+                // ====================================================================
+                // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+                // ====================================================================
+                //
+                // Purpose:   Getting the GLOBAL coordinates of the block in its world
+                // Requires:  THE CHUNK your block is in AND the local coordinates of your block (or some way i can get its local coords)
+
+                //   #region block
+                //   ====================================================================
+                //   idea:
+                //   + you have a reference to your block
+                //   ====================================================================
+
+                @Nullable
+                public static final Vector3i get(@Nonnull final Ref<ChunkStore> blockRef) {
+                    final var info = Block.Info.get(blockRef);
+                    if (info == null) {
+                        return null;
+                    }
+
+                    return Coords.Global.get(info.getChunkRef(), info.getIndex());
+                }
+
+                @Nullable
+                public static final Vector3i get(@Nonnull final BlockStateInfo info) {
+                    return Coords.Global.get(info.getChunkRef(), info.getIndex());
+                }
+
+                //   #endregion block
+                //   #region chunkNLocal
+                //   ====================================================================
+                //   idea:
+                //   + you have a reference to the chunk
+                //   + you have the local coords of your block
+                //   ====================================================================
+
+                //     #region chunkRef
+                //     |=================================================================
+                //     | Ref<ChunkStore> (ChunkRef)
+                //     |=================================================================
+
+                @Nullable
+                public static final Vector3i get(
+                    @Nonnull final Ref<ChunkStore> chunkRef,
+                    @Nonnull final Vector3i localCoords
+                ) {
+                    final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
+                    if (worldChunk == null) {
+                        return null;
+                    }
+
+                    return Coords.Global.get(worldChunk.getX(), worldChunk.getZ(), localCoords);
+                }
+
+                @Nullable
+                public static final Vector3i get(
+                    @Nonnull final Ref<ChunkStore> chunkRef,
+                    final int localX,
+                    final int localY,
+                    final int localZ
+                ) {
+                    final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
+                    if (worldChunk == null) {
+                        return null;
+                    }
+
+                    return Coords.Global.get(worldChunk.getX(), worldChunk.getZ(), localX, localY, localZ);
+                }
+
+                @Nullable
+                public static final Vector3i get(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
+                    final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
+                    if (worldChunk == null) {
+                        return null;
+                    }
+
+                    return Coords.Global.get(worldChunk.getX(), worldChunk.getZ(), blockIndex);
+                }
+
+                //     #endregion chunkRef
+                //     #region BlockAccessor
+                //     |=================================================================
+                //     | BlockAccessor OR WorldChunk
+                //     |=================================================================
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final WorldChunk chunk, @Nonnull final Vector3i localCoords) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), localCoords);
+                }
+
+                @Nonnull
+                public static final Vector3i get(
+                    @Nonnull final WorldChunk chunk,
+                    final int localX,
+                    final int localY,
+                    final int localZ
+                ) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), localX, localY, localZ);
+                }
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final WorldChunk chunk, final int blockIndex) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), blockIndex);
+                }
+
+                // this seems pointless, but its for anyone who already has a worldChunk so i don't have to fetch it
+                @Nonnull
+                public static final Vector3i get(@Nonnull final WorldChunk chunk, @Nonnull final BlockStateInfo info) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), info.getIndex());
+                }
+
+                //     #endregion chunkRef
+                //     #region BlockAccessor
+                //     |=================================================================
+                //     | BlockAccessor OR WorldChunk
+                //     |=================================================================
+
+                @Nonnull
+                public static final Vector3i get(
+                    @Nonnull final BlockAccessor chunk,
+                    @Nonnull final Vector3i localCoords
+                ) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), localCoords);
+                }
+
+                @Nonnull
+                public static final Vector3i get(
+                    @Nonnull final BlockAccessor chunk,
+                    final int localX,
+                    final int localY,
+                    final int localZ
+                ) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), localX, localY, localZ);
+                }
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final BlockAccessor chunk, final int blockIndex) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), blockIndex);
+                }
+
+                @Nonnull
+                public static final Vector3i get(
+                    @Nonnull final BlockAccessor chunk,
+                    @Nonnull final BlockStateInfo info
+                ) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), info.getIndex());
+                }
+
+                //     #endregion BlockAccessor
+                //     #region BlockChunk
+                //     |=================================================================
+                //     | BlockChunk
+                //     |=================================================================
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final BlockChunk chunk, @Nonnull final Vector3i localCoords) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), localCoords);
+                }
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final BlockChunk chunk, final int blockIndex) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), blockIndex);
+                }
+
+                @Nonnull
+                public static final Vector3i get(@Nonnull final BlockChunk chunk, @Nonnull final BlockStateInfo info) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), info.getIndex());
+                }
+
+                @Nonnull
+                public static final Vector3i get(
+                    @Nonnull final BlockChunk chunk,
+                    final int localX,
+                    final int localY,
+                    final int localZ
+                ) {
+                    return Coords.Global.get(chunk.getX(), chunk.getZ(), localX, localY, localZ);
+                }
+
+                //     #endregion BlockChunk
+                //     #region done
+                //     |=================================================================
+                //     | Done!
+                //     |=================================================================
+
+                // Chunk Coords AND Block Coords
+                @Nonnull
+                public static final Vector3i get(
+                    final int chunkX,
+                    final int chunkZ,
+                    @Nonnull final Vector3i localCoords
+                ) {
+                    return new Vector3i(localCoords.x + (chunkX << 5), localCoords.y, localCoords.z + (chunkZ << 5));
+                }
+
+                // Chunk Coords AND Block Coords
+                @Nonnull
+                public static final Vector3i get(
+                    final int chunkX,
+                    final int chunkZ,
+                    final int localX,
+                    final int localY,
+                    final int localZ
+                ) {
+                    return new Vector3i(localX + (chunkX << 5), localY, localZ + (chunkZ << 5));
+                }
+
+                // Chunk coords AND Block Index
+                @Nonnull
+                public static final Vector3i get(final int chunkX, final int chunkZ, final int blockIndex) {
+                    // remember: 5 bits -> 32
+                    final int globalX = (blockIndex & 31) + (chunkX << 5); // globalX = local X + 32 * chunkX (chunk is 32x32 for x,z)
+                    final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // same as local y, there is no distinction between the two
+                    final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5); // globalX = local z + 32 * chunkZ (chunk is 32x32 for x,z)
+
+                    return new Vector3i(globalX, globalY, globalZ);
+                }
+
+                // may seem pointless, but its so if you already have the chunkX and chunkZ i don't have to fetch them
+                @Nonnull
+                public static final Vector3i get(
+                    final int chunkX,
+                    final int chunkZ,
+                    @Nonnull final BlockStateInfo info
+                ) {
+                    final var blockIndex = info.getIndex();
+
+                    // remember: 5 bits -> 32
+                    final int globalX = (blockIndex & 31) + (chunkX << 5); // globalX = local X + 32 * chunkX (chunk is 32x32 for x,z)
+                    final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // same as local y, there is no distinction between the two
+                    final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5); // globalX = local z + 32 * chunkZ (chunk is 32x32 for x,z)
+
+                    return new Vector3i(globalX, globalY, globalZ);
+                }
+
+                // Chunk Coords AND Block Coords
+                @Nonnull
+                public static final Vector3i get(final long chunkIndex, @Nonnull final Vector3i localCoords) {
+                    final int chunkX = (int) (chunkIndex >> 32);
+                    final int chunkZ = (int) (chunkIndex);
+
+                    return new Vector3i(localCoords.x + (chunkX << 5), localCoords.y, localCoords.z + (chunkZ << 5));
+                }
+
+                // Chunk Coords AND Block Coords
+                @Nonnull
+                public static final Vector3i get(
+                    final long chunkIndex,
+                    final int localX,
+                    final int localY,
+                    final int localZ
+                ) {
+                    final int chunkX = (int) (chunkIndex >> 32);
+                    final int chunkZ = (int) (chunkIndex);
+
+                    return new Vector3i(localX + (chunkX << 5), localY, localZ + (chunkZ << 5));
+                }
+
+                // Chunk coords AND Block Index
+                @Nonnull
+                public static final Vector3i get(final long chunkIndex, final int blockIndex) {
+                    // our chunk X coord is in the 33-64 bits (inclusive) of chunkIndex. We want that part, multiplied by 32, thus we must drop the first 32 bits of chunkIndex, then later shift it back 5 bits to "multiply" it by 32
+                    final int chunkX = (int) (chunkIndex >> 32);
+                    // our chunk z coord is in the first 32 bits, so we'll cast it to an int (just keeps first 32 bits) then later shift it back 5 bits to "multiply" it by 32
+                    final int chunkZ = (int) (chunkIndex);
+
+                    final int globalX = (blockIndex & 31) + (chunkX << 5);
+                    final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK;
+                    final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5);
+
+                    return new Vector3i(globalX, globalY, globalZ);
+                }
+
+                // Chunk coords AND Block Index
+                @Nonnull
+                public static final Vector3i get(final long chunkIndex, @Nonnull final BlockStateInfo info) {
+                    final var blockIndex = info.getIndex();
+
+                    // our chunk X coord is in the 33-64 bits (inclusive) of chunkIndex. We want that part, multiplied by 32, thus we must drop the first 32 bits of chunkIndex, then later shift it back 5 bits to "multiply" it by 32
+                    final int chunkX = (int) (chunkIndex >> 32);
+                    // our chunk z coord is in the first 32 bits, so we'll cast it to an int (just keeps first 32 bits) then later shift it back 5 bits to "multiply" it by 32
+                    final int chunkZ = (int) (chunkIndex);
+
+                    final int globalX = (blockIndex & 31) + (chunkX << 5);
+                    final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK;
+                    final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5);
+
+                    return new Vector3i(globalX, globalY, globalZ);
+                }
+
+                //     #endregion done
+                //   #endregion chunkNLocal
+                // #endregion getGlobalCoords
+            }
+        }
+
+        // TESTS ADDED AND VERIFIED
         public static final class Ref_ {
 
             /**
@@ -152,15 +794,15 @@ public final class Utils {
                      */
                     world.getBlock(coords.x, coords.y, coords.z);
                     world.getBlockType(coords);
-                    world.getChunkIfInMemory(ChunkCoords.Index.get(coords));
-                    world.getChunkIfLoaded(ChunkCoords.Index.get(coords));
-                    world.getChunk(ChunkCoords.Index.get(coords));
+                    world.getChunkIfInMemory(Chunk.Coords.Index.get(coords));
+                    world.getChunkIfLoaded(Chunk.Coords.Index.get(coords));
+                    world.getChunk(Chunk.Coords.Index.get(coords));
 
                     /**
                      * get chunk if non ticking seems to be of no value
                      * idk how to get it to not-fail, always fails for me
                      */
-                    // var c = world.getChunkIfNonTicking(ChunkCoords.Index.getChunkIndex(coords));
+                    // var c = world.getChunkIfNonTicking(Chunk.Coords.Index.getChunkIndex(coords));
                     // if (c == null) {
                     //     console.log("getChunkIfNonTicking failed");
                     // }
@@ -198,10 +840,10 @@ public final class Utils {
                 final var blockX = providedCoords.x;
                 final var blockY = providedCoords.y;
                 final var blockZ = providedCoords.z;
-                final var index = BlockCoords.Index.get(blockX, blockY, blockZ);
-                final var localCoords = BlockCoords.Local.get(index);
+                final var index = Coords.Index.get(blockX, blockY, blockZ);
+                final var localCoords = Coords.Local.get(index);
                 final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-                final var chunkIndex = ChunkCoords.Index.get(blockCoords);
+                final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
 
                 final var test = new TestUtil(commandBuffer, blockCoords);
                 // functions to test
@@ -314,8 +956,8 @@ public final class Utils {
 
                 return Block.Ref_.get2(
                     otherChunkRef.getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockCoords),
-                    BlockCoords.Index.get(blockCoords)
+                    Chunk.Coords.Index.get(blockCoords),
+                    Coords.Index.get(blockCoords)
                 );
             }
 
@@ -336,8 +978,8 @@ public final class Utils {
 
                 return Block.Ref_.get2(
                     otherChunkRef.getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockX, blockZ),
-                    BlockCoords.Index.get(blockX, blockY, blockZ)
+                    Chunk.Coords.Index.get(blockX, blockZ),
+                    Coords.Index.get(blockX, blockY, blockZ)
                 );
             }
 
@@ -377,12 +1019,12 @@ public final class Utils {
             ) {
                 // return worldProvider
                 //     .getWorld()
-                //     .getChunk(ChunkCoords.Index.getChunkIndex(coords))
+                //     .getChunk(Chunk.Coords.Index.getChunkIndex(coords))
                 //     .getBlockComponentEntity(coords.x, coords.y, coords.z);
                 return Block.Ref_.get2(
                     worldProvider.getWorld().getChunkStore(),
-                    ChunkCoords.Index.get(coords),
-                    BlockCoords.Index.get(coords)
+                    Chunk.Coords.Index.get(coords),
+                    Coords.Index.get(coords)
                 );
             }
 
@@ -396,8 +1038,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     worldProvider.getWorld().getChunkStore(),
-                    ChunkCoords.Index.get(blockX, blockZ),
-                    BlockCoords.Index.get(blockX, blockY, blockZ)
+                    Chunk.Coords.Index.get(blockX, blockZ),
+                    Coords.Index.get(blockX, blockY, blockZ)
                 );
             }
 
@@ -423,13 +1065,9 @@ public final class Utils {
             @Nullable
             public static final Ref<ChunkStore> get(@Nonnull final World world, @Nonnull final Vector3i coords) {
                 // return world
-                //     .getChunk(ChunkCoords.Index.getChunkIndex(coords))
+                //     .getChunk(Chunk.Coords.Index.getChunkIndex(coords))
                 //     .getBlockComponentEntity(coords.x, coords.y, coords.z);
-                return Block.Ref_.get2(
-                    world.getChunkStore(),
-                    ChunkCoords.Index.get(coords),
-                    BlockCoords.Index.get(coords)
-                );
+                return Block.Ref_.get2(world.getChunkStore(), Chunk.Coords.Index.get(coords), Coords.Index.get(coords));
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -441,12 +1079,12 @@ public final class Utils {
                 final int blockZ
             ) {
                 // return world
-                //     .getChunk(ChunkCoords.Index.getChunkIndex(blockX, blockZ))
+                //     .getChunk(Chunk.Coords.Index.getChunkIndex(blockX, blockZ))
                 //     .getBlockComponentEntity(blockX, blockY, blockZ);
                 return Block.Ref_.get2(
                     world.getChunkStore(),
-                    ChunkCoords.Index.get(blockX, blockZ),
-                    BlockCoords.Index.get(blockX, blockY, blockZ)
+                    Chunk.Coords.Index.get(blockX, blockZ),
+                    Coords.Index.get(blockX, blockY, blockZ)
                 );
             }
 
@@ -473,8 +1111,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     commandBuffer.getExternalData(),
-                    ChunkCoords.Index.get(coords),
-                    BlockCoords.Index.get(coords)
+                    Chunk.Coords.Index.get(coords),
+                    Coords.Index.get(coords)
                 );
             }
 
@@ -488,8 +1126,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     commandBuffer.getExternalData(),
-                    ChunkCoords.Index.get(blockX, blockZ),
-                    BlockCoords.Index.get(blockX, blockY, blockZ)
+                    Chunk.Coords.Index.get(blockX, blockZ),
+                    Coords.Index.get(blockX, blockY, blockZ)
                 );
             }
 
@@ -513,8 +1151,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     info.getChunkRef().getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockCoords),
-                    BlockCoords.Index.get(blockCoords)
+                    Chunk.Coords.Index.get(blockCoords),
+                    Coords.Index.get(blockCoords)
                 );
             }
 
@@ -527,8 +1165,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     info.getChunkRef().getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockX, blockZ),
-                    BlockCoords.Index.get(blockX, blockY, blockZ)
+                    Chunk.Coords.Index.get(blockX, blockZ),
+                    Coords.Index.get(blockX, blockY, blockZ)
                 );
             }
 
@@ -558,8 +1196,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     otherChunkRef.getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockCoords),
-                    BlockCoords.Index.get(blockCoords)
+                    Chunk.Coords.Index.get(blockCoords),
+                    Coords.Index.get(blockCoords)
                 );
             }
 
@@ -573,8 +1211,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     otherChunkRef.getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockX, blockZ),
-                    BlockCoords.Index.get(blockX, blockY, blockZ)
+                    Chunk.Coords.Index.get(blockX, blockZ),
+                    Coords.Index.get(blockX, blockY, blockZ)
                 );
             }
 
@@ -607,12 +1245,12 @@ public final class Utils {
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final Vector3i blockCoords
             ) {
-                final var chunkRef = store.getExternalData().getChunkReference(ChunkCoords.Index.get(blockCoords));
+                final var chunkRef = store.getExternalData().getChunkReference(Chunk.Coords.Index.get(blockCoords));
                 if (chunkRef == null) {
                     return null;
                 }
 
-                return Block.Ref_.getLocal1_chunkRef(chunkRef, BlockCoords.Index.get(blockCoords));
+                return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockCoords));
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -623,12 +1261,12 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                final var chunkRef = store.getExternalData().getChunkReference(ChunkCoords.Index.get(blockX, blockZ));
+                final var chunkRef = store.getExternalData().getChunkReference(Chunk.Coords.Index.get(blockX, blockZ));
                 if (chunkRef == null) {
                     return null;
                 }
 
-                return Block.Ref_.getLocal1_chunkRef(chunkRef, BlockCoords.Index.get(blockX, blockY, blockZ));
+                return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockX, blockY, blockZ));
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -655,12 +1293,12 @@ public final class Utils {
                 @Nonnull final ChunkStore chunkStore,
                 @Nonnull final Vector3i blockCoords
             ) {
-                final var chunkRef = chunkStore.getChunkReference(ChunkCoords.Index.get(blockCoords));
+                final var chunkRef = chunkStore.getChunkReference(Chunk.Coords.Index.get(blockCoords));
                 if (chunkRef == null) {
                     return null;
                 }
 
-                return Block.Ref_.getLocal1_chunkRef(chunkRef, BlockCoords.Index.get(blockCoords));
+                return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockCoords));
             }
 
             // => (ChunkStore, chunkIndex, blockIndex)
@@ -671,12 +1309,12 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                final var chunkRef = chunkStore.getChunkReference(ChunkCoords.Index.get(blockX, blockZ));
+                final var chunkRef = chunkStore.getChunkReference(Chunk.Coords.Index.get(blockX, blockZ));
                 if (chunkRef == null) {
                     return null;
                 }
 
-                return Block.Ref_.getLocal1_chunkRef(chunkRef, BlockCoords.Index.get(blockX, blockY, blockZ));
+                return Block.Ref_.getLocal1_chunkRef(chunkRef, Coords.Index.get(blockX, blockY, blockZ));
             }
 
             @Nullable
@@ -770,7 +1408,7 @@ public final class Utils {
                     return null;
                 }
 
-                var blockIndex = BlockCoords.Index.get(blockCoords);
+                var blockIndex = Coords.Index.get(blockCoords);
 
                 return Block.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
             }
@@ -787,7 +1425,7 @@ public final class Utils {
                     return null;
                 }
 
-                var blockIndex = BlockCoords.Index.get(blockX, blockY, blockZ);
+                var blockIndex = Coords.Index.get(blockX, blockY, blockZ);
 
                 return Block.Ref_.getLocal1_chunkRef(info.getChunkRef(), blockIndex);
             }
@@ -819,7 +1457,7 @@ public final class Utils {
                     return null;
                 }
 
-                return Block.Ref_.getLocal0(blockComponentChunk, BlockCoords.Index.get(blockCoords));
+                return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
             }
 
             // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -835,7 +1473,7 @@ public final class Utils {
                     return null;
                 }
 
-                return Block.Ref_.getLocal0(blockComponentChunk, BlockCoords.Index.get(blockX, blockY, blockZ));
+                return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
             }
 
             // ChunkRef => component ON the chunk itself => block ref in the chunk
@@ -877,7 +1515,7 @@ public final class Utils {
                     return null;
                 }
 
-                return Block.Ref_.getLocal0(blockComponentChunk, BlockCoords.Index.get(blockCoords));
+                return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
             }
 
             /**
@@ -896,7 +1534,7 @@ public final class Utils {
                     return null;
                 }
 
-                return Block.Ref_.getLocal0(blockComponentChunk, BlockCoords.Index.get(blockX, blockY, blockZ));
+                return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
             }
 
             /**
@@ -923,8 +1561,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     worldChunk.getReference().getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockCoords),
-                    BlockCoords.Index.get(blockCoords)
+                    Chunk.Coords.Index.get(blockCoords),
+                    Coords.Index.get(blockCoords)
                 );
             }
 
@@ -939,8 +1577,8 @@ public final class Utils {
             ) {
                 return Block.Ref_.get2(
                     worldChunk.getReference().getStore().getExternalData(),
-                    ChunkCoords.Index.get(blockX, blockZ),
-                    BlockCoords.Index.get(blockX, blockY, blockZ)
+                    Chunk.Coords.Index.get(blockX, blockZ),
+                    Coords.Index.get(blockX, blockY, blockZ)
                 );
             }
 
@@ -975,7 +1613,7 @@ public final class Utils {
 
             @Nullable
             public static final Ref<ChunkStore> getLocal(@Nonnull final WorldChunk worldChunk, final int blockIndex) {
-                final var localCoords = BlockCoords.Local.get(blockIndex);
+                final var localCoords = Coords.Local.get(blockIndex);
                 return worldChunk.getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z);
             }
 
@@ -994,7 +1632,7 @@ public final class Utils {
                 @Nonnull final BlockComponentChunk blockComponentChunk,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Block.Ref_.getLocal0(blockComponentChunk, BlockCoords.Index.get(blockCoords));
+                return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -1004,7 +1642,7 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                return Block.Ref_.getLocal0(blockComponentChunk, BlockCoords.Index.get(blockX, blockY, blockZ));
+                return Block.Ref_.getLocal0(blockComponentChunk, Coords.Index.get(blockX, blockY, blockZ));
             }
 
             @Nullable
@@ -1049,10 +1687,10 @@ public final class Utils {
                 final var blockX = providedCoords.x;
                 final var blockY = providedCoords.y;
                 final var blockZ = providedCoords.z;
-                final var localIndex = BlockCoords.Index.get(blockX, blockY, blockZ);
-                final var localCoords = BlockCoords.Local.get(localIndex);
+                final var localIndex = Coords.Index.get(blockX, blockY, blockZ);
+                final var localCoords = Coords.Local.get(localIndex);
                 final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-                final var chunkIndex = ChunkCoords.Index.get(blockCoords);
+                final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
 
                 final var test = new TestUtil(commandBuffer, blockCoords);
                 // functions to test
@@ -1482,7 +2120,7 @@ public final class Utils {
 
             @Nullable
             public static final BlockStateInfo getLocal(@Nonnull final WorldChunk worldChunk, final int blockIndex) {
-                final var localCoords = BlockCoords.Local.get(blockIndex);
+                final var localCoords = Coords.Local.get(blockIndex);
                 return Block.Info.get(worldChunk.getBlockComponentEntity(localCoords.x, localCoords.y, localCoords.z));
             }
 
@@ -1502,7 +2140,7 @@ public final class Utils {
                 @Nonnull final BlockComponentChunk blockComponentChunk,
                 @Nonnull final Vector3i blockCoords
             ) {
-                final int blockIndex = BlockCoords.Index.get(blockCoords);
+                final int blockIndex = Coords.Index.get(blockCoords);
                 return blockComponentChunk.getComponent(blockIndex, BLOCK_STATE_INFO_COMPONENT);
             }
 
@@ -1513,7 +2151,7 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                final int blockIndex = BlockCoords.Index.get(blockX, blockY, blockZ);
+                final int blockIndex = Coords.Index.get(blockX, blockY, blockZ);
                 return blockComponentChunk.getComponent(blockIndex, BLOCK_STATE_INFO_COMPONENT);
             }
 
@@ -1817,10 +2455,10 @@ public final class Utils {
                 final var blockX = providedCoords.x;
                 final var blockY = providedCoords.y;
                 final var blockZ = providedCoords.z;
-                final var localIndex = BlockCoords.Index.get(blockX, blockY, blockZ);
+                final var localIndex = Coords.Index.get(blockX, blockY, blockZ);
                 final var blockIndex = localIndex;
                 final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-                final var chunkIndex = ChunkCoords.Index.get(blockCoords);
+                final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
 
                 final var test = new TestUtil(commandBuffer, blockCoords);
 
@@ -1878,7 +2516,7 @@ public final class Utils {
                 @Nonnull final WorldProvider worldProvider,
                 @Nonnull final Vector3i blockCoords
             ) {
-                final var worldChunk = worldProvider.getWorld().getChunk(ChunkCoords.Index.get(blockCoords));
+                final var worldChunk = worldProvider.getWorld().getChunk(Chunk.Coords.Index.get(blockCoords));
                 if (worldChunk == null) {
                     return null;
                 }
@@ -1893,7 +2531,7 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                final var worldChunk = worldProvider.getWorld().getChunk(ChunkCoords.Index.get(blockX, blockZ));
+                final var worldChunk = worldProvider.getWorld().getChunk(Chunk.Coords.Index.get(blockX, blockZ));
                 if (worldChunk == null) {
                     return null;
                 }
@@ -1912,7 +2550,7 @@ public final class Utils {
                     return null;
                 }
 
-                return worldChunk.getBlock(BlockCoords.Local.get(blockIndex));
+                return worldChunk.getBlock(Coords.Local.get(blockIndex));
             }
 
             // #endregion WorldProvider
@@ -1924,7 +2562,7 @@ public final class Utils {
 
             @Nullable
             public static final Integer get(@Nonnull final World world, @Nonnull final Vector3i blockCoords) {
-                final var worldChunk = world.getChunk(ChunkCoords.Index.get(blockCoords));
+                final var worldChunk = world.getChunk(Chunk.Coords.Index.get(blockCoords));
                 if (worldChunk == null) {
                     return null;
                 }
@@ -1939,7 +2577,7 @@ public final class Utils {
                 final int blockY,
                 final int blockZ
             ) {
-                final var worldChunk = world.getChunk(ChunkCoords.Index.get(blockX, blockZ));
+                final var worldChunk = world.getChunk(Chunk.Coords.Index.get(blockX, blockZ));
                 if (worldChunk == null) {
                     return null;
                 }
@@ -1954,7 +2592,7 @@ public final class Utils {
                     return null;
                 }
 
-                return worldChunk.getBlock(BlockCoords.Local.get(blockIndex));
+                return worldChunk.getBlock(Coords.Local.get(blockIndex));
             }
 
             // #endregion World
@@ -2003,7 +2641,7 @@ public final class Utils {
                     return null;
                 }
 
-                return worldChunk.getBlock(BlockCoords.Local.get(blockIndex));
+                return worldChunk.getBlock(Coords.Local.get(blockIndex));
             }
 
             // #endregion CommandBuffer
@@ -2052,7 +2690,7 @@ public final class Utils {
                     return null;
                 }
 
-                return worldChunk.getBlock(BlockCoords.Local.get(blockIndex));
+                return worldChunk.getBlock(Coords.Local.get(blockIndex));
             }
 
             // #endregion Store<ChunkStore>
@@ -2098,7 +2736,7 @@ public final class Utils {
                     return null;
                 }
 
-                return worldChunk.getBlock(BlockCoords.Local.get(blockIndex));
+                return worldChunk.getBlock(Coords.Local.get(blockIndex));
             }
 
             // #endregion ChunkStore
@@ -2147,7 +2785,7 @@ public final class Utils {
                     return null;
                 }
 
-                return worldChunk.getBlock(BlockCoords.Local.get(blockIndex));
+                return worldChunk.getBlock(Coords.Local.get(blockIndex));
             }
 
             // #endregion Ref<ChunkStore>
@@ -2244,6 +2882,274 @@ public final class Utils {
     public static final class Chunk {
 
         // TESTS ADDED AND VERIFIED
+        public static final class Coords {
+
+            /// -> get CHUNK coordinates                 (long | Vector2i | ChunkCoordinates)
+            public static final class Global {
+
+                public static final void test(
+                    @Nonnull final Ref<ChunkStore> blockRef,
+                    @Nonnull final WorldChunk worldChunk,
+                    @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                    @Nonnull final Vector3i providedCoords
+                ) {
+                    final var blockX = providedCoords.x;
+                    final var blockY = providedCoords.y;
+                    final var blockZ = providedCoords.z;
+                    final var blockCoords = new Vector3i(blockX, blockY, blockZ);
+
+                    var coords = Chunk.Coords.Global.get(blockX, blockZ);
+                    final var sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN =
+                        coords;
+                    if (
+                        coords == null ||
+                        !coords.equals(
+                            sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN
+                        )
+                    ) {
+                        throw new RuntimeException("Failed to convert blockX,blockZ to chunkCoords");
+                    }
+                    coords = Chunk.Coords.Global.get(blockCoords);
+                    if (
+                        coords == null ||
+                        !coords.equals(
+                            sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN
+                        )
+                    ) {
+                        throw new RuntimeException("Failed to convert blockCoords to chunkCoords");
+                    }
+
+                    var coords2 = Chunk.Coords.Global.getVector2i(blockX, blockZ);
+                    final var myVec2 = new Vector2i(
+                        sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN.x,
+                        sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN.z
+                    );
+                    if (coords2 == null || !coords2.equals(myVec2)) {
+                        throw new RuntimeException("Failed to convert blockX,blockZ to chunkCoords (vector2i)");
+                    }
+
+                    coords2 = Chunk.Coords.Global.getVector2i(blockCoords);
+                    if (coords2 == null || !coords2.equals(myVec2)) {
+                        throw new RuntimeException("Failed to convert blockCoords to chunkCoords (vector2i)");
+                    }
+                }
+
+                // #region getChunkCoords
+                // ====================================================================
+                // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+                // ====================================================================
+                //
+                // Purpose:   Getting chunk coordinates within a world
+                // Requires:  BlockStateInfo component of the relevant block (or a method of getting this -> see Info.get() and thus -> Entity.getRef)
+                // importantly, most methods of getInfo are pointless, as usually these require the coordinates of a block (and if you have that, you don't need this)
+
+                // ====================================================================
+                // Chunk Coordinates FROM block coordinates
+                // ====================================================================
+
+                // With GLOBAL block coords
+                @Nonnull
+                public static final ChunkCoordinates get(final int blockX, final int blockZ) {
+                    // see ChunkUtil.chunkCoordinate
+                    return new ChunkCoordinates(blockX >> 5, blockZ >> 5);
+                }
+
+                // With GLOBAL block coords
+                @Nonnull
+                public static final ChunkCoordinates get(@Nonnull final Vector3i blockCoords) {
+                    // see ChunkUtil.chunkCoordinate
+                    return new ChunkCoordinates(blockCoords.x >> 5, blockCoords.z >> 5);
+                }
+
+                /**
+                 * With GLOBAL block coords
+                 *
+                 * returned "y" in vector is actually the chunk's "z" coordinate
+                 */
+                @Nonnull
+                public static final Vector2i getVector2i(final int blockX, final int blockZ) {
+                    // see ChunkUtil.chunkCoordinate
+                    return new Vector2i(blockX >> 5, blockZ >> 5);
+                }
+
+                /**
+                 * With GLOBAL block coords
+                 *
+                 * returned "y" in vector is actually the chunk's "z" coordinate
+                 */
+                @Nonnull
+                public static final Vector2i getVector2i(@Nonnull final Vector3i blockCoords) {
+                    // see ChunkUtil.chunkCoordinate
+                    return new Vector2i(blockCoords.x >> 5, blockCoords.z >> 5);
+                }
+                // #endregion getChunkCoords
+            }
+
+            // ====================================================================
+            // Chunk Index (index is interchangable with coordinates) FROM block coordinates
+            // ====================================================================
+
+            public static final class Index {
+
+                public static final void test(
+                    @Nonnull final Ref<ChunkStore> blockRef,
+                    @Nonnull final WorldChunk worldChunk,
+                    @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+                    @Nonnull final Vector3i providedCoords
+                ) {
+                    final var blockX = providedCoords.x;
+                    final var blockY = providedCoords.y;
+                    final var blockZ = providedCoords.z;
+                    final var blockCoords = new Vector3i(blockX, blockY, blockZ);
+                    final var test = new TestUtil(commandBuffer, blockCoords);
+                    final var chunkCoords = Chunk.Coords.Global.get(blockX, blockZ);
+                    final var chunkIndex = Chunk.Coords.Index.get(blockRef); // shush, i know....
+
+                    // Long get(Ref<ChunkStore> anyRef)
+                    Long testIndex = Chunk.Coords.Index.get(test.chunkRef);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert chunkRef (anyref) to chunkIndex");
+                    }
+                    testIndex = Chunk.Coords.Index.get(blockRef);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert blockRef (anyref) to chunkIndex");
+                    }
+                    // Long get(BlockStateInfo info)
+                    testIndex = Chunk.Coords.Index.get(test.info);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert info to chunkIndex");
+                    }
+
+                    // Long get_chunkRef(Ref<ChunkStore> chunkRef)
+                    testIndex = Chunk.Coords.Index.get_chunkRef(test.chunkRef);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert chunkRef (specific method) to chunkIndex");
+                    }
+
+                    // Long get_blockRef(Ref<ChunkStore> blockRef)
+                    testIndex = Chunk.Coords.Index.get_blockRef(blockRef);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert blockRef (specific method) to chunkIndex");
+                    }
+
+                    // long get(WorldChunk worldChunk)
+                    testIndex = Chunk.Coords.Index.get(worldChunk);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert worldChunk to chunkIndex");
+                    }
+
+                    // long get(int blockX, int blockZ)
+                    testIndex = Chunk.Coords.Index.get(blockX, blockZ);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert blockX, blockZ to chunkIndex");
+                    }
+
+                    // long get(Vector3i blockCoords)
+                    testIndex = Chunk.Coords.Index.get(blockCoords);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert blockCoords to chunkIndex");
+                    }
+
+                    // long get_chunkCoords(int chunkX, int chunkZ)
+                    testIndex = Chunk.Coords.Index.get_chunkCoords(chunkCoords.x, chunkCoords.z);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert chunkCoords.x, chunkCoords.z to chunkIndex");
+                    }
+
+                    // long get_chunkCoords(ChunkCoordinates coords)
+                    testIndex = Chunk.Coords.Index.get_chunkCoords(chunkCoords);
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert chunkCoords to chunkIndex");
+                    }
+
+                    // long get_chunkCoords(Vector2i chunkCoords)
+                    testIndex = Chunk.Coords.Index.get_chunkCoords(new Vector2i(chunkCoords.x, chunkCoords.z));
+                    if (testIndex == null || !testIndex.equals(chunkIndex)) {
+                        throw new RuntimeException("Failed to convert chunkCoords (vector2i) to chunkIndex");
+                    }
+                }
+
+                // #region getChunkIndex
+
+                @Nullable
+                public static final Long get(@Nonnull final Ref<ChunkStore> anyRef) {
+                    final var worldChunk = Chunk.WorldChunk_.get(anyRef);
+                    if (worldChunk == null) {
+                        return null;
+                    }
+
+                    return worldChunk.getIndex();
+                }
+
+                @Nullable
+                public static final Long get(@Nonnull final BlockStateInfo info) {
+                    return Chunk.Coords.Index.get_chunkRef(info.getChunkRef());
+                }
+
+                @Nullable
+                public static final Long get_chunkRef(@Nonnull final Ref<ChunkStore> chunkRef) {
+                    final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
+                    if (worldChunk == null) {
+                        return null;
+                    }
+
+                    return worldChunk.getIndex();
+                }
+
+                @Nullable
+                public static final Long get_blockRef(@Nonnull final Ref<ChunkStore> blockRef) {
+                    final var worldChunk = Chunk.WorldChunk_.get_blockRef(blockRef);
+                    if (worldChunk == null) {
+                        return null;
+                    }
+
+                    return worldChunk.getIndex();
+                }
+
+                // TODO worldChunk.getIndex()  and      Chunk.Coords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ()) do the same thing
+                public static final long get(@Nonnull final WorldChunk worldChunk) {
+                    return worldChunk.getIndex();
+                }
+
+                /**
+                 * a `long` is just a bit-packed version of chunk coords.
+                 * int: 32 bits
+                 * long: 64 bits
+                 *
+                 * hence, a long is basically 2 ints back to back
+                 */
+                public static final long get(final int blockX, final int blockZ) {
+                    // see ChunkUtil.indexChunkFromBlock
+                    return ((long) (blockX >> 5) << 32) | ((long) (blockZ >> 5) & 4294967295L);
+                }
+
+                public static final long get(@Nonnull final Vector3i blockCoords) {
+                    // see ChunkUtil.indexChunkFromBlock
+                    return ((long) (blockCoords.x >> 5) << 32) | ((long) (blockCoords.z >> 5) & 4294967295L);
+                }
+
+                public static final long get_chunkCoords(final int chunkX, final int chunkZ) {
+                    // see ChunkUtil.indexChunkFromBlock
+                    return ((long) chunkX << 32) | ((long) chunkZ & 4294967295L);
+                }
+
+                public static final long get_chunkCoords(@Nonnull final ChunkCoordinates coords) {
+                    // see ChunkUtil.indexChunkFromBlock
+                    return ((long) coords.x << 32) | ((long) coords.z & 4294967295L);
+                }
+
+                /**
+                 * WARNING: the `y` value MUST be the `z` value for the chunk
+                 */
+                public static final long get_chunkCoords(@Nonnull final Vector2i chunkCoords) {
+                    // see ChunkUtil.indexChunkFromBlock
+                    return ((long) chunkCoords.x << 32) | ((long) chunkCoords.y & 4294967295L);
+                }
+                // #endregion getChunkIndex
+            }
+        }
+
+        // TESTS ADDED AND VERIFIED
         /// -> get WorldChunk
         public static final class WorldChunk_ {
 
@@ -2263,8 +3169,8 @@ public final class Utils {
                 // final var localIndex = BlockCoords.Index.getLocalIndex(blockX, blockY, blockZ);
                 // final var localCoords = BlockCoords.Local.get(localIndex);
                 final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-                final var chunkIndex = ChunkCoords.Index.get(blockCoords);
-                final var chunkCoords = ChunkCoords.Global.get(blockCoords);
+                final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
+                final var chunkCoords = Chunk.Coords.Global.get(blockCoords);
                 final var chunkX = chunkCoords.x;
                 final var chunkZ = chunkCoords.z;
 
@@ -2400,7 +3306,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.WorldChunk_.get(worldProvider, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.WorldChunk_.get(worldProvider, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2408,7 +3314,7 @@ public final class Utils {
                 @Nonnull final WorldProvider worldProvider,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.WorldChunk_.get(worldProvider, ChunkCoords.Index.get(blockCoords));
+                return Chunk.WorldChunk_.get(worldProvider, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2417,7 +3323,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.WorldChunk_.get(worldProvider, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.WorldChunk_.get(worldProvider, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2438,12 +3344,12 @@ public final class Utils {
 
             @Nullable
             public static final WorldChunk get(@Nonnull final World world, final int blockX, final int blockZ) {
-                return Chunk.WorldChunk_.get(world, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.WorldChunk_.get(world, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
             public static final WorldChunk get(@Nonnull final World world, @Nonnull final Vector3i blockCoords) {
-                return Chunk.WorldChunk_.get(world, ChunkCoords.Index.get(blockCoords));
+                return Chunk.WorldChunk_.get(world, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2452,7 +3358,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.WorldChunk_.get(world, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.WorldChunk_.get(world, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2480,7 +3386,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.WorldChunk_.get(anyRef, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.WorldChunk_.get(anyRef, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2488,7 +3394,7 @@ public final class Utils {
                 @Nonnull final Ref<ChunkStore> anyRef,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.WorldChunk_.get(anyRef, ChunkCoords.Index.get(blockCoords));
+                return Chunk.WorldChunk_.get(anyRef, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2497,7 +3403,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.WorldChunk_.get(anyRef, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.WorldChunk_.get(anyRef, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2528,7 +3434,7 @@ public final class Utils {
              */
             @Nullable
             public static final WorldChunk get(@Nonnull final BlockStateInfo info, final int blockX, final int blockZ) {
-                return Chunk.WorldChunk_.get(info, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.WorldChunk_.get(info, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2536,7 +3442,7 @@ public final class Utils {
                 @Nonnull final BlockStateInfo info,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.WorldChunk_.get(info, ChunkCoords.Index.get(blockCoords));
+                return Chunk.WorldChunk_.get(info, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2545,7 +3451,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.WorldChunk_.get(info, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.WorldChunk_.get(info, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             /**
@@ -2585,7 +3491,7 @@ public final class Utils {
                 final int blockZ
             ) {
                 // but regardless we don't need the world to get the world chunk
-                return Chunk.WorldChunk_.get(commandBuffer, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.WorldChunk_.get(commandBuffer, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2593,7 +3499,7 @@ public final class Utils {
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.WorldChunk_.get(commandBuffer, ChunkCoords.Index.get(blockCoords));
+                return Chunk.WorldChunk_.get(commandBuffer, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2602,7 +3508,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.WorldChunk_.get(commandBuffer, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.WorldChunk_.get(commandBuffer, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2634,7 +3540,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.WorldChunk_.get(store, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.WorldChunk_.get(store, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2642,7 +3548,7 @@ public final class Utils {
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.WorldChunk_.get(store, ChunkCoords.Index.get(blockCoords));
+                return Chunk.WorldChunk_.get(store, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2651,7 +3557,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.WorldChunk_.get(store, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.WorldChunk_.get(store, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2683,7 +3589,7 @@ public final class Utils {
                 final int blockZ
             ) {
                 // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
-                return Chunk.WorldChunk_.get(chunkStore, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.WorldChunk_.get(chunkStore, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2691,7 +3597,7 @@ public final class Utils {
                 @Nonnull final ChunkStore chunkStore,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.WorldChunk_.get(chunkStore, ChunkCoords.Index.get(blockCoords));
+                return Chunk.WorldChunk_.get(chunkStore, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2700,7 +3606,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.WorldChunk_.get(chunkStore, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.WorldChunk_.get(chunkStore, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2733,8 +3639,8 @@ public final class Utils {
                 // final var localIndex = BlockCoords.Index.getLocalIndex(blockX, blockY, blockZ);
                 // final var localCoords = BlockCoords.Local.get(localIndex);
                 final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-                final var chunkIndex = ChunkCoords.Index.get(blockCoords);
-                final var chunkCoords = ChunkCoords.Global.get(blockCoords);
+                final var chunkIndex = Chunk.Coords.Index.get(blockCoords);
+                final var chunkCoords = Chunk.Coords.Global.get(blockCoords);
                 final var chunkX = chunkCoords.x;
                 final var chunkZ = chunkCoords.z;
 
@@ -2832,12 +3738,12 @@ public final class Utils {
 
             @Nullable
             public static final Ref<ChunkStore> get(@Nonnull final World world, @Nonnull final Vector3i blockCoords) {
-                return Chunk.Ref_.get(world, ChunkCoords.Index.get(blockCoords));
+                return Chunk.Ref_.get(world, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
             public static final Ref<ChunkStore> get(@Nonnull final World world, final int blockX, final int blockZ) {
-                return Chunk.Ref_.get(world, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.Ref_.get(world, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2846,7 +3752,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.Ref_.get(world, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.Ref_.get(world, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2865,7 +3771,7 @@ public final class Utils {
                 @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.Ref_.get(commandBuffer, ChunkCoords.Index.get(blockCoords));
+                return Chunk.Ref_.get(commandBuffer, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2874,7 +3780,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.Ref_.get(commandBuffer, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.Ref_.get(commandBuffer, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2883,7 +3789,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.Ref_.get(commandBuffer, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.Ref_.get(commandBuffer, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2905,7 +3811,7 @@ public final class Utils {
                 @Nonnull final Store<ChunkStore> store,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.Ref_.get(store, ChunkCoords.Index.get(blockCoords));
+                return Chunk.Ref_.get(store, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2914,7 +3820,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.Ref_.get(store, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.Ref_.get(store, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2923,7 +3829,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.Ref_.get(store, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.Ref_.get(store, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2942,7 +3848,7 @@ public final class Utils {
                 @Nonnull final ChunkStore chunkStore,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.Ref_.get(chunkStore, ChunkCoords.Index.get(blockCoords));
+                return Chunk.Ref_.get(chunkStore, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2951,7 +3857,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.Ref_.get(chunkStore, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.Ref_.get(chunkStore, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2960,7 +3866,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.Ref_.get(chunkStore, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.Ref_.get(chunkStore, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -2976,7 +3882,7 @@ public final class Utils {
                 @Nonnull final Ref<ChunkStore> chunkRef,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.Ref_.get(chunkRef, ChunkCoords.Index.get(blockCoords));
+                return Chunk.Ref_.get(chunkRef, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -2985,7 +3891,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.Ref_.get(chunkRef, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.Ref_.get(chunkRef, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -2994,7 +3900,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.Ref_.get(chunkRef, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.Ref_.get(chunkRef, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -3013,7 +3919,7 @@ public final class Utils {
                 @Nonnull final BlockStateInfo info,
                 @Nonnull final Vector3i blockCoords
             ) {
-                return Chunk.Ref_.get(info, ChunkCoords.Index.get(blockCoords));
+                return Chunk.Ref_.get(info, Chunk.Coords.Index.get(blockCoords));
             }
 
             @Nullable
@@ -3022,7 +3928,7 @@ public final class Utils {
                 final int blockX,
                 final int blockZ
             ) {
-                return Chunk.Ref_.get(info, ChunkCoords.Index.get(blockX, blockZ));
+                return Chunk.Ref_.get(info, Chunk.Coords.Index.get(blockX, blockZ));
             }
 
             @Nullable
@@ -3031,7 +3937,7 @@ public final class Utils {
                 final int chunkX,
                 final int chunkZ
             ) {
-                return Chunk.Ref_.get(info, ChunkCoords.Index.get_chunkCoords(chunkX, chunkZ));
+                return Chunk.Ref_.get(info, Chunk.Coords.Index.get_chunkCoords(chunkX, chunkZ));
             }
 
             @Nullable
@@ -3217,7 +4123,7 @@ public final class Utils {
                         throw new RuntimeException("Failed to get component by block coords");
                     }
 
-                    final var localCoords = BlockCoords.Local.get(blockCoords);
+                    final var localCoords = Block.Coords.Local.get(blockCoords);
                     var component3 = Utils.Component_.get_localCoords(
                         test.blockComponentChunk,
                         TwunkDevTestComponent.COMPONENT_TYPE,
@@ -3346,7 +4252,7 @@ public final class Utils {
             if (Block.isChunkRef(anyRef)) {
                 return Component_.get(anyRef, componentType);
             } else if (Block.isBlockRef(anyRef)) {
-                final var chunkIndex = ChunkCoords.Index.get_blockRef(anyRef);
+                final var chunkIndex = Chunk.Coords.Index.get_blockRef(anyRef);
                 if (chunkIndex == null) {
                     return null;
                 }
@@ -3450,893 +4356,6 @@ public final class Utils {
         }
     }
 
-    // TESTS ADDED AND VERIFIED
-    public static final class BlockCoords {
-
-        // TESTS ADDED AND VERIFIED        /// -> get LOCAL coordinates within chunk    (Vector3i)
-        public static final class Local {
-
-            public static final void test(
-                @Nonnull final Ref<ChunkStore> blockRef,
-                @Nonnull final WorldChunk worldChunk,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
-            ) {
-                final var blockX = providedCoords.x;
-                final var blockY = providedCoords.y;
-                final var blockZ = providedCoords.z;
-                final var index = BlockCoords.Index.get(blockX, blockY, blockZ);
-                final var localCoords = BlockCoords.Local.get(index);
-                final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-
-                final var test = new TestUtil(commandBuffer, blockCoords);
-
-                var local = BlockCoords.Local.get(test.blockRef);
-                if (local == null || !local.equals(localCoords)) {
-                    throw new RuntimeException("Failed to convert blockRef to localCoords");
-                }
-                local = BlockCoords.Local.get(test.info);
-                if (local == null || !local.equals(localCoords)) {
-                    throw new RuntimeException("Failed to convert info to localCoords");
-                }
-                local = BlockCoords.Local.get(blockCoords);
-                if (local == null || !local.equals(localCoords)) {
-                    throw new RuntimeException("Failed to convert blockCoords to localCoords");
-                }
-                local = BlockCoords.Local.get(localCoords);
-                if (local == null || !local.equals(localCoords)) {
-                    throw new RuntimeException("Failed to convert LOCAL coords to localCoords");
-                }
-                local = BlockCoords.Local.get(blockCoords.x, blockCoords.y, blockCoords.z);
-                if (local == null || !local.equals(localCoords)) {
-                    throw new RuntimeException("Failed to convert coords (split) to localCoords");
-                }
-                local = BlockCoords.Local.get(localCoords.x, localCoords.y, localCoords.z);
-                if (local == null || !local.equals(localCoords)) {
-                    throw new RuntimeException("Failed to convert local coords (split) to localCoords");
-                }
-                local = BlockCoords.Local.get(index);
-                if (local == null || !local.equals(localCoords)) {
-                    throw new RuntimeException("Failed to convert block index to localCoords");
-                }
-            }
-
-            // #region get
-            // ====================================================================
-            // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            // ====================================================================
-            //
-            // Purpose:   Getting the local coordinates of the block (within its chunk)
-            // Requires:  BlockStateInfo component of the relevant block (or a method of getting this -> see Info.get() and thus -> Entity.getRef)
-            // importantly, most methods of getInfo are pointless, as usually these require the coordinates of a block (and if you have that, you don't need this)
-
-            @Nullable
-            public static final Vector3i get(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var info = Block.Info.get(blockRef);
-                if (info == null) {
-                    return null;
-                }
-
-                // => blockIndex
-                return BlockCoords.Local.get(info.getIndex());
-            }
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final BlockStateInfo info) {
-                // => blockIndex
-                return BlockCoords.Local.get(info.getIndex());
-            }
-
-            // ====================================================================
-            // Global coords to local coords
-            // ====================================================================
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final Vector3i coords) {
-                return new Vector3i(coords.x & 31, coords.y, coords.z & 31);
-            }
-
-            // You're telling me i can get local coordinates from coordinates?
-            // yeah, cause, well, if you're calling this its definitely with global coords
-            //
-            // thus, all we need to do is do is keep x % 32, y, z % 32
-            //
-            // notably, 32 = 2^5, thus we only need to keep the 5 lowest bits
-            @Nonnull
-            public static final Vector3i get(final int x, final int y, final int z) {
-                return new Vector3i(x & 31, y, z & 31);
-            }
-
-            // ====================================================================
-            // index -> this is how we actually get coords of a block throughout their system
-            // ====================================================================
-
-            @Nonnull
-            public static final Vector3i get(final int blockIndex) {
-                // bits are as follows (assumes 32bit integers)
-                //  1  2  3  4  5
-                //  x  x  x  x  x
-                //
-                //  6  7  8  9  10
-                //  z  z  z  z  z
-                //
-                // 11 12 13 14 15 16 17 18 19
-                //  y  y  y  y  y  y  y  y  y
-                //
-                // bits 20-32 are assumed to be unused at this stage
-                //
-                // meaning:
-                //  x: [0, 32)   | x can represent 32 different positions
-                //  y: [0, 512)  | y can represent 512 different positions
-                //  z: [0, 32)   | z can represent 32 different positions
-                // thus, from this we can conclude (but also we just kind of know) that
-                // chunks in hytale are 32x, 512y, 32z -> a really tall rectangular prism
-
-                // tidbit on block coordinates
-                // - local coordinates are the position within the chunk for the block
-                // - this can be represented within 19 bits
-                // - thus, every blockIndex is unique ONLY to the chunk its within
-                // - thus, with just the first 19 bits we can figure out the local coordinates
-                //   of any block given its index within its chunk
-
-                final int x = blockIndex & 31; // keep 5
-                final int y = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // shift 10 then keep 9
-                final int z = (blockIndex >> 5) & 31; // shift 5 then keep 5
-
-                return new Vector3i(x, y, z);
-            }
-
-            // #endregion get
-        }
-
-        // TESTS ADDED AND VERIFIED
-        /// -> get LOCAL index                       (int | Integer) (returns Integer so it can be nullable on method that can fail)
-        public static final class Index {
-
-            public static final void test(
-                @Nonnull final Ref<ChunkStore> blockRef,
-                @Nonnull final WorldChunk worldChunk,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
-            ) {
-                final var blockX = providedCoords.x;
-                final var blockY = providedCoords.y;
-                final var blockZ = providedCoords.z;
-                final var index = BlockCoords.Index.get(blockX, blockY, blockZ);
-                final var localCoords = BlockCoords.Local.get(index);
-                final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-
-                final var test = new TestUtil(commandBuffer, blockCoords);
-
-                var testIndex = BlockCoords.Index.get(test.blockRef);
-                if (testIndex == null || !testIndex.equals(index)) {
-                    throw new RuntimeException("Failed to convert blockRef to blockIndex");
-                }
-                testIndex = BlockCoords.Index.get(test.info);
-                if (testIndex == null || !testIndex.equals(index)) {
-                    throw new RuntimeException("Failed to convert info to blockIndex");
-                }
-                testIndex = BlockCoords.Index.get(blockCoords);
-                if (testIndex == null || !testIndex.equals(index)) {
-                    throw new RuntimeException("Failed to convert blockCoords to blockIndex");
-                }
-                testIndex = BlockCoords.Index.get(localCoords);
-                if (testIndex == null || !testIndex.equals(index)) {
-                    throw new RuntimeException("Failed to convert LOCAL coords to blockIndex");
-                }
-                testIndex = BlockCoords.Index.get(blockCoords.x, blockCoords.y, blockCoords.z);
-                if (testIndex == null || !testIndex.equals(index)) {
-                    throw new RuntimeException("Failed to convert coords (split) to blockIndex");
-                }
-                testIndex = BlockCoords.Index.get(localCoords.x, localCoords.y, localCoords.z);
-                if (testIndex == null || !testIndex.equals(index)) {
-                    throw new RuntimeException("Failed to convert local coords (split) to blockIndex");
-                }
-            }
-
-            // #region getLocalIndex
-
-            // Integer cause, nullable
-            @Nullable
-            public static final Integer get(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var info = Block.Info.get(blockRef);
-                if (info == null) {
-                    return null;
-                }
-
-                // => blockIndex
-                return info.getIndex();
-            }
-
-            /**
-             * IMPORTANT: don't use this, just call `getIndex()` on the info component....
-             *
-             * i mean, fr.
-             */
-            public static final int get(@Nonnull final BlockStateInfo info) {
-                return info.getIndex();
-            }
-
-            public static final int get(@Nonnull final Vector3i coords) {
-                return ChunkUtil.indexBlockInColumn(coords.x, coords.y, coords.z);
-            }
-
-            public static final int get(final int x, final int y, final int z) {
-                return ChunkUtil.indexBlockInColumn(x, y, z);
-            }
-
-            // #endregion getLocalIndex}
-        }
-
-        // TESTS ADDED AND VERIFIED
-        /// -> get GLOBAL coordinates                (Vector3i)
-        public static final class Global {
-
-            public static final void test(
-                @Nonnull final Ref<ChunkStore> blockRef,
-                @Nonnull final WorldChunk worldChunk,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
-            ) {
-                final var blockX = providedCoords.x;
-                final var blockY = providedCoords.y;
-                final var blockZ = providedCoords.z;
-                final var index = BlockCoords.Index.get(blockX, blockY, blockZ);
-                final var localCoords = BlockCoords.Local.get(index);
-                final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-
-                final var test = new TestUtil(commandBuffer, blockCoords);
-
-                var coords = BlockCoords.Global.get(test.blockRef);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert blockRef to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.info);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert info to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.chunkRef, localCoords);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunkRef + LOCAL coords to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.chunkRef, localCoords.x, localCoords.y, localCoords.z);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunkRef + LOCAL coords (split) to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.chunkRef, index);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunkRef + blockIndex to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.worldChunk, localCoords);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert worldChunk + LOCAL coords to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.worldChunk, localCoords.x, localCoords.y, localCoords.z);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert worldChunk + LOCAL coords (split) to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.worldChunk, index);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert worldChunk + blockIndex to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.blockChunk, localCoords);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert blockChunk + LOCAL coords to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.blockChunk, localCoords.x, localCoords.y, localCoords.z);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert blockChunk + LOCAL coords (split) to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.blockChunk, index);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert blockChunk + blockIndex to blockCoords");
-                }
-                final var chunkCoords = ChunkCoords.Global.get(blockCoords);
-                coords = BlockCoords.Global.get(chunkCoords.x, chunkCoords.z, localCoords);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunk coords (split) + localCoords to blockCoords");
-                }
-                coords = BlockCoords.Global.get(
-                    chunkCoords.x,
-                    chunkCoords.z,
-                    localCoords.x,
-                    localCoords.y,
-                    localCoords.z
-                );
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException(
-                        "Failed to convert chunk coords (split) + localCoords (split) to blockCoords"
-                    );
-                }
-                coords = BlockCoords.Global.get(chunkCoords.x, chunkCoords.z, index);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunk coords (split) + blockIndex to blockCoords");
-                }
-
-                final var chunkIndex = ChunkCoords.Index.get(blockCoords);
-                coords = BlockCoords.Global.get(chunkIndex, localCoords);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunkIndex + localCoords to blockCoords");
-                }
-                coords = BlockCoords.Global.get(chunkIndex, localCoords.x, localCoords.y, localCoords.z);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException(
-                        "Failed to convert chunk chunkIndex + localCoords (split) to blockCoords"
-                    );
-                }
-                coords = BlockCoords.Global.get(chunkIndex, index);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunkIndex + blockIndex to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.worldChunk, test.info);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert worldChunk + info to blockCoords");
-                }
-                coords = BlockCoords.Global.get(test.blockChunk, test.info);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert blockChunk + info to blockCoords");
-                }
-                coords = BlockCoords.Global.get(chunkCoords.x, chunkCoords.z, test.info);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunkCoords (split) + info to blockCoords");
-                }
-                coords = BlockCoords.Global.get(chunkIndex, test.info);
-                if (coords == null || !coords.equals(blockCoords)) {
-                    throw new RuntimeException("Failed to convert chunkIndex + info to blockCoords");
-                }
-            }
-
-            // #region getGlobalCoords
-            // ====================================================================
-            // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            // ====================================================================
-            //
-            // Purpose:   Getting the GLOBAL coordinates of the block in its world
-            // Requires:  THE CHUNK your block is in AND the local coordinates of your block (or some way i can get its local coords)
-
-            //   #region block
-            //   ====================================================================
-            //   idea:
-            //   + you have a reference to your block
-            //   ====================================================================
-
-            @Nullable
-            public static final Vector3i get(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var info = Block.Info.get(blockRef);
-                if (info == null) {
-                    return null;
-                }
-
-                return BlockCoords.Global.get(info.getChunkRef(), info.getIndex());
-            }
-
-            @Nullable
-            public static final Vector3i get(@Nonnull final BlockStateInfo info) {
-                return BlockCoords.Global.get(info.getChunkRef(), info.getIndex());
-            }
-
-            //   #endregion block
-            //   #region chunkNLocal
-            //   ====================================================================
-            //   idea:
-            //   + you have a reference to the chunk
-            //   + you have the local coords of your block
-            //   ====================================================================
-
-            //     #region chunkRef
-            //     |=================================================================
-            //     | Ref<ChunkStore> (ChunkRef)
-            //     |=================================================================
-
-            @Nullable
-            public static final Vector3i get(
-                @Nonnull final Ref<ChunkStore> chunkRef,
-                @Nonnull final Vector3i localCoords
-            ) {
-                final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
-                if (worldChunk == null) {
-                    return null;
-                }
-
-                return BlockCoords.Global.get(worldChunk.getX(), worldChunk.getZ(), localCoords);
-            }
-
-            @Nullable
-            public static final Vector3i get(
-                @Nonnull final Ref<ChunkStore> chunkRef,
-                final int localX,
-                final int localY,
-                final int localZ
-            ) {
-                final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
-                if (worldChunk == null) {
-                    return null;
-                }
-
-                return BlockCoords.Global.get(worldChunk.getX(), worldChunk.getZ(), localX, localY, localZ);
-            }
-
-            @Nullable
-            public static final Vector3i get(@Nonnull final Ref<ChunkStore> chunkRef, final int blockIndex) {
-                final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
-                if (worldChunk == null) {
-                    return null;
-                }
-
-                return BlockCoords.Global.get(worldChunk.getX(), worldChunk.getZ(), blockIndex);
-            }
-
-            //     #endregion chunkRef
-            //     #region BlockAccessor
-            //     |=================================================================
-            //     | BlockAccessor OR WorldChunk
-            //     |=================================================================
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final WorldChunk chunk, @Nonnull final Vector3i localCoords) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), localCoords);
-            }
-
-            @Nonnull
-            public static final Vector3i get(
-                @Nonnull final WorldChunk chunk,
-                final int localX,
-                final int localY,
-                final int localZ
-            ) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), localX, localY, localZ);
-            }
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final WorldChunk chunk, final int blockIndex) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), blockIndex);
-            }
-
-            // this seems pointless, but its for anyone who already has a worldChunk so i don't have to fetch it
-            @Nonnull
-            public static final Vector3i get(@Nonnull final WorldChunk chunk, @Nonnull final BlockStateInfo info) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), info.getIndex());
-            }
-
-            //     #endregion chunkRef
-            //     #region BlockAccessor
-            //     |=================================================================
-            //     | BlockAccessor OR WorldChunk
-            //     |=================================================================
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final BlockAccessor chunk, @Nonnull final Vector3i localCoords) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), localCoords);
-            }
-
-            @Nonnull
-            public static final Vector3i get(
-                @Nonnull final BlockAccessor chunk,
-                final int localX,
-                final int localY,
-                final int localZ
-            ) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), localX, localY, localZ);
-            }
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final BlockAccessor chunk, final int blockIndex) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), blockIndex);
-            }
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final BlockAccessor chunk, @Nonnull final BlockStateInfo info) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), info.getIndex());
-            }
-
-            //     #endregion BlockAccessor
-            //     #region BlockChunk
-            //     |=================================================================
-            //     | BlockChunk
-            //     |=================================================================
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final BlockChunk chunk, @Nonnull final Vector3i localCoords) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), localCoords);
-            }
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final BlockChunk chunk, final int blockIndex) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), blockIndex);
-            }
-
-            @Nonnull
-            public static final Vector3i get(@Nonnull final BlockChunk chunk, @Nonnull final BlockStateInfo info) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), info.getIndex());
-            }
-
-            @Nonnull
-            public static final Vector3i get(
-                @Nonnull final BlockChunk chunk,
-                final int localX,
-                final int localY,
-                final int localZ
-            ) {
-                return BlockCoords.Global.get(chunk.getX(), chunk.getZ(), localX, localY, localZ);
-            }
-
-            //     #endregion BlockChunk
-            //     #region done
-            //     |=================================================================
-            //     | Done!
-            //     |=================================================================
-
-            // Chunk Coords AND Block Coords
-            @Nonnull
-            public static final Vector3i get(final int chunkX, final int chunkZ, @Nonnull final Vector3i localCoords) {
-                return new Vector3i(localCoords.x + (chunkX << 5), localCoords.y, localCoords.z + (chunkZ << 5));
-            }
-
-            // Chunk Coords AND Block Coords
-            @Nonnull
-            public static final Vector3i get(
-                final int chunkX,
-                final int chunkZ,
-                final int localX,
-                final int localY,
-                final int localZ
-            ) {
-                return new Vector3i(localX + (chunkX << 5), localY, localZ + (chunkZ << 5));
-            }
-
-            // Chunk coords AND Block Index
-            @Nonnull
-            public static final Vector3i get(final int chunkX, final int chunkZ, final int blockIndex) {
-                // remember: 5 bits -> 32
-                final int globalX = (blockIndex & 31) + (chunkX << 5); // globalX = local X + 32 * chunkX (chunk is 32x32 for x,z)
-                final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // same as local y, there is no distinction between the two
-                final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5); // globalX = local z + 32 * chunkZ (chunk is 32x32 for x,z)
-
-                return new Vector3i(globalX, globalY, globalZ);
-            }
-
-            // may seem pointless, but its so if you already have the chunkX and chunkZ i don't have to fetch them
-            @Nonnull
-            public static final Vector3i get(final int chunkX, final int chunkZ, @Nonnull final BlockStateInfo info) {
-                final var blockIndex = info.getIndex();
-
-                // remember: 5 bits -> 32
-                final int globalX = (blockIndex & 31) + (chunkX << 5); // globalX = local X + 32 * chunkX (chunk is 32x32 for x,z)
-                final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK; // same as local y, there is no distinction between the two
-                final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5); // globalX = local z + 32 * chunkZ (chunk is 32x32 for x,z)
-
-                return new Vector3i(globalX, globalY, globalZ);
-            }
-
-            // Chunk Coords AND Block Coords
-            @Nonnull
-            public static final Vector3i get(final long chunkIndex, @Nonnull final Vector3i localCoords) {
-                final int chunkX = (int) (chunkIndex >> 32);
-                final int chunkZ = (int) (chunkIndex);
-
-                return new Vector3i(localCoords.x + (chunkX << 5), localCoords.y, localCoords.z + (chunkZ << 5));
-            }
-
-            // Chunk Coords AND Block Coords
-            @Nonnull
-            public static final Vector3i get(
-                final long chunkIndex,
-                final int localX,
-                final int localY,
-                final int localZ
-            ) {
-                final int chunkX = (int) (chunkIndex >> 32);
-                final int chunkZ = (int) (chunkIndex);
-
-                return new Vector3i(localX + (chunkX << 5), localY, localZ + (chunkZ << 5));
-            }
-
-            // Chunk coords AND Block Index
-            @Nonnull
-            public static final Vector3i get(final long chunkIndex, final int blockIndex) {
-                // our chunk X coord is in the 33-64 bits (inclusive) of chunkIndex. We want that part, multiplied by 32, thus we must drop the first 32 bits of chunkIndex, then later shift it back 5 bits to "multiply" it by 32
-                final int chunkX = (int) (chunkIndex >> 32);
-                // our chunk z coord is in the first 32 bits, so we'll cast it to an int (just keeps first 32 bits) then later shift it back 5 bits to "multiply" it by 32
-                final int chunkZ = (int) (chunkIndex);
-
-                final int globalX = (blockIndex & 31) + (chunkX << 5);
-                final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK;
-                final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5);
-
-                return new Vector3i(globalX, globalY, globalZ);
-            }
-
-            // Chunk coords AND Block Index
-            @Nonnull
-            public static final Vector3i get(final long chunkIndex, @Nonnull final BlockStateInfo info) {
-                final var blockIndex = info.getIndex();
-
-                // our chunk X coord is in the 33-64 bits (inclusive) of chunkIndex. We want that part, multiplied by 32, thus we must drop the first 32 bits of chunkIndex, then later shift it back 5 bits to "multiply" it by 32
-                final int chunkX = (int) (chunkIndex >> 32);
-                // our chunk z coord is in the first 32 bits, so we'll cast it to an int (just keeps first 32 bits) then later shift it back 5 bits to "multiply" it by 32
-                final int chunkZ = (int) (chunkIndex);
-
-                final int globalX = (blockIndex & 31) + (chunkX << 5);
-                final int globalY = (blockIndex >> 10) & ChunkUtil.HEIGHT_MASK;
-                final int globalZ = ((blockIndex >> 5) & 31) + (chunkZ << 5);
-
-                return new Vector3i(globalX, globalY, globalZ);
-            }
-
-            //     #endregion done
-            //   #endregion chunkNLocal
-            // #endregion getGlobalCoords
-        }
-    }
-
-    // TESTS ADDED AND VERIFIED
-    public static final class ChunkCoords {
-
-        /// -> get CHUNK coordinates                 (long | Vector2i | ChunkCoordinates)
-        public static final class Global {
-
-            public static final void test(
-                @Nonnull final Ref<ChunkStore> blockRef,
-                @Nonnull final WorldChunk worldChunk,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
-            ) {
-                final var blockX = providedCoords.x;
-                final var blockY = providedCoords.y;
-                final var blockZ = providedCoords.z;
-                final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-
-                var coords = ChunkCoords.Global.get(blockX, blockZ);
-                final var sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN =
-                    coords;
-                if (
-                    coords == null ||
-                    !coords.equals(
-                        sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN
-                    )
-                ) {
-                    throw new RuntimeException("Failed to convert blockX,blockZ to chunkCoords");
-                }
-                coords = ChunkCoords.Global.get(blockCoords);
-                if (
-                    coords == null ||
-                    !coords.equals(
-                        sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN
-                    )
-                ) {
-                    throw new RuntimeException("Failed to convert blockCoords to chunkCoords");
-                }
-
-                var coords2 = ChunkCoords.Global.getVector2i(blockX, blockZ);
-                final var myVec2 = new Vector2i(
-                    sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN.x,
-                    sue_me__IKnowThisTestSeemsPointlessSinceItsTestingItselfWithItsOwnOutputBUTHearMeOut_IJustWantToStopRegressionsAndImPretySureItWorksRN.z
-                );
-                if (coords2 == null || !coords2.equals(myVec2)) {
-                    throw new RuntimeException("Failed to convert blockX,blockZ to chunkCoords (vector2i)");
-                }
-
-                coords2 = ChunkCoords.Global.getVector2i(blockCoords);
-                if (coords2 == null || !coords2.equals(myVec2)) {
-                    throw new RuntimeException("Failed to convert blockCoords to chunkCoords (vector2i)");
-                }
-            }
-
-            // #region getChunkCoords
-            // ====================================================================
-            // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-            // ====================================================================
-            //
-            // Purpose:   Getting chunk coordinates within a world
-            // Requires:  BlockStateInfo component of the relevant block (or a method of getting this -> see Info.get() and thus -> Entity.getRef)
-            // importantly, most methods of getInfo are pointless, as usually these require the coordinates of a block (and if you have that, you don't need this)
-
-            // ====================================================================
-            // Chunk Coordinates FROM block coordinates
-            // ====================================================================
-
-            // With GLOBAL block coords
-            @Nonnull
-            public static final ChunkCoordinates get(final int blockX, final int blockZ) {
-                // see ChunkUtil.chunkCoordinate
-                return new ChunkCoordinates(blockX >> 5, blockZ >> 5);
-            }
-
-            // With GLOBAL block coords
-            @Nonnull
-            public static final ChunkCoordinates get(@Nonnull final Vector3i blockCoords) {
-                // see ChunkUtil.chunkCoordinate
-                return new ChunkCoordinates(blockCoords.x >> 5, blockCoords.z >> 5);
-            }
-
-            /**
-             * With GLOBAL block coords
-             *
-             * returned "y" in vector is actually the chunk's "z" coordinate
-             */
-            @Nonnull
-            public static final Vector2i getVector2i(final int blockX, final int blockZ) {
-                // see ChunkUtil.chunkCoordinate
-                return new Vector2i(blockX >> 5, blockZ >> 5);
-            }
-
-            /**
-             * With GLOBAL block coords
-             *
-             * returned "y" in vector is actually the chunk's "z" coordinate
-             */
-            @Nonnull
-            public static final Vector2i getVector2i(@Nonnull final Vector3i blockCoords) {
-                // see ChunkUtil.chunkCoordinate
-                return new Vector2i(blockCoords.x >> 5, blockCoords.z >> 5);
-            }
-            // #endregion getChunkCoords
-        }
-
-        // ====================================================================
-        // Chunk Index (index is interchangable with coordinates) FROM block coordinates
-        // ====================================================================
-
-        public static final class Index {
-
-            public static final void test(
-                @Nonnull final Ref<ChunkStore> blockRef,
-                @Nonnull final WorldChunk worldChunk,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
-            ) {
-                final var blockX = providedCoords.x;
-                final var blockY = providedCoords.y;
-                final var blockZ = providedCoords.z;
-                final var blockCoords = new Vector3i(blockX, blockY, blockZ);
-                final var test = new TestUtil(commandBuffer, blockCoords);
-                final var chunkCoords = ChunkCoords.Global.get(blockX, blockZ);
-                final var chunkIndex = ChunkCoords.Index.get(blockRef); // shush, i know....
-
-                // Long get(Ref<ChunkStore> anyRef)
-                Long testIndex = ChunkCoords.Index.get(test.chunkRef);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert chunkRef (anyref) to chunkIndex");
-                }
-                testIndex = ChunkCoords.Index.get(blockRef);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert blockRef (anyref) to chunkIndex");
-                }
-                // Long get(BlockStateInfo info)
-                testIndex = ChunkCoords.Index.get(test.info);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert info to chunkIndex");
-                }
-
-                // Long get_chunkRef(Ref<ChunkStore> chunkRef)
-                testIndex = ChunkCoords.Index.get_chunkRef(test.chunkRef);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert chunkRef (specific method) to chunkIndex");
-                }
-
-                // Long get_blockRef(Ref<ChunkStore> blockRef)
-                testIndex = ChunkCoords.Index.get_blockRef(blockRef);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert blockRef (specific method) to chunkIndex");
-                }
-
-                // long get(WorldChunk worldChunk)
-                testIndex = ChunkCoords.Index.get(worldChunk);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert worldChunk to chunkIndex");
-                }
-
-                // long get(int blockX, int blockZ)
-                testIndex = ChunkCoords.Index.get(blockX, blockZ);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert blockX, blockZ to chunkIndex");
-                }
-
-                // long get(Vector3i blockCoords)
-                testIndex = ChunkCoords.Index.get(blockCoords);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert blockCoords to chunkIndex");
-                }
-
-                // long get_chunkCoords(int chunkX, int chunkZ)
-                testIndex = ChunkCoords.Index.get_chunkCoords(chunkCoords.x, chunkCoords.z);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert chunkCoords.x, chunkCoords.z to chunkIndex");
-                }
-
-                // long get_chunkCoords(ChunkCoordinates coords)
-                testIndex = ChunkCoords.Index.get_chunkCoords(chunkCoords);
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert chunkCoords to chunkIndex");
-                }
-
-                // long get_chunkCoords(Vector2i chunkCoords)
-                testIndex = ChunkCoords.Index.get_chunkCoords(new Vector2i(chunkCoords.x, chunkCoords.z));
-                if (testIndex == null || !testIndex.equals(chunkIndex)) {
-                    throw new RuntimeException("Failed to convert chunkCoords (vector2i) to chunkIndex");
-                }
-            }
-
-            // #region getChunkIndex
-
-            @Nullable
-            public static final Long get(@Nonnull final Ref<ChunkStore> anyRef) {
-                final var worldChunk = Chunk.WorldChunk_.get(anyRef);
-                if (worldChunk == null) {
-                    return null;
-                }
-
-                return worldChunk.getIndex();
-            }
-
-            @Nullable
-            public static final Long get(@Nonnull final BlockStateInfo info) {
-                return ChunkCoords.Index.get_chunkRef(info.getChunkRef());
-            }
-
-            @Nullable
-            public static final Long get_chunkRef(@Nonnull final Ref<ChunkStore> chunkRef) {
-                final var worldChunk = Chunk.WorldChunk_.get_chunkRef(chunkRef);
-                if (worldChunk == null) {
-                    return null;
-                }
-
-                return worldChunk.getIndex();
-            }
-
-            @Nullable
-            public static final Long get_blockRef(@Nonnull final Ref<ChunkStore> blockRef) {
-                final var worldChunk = Chunk.WorldChunk_.get_blockRef(blockRef);
-                if (worldChunk == null) {
-                    return null;
-                }
-
-                return worldChunk.getIndex();
-            }
-
-            // TODO worldChunk.getIndex()  and      ChunkCoords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ()) do the same thing
-            public static final long get(@Nonnull final WorldChunk worldChunk) {
-                return worldChunk.getIndex();
-            }
-
-            /**
-             * a `long` is just a bit-packed version of chunk coords.
-             * int: 32 bits
-             * long: 64 bits
-             *
-             * hence, a long is basically 2 ints back to back
-             */
-            public static final long get(final int blockX, final int blockZ) {
-                // see ChunkUtil.indexChunkFromBlock
-                return ((long) (blockX >> 5) << 32) | ((long) (blockZ >> 5) & 4294967295L);
-            }
-
-            public static final long get(@Nonnull final Vector3i blockCoords) {
-                // see ChunkUtil.indexChunkFromBlock
-                return ((long) (blockCoords.x >> 5) << 32) | ((long) (blockCoords.z >> 5) & 4294967295L);
-            }
-
-            public static final long get_chunkCoords(final int chunkX, final int chunkZ) {
-                // see ChunkUtil.indexChunkFromBlock
-                return ((long) chunkX << 32) | ((long) chunkZ & 4294967295L);
-            }
-
-            public static final long get_chunkCoords(@Nonnull final ChunkCoordinates coords) {
-                // see ChunkUtil.indexChunkFromBlock
-                return ((long) coords.x << 32) | ((long) coords.z & 4294967295L);
-            }
-
-            /**
-             * WARNING: the `y` value MUST be the `z` value for the chunk
-             */
-            public static final long get_chunkCoords(@Nonnull final Vector2i chunkCoords) {
-                // see ChunkUtil.indexChunkFromBlock
-                return ((long) chunkCoords.x << 32) | ((long) chunkCoords.y & 4294967295L);
-            }
-            // #endregion getChunkIndex
-        }
-    }
-
     /**
      * @deprecated I don't plan to use tick procedure stuff, so I'm not maintaining a billion
      * methods rn. mainly, i dont want to go through and make all the millions of methods.
@@ -4370,7 +4389,7 @@ public final class Utils {
                 return false;
             }
 
-            final var coords = BlockCoords.Local.get(info);
+            final var coords = Coords.Local.get(info);
             return TickProcedure.setTicking(worldChunk, coords, ticking);
         }
 
@@ -4391,7 +4410,7 @@ public final class Utils {
             @Nonnull final BlockStateInfo info,
             final boolean ticking
         ) {
-            final var coords = BlockCoords.Local.get(info);
+            final var coords = Coords.Local.get(info);
             return chunk.setTicking(coords.x, coords.y, coords.z, ticking);
         }
 

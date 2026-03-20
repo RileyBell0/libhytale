@@ -109,7 +109,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         if (world == null) {
             return;
         }
-        var coords = Utils.BlockCoords.Global.get(worldChunk, blockInfo);
+        var coords = Utils.Block.Coords.Global.get(worldChunk, blockInfo);
 
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
