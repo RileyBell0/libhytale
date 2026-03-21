@@ -1,0 +1,94 @@
+InteractionType Values
+
+Primary
+Secondary
+Ability1
+Ability2
+Ability3
+Use
+Pick
+Pickup
+CollisionEnter
+CollisionLeave
+Collision
+EntityStatEffect
+SwapTo
+SwapFrom
+Death
+Wielding
+ProjectileSpawn
+ProjectileHit
+ProjectileMiss
+ProjectileBounce
+Held
+HeldOffhand
+Equipped
+Dodge
+GameModeSwap
+
+
+Interaction classes are constructed a few times but only while the server is starting up
+
+Seems like they make a few and just go from there? maybe they clone it? idk
+
+but yeah, this means that if we hook it up to a block, it's going to STAY hooked up to that one block, 
+
+Mine was created 4x times total, one near the start of setup, and three very close together
+1: when adding the interaction itself
+2/3/4: checking for unused keys and doing something in AssetStore
+
+
+not sure if that's going to be helpful info or not later
+
+seems like its just a good idea to define interactions super basically, just make a class and go from there
+
+I COULD define "ids" or someting in it and make a map adn go back to my code with it but honestly, their code for this is actually totally fine, their API works, and makes sense, i can define block stuff on the block definition
+and since interactions are per BLOCK and not based on components i don't want it mixed in with systems anyway
+
+so honestly, this works
+
+plus, i see how to do interactions now
+
+the structure is
+
+```json
+{
+    "BlockType" {
+        ...
+
+        "Interactions": {
+            "<enum key of InteractionTypes type>": {
+                "Interactions": [
+                    {
+                        "Type": "<id of your interaction>"
+                    }
+                ]
+            }
+        }
+    }
+}
+```
+e.g.
+
+```json
+{
+    "BlockType" {
+        "Interactions": {
+            "Use": {
+                "Interactions": [
+                    {
+                        "Type": "dev.twunk.interactions.OpenChestInteraction"
+                    }
+                ]
+            },
+            "Primary":  {
+                "Interactions": [
+                    {
+                        "Type": "Break_Block"
+                    }
+                ]
+            }
+        }
+    }
+}
+```
