@@ -31,8 +31,8 @@ import javax.annotation.Nonnull;
  * - register the instance to your plugin
  */
 public final class TickableBlockComponentSystem<T extends ITickableBlockComponent>
-    extends SubSystemOwner
-    implements IEntityTickSystem
+    extends SubSystemOwner<ChunkStore>
+    implements IEntityTickSystem<ChunkStore>
 {
 
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
@@ -50,8 +50,8 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
     }
 
     public TickableBlockComponentSystem(@Nonnull Class<T> componentClass) {
-        super(Query.and(TwunkLib.getComponentType(componentClass)));
-        this.componentType = TwunkLib.getComponentType(componentClass);
+        super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
+        this.componentType = TwunkLib.getChunkComponentType(componentClass);
         this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
 
