@@ -12,6 +12,7 @@ import dev.twunk.interfaces.component.ITickableBlockComponent;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import dev.twunk.utils.BlockUtils;
 import dev.twunk.utils.ComponentUtils;
 import java.util.function.Supplier;
@@ -124,5 +125,10 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
             console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
             return;
         }
+    }
+
+    @Override
+    public IRegistry<ChunkStore> getRegistry() {
+        return TwunkLib.CHUNK_REGISTRY;
     }
 }

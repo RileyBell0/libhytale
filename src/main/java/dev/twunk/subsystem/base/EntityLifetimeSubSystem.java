@@ -36,6 +36,7 @@ public abstract class EntityLifetimeSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
+    @Nonnull
     public static <
         ECS_STORE extends WorldProvider,
         T extends EntityLifetimeSubSystem<ECS_STORE>

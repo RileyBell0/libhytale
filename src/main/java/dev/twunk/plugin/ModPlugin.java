@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.TwunkLib;
 import dev.twunk.interfaces.component.auto.IAutoBlockLifetimeComponent;
 import dev.twunk.interfaces.component.auto.IAutoTickingBlockComponent;
@@ -53,7 +54,9 @@ public abstract class ModPlugin extends JavaPlugin {
      */
     @Nonnull
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerComponent(BuilderCodec<T> codec) {
+    public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
+        BuilderCodec<T> codec
+    ) {
         Class<T> myClass = codec.getInnerClass();
         var defaultId = myClass.getName();
         console.log("Adding component " + defaultId + " -- from class " + myClass);
@@ -68,17 +71,42 @@ public abstract class ModPlugin extends JavaPlugin {
         );
 
         // Store our component in the global register
-        TwunkLib.registerComponentType(myClass, defaultId, component);
+        TwunkLib.registerChunkComponentType(myClass, defaultId, component);
 
         if (IAutoTickingBlockComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
+            // just, suppressing unchecked conversions for now
             new TickableBlockComponentSystem(component).registerTo(this);
         }
 
         if (IAutoBlockLifetimeComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
+            // just, suppressing unchecked conversions for now
             new BlockLifetimeComponentSystem(component).registerTo(this);
         }
+
+        return component;
+    }
+
+    @Nonnull
+    public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
+        BuilderCodec<T> codec
+    ) {
+        Class<T> myClass = codec.getInnerClass();
+        var defaultId = myClass.getName();
+        console.log("Adding component " + defaultId + " -- from class " + myClass);
+        if (defaultId == null) {
+            throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
+        }
+
+        ComponentType<EntityStore, T> component = this.getEntityStoreRegistry().registerComponent(
+            myClass,
+            defaultId,
+            codec
+        );
+
+        // Store our component in the global register
+        TwunkLib.registerEntityComponentType(myClass, defaultId, component);
 
         return component;
     }

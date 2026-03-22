@@ -1,7 +1,7 @@
 package dev.twunk.subsystem;
 
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.plugin.ModPlugin;
 import java.util.ArrayList;
@@ -20,23 +20,23 @@ import javax.annotation.Nonnull;
  * Forces the parent to provide a `query` that its subsystems will use. That's
  * the most handy part honestly
  */
-public abstract class SubSystemOwner implements IQuery {
+public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements IQuery<ECS_STORE> {
 
     @Nonnull
-    private final ArrayList<ISubSystem> subSystems = new ArrayList<>();
+    private final ArrayList<ISubSystem<ECS_STORE>> subSystems = new ArrayList<>();
 
     @Nonnull
-    private final Query<ChunkStore> query;
+    private final Query<ECS_STORE> query;
 
-    public SubSystemOwner(@Nonnull final Query<ChunkStore> query) {
+    public SubSystemOwner(@Nonnull final Query<ECS_STORE> query) {
         this.query = query;
     }
 
-    protected void appendSubSystem(ISubSystem system) {
+    protected void appendSubSystem(@Nonnull final ISubSystem<ECS_STORE> system) {
         this.subSystems.add(system);
     }
 
-    public void registerTo(ModPlugin plugin) {
+    public void registerTo(@Nonnull final ModPlugin plugin) {
         for (var system : subSystems) {
             system.registerTo(plugin);
         }
@@ -44,7 +44,7 @@ public abstract class SubSystemOwner implements IQuery {
 
     @Override
     @Nonnull
-    public Query<ChunkStore> getQuery() {
+    public Query<ECS_STORE> getQuery() {
         return this.query;
     }
 }

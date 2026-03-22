@@ -3,10 +3,10 @@ package dev.twunk.subsystem.composite.interfaces;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.IRegistryProvider;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.subsystem.composite.TickPlan;
 import javax.annotation.Nonnull;
@@ -22,17 +22,17 @@ import javax.annotation.Nullable;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IScheduledTickSystem extends IQuery {
+public interface IScheduledTickSystem<
+    ECS_STORE extends WorldProvider
+> extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
     @Nullable
     public abstract TickPlan onEntityTick(
         @Nonnull World world,
         @Nonnull WorldChunk chunk,
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull Vector3i coords,
-        int blockId,
+        @Nonnull Ref<ECS_STORE> ref,
         float dt,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull Store<ECS_STORE> store,
+        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     );
 
     /**
@@ -57,5 +57,6 @@ public interface IScheduledTickSystem extends IQuery {
      * Do not change the ID you chose unless you're REALLY REALLY sure you
      * want this.
      */
+    @Nonnull
     public String getId();
 }

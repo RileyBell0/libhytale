@@ -1,15 +1,14 @@
 package dev.twunk.subsystem.base;
 
-import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -35,6 +34,7 @@ public class EntityTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
+    @Nonnull
     public static <ECS_STORE extends WorldProvider, T extends EntityTickSubSystem<ECS_STORE>> EntityTickSubSystem<
         ECS_STORE
     > newSubsystemFor(@Nonnull final IEntityTickSystem<ECS_STORE> parent) {
@@ -59,5 +59,10 @@ public class EntityTickSubSystem<ECS_STORE extends WorldProvider>
     @Override
     public Query<ECS_STORE> getQuery() {
         return this.query;
+    }
+
+    @Override
+    public IRegistry<ECS_STORE> getRegistry() {
+        return this.parent.getRegistry();
     }
 }

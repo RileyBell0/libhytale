@@ -8,6 +8,7 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.base.interfaces.IGlobalTickSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -33,6 +34,7 @@ public class GlobalTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
+    @Nonnull
     public static <ECS_STORE extends WorldProvider, T extends GlobalTickSubSystem<ECS_STORE>> GlobalTickSubSystem<
         ECS_STORE
     > newSubsystemFor(@Nonnull final IGlobalTickSystem<ECS_STORE> parent) {
@@ -63,5 +65,10 @@ public class GlobalTickSubSystem<ECS_STORE extends WorldProvider>
     @Nullable
     public Query<ECS_STORE> getQuery() {
         return this.query;
+    }
+
+    @Override
+    public IRegistry<ECS_STORE> getRegistry() {
+        return parent.getRegistry();
     }
 }

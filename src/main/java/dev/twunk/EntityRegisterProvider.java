@@ -3,11 +3,13 @@ package dev.twunk;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.subsystem.composite.interfaces.IECSRegistryProvider;
+import dev.twunk.plugin.ModPlugin;
+import dev.twunk.subsystem.ISubSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class EntityRegisterProvider implements IECSRegistryProvider<EntityStore> {
+public final class EntityRegisterProvider implements IRegistry<EntityStore> {
 
     @Nonnull
     public final <T extends Component<EntityStore>> ComponentType<EntityStore, T> getComponentType(
@@ -34,5 +36,9 @@ public final class EntityRegisterProvider implements IECSRegistryProvider<Entity
         @Nonnull final ComponentType<EntityStore, T> componentType
     ) {
         TwunkLib.registerEntityComponentType(myClass, id, componentType);
+    }
+
+    public final void registerSystem(@Nonnull final ModPlugin plugin, @Nonnull final ISubSystem<EntityStore> system) {
+        plugin.getEntityStoreRegistry().registerSystem(system);
     }
 }

@@ -48,7 +48,7 @@ public class TwunkDevTestComponent implements Component<ChunkStore> {
 
     @Nonnull
     public static ComponentType<ChunkStore, TwunkDevTestComponent> getComponentType() {
-        return (ComponentType<ChunkStore, TwunkDevTestComponent>) TwunkLib.getComponentType(
+        return (ComponentType<ChunkStore, TwunkDevTestComponent>) TwunkLib.getChunkComponentType(
             TwunkDevTestComponent.class
         );
     }

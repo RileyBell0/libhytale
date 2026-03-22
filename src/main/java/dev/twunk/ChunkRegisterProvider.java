@@ -3,11 +3,13 @@ package dev.twunk;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.subsystem.composite.interfaces.IECSRegistryProvider;
+import dev.twunk.plugin.ModPlugin;
+import dev.twunk.subsystem.ISubSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class ChunkRegisterProvider implements IECSRegistryProvider<ChunkStore> {
+public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
 
     @Nonnull
     public final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getComponentType(
@@ -34,5 +36,9 @@ public final class ChunkRegisterProvider implements IECSRegistryProvider<ChunkSt
         @Nonnull final ComponentType<ChunkStore, T> componentType
     ) {
         TwunkLib.registerChunkComponentType(myClass, id, componentType);
+    }
+
+    public final void registerSystem(@Nonnull final ModPlugin plugin, @Nonnull final ISubSystem<ChunkStore> system) {
+        plugin.getChunkStoreRegistry().registerSystem(system);
     }
 }
