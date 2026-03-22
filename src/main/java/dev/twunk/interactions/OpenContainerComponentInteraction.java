@@ -5,7 +5,6 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -24,8 +23,6 @@ import javax.annotation.Nullable;
 
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
-
     @Nonnull
     private static final ComponentType<ChunkStore, ? extends IContainerComponent> DEFAULT_COMPONENT_TYPE =
         ContainerComponent.COMPONENT_TYPE;
@@ -39,6 +36,7 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
     @Nonnull
     private String componentId = DEFAULT_COMPONENT_ID;
 
+    @SuppressWarnings("unchecked")
     @Nonnull
     public static final BuilderCodec<OpenContainerComponentInteraction> CODEC = BuilderCodec.builder(
         OpenContainerComponentInteraction.class,
@@ -57,27 +55,14 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
                 final var potentialComponentType = TwunkLib.getComponentType(id);
                 if (potentialComponentType == null) {
                     // I'm deciding to crash gracefully here
-                    console.log("Failed to get component type for id " + id);
-                    console.log("Failed to get component type for id " + id);
-                    console.log("Failed to get component type for id " + id);
-                    console.log("Failed to get component type for id " + id);
                     return;
                 }
 
                 final var innerClass = potentialComponentType.getTypeClass();
                 if (!IContainerComponent.class.isAssignableFrom(innerClass)) {
-                    console.log("Failed to validate " + innerClass + " assignable from ContainerComponent");
-                    console.log("Failed to validate " + innerClass + " assignable from ContainerComponent");
-                    console.log("Failed to validate " + innerClass + " assignable from ContainerComponent");
-                    console.log("Failed to validate " + innerClass + " assignable from ContainerComponent");
                     return;
                 }
-                for (var i = 0; i < 50; i++) {
-                    console.log("RILEY HERE");
-                }
-                console.log("Component Type: " + potentialComponentType);
-                console.log("Inner class: " + innerClass);
-                console.log("ID: " + id);
+
                 self.componentType = (ComponentType<ChunkStore, ? extends IContainerComponent>) potentialComponentType;
                 self.componentId = id;
             },
