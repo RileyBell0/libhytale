@@ -17,6 +17,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
+// TODO add a "timeout" for inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
+// want to delete these items. Just gonna make SURE you're sure, by keeping them around for like, 30 seconds"
+//
+// and i wanna do that with ALL non-empty inventories that are put on a trash componnet
+// AND limit it to only be the player that opened it that can see those inventories
 public class TrashComponent implements IContainerComponent {
 
     @Nonnull
