@@ -1,10 +1,10 @@
 package dev.twunk.interfaces.methods;
 
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import javax.annotation.Nonnull;
 
-public interface IQuery {
+public interface IQuery<ECS_STORE extends WorldProvider> {
     @Nonnull
-    public Query<ChunkStore> getQuery();
+    public Query<ECS_STORE> getQuery();
 }

@@ -5,21 +5,21 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import javax.annotation.Nonnull;
 
-public interface IEntityLifetime {
+public interface IEntityLifetime<ECS_STORE extends WorldProvider> {
     public void onEntityAdded(
-        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull Ref<ECS_STORE> ref,
         @Nonnull AddReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull Store<ECS_STORE> store,
+        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     );
 
     public void onEntityRemove(
-        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull Ref<ECS_STORE> ref,
         @Nonnull RemoveReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull Store<ECS_STORE> store,
+        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     );
 }

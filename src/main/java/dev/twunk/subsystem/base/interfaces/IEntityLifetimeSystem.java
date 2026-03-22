@@ -1,5 +1,6 @@
 package dev.twunk.subsystem.base.interfaces;
 
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.methods.IEntityLifetime;
 import dev.twunk.interfaces.methods.IQuery;
 
@@ -12,4 +13,6 @@ import dev.twunk.interfaces.methods.IQuery;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IEntityLifetimeSystem extends IEntityLifetime, IQuery {}
+public interface IEntityLifetimeSystem<
+    ECS_STORE extends WorldProvider
+> extends IEntityLifetime<ECS_STORE>, IQuery<ECS_STORE> {}

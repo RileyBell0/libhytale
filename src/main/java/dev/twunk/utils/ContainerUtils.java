@@ -29,7 +29,7 @@ public abstract class ContainerUtils {
         @Nonnull CommandBuffer<EntityStore> commandBuffer,
         @Nonnull InteractionContext context,
         @Nonnull Vector3i pos,
-        @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent> containerComponentType
+        @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType
     ) {
         Ref<EntityStore> ref = context.getEntity();
         Store<EntityStore> store = ref.getStore();

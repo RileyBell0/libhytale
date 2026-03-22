@@ -32,8 +32,8 @@ import javax.annotation.Nonnull;
  * - register the instance to your plugin
  */
 public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
-    extends SubSystemOwner
-    implements IEntityLifetimeSystem
+    extends SubSystemOwner<ChunkStore>
+    implements IEntityLifetimeSystem<ChunkStore>
 {
 
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
@@ -51,8 +51,8 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
     }
 
     public BlockLifetimeComponentSystem(@Nonnull Class<T> componentClass) {
-        super(Query.and(TwunkLib.getComponentType(componentClass)));
-        this.componentType = TwunkLib.getComponentType(componentClass);
+        super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
+        this.componentType = TwunkLib.getChunkComponentType(componentClass);
         this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 

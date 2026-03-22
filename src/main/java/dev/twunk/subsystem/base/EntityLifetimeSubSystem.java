@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
 import javax.annotation.Nonnull;
@@ -24,48 +24,52 @@ import javax.annotation.Nullable;
  * PRODUCES:
  * - ILifetimeSystem runner
  */
-public abstract class EntityLifetimeSubSystem extends RefSystem<ChunkStore> implements ISubSystem {
+public abstract class EntityLifetimeSubSystem<ECS_STORE extends WorldProvider>
+    extends RefSystem<ECS_STORE>
+    implements ISubSystem<ECS_STORE>
+{
 
-    private final @Nonnull IEntityLifetimeSystem parent;
-    private final @Nullable Query<ChunkStore> query;
+    private final @Nonnull IEntityLifetimeSystem<ECS_STORE> parent;
+    private final @Nullable Query<ECS_STORE> query;
 
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <T extends EntityLifetimeSubSystem> EntityLifetimeSubSystem newSubsystemFor(
-        @Nonnull final IEntityLifetimeSystem parent
-    ) {
+    public static <
+        ECS_STORE extends WorldProvider,
+        T extends EntityLifetimeSubSystem<ECS_STORE>
+    > EntityLifetimeSubSystem<ECS_STORE> newSubsystemFor(@Nonnull final IEntityLifetimeSystem<ECS_STORE> parent) {
         return ISubSystem.__newSubSystem(EntityLifetimeSubSystem.class, IEntityLifetimeSystem.class, parent);
     }
 
-    protected EntityLifetimeSubSystem(@Nonnull final IEntityLifetimeSystem parent) {
+    protected EntityLifetimeSubSystem(@Nonnull final IEntityLifetimeSystem<ECS_STORE> parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }
 
     @Override
     public void onEntityAdded(
-        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull Ref<ECS_STORE> ref,
         @Nonnull AddReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull Store<ECS_STORE> store,
+        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         parent.onEntityAdded(ref, reason, store, commandBuffer);
     }
 
     @Override
     public void onEntityRemove(
-        @Nonnull Ref<ChunkStore> ref,
+        @Nonnull Ref<ECS_STORE> ref,
         @Nonnull RemoveReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull Store<ECS_STORE> store,
+        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         parent.onEntityRemove(ref, reason, store, commandBuffer);
     }
 
     @Override
-    public Query<ChunkStore> getQuery() {
+    public Query<ECS_STORE> getQuery() {
         return this.query;
     }
 }

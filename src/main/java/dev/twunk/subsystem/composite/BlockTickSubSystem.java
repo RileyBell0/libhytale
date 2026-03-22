@@ -23,7 +23,10 @@ import javax.annotation.Nonnull;
  * PRODUCES:
  * - IQueryTickingSystem runner
  */
-public class BlockTickSubSystem extends SubSystemOwner implements IEntityTickSystem, ISubSystem {
+public class BlockTickSubSystem
+    extends SubSystemOwner<ChunkStore>
+    implements IEntityTickSystem<ChunkStore>, ISubSystem<ChunkStore>
+{
 
     private final @Nonnull IBlockTickSystem parent;
 
