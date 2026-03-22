@@ -24,14 +24,12 @@ import javax.annotation.Nullable;
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
     @Nonnull
-    private static final ComponentType<ChunkStore, ? extends IContainerComponent> DEFAULT_COMPONENT_TYPE =
-        ContainerComponent.COMPONENT_TYPE;
-
-    @Nonnull
     private static final String DEFAULT_COMPONENT_ID = "dev.twunk.components.ContainerComponent";
 
+    @SuppressWarnings("unchecked")
     @Nonnull
-    private ComponentType<ChunkStore, ? extends IContainerComponent> componentType = DEFAULT_COMPONENT_TYPE;
+    private ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
+        TwunkLib.getChunkComponentType(ContainerComponent.class);
 
     @Nonnull
     private String componentId = DEFAULT_COMPONENT_ID;
@@ -52,7 +50,7 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
                 if (id == null) {
                     return;
                 }
-                final var potentialComponentType = TwunkLib.getComponentType(id);
+                final var potentialComponentType = TwunkLib.getChunkComponentType(id);
                 if (potentialComponentType == null) {
                     // I'm deciding to crash gracefully here
                     return;
@@ -63,7 +61,10 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
                     return;
                 }
 
-                self.componentType = (ComponentType<ChunkStore, ? extends IContainerComponent>) potentialComponentType;
+                self.componentType = (ComponentType<
+                    ChunkStore,
+                    ? extends IContainerComponent<ChunkStore>
+                >) potentialComponentType;
                 self.componentId = id;
             },
             self -> self.componentId

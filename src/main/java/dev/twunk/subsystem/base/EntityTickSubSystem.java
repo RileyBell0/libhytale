@@ -34,6 +34,7 @@ public class EntityTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
+    @SuppressWarnings("unchecked")
     @Nonnull
     public static <ECS_STORE extends WorldProvider, T extends EntityTickSubSystem<ECS_STORE>> EntityTickSubSystem<
         ECS_STORE

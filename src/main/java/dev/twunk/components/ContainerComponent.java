@@ -2,20 +2,16 @@ package dev.twunk.components;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
-public class ContainerComponent implements IContainerComponent {
-
-    @Nonnull
-    @SuppressWarnings("null")
-    public static ComponentType<ChunkStore, ContainerComponent> COMPONENT_TYPE;
+public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
     // private boolean canView = true;
     // private boolean canOpen = true;
@@ -23,8 +19,9 @@ public class ContainerComponent implements IContainerComponent {
     @Nonnull
     protected SimpleItemContainer container;
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
-    public static final BuilderCodec<ContainerComponent> CODEC = BuilderCodec.builder(
+    private static final BuilderCodec<ContainerComponent> RAW_CODEC = BuilderCodec.builder(
         ContainerComponent.class,
         ContainerComponent::new
     )
@@ -39,6 +36,18 @@ public class ContainerComponent implements IContainerComponent {
         )
         .add()
         .build();
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Nonnull
+    public static final BuilderCodec<ContainerComponent<EntityStore>> ENTITY_CODEC = (BuilderCodec<
+        ContainerComponent<EntityStore>
+    >) ((BuilderCodec) RAW_CODEC);
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Nonnull
+    public static final BuilderCodec<ContainerComponent<ChunkStore>> CHUNK_CODEC = (BuilderCodec<
+        ContainerComponent<ChunkStore>
+    >) ((BuilderCodec) RAW_CODEC);
 
     private static final short DEFAULT_CAPACITY = 10;
 
@@ -71,7 +80,7 @@ public class ContainerComponent implements IContainerComponent {
         return this.container.getCapacity();
     }
 
-    public ContainerComponent clone() {
-        return new ContainerComponent(this.container);
+    public ContainerComponent<ECS_TYPE> clone() {
+        return new ContainerComponent<>(this.container);
     }
 }

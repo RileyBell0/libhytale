@@ -2,6 +2,7 @@ package dev.twunk.subsystem;
 
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.IRegistryProvider;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.plugin.ModPlugin;
 import java.util.ArrayList;
@@ -20,7 +21,9 @@ import javax.annotation.Nonnull;
  * Forces the parent to provide a `query` that its subsystems will use. That's
  * the most handy part honestly
  */
-public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements IQuery<ECS_STORE> {
+public abstract class SubSystemOwner<
+    ECS_STORE extends WorldProvider
+> implements IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
 
     @Nonnull
     private final ArrayList<ISubSystem<ECS_STORE>> subSystems = new ArrayList<>();

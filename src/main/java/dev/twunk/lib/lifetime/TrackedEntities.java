@@ -5,11 +5,7 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.server.core.modules.block.BlockModule;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.subsystem.composite.TickPlan;
 import java.util.ArrayList;
@@ -26,7 +22,7 @@ import javax.annotation.Nullable;
 //
 // OH and responsible for finding the block info when they're loaded (coords,
 // the world and chunk its in, etc)
-public class TrackedEntities {
+public class TrackedEntities<ECS_STORE extends WorldProvider> {
 
     // A unique and STABLE identifier for the system. you cannot change this.
     // once you decide on an ID your players REQUIRE it to be stable (or everything
@@ -39,47 +35,40 @@ public class TrackedEntities {
     // what state they held
     private final String id;
 
-    public TrackedEntities(final String id) {
+    @Nonnull
+    private final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> tickStateComponent;
+
+    public TrackedEntities(
+        @Nonnull final String id,
+        @Nonnull final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> component
+    ) {
         this.id = id;
+        this.tickStateComponent = component;
     }
-
-    @Nonnull
-    public static final ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent> TICK_STATE_COMPONENT =
-        INTERNAL_TickSchedulerComponent.getComponentType();
-
-    @Nonnull
-    @SuppressWarnings("null")
-    private static final ComponentType<ChunkStore, BlockModule.BlockStateInfo> BLOCK_INFO_COMPONENT_TYPE =
-        BlockModule.BlockStateInfo.getComponentType();
-
-    @Nonnull
-    @SuppressWarnings("null")
-    private static final ComponentType<ChunkStore, WorldChunk> WORLD_CHUNK_COMPONENT_TYPE =
-        WorldChunk.getComponentType();
 
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
     // Non-static implementation begins
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
     @Nonnull
-    public final ArrayList<TrackedBlockEntity> ticking = new ArrayList<>();
+    public final ArrayList<TrackedEntity<ECS_STORE>> ticking = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TrackedBlockEntity> sleeping = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_STORE>> sleeping = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TrackedBlockEntity> comatose = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_STORE>> comatose = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TrackedBlockEntity> stopped = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_STORE>> stopped = new ArrayList<>();
 
     @Nonnull
-    private final ArrayList<TrackedBlockEntity> broken = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_STORE>> broken = new ArrayList<>();
 
     public void track(
-        @Nonnull final Ref<ChunkStore> ref,
-        @Nonnull final Store<ChunkStore> store,
-        @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull final Ref<ECS_STORE> ref,
+        @Nonnull final Store<ECS_STORE> store,
+        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // figure out the current/initial ticking state our entity has
         var tickingInfo = this.loadEntityTickingState(ref, commandBuffer);
@@ -91,7 +80,7 @@ public class TrackedEntities {
 
         // prepare the variables/references we need to run our tick method
         // (whenever that tick happens)
-        var onTickCache = TrackedEntities.getTickVars(ref, store, area);
+        var onTickCache = this.getTickVars(ref, store, area);
         if (onTickCache == null) {
             return;
         }
@@ -106,69 +95,44 @@ public class TrackedEntities {
     }
 
     public void untrack(
-        @Nonnull final Ref<ChunkStore> ref,
-        @Nonnull final Store<ChunkStore> store,
+        @Nonnull final Ref<ECS_STORE> ref,
+        @Nonnull final Store<ECS_STORE> store,
         @Nonnull final RemoveReason reason
     ) {
-        store.getComponent(ref, TrackedEntities.TICK_STATE_COMPONENT).drop(this.id, reason);
+        store.getComponent(ref, this.tickStateComponent).drop(this.id, reason);
     }
 
     /**
      * Get a cached version of the info required to tick an entity
      */
     @Nullable
-    private static TrackedBlockEntity getTickVars(
-        @Nonnull final Ref<ChunkStore> ref,
-        @Nonnull final Store<ChunkStore> store,
-        @Nonnull final ArrayList<TrackedBlockEntity> area
+    private TrackedEntity<ECS_STORE> getTickVars(
+        @Nonnull final Ref<ECS_STORE> ref,
+        @Nonnull final Store<ECS_STORE> store,
+        @Nonnull final ArrayList<TrackedEntity<ECS_STORE>> area
     ) {
         // We're going to spend a bunch of extra time in onEntityAdd to cache
         // all the information we'll need when this thing is ticking
         //
         // Most of this starts from the "info"
-        var info = store.getComponent(ref, BLOCK_INFO_COMPONENT_TYPE);
-        if (info == null) {
-            return null;
-        }
-
-        // Now, we use the info to get the chunk that we're in
-        var chunkRef = info.getChunkRef();
-        var chunk = store.getComponent(chunkRef, WORLD_CHUNK_COMPONENT_TYPE);
-        if (chunk == null) {
-            return null;
-        }
-        var world = chunk.getWorld();
-        if (world == null) {
-            return null;
-        }
-
-        // We use the info + chunk to get the global coords of the block
-        // using some magic I found in the depths of the hytale source code
-        // split across a couple files
-        var indexInChunk = info.getIndex();
-        var coords = new Vector3i(
-            (chunk.getX() << 5) | (indexInChunk & 31),
-            (indexInChunk >> 10) & ChunkUtil.HEIGHT_MASK,
-            (chunk.getZ() << 5) | ((indexInChunk >> 5) & 31)
-        );
+        var world = store.getExternalData().getWorld();
 
         // lets get this all bundled up for easy re-use
-        var blockId = chunk.getBlock(coords);
-        var cache = new TrackedBlockEntity(world, chunk, ref, coords, blockId, area);
+        var cache = new TrackedEntity<>(world, ref, area);
 
         return cache;
     }
 
     @Nonnull
-    private INTERNAL_TickSchedulerComponent loadEntityTickingState(
-        @Nonnull final Ref<ChunkStore> ref,
-        @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+    private INTERNAL_TickSchedulerComponent<ECS_STORE> loadEntityTickingState(
+        @Nonnull final Ref<ECS_STORE> ref,
+        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // Setup a tickingInfo component to track the state of our entitiy
         // so it can resume ticking/sleeping/etc when the server reboots. really
         // we just want to store shit so the lifetime extends past (NOW), and
         // so we can QUICKLY remove the entity again later
-        var tickingInfo = commandBuffer.ensureAndGetComponent(ref, TICK_STATE_COMPONENT);
+        var tickingInfo = commandBuffer.ensureAndGetComponent(ref, this.tickStateComponent);
         var systemState = tickingInfo.getTickingInfo(this.id);
         if (systemState == null) {
             systemState = new TickPlan.Active();
@@ -184,7 +148,7 @@ public class TrackedEntities {
      * @return
      */
     @Nonnull
-    private ArrayList<TrackedBlockEntity> getOwner(TickPlan currentState) {
+    private ArrayList<TrackedEntity<ECS_STORE>> getOwner(TickPlan currentState) {
         // and finally, we'll store it in the right place
         if (currentState instanceof TickPlan.Active) {
             return ticking;

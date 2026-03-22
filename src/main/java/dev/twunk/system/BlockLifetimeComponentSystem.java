@@ -14,6 +14,7 @@ import dev.twunk.interfaces.component.IBlockLifetimeComponent;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import dev.twunk.utils.ComponentUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -102,5 +103,10 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
             console.log(String.format("ERROR: Failed to run onEntityRemove - " + e));
             return;
         }
+    }
+
+    @Override
+    public IRegistry<ChunkStore> getRegistry() {
+        return TwunkLib.CHUNK_REGISTRY;
     }
 }

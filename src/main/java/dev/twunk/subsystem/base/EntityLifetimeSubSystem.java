@@ -10,6 +10,7 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -36,6 +37,7 @@ public abstract class EntityLifetimeSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
+    @SuppressWarnings("unchecked")
     @Nonnull
     public static <
         ECS_STORE extends WorldProvider,
@@ -72,5 +74,9 @@ public abstract class EntityLifetimeSubSystem<ECS_STORE extends WorldProvider>
     @Override
     public Query<ECS_STORE> getQuery() {
         return this.query;
+    }
+
+    public IRegistry<ECS_STORE> getRegistry() {
+        return this.parent.getRegistry();
     }
 }

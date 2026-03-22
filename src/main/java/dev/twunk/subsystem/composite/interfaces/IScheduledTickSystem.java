@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import dev.twunk.IRegistryProvider;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.subsystem.composite.TickPlan;
@@ -28,7 +27,6 @@ public interface IScheduledTickSystem<
     @Nullable
     public abstract TickPlan onEntityTick(
         @Nonnull World world,
-        @Nonnull WorldChunk chunk,
         @Nonnull Ref<ECS_STORE> ref,
         float dt,
         @Nonnull Store<ECS_STORE> store,

@@ -6,7 +6,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.lib.lifetime.TrackedEntities;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.SubSystemOwner;
@@ -14,6 +15,7 @@ import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
 import dev.twunk.subsystem.base.GlobalTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
 import dev.twunk.subsystem.base.interfaces.IGlobalTickSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import dev.twunk.subsystem.composite.interfaces.IScheduledTickSystem;
 import javax.annotation.Nonnull;
 
@@ -32,34 +34,45 @@ import javax.annotation.Nonnull;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class ScheduledTickSubSystem
-    extends SubSystemOwner
-    implements IEntityLifetimeSystem, IGlobalTickSystem, ISubSystem
+public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
+    extends SubSystemOwner<ECS_STORE>
+    implements IEntityLifetimeSystem<ECS_STORE>, IGlobalTickSystem<ECS_STORE>, ISubSystem<ECS_STORE>
 {
 
     @Nonnull
-    private final TrackedEntities entities;
+    private final TrackedEntities<ECS_STORE> entities;
 
     @Nonnull
-    private final IScheduledTickSystem parent;
+    private final IScheduledTickSystem<ECS_STORE> parent;
 
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <T extends ScheduledTickSubSystem> ScheduledTickSubSystem newSubsystemFor(
-        @Nonnull final IScheduledTickSystem parent
+    @SuppressWarnings("unchecked")
+    @Nonnull
+    public <T extends ScheduledTickSubSystem<ECS_STORE>> ScheduledTickSubSystem<ECS_STORE> newSubsystemFor(
+        @Nonnull final IScheduledTickSystem<ECS_STORE> parent
     ) {
         return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, IScheduledTickSystem.class, parent);
     }
 
-    protected ScheduledTickSubSystem(@Nonnull final IScheduledTickSystem parent) {
+    protected ScheduledTickSubSystem(@Nonnull final IScheduledTickSystem<ECS_STORE> parent) {
         super(parent.getQuery());
         this.parent = parent;
 
+        @SuppressWarnings("unchecked")
+        final var componentType = parent
+            .getRegistry()
+            .getComponentType(
+                (Class<INTERNAL_TickSchedulerComponent<ECS_STORE>>) (Class<?>) INTERNAL_TickSchedulerComponent.class
+            );
+        if (componentType == null) {
+            throw new RuntimeException("Failed to get component type for " + INTERNAL_TickSchedulerComponent.class);
+        }
         // Init our module for tracking and persisting how our entities are
         // ticking/sleeping/etc
-        this.entities = new TrackedEntities(parent.getId());
+        this.entities = new TrackedEntities<ECS_STORE>(parent.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
         this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
@@ -74,10 +87,10 @@ public class ScheduledTickSubSystem
      * that'll set it up to be easily tickable for us later.
      */
     public void onEntityAdded(
-        @Nonnull final Ref<ChunkStore> ref,
+        @Nonnull final Ref<ECS_STORE> ref,
         @Nonnull final AddReason reason,
-        @Nonnull final Store<ChunkStore> store,
-        @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull final Store<ECS_STORE> store,
+        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         entities.track(ref, store, commandBuffer);
     }
@@ -90,10 +103,10 @@ public class ScheduledTickSubSystem
      * Removes the entity from our TrackedEntities tracker.
      */
     public void onEntityRemove(
-        @Nonnull final Ref<ChunkStore> ref,
+        @Nonnull final Ref<ECS_STORE> ref,
         @Nonnull final RemoveReason reason,
-        @Nonnull final Store<ChunkStore> store,
-        @Nonnull final CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull final Store<ECS_STORE> store,
+        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // drop the entity from our tracker
         entities.untrack(ref, store, reason);
@@ -108,9 +121,9 @@ public class ScheduledTickSubSystem
      */
     public void onSystemTick(
         float dt,
-        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
+        @Nonnull Store<ECS_STORE> store,
+        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // tick all our refs (ugly loop syntaxt basically just to assert that it's not
         // null. trust me, it's not, i guarantee it on its way in elsewhere, just want
@@ -121,16 +134,7 @@ public class ScheduledTickSubSystem
         var ticker : entities.ticking) {
             // need to make it so that we check if the ref is still valid at this stage
             // (eventually)
-            var res = parent.onEntityTick(
-                ticker.world,
-                ticker.chunk,
-                ticker.ref,
-                ticker.pos,
-                ticker.blockId,
-                dt,
-                store,
-                commandBuffer
-            );
+            var res = parent.onEntityTick(ticker.world, ticker.ref, dt, store, commandBuffer);
 
             // Transition to the state returned by the block
             if (res != null) {
@@ -143,5 +147,10 @@ public class ScheduledTickSubSystem
                 }
             }
         }
+    }
+
+    @Override
+    public IRegistry<ECS_STORE> getRegistry() {
+        return parent.getRegistry();
     }
 }

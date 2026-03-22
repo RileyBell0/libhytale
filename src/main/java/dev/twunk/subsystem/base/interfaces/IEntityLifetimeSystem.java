@@ -1,6 +1,7 @@
 package dev.twunk.subsystem.base.interfaces;
 
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.IRegistryProvider;
 import dev.twunk.interfaces.methods.IEntityLifetime;
 import dev.twunk.interfaces.methods.IQuery;
 
@@ -15,4 +16,4 @@ import dev.twunk.interfaces.methods.IQuery;
  */
 public interface IEntityLifetimeSystem<
     ECS_STORE extends WorldProvider
-> extends IEntityLifetime<ECS_STORE>, IQuery<ECS_STORE> {}
+> extends IEntityLifetime<ECS_STORE>, IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {}

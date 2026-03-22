@@ -4,7 +4,6 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
@@ -22,14 +21,11 @@ import javax.annotation.Nonnull;
 //
 // and i wanna do that with ALL non-empty inventories that are put on a trash componnet
 // AND limit it to only be the player that opened it that can see those inventories
-public class TrashComponent implements IContainerComponent {
+public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
-    @SuppressWarnings("null")
-    public static ComponentType<ChunkStore, TrashComponent> COMPONENT_TYPE;
-
-    @Nonnull
-    public static final BuilderCodec<TrashComponent> CODEC = BuilderCodec.builder(
+    private static final BuilderCodec<TrashComponent> RAW_CODEC = BuilderCodec.builder(
         TrashComponent.class,
         TrashComponent::new
     )
@@ -45,6 +41,18 @@ public class TrashComponent implements IContainerComponent {
         )
         .add()
         .build();
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Nonnull
+    public static final BuilderCodec<ContainerComponent<EntityStore>> ENTITY_CODEC = (BuilderCodec<
+        ContainerComponent<EntityStore>
+    >) ((BuilderCodec) RAW_CODEC);
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Nonnull
+    public static final BuilderCodec<ContainerComponent<ChunkStore>> CHUNK_CODEC = (BuilderCodec<
+        ContainerComponent<ChunkStore>
+    >) ((BuilderCodec) RAW_CODEC);
 
     private static final short DEFAULT_CAPACITY = 45;
 
@@ -88,8 +96,8 @@ public class TrashComponent implements IContainerComponent {
     }
 
     @Override
-    public TrashComponent clone() {
-        return new TrashComponent(this.capacity);
+    public TrashComponent<ECS_TYPE> clone() {
+        return new TrashComponent<ECS_TYPE>(this.capacity);
     }
 
     @Override

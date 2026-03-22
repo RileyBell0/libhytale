@@ -2,11 +2,12 @@ package dev.twunk.lib.component;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.RemoveReason;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.TwunkLib;
-import dev.twunk.lib.lifetime.TrackedBlockEntity;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.components.ContainerComponent;
+import dev.twunk.lib.lifetime.TrackedEntity;
 import dev.twunk.subsystem.composite.TickPlan;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
@@ -28,18 +29,27 @@ import javax.annotation.Nullable;
  *
  * but to be fair, stupid stuff is fun stuff
  */
-public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
+public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> implements Component<ECS_STORE> {
 
     // serializing/deserializing your vars
+    @SuppressWarnings({ "rawtypes" })
     @Nonnull
-    public static final BuilderCodec<INTERNAL_TickSchedulerComponent> CODEC = BuilderCodec.builder(
+    private static final BuilderCodec<INTERNAL_TickSchedulerComponent> RAW_CODEC = BuilderCodec.builder(
         INTERNAL_TickSchedulerComponent.class,
         INTERNAL_TickSchedulerComponent::new
     ).build();
 
-    @SuppressWarnings("null")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
-    public static ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent> COMPONENT_TYPE;
+    public static final BuilderCodec<ContainerComponent<EntityStore>> ENTITY_CODEC = (BuilderCodec<
+        ContainerComponent<EntityStore>
+    >) ((BuilderCodec) RAW_CODEC);
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Nonnull
+    public static final BuilderCodec<ContainerComponent<ChunkStore>> CHUNK_CODEC = (BuilderCodec<
+        ContainerComponent<ChunkStore>
+    >) ((BuilderCodec) RAW_CODEC);
 
     /**
      * The idea is to only have 1x of this component per entity, thus, since my
@@ -63,7 +73,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
      * not stored to disk)
      */
     @Nonnull
-    private final HashMap<String, TrackedBlockEntity> memoryLocation = new HashMap<>();
+    private final HashMap<String, TrackedEntity<ECS_STORE>> memoryLocation = new HashMap<>();
 
     /**
      * Store the current ticking state we've got for the given system (e.g. awake,
@@ -95,7 +105,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedBlockEntity _setMemoryLocation(String systemId, @Nonnull TrackedBlockEntity state) {
+    public TrackedEntity<ECS_STORE> _setMemoryLocation(String systemId, @Nonnull TrackedEntity<ECS_STORE> state) {
         return memoryLocation.put(systemId, state);
     }
 
@@ -107,7 +117,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedBlockEntity _getMemoryLocation(String systemId) {
+    public TrackedEntity<ECS_STORE> _getMemoryLocation(String systemId) {
         return memoryLocation.get(systemId);
     }
 
@@ -119,7 +129,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedBlockEntity _dumpMemoryLocation(String systemId, RemoveReason reason) {
+    public TrackedEntity<ECS_STORE> _dumpMemoryLocation(String systemId, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
@@ -135,14 +145,7 @@ public class INTERNAL_TickSchedulerComponent implements Component<ChunkStore> {
     }
 
     @Nonnull
-    public INTERNAL_TickSchedulerComponent clone() {
-        return new INTERNAL_TickSchedulerComponent();
-    }
-
-    @Nonnull
-    public static ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent> getComponentType() {
-        return (ComponentType<ChunkStore, INTERNAL_TickSchedulerComponent>) TwunkLib.getComponentType(
-            INTERNAL_TickSchedulerComponent.class
-        );
+    public INTERNAL_TickSchedulerComponent<ECS_STORE> clone() {
+        return new INTERNAL_TickSchedulerComponent<>();
     }
 }

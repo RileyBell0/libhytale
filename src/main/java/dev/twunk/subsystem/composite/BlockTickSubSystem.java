@@ -4,11 +4,13 @@ import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.TwunkLib;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import dev.twunk.subsystem.composite.interfaces.IBlockTickSystem;
+import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import dev.twunk.utils.BlockUtils;
 import javax.annotation.Nonnull;
 
@@ -98,5 +100,10 @@ public class BlockTickSubSystem
         var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
 
         parent.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
+    }
+
+    @Override
+    public IRegistry<ChunkStore> getRegistry() {
+        return TwunkLib.CHUNK_REGISTRY;
     }
 }

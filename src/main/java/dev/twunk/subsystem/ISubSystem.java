@@ -6,7 +6,6 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.IRegistryProvider;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.plugin.ModPlugin;
-import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
 import javax.annotation.Nonnull;
@@ -27,8 +26,6 @@ import net.bytebuddy.utility.RandomString;
  */
 public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS_STORE>, IRegistryProvider<ECS_STORE> {
     public static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
-
-    public IRegistry<ECS_STORE> getRegistry();
 
     public default void registerTo(@Nonnull final ModPlugin plugin) {
         this.getRegistry().registerSystem(plugin, this);
