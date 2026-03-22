@@ -258,9 +258,9 @@ public abstract class ComponentUtils {
         });
     }
 
-    public static final <T extends Component<ChunkStore>> boolean has(
-        @Nonnull final Ref<ChunkStore> ref,
-        @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType
+    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> boolean has(
+        @Nonnull final Ref<ECS_TYPE> ref,
+        @Nonnull final Supplier<ComponentType<ECS_TYPE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -270,9 +270,9 @@ public abstract class ComponentUtils {
         return ComponentUtils.has(ref, componentType);
     }
 
-    public static final <T extends Component<ChunkStore>> boolean has(
-        @Nonnull final Ref<ChunkStore> ref,
-        @Nonnull final ComponentType<ChunkStore, T> componentType
+    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> boolean has(
+        @Nonnull final Ref<ECS_TYPE> ref,
+        @Nonnull final ComponentType<ECS_TYPE, T> componentType
     ) {
         return (T) ref.getStore().getComponent(ref, componentType) != null;
     }
@@ -281,9 +281,9 @@ public abstract class ComponentUtils {
     // Get another component that's ON the same ref you passed in
     // ====================================================================
 
-    public static final <T extends Component<ChunkStore>> T get(
-        @Nonnull final Ref<ChunkStore> anyRef,
-        @Nonnull final Supplier<ComponentType<ChunkStore, T>> getComponentType
+    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> T get(
+        @Nonnull final Ref<ECS_TYPE> anyRef,
+        @Nonnull final Supplier<ComponentType<ECS_TYPE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -293,9 +293,9 @@ public abstract class ComponentUtils {
         return anyRef.getStore().getComponent(anyRef, componentType);
     }
 
-    public static final <T extends Component<ChunkStore>> T get(
-        @Nonnull final Ref<ChunkStore> anyRef,
-        @Nonnull final ComponentType<ChunkStore, T> componentType
+    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> T get(
+        @Nonnull final Ref<ECS_TYPE> anyRef,
+        @Nonnull final ComponentType<ECS_TYPE, T> componentType
     ) {
         return anyRef.getStore().getComponent(anyRef, componentType);
     }
