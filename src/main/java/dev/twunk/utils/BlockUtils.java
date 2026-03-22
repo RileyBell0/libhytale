@@ -733,7 +733,8 @@ public abstract class BlockUtils {
                 // } else {
                 //     world.execute(() -> world.breakBlock(coords.x, coords.y - 1, coords.z, 0));
                 // }
-                world.execute(() -> world.breakBlock(coords.x, coords.y - 1, coords.z, 0));
+                // >>>>>>>> UPDATE: heck deleting the block below, that is annoying as
+                world.execute(() -> world.breakBlock(coords.x, coords.y + 1, coords.z, 0));
 
                 /**
                  * These five work as is

@@ -68,7 +68,7 @@ public abstract class ModPlugin extends JavaPlugin {
         );
 
         // Store our component in the global register
-        TwunkLib.registerComponentType(myClass, component);
+        TwunkLib.registerComponentType(myClass, defaultId, component);
 
         if (IAutoTickingBlockComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
@@ -84,15 +84,25 @@ public abstract class ModPlugin extends JavaPlugin {
     }
 
     @Nonnull
-    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(BuilderCodec<T> codec) {
+    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(@Nonnull final BuilderCodec<T> codec) {
         Class<T> myClass = codec.getInnerClass();
         var defaultId = myClass.getName();
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering interaction with codec " + codec);
         }
 
-        console.log("Adding Interaction " + defaultId + " -- from class " + myClass);
+        return registerInteraction(codec, defaultId);
+    }
 
-        return this.getCodecRegistry(Interaction.CODEC).register(defaultId, myClass, codec);
+    @Nonnull
+    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(
+        @Nonnull final BuilderCodec<T> codec,
+        @Nonnull final String id
+    ) {
+        Class<T> myClass = codec.getInnerClass();
+
+        console.log("Adding Interaction " + id + " -- from class " + myClass);
+
+        return this.getCodecRegistry(Interaction.CODEC).register(id, myClass, codec);
     }
 }

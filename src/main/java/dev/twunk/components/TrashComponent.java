@@ -1,0 +1,95 @@
+package dev.twunk.components;
+
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
+import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.utils.message.Chat;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nonnull;
+
+public class TrashComponent implements IContainerComponent {
+
+    @Nonnull
+    @SuppressWarnings("null")
+    public static ComponentType<ChunkStore, TrashComponent> COMPONENT_TYPE;
+
+    @Nonnull
+    public static final BuilderCodec<TrashComponent> CODEC = BuilderCodec.builder(
+        TrashComponent.class,
+        TrashComponent::new
+    )
+        .appendInherited(
+            new KeyedCodec<>("Capacity", Codec.SHORT),
+            (self, capacity) -> {
+                if (capacity != null) {
+                    self.capacity = capacity;
+                }
+            },
+            self -> self.capacity,
+            (self, parent) -> self.capacity = parent.capacity
+        )
+        .add()
+        .build();
+
+    private static final short DEFAULT_CAPACITY = 45;
+
+    @Nonnull
+    private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
+
+    // private boolean canView = true;
+    // private boolean canOpen = true;
+    private short capacity = DEFAULT_CAPACITY;
+
+    public TrashComponent() {
+        this.capacity = DEFAULT_CAPACITY;
+    }
+
+    public TrashComponent(final short capacity) {
+        this.capacity = capacity;
+    }
+
+    public TrashComponent(@Nonnull final SimpleItemContainer container) {
+        this.capacity = container.getCapacity();
+    }
+
+    @Override
+    public void onClose(
+        @Nonnull CommandBuffer<EntityStore> commandBuffer,
+        @Nonnull InteractionContext context,
+        @Nonnull Vector3i pos
+    ) {
+        Chat.send("Sent clear command to my container!");
+    }
+
+    @Nonnull
+    @Override
+    public SimpleItemContainer getContainer() {
+        return new SimpleItemContainer(this.capacity);
+    }
+
+    @Override
+    public short getCapacity() {
+        return this.capacity;
+    }
+
+    @Override
+    public TrashComponent clone() {
+        return new TrashComponent(this.capacity);
+    }
+
+    @Override
+    @Nonnull
+    public Map<UUID, ContainerBlockWindow> getWindows() {
+        return this.windows;
+    }
+}

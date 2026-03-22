@@ -6,12 +6,42 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class Chat {
 
-    private static final Message INFO_PREFIX = Message.raw("[INFO] ").bold(true).color("#0083db").monospace(true);
+    @Nonnull
+    public static final String getColor(@Nullable final Level level) {
+        String color = null;
+        if (level == null) {
+            return "#00d9ed";
+        }
+
+        var levelCode = level.intValue();
+        if (levelCode <= Level.ALL.intValue()) {
+            color = "#dadada";
+        } else if (levelCode <= Level.FINEST.intValue()) {
+            color = "#a600ed";
+        } else if (levelCode <= Level.FINER.intValue()) {
+            color = "#5b00ed";
+        } else if (levelCode <= Level.FINE.intValue()) {
+            color = "#002fed";
+        } else if (levelCode <= Level.CONFIG.intValue()) {
+            color = "#0096ed";
+        } else if (levelCode <= Level.INFO.intValue()) {
+            color = "#00d9ed";
+        } else if (levelCode <= Level.WARNING.intValue()) {
+            color = "#edba00";
+        } else if (levelCode <= Level.SEVERE.intValue()) {
+            color = "#c90d00";
+        } else {
+            color = "#00d9ed";
+        }
+
+        return color;
+    }
 
     @Nonnull
     public static final Message parse(@Nullable final Object message) {
@@ -54,10 +84,25 @@ public abstract class Chat {
 
     @Nonnull
     private static final Message constructLogMessage(@Nonnull final Message message) {
-        return Message.join(INFO_PREFIX, message.monospace(true)).monospace(true);
+        return constructLogMessage(Level.INFO, message);
     }
 
-    public static void sendMessage(@Nonnull final Player player, @Nonnull final Object... messages) {
+    @Nonnull
+    private static final Message constructLogMessage(@Nullable Level level, @Nonnull final Message message) {
+        if (level == null) {
+            level = Level.INFO;
+        }
+
+        if (level == null) {
+            return message.monospace(true);
+        }
+
+        var prefix = Message.raw("[" + level.toString() + "] ").color(getColor(level)).bold(true).monospace(true);
+
+        return Message.join(prefix, message.monospace(true)).monospace(true);
+    }
+
+    public static void send(@Nonnull final Player player, @Nonnull final Object... messages) {
         player.sendMessage(Chat.join(messages));
     }
 
@@ -65,13 +110,35 @@ public abstract class Chat {
         player.sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
-    // defaults to log to the universe
+    public static void log(
+        @Nonnull final Player player,
+        @Nonnull final Level level,
+        @Nonnull final Object... messages
+    ) {
+        player.sendMessage(constructLogMessage(level, Chat.join(messages)));
+    }
+
+    public static void send(@Nonnull final World world, @Nonnull final Object... messages) {
+        world.sendMessage(Chat.join(messages));
+    }
+
     public static void log(@Nonnull final World world, @Nonnull final Object... messages) {
         world.sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
-    // defaults to log to the universe
+    public static void log(@Nonnull final World world, @Nonnull final Level level, @Nonnull final Object... messages) {
+        world.sendMessage(constructLogMessage(level, Chat.join(messages)));
+    }
+
+    public static void send(@Nonnull final Object... messages) {
+        Universe.get().sendMessage(Chat.join(messages));
+    }
+
     public static void log(@Nonnull final Object... messages) {
         Universe.get().sendMessage(constructLogMessage(Chat.join(messages)));
+    }
+
+    public static void log(@Nonnull final Level level, @Nonnull final Object... messages) {
+        Universe.get().sendMessage(constructLogMessage(level, Chat.join(messages)));
     }
 }
