@@ -1,5 +1,24 @@
 # libhytale (WIP)
 
+## PLAN for getting onUpdate sub system
+
+> [!IMPORTANT]
+> Next plan
+> 
+> well, plan for like, idk, i need to figure out when a block updates WHAT systems to call. seriously, is there a way to do that efficiently? can i hook into another system somehow? maybe i just have a component i throw on called like "onUpdateComponent" yeah, ok that works, then i just need some way to talk back to all systems that OH systems can register THEMSELVES on the component right? idk. nah that doesn't really work, or, ooh ok onEntityAdded: i listen for THAT and when an entity comes in, i go somewhere the tick procedure can tell and yeah
+> 
+> entityAdded -> some library component (registers self)
+> 
+> THEN
+> 
+> TickProcedure -> SAME library component -> runs through all systems we had before, now, congrats, they can run onUpdate!! WOOO!
+> - remind systems to be KIND and assume other systems are running onUpdate too!!
+
+> [!NOTE]
+> OH and side note, ALSO need to generalise the idea of "I need to store some global data on an entity" e.g. scheduledTickSystem needs me to store on each entity that there's a system watching it (and equally i should remember to actually rmeove that when that list goes down to zero too lmao)
+
+## preamble (this library is super pre-alpha)
+
 If you found this, uuh, it's very much really a work in progress.
 
 Worth reading around to see how i do things if i happen to have solved or found
