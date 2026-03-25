@@ -55,8 +55,7 @@ public abstract class ModPlugin extends JavaPlugin {
     @Nonnull
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
-        BuilderCodec<T> codec
-    ) {
+            BuilderCodec<T> codec) {
         Class<T> myClass = codec.getInnerClass();
         var defaultId = myClass.getName();
         console.log("Adding component " + defaultId + " -- from class " + myClass);
@@ -65,13 +64,12 @@ public abstract class ModPlugin extends JavaPlugin {
         }
 
         ComponentType<ChunkStore, T> component = this.getChunkStoreRegistry().registerComponent(
-            myClass,
-            defaultId,
-            codec
-        );
+                myClass,
+                defaultId,
+                codec);
 
         // Store our component in the global register
-        TwunkLib.registerChunkComponentType(myClass, defaultId, component);
+        TwunkLib.registerChunkComponentType(component, myClass, defaultId);
 
         if (IAutoTickingBlockComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
@@ -90,8 +88,7 @@ public abstract class ModPlugin extends JavaPlugin {
 
     @Nonnull
     public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
-        BuilderCodec<T> codec
-    ) {
+            BuilderCodec<T> codec) {
         Class<T> myClass = codec.getInnerClass();
         var defaultId = myClass.getName();
         console.log("Adding component " + defaultId + " -- from class " + myClass);
@@ -100,13 +97,12 @@ public abstract class ModPlugin extends JavaPlugin {
         }
 
         ComponentType<EntityStore, T> component = this.getEntityStoreRegistry().registerComponent(
-            myClass,
-            defaultId,
-            codec
-        );
+                myClass,
+                defaultId,
+                codec);
 
         // Store our component in the global register
-        TwunkLib.registerEntityComponentType(myClass, defaultId, component);
+        TwunkLib.registerEntityComponentType(component, myClass, defaultId);
 
         return component;
     }
@@ -124,9 +120,8 @@ public abstract class ModPlugin extends JavaPlugin {
 
     @Nonnull
     public <T extends Interaction> Assets<Interaction, ?> registerInteraction(
-        @Nonnull final BuilderCodec<T> codec,
-        @Nonnull final String id
-    ) {
+            @Nonnull final BuilderCodec<T> codec,
+            @Nonnull final String id) {
         Class<T> myClass = codec.getInnerClass();
 
         console.log("Adding Interaction " + id + " -- from class " + myClass);
