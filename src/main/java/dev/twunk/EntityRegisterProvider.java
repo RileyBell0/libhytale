@@ -13,20 +13,28 @@ import javax.annotation.Nullable;
 public final class EntityRegisterProvider implements IRegistry<EntityStore> {
 
     @Nonnull
-    public static final HashMap<Class<? extends Component<EntityStore>>, ComponentType<EntityStore, ? extends Component<EntityStore>>> registeredEntityComponents = new HashMap<>();
+    public static final HashMap<
+        Class<? extends Component<EntityStore>>,
+        ComponentType<EntityStore, ? extends Component<EntityStore>>
+    > registeredEntityComponents = new HashMap<>();
 
     @Nonnull
-    public static final HashMap<String, ComponentType<EntityStore, ? extends Component<EntityStore>>> registeredEntityComponentsById = new HashMap<>();
+    public static final HashMap<
+        String,
+        ComponentType<EntityStore, ? extends Component<EntityStore>>
+    > registeredEntityComponentsById = new HashMap<>();
 
     @Nonnull
     public final <T extends Component<EntityStore>> ComponentType<EntityStore, T> getComponentType(
-            @Nonnull final Class<T> componentClass) {
+        final @Nonnull Class<T> componentClass
+    ) {
         return TwunkLib.getEntityComponentType(componentClass);
     }
 
     @Nullable
     public final ComponentType<EntityStore, ? extends Component<EntityStore>> getComponentType(
-            @Nonnull final String componentId) {
+        final @Nonnull String componentId
+    ) {
         return TwunkLib.getEntityComponentType(componentId);
     }
 
@@ -36,13 +44,14 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
      * about EVERYTHING above it WOOOO
      */
     public final <T extends Component<EntityStore>> void registerComponentType(
-            @Nonnull final ComponentType<EntityStore, T> componentType,
-            @Nonnull final Class<T> myClass,
-            @Nonnull final String id) {
+        final @Nonnull ComponentType<EntityStore, T> componentType,
+        final @Nonnull Class<T> myClass,
+        final @Nonnull String id
+    ) {
         TwunkLib.registerEntityComponentType(componentType, myClass, id);
     }
 
-    public final void registerSystem(@Nonnull final ModPlugin plugin, @Nonnull final ISubSystem<EntityStore> system) {
+    public final void registerSystem(final @Nonnull ModPlugin plugin, final @Nonnull ISubSystem<EntityStore> system) {
         plugin.getEntityStoreRegistry().registerSystem(system);
     }
 }

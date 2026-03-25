@@ -140,7 +140,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
-        var cache = memoryLocation.remove(systemId);
+        final var cache = memoryLocation.remove(systemId);
         cache.drop();
     }
 

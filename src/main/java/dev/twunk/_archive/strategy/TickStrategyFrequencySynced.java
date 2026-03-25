@@ -29,19 +29,19 @@ public class TickStrategyFrequencySynced extends TickStrategy {
         this.initialDelay = 0;
     }
 
-    public TickStrategyFrequencySynced(int tickFrequency) {
+    public TickStrategyFrequencySynced(final int tickFrequency) {
         this.tickFrequency = tickFrequency;
         this.initialDelay = 0;
         this.tickOffset = 0;
     }
 
-    public TickStrategyFrequencySynced(int tickFrequency, int initialDelay) {
+    public TickStrategyFrequencySynced(final int tickFrequency, final int initialDelay) {
         this.tickFrequency = tickFrequency;
         this.initialDelay = initialDelay;
         this.tickOffset = 0;
     }
 
-    public TickStrategyFrequencySynced(int tickFrequency, int initialDelay, int tickOffset) {
+    public TickStrategyFrequencySynced(final int tickFrequency, final int initialDelay, final int tickOffset) {
         this.tickFrequency = tickFrequency;
         this.initialDelay = initialDelay;
         this.tickOffset = tickOffset;

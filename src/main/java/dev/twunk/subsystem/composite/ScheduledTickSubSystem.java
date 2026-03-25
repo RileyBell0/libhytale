@@ -52,12 +52,12 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
     @SuppressWarnings("unchecked")
     @Nonnull
     public <T extends ScheduledTickSubSystem<ECS_STORE>> ScheduledTickSubSystem<ECS_STORE> newSubsystemFor(
-        @Nonnull final IScheduledTickSystem<ECS_STORE> parent
+        final @Nonnull IScheduledTickSystem<ECS_STORE> parent
     ) {
         return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, IScheduledTickSystem.class, parent);
     }
 
-    protected ScheduledTickSubSystem(@Nonnull final IScheduledTickSystem<ECS_STORE> parent) {
+    protected ScheduledTickSubSystem(final @Nonnull IScheduledTickSystem<ECS_STORE> parent) {
         super(parent.getQuery());
         this.parent = parent;
 
@@ -87,10 +87,10 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * that'll set it up to be easily tickable for us later.
      */
     public void onEntityAdded(
-        @Nonnull final Ref<ECS_STORE> ref,
-        @Nonnull final AddReason reason,
-        @Nonnull final Store<ECS_STORE> store,
-        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull AddReason reason,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         entities.track(ref, store, commandBuffer);
     }
@@ -103,10 +103,10 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * Removes the entity from our TrackedEntities tracker.
      */
     public void onEntityRemove(
-        @Nonnull final Ref<ECS_STORE> ref,
-        @Nonnull final RemoveReason reason,
-        @Nonnull final Store<ECS_STORE> store,
-        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull RemoveReason reason,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // drop the entity from our tracker
         entities.untrack(ref, store, reason);
@@ -120,21 +120,19 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * their scheduled tick
      */
     public void onSystemTick(
-        float dt,
-        @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final float dt,
+        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        // tick all our refs (ugly loop syntaxt basically just to assert that it's not
-        // null. trust me, it's not, i guarantee it on its way in elsewhere, just want
-        // to avoid having to check something the java type system can't pick up for
-        // some reason)
-        for (@Nonnull
+        for (// Java doesn't believe us when we assert that items inside an arraylist are nonnull.
+        // Don't worry, they are, that's the only reason we suppress null here
+        @Nonnull
         @SuppressWarnings("null")
-        var ticker : entities.ticking) {
-            // need to make it so that we check if the ref is still valid at this stage
-            // (eventually)
-            var res = parent.onEntityTick(ticker.world, ticker.ref, dt, store, commandBuffer);
+        final var ticker : entities.ticking) {
+            // TODO - need to make it so that we check if the ref is still valid
+            // at this stage (eventually)
+            final var res = parent.onEntityTick(ticker.world, ticker.ref, dt, store, commandBuffer);
 
             // Transition to the state returned by the block
             if (res != null) {

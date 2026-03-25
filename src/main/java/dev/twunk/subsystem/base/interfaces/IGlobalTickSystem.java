@@ -22,9 +22,9 @@ public interface IGlobalTickSystem<
     ECS_STORE extends WorldProvider
 > extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
     public void onSystemTick(
-        float dt,
-        @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final float dt,
+        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     );
 }

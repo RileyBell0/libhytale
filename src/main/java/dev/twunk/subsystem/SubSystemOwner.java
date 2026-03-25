@@ -31,16 +31,16 @@ public abstract class SubSystemOwner<
     @Nonnull
     private final Query<ECS_STORE> query;
 
-    public SubSystemOwner(@Nonnull final Query<ECS_STORE> query) {
+    public SubSystemOwner(final @Nonnull Query<ECS_STORE> query) {
         this.query = query;
     }
 
-    protected void appendSubSystem(@Nonnull final ISubSystem<ECS_STORE> system) {
+    protected void appendSubSystem(final @Nonnull ISubSystem<ECS_STORE> system) {
         this.subSystems.add(system);
     }
 
-    public void registerTo(@Nonnull final ModPlugin plugin) {
-        for (var system : subSystems) {
+    public void registerTo(final @Nonnull ModPlugin plugin) {
+        for (final var system : subSystems) {
             system.registerTo(plugin);
         }
     }

@@ -21,10 +21,10 @@ public interface IEntityTickSystem<
     ECS_STORE extends WorldProvider
 > extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
     public void onEntityTick(
-        float dt,
-        int index,
-        @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final float dt,
+        final int index,
+        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     );
 }

@@ -96,12 +96,12 @@ public class TrackedBlockEntity {
     public final int blockId;
 
     public TrackedBlockEntity(
-        @Nonnull World world,
-        @Nonnull WorldChunk chunk,
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull Vector3i coords,
-        int blockId,
-        @Nonnull ArrayList<TrackedBlockEntity> currentAreaRef
+        final @Nonnull World world,
+        final @Nonnull WorldChunk chunk,
+        final @Nonnull Ref<ChunkStore> ref,
+        final @Nonnull Vector3i coords,
+        final int blockId,
+        final @Nonnull ArrayList<TrackedBlockEntity> currentAreaRef
     ) {
         this.lifetimeId = ++nextLifetimeId;
         this.pos = coords;
@@ -120,7 +120,7 @@ public class TrackedBlockEntity {
      * We'll say they're the same if they have the same ref. should make removal easy
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof TrackedBlockEntity) {
             return ((TrackedBlockEntity) obj).ref == this.ref;
         }

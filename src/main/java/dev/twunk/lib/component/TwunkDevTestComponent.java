@@ -32,12 +32,12 @@ public class TwunkDevTestComponent implements Component<ChunkStore> {
     public TwunkDevTestComponent() {}
 
     @Nonnull
-    public TwunkDevTestComponent setVal(int val) {
+    public final TwunkDevTestComponent setVal(final int val) {
         this.val = val;
         return this;
     }
 
-    public int getVal() {
+    public final int getVal() {
         return this.val;
     }
 
@@ -47,7 +47,7 @@ public class TwunkDevTestComponent implements Component<ChunkStore> {
     }
 
     @Nonnull
-    public static ComponentType<ChunkStore, TwunkDevTestComponent> getComponentType() {
+    public static final ComponentType<ChunkStore, TwunkDevTestComponent> getComponentType() {
         return (ComponentType<ChunkStore, TwunkDevTestComponent>) TwunkLib.getChunkComponentType(
             TwunkDevTestComponent.class
         );

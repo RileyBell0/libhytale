@@ -3,14 +3,10 @@ package dev.twunk.components;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.utils.message.Chat;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +36,28 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
             (self, parent) -> self.capacity = parent.capacity
         )
         .add()
+        .appendInherited(
+            new KeyedCodec<>("CanView", Codec.BOOLEAN),
+            (self, canView) -> {
+                if (canView != null) {
+                    self.canView = canView;
+                }
+            },
+            self -> self.canView,
+            (self, parent) -> self.canView = parent.canView
+        )
+        .add()
+        .appendInherited(
+            new KeyedCodec<>("CanOpen", Codec.BOOLEAN),
+            (self, canOpen) -> {
+                if (canOpen != null) {
+                    self.canOpen = canOpen;
+                }
+            },
+            self -> self.canOpen,
+            (self, parent) -> self.canOpen = parent.canOpen
+        )
+        .add()
         .build();
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -59,9 +77,11 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
-    // private boolean canView = true;
-    // private boolean canOpen = true;
     private short capacity = DEFAULT_CAPACITY;
+
+    // TODO write up canView and canOpen logic
+    private boolean canView = true;
+    private boolean canOpen = true;
 
     public TrashComponent() {
         this.capacity = DEFAULT_CAPACITY;
@@ -71,17 +91,8 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
         this.capacity = capacity;
     }
 
-    public TrashComponent(@Nonnull final SimpleItemContainer container) {
+    public TrashComponent(final @Nonnull SimpleItemContainer container) {
         this.capacity = container.getCapacity();
-    }
-
-    @Override
-    public void onClose(
-        @Nonnull CommandBuffer<EntityStore> commandBuffer,
-        @Nonnull InteractionContext context,
-        @Nonnull Vector3i pos
-    ) {
-        Chat.send("Sent clear command to my container!");
     }
 
     @Nonnull

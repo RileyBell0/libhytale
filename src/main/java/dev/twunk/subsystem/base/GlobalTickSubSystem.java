@@ -38,11 +38,11 @@ public class GlobalTickSubSystem<ECS_STORE extends WorldProvider>
     @Nonnull
     public static <ECS_STORE extends WorldProvider, T extends GlobalTickSubSystem<ECS_STORE>> GlobalTickSubSystem<
         ECS_STORE
-    > newSubsystemFor(@Nonnull final IGlobalTickSystem<ECS_STORE> parent) {
+    > newSubsystemFor(final @Nonnull IGlobalTickSystem<ECS_STORE> parent) {
         return ISubSystem.__newSubSystem(GlobalTickSubSystem.class, IGlobalTickSystem.class, parent);
     }
 
-    protected GlobalTickSubSystem(@Nonnull IGlobalTickSystem<ECS_STORE> parent) {
+    protected GlobalTickSubSystem(final @Nonnull IGlobalTickSystem<ECS_STORE> parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }
@@ -54,10 +54,10 @@ public class GlobalTickSubSystem<ECS_STORE extends WorldProvider>
      */
     @Override
     public void tick(
-        float dt,
-        @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final float dt,
+        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         parent.onSystemTick(dt, archetypeChunk, store, commandBuffer);
     }

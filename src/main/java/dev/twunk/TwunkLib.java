@@ -26,7 +26,7 @@ public abstract class TwunkLib {
     private static boolean hasRegisteredLibComponents = false;
 
     // Called automatically when you load a mod plugin
-    public static void init(@Nonnull final ModPlugin plugin) {
+    public static void init(final @Nonnull ModPlugin plugin) {
         if (hasRegisteredLibComponents) {
             return;
         }
@@ -56,7 +56,8 @@ public abstract class TwunkLib {
      */
     @Nonnull
     public static <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getChunkComponentType(
-            @Nonnull final Class<T> componentClass) {
+        final @Nonnull Class<T> componentClass
+    ) {
         return CHUNK_REGISTRY.getComponentType(componentClass);
     }
 
@@ -67,7 +68,8 @@ public abstract class TwunkLib {
      */
     @Nullable
     public static ComponentType<ChunkStore, ? extends Component<ChunkStore>> getChunkComponentType(
-            @Nonnull final String componentId) {
+        final @Nonnull String componentId
+    ) {
         return CHUNK_REGISTRY.getComponentType(componentId);
     }
 
@@ -78,7 +80,8 @@ public abstract class TwunkLib {
      */
     @Nonnull
     public static <T extends Component<EntityStore>> ComponentType<EntityStore, T> getEntityComponentType(
-            @Nonnull final Class<T> componentClass) {
+        final @Nonnull Class<T> componentClass
+    ) {
         return ENTITY_REGISTRY.getComponentType(componentClass);
     }
 
@@ -89,7 +92,8 @@ public abstract class TwunkLib {
      */
     @Nullable
     public static ComponentType<EntityStore, ? extends Component<EntityStore>> getEntityComponentType(
-            @Nonnull final String componentId) {
+        final @Nonnull String componentId
+    ) {
         return ENTITY_REGISTRY.getComponentType(componentId);
     }
 
@@ -97,16 +101,18 @@ public abstract class TwunkLib {
      * Register component type to both its Class, and to its ID
      */
     public static <T extends Component<ChunkStore>> void registerChunkComponentType(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final Class<T> myClass,
-            @Nonnull final String id) {
+        final @Nonnull ComponentType<ChunkStore, T> componentType,
+        final @Nonnull Class<T> myClass,
+        final @Nonnull String id
+    ) {
         CHUNK_REGISTRY.registerComponentType(componentType, myClass, id);
     }
 
     public static <T extends Component<EntityStore>> void registerEntityComponentType(
-            @Nonnull final ComponentType<EntityStore, T> componentType,
-            @Nonnull final Class<T> myClass,
-            @Nonnull final String id) {
+        final @Nonnull ComponentType<EntityStore, T> componentType,
+        final @Nonnull Class<T> myClass,
+        final @Nonnull String id
+    ) {
         ENTITY_REGISTRY.registerComponentType(componentType, myClass, id);
     }
 }

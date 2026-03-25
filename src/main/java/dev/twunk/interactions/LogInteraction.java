@@ -104,7 +104,7 @@ public class LogInteraction extends SimpleInstantInteraction {
         .appendInherited(
             new KeyedCodec<>("Level", Codec.STRING, false),
             (o, v) -> {
-                var level = Level.parse(v);
+                final var level = Level.parse(v);
                 if (level == null) {
                     o.level = Level.INFO;
                 } else {
@@ -174,15 +174,15 @@ public class LogInteraction extends SimpleInstantInteraction {
         return LogInteraction.CODEC;
     }
 
-    protected Assets<Interaction, ?> registerToPlugin(@Nonnull final ModPlugin plugin) {
+    protected Assets<Interaction, ?> registerToPlugin(final @Nonnull ModPlugin plugin) {
         return plugin.getCodecRegistry(Interaction.CODEC).register(this.getId(), this.getClass(), this.getCodec());
     }
 
     @Override
     protected void firstRun(
-        @Nonnull InteractionType interactionType,
-        @Nonnull InteractionContext interactionContext,
-        @Nonnull CooldownHandler cooldownHandler
+        final @Nonnull InteractionType interactionType,
+        final @Nonnull InteractionContext interactionContext,
+        final @Nonnull CooldownHandler cooldownHandler
     ) {
         final var commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {

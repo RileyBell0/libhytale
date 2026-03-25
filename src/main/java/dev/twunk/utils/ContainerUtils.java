@@ -24,16 +24,21 @@ import javax.annotation.Nonnull;
 
 public abstract class ContainerUtils {
 
-    @SuppressWarnings({ "removal" })
+    /**
+     * Opens a UI window for the player (only works for players here) for the
+     * container within the container component type
+     *
+     * Most of this comes from the hytale src code
+     */
     public static void open(
-        @Nonnull CommandBuffer<EntityStore> commandBuffer,
-        @Nonnull InteractionContext context,
-        @Nonnull Vector3i pos,
-        @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType
+        final @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType,
+        final @Nonnull CommandBuffer<EntityStore> commandBuffer,
+        final @Nonnull InteractionContext context,
+        final @Nonnull Vector3i pos
     ) {
-        Ref<EntityStore> ref = context.getEntity();
-        Store<EntityStore> store = ref.getStore();
-        Player playerComponent = commandBuffer.getComponent(ref, Player.getComponentType());
+        final Ref<EntityStore> ref = context.getEntity();
+        final Store<EntityStore> store = ref.getStore();
+        final Player playerComponent = commandBuffer.getComponent(ref, Player.getComponentType());
         if (playerComponent == null) {
             return;
         }
@@ -56,17 +61,17 @@ public abstract class ContainerUtils {
         }
 
         final var container = containerComponent.getContainer();
-        BlockType blockType = world.getBlockType(pos.x, pos.y, pos.z);
+        final BlockType blockType = world.getBlockType(pos.x, pos.y, pos.z);
         if (blockType == null) {
             return;
         }
 
-        UUIDComponent uuidComponent = commandBuffer.getComponent(ref, UUIDComponent.getComponentType());
+        final UUIDComponent uuidComponent = commandBuffer.getComponent(ref, UUIDComponent.getComponentType());
         assert uuidComponent != null;
 
-        UUID uuid = uuidComponent.getUuid();
-        WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(pos.x, pos.z));
-        ContainerBlockWindow window = new ContainerBlockWindow(
+        final UUID uuid = uuidComponent.getUuid();
+        final WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(pos.x, pos.z));
+        final ContainerBlockWindow window = new ContainerBlockWindow(
             pos.x,
             pos.y,
             pos.z,
@@ -75,12 +80,14 @@ public abstract class ContainerUtils {
             container
         );
 
-        Map<UUID, ContainerBlockWindow> windows = containerComponent.getWindows();
+        final Map<UUID, ContainerBlockWindow> windows = containerComponent.getWindows();
         if (windows.putIfAbsent(uuid, window) != null) {
+            // TODO
             // itemContainerState.onOpen(ref, world, store);
             return;
         }
         if (!playerComponent.getPageManager().setPageWithWindows(ref, store, Page.Bench, true, window)) {
+            // TODO
             // itemContainerState.onOpen(ref, world, store);
             windows.remove(uuid, window);
             return;
@@ -96,17 +103,17 @@ public abstract class ContainerUtils {
                 world.setBlockInteractionState(pos, currentBlockType, "CloseWindow");
             }
 
-            BlockType interactionStatex = currentBlockType.getBlockForState("CloseWindow");
+            final BlockType interactionStatex = currentBlockType.getBlockForState("CloseWindow");
             if (interactionStatex == null) {
                 return;
             }
-            int soundEventIndexx = interactionStatex.getInteractionSoundEventIndex();
+            final int soundEventIndexx = interactionStatex.getInteractionSoundEventIndex();
             if (soundEventIndexx == 0) {
                 return;
             }
 
-            int rotationIndexx = chunk.getRotationIndex(pos.x, pos.y, pos.z);
-            Vector3d soundPosx = new Vector3d();
+            final int rotationIndexx = chunk.getRotationIndex(pos.x, pos.y, pos.z);
+            final Vector3d soundPosx = new Vector3d();
             blockType.getBlockCenter(rotationIndexx, soundPosx);
             soundPosx.add(pos);
             SoundUtil.playSoundEvent3d(ref, soundEventIndexx, soundPosx, commandBuffer);
@@ -116,23 +123,24 @@ public abstract class ContainerUtils {
             world.setBlockInteractionState(pos, blockType, "OpenWindow");
         }
 
-        BlockType interactionState = blockType.getBlockForState("OpenWindow");
+        final BlockType interactionState = blockType.getBlockForState("OpenWindow");
         if (interactionState == null) {
             return;
         }
 
-        int soundEventIndex = interactionState.getInteractionSoundEventIndex();
+        final int soundEventIndex = interactionState.getInteractionSoundEventIndex();
         if (soundEventIndex == 0) {
             return;
         }
 
-        int rotationIndex = chunk.getRotationIndex(pos.x, pos.y, pos.z);
-        Vector3d soundPos = new Vector3d();
+        final int rotationIndex = chunk.getRotationIndex(pos.x, pos.y, pos.z);
+        final Vector3d soundPos = new Vector3d();
         blockType.getBlockCenter(rotationIndex, soundPos);
         soundPos.add(pos);
         SoundUtil.playSoundEvent3d(ref, soundEventIndex, soundPos, commandBuffer);
         windows.remove(uuid, window);
 
+        // TODO
         // itemContainerState.onOpen(ref, world, store);}
     }
 }

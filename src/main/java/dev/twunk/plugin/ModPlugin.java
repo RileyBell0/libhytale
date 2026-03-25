@@ -23,7 +23,7 @@ public abstract class ModPlugin extends JavaPlugin {
 
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
-    public ModPlugin(@Nonnull JavaPluginInit init) {
+    public ModPlugin(final @Nonnull JavaPluginInit init) {
         super(init);
         console.log("Initializing plugin " + this.getName());
         TwunkLib.init(this);
@@ -40,7 +40,15 @@ public abstract class ModPlugin extends JavaPlugin {
      * Register the given system to the plugin
      * @param system
      */
-    public final void registerSystem(@Nonnull final ISystem<ChunkStore> system) {
+    public final void register(final @Nonnull ISystem<ChunkStore> system) {
+        this.getChunkStoreRegistry().registerSystem(system);
+    }
+
+    /**
+     * Register the given system to the plugin
+     * @param system
+     */
+    public final void registerSystem(final @Nonnull ISystem<ChunkStore> system) {
         this.getChunkStoreRegistry().registerSystem(system);
     }
 
@@ -55,18 +63,21 @@ public abstract class ModPlugin extends JavaPlugin {
     @Nonnull
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
-            BuilderCodec<T> codec) {
-        Class<T> myClass = codec.getInnerClass();
-        var defaultId = myClass.getName();
+        final @Nonnull BuilderCodec<T> codec
+    ) {
+        final Class<T> myClass = codec.getInnerClass();
+        final var defaultId = myClass.getName();
+
         console.log("Adding component " + defaultId + " -- from class " + myClass);
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }
 
-        ComponentType<ChunkStore, T> component = this.getChunkStoreRegistry().registerComponent(
-                myClass,
-                defaultId,
-                codec);
+        final ComponentType<ChunkStore, T> component = this.getChunkStoreRegistry().registerComponent(
+            myClass,
+            defaultId,
+            codec
+        );
 
         // Store our component in the global register
         TwunkLib.registerChunkComponentType(component, myClass, defaultId);
@@ -88,18 +99,20 @@ public abstract class ModPlugin extends JavaPlugin {
 
     @Nonnull
     public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
-            BuilderCodec<T> codec) {
-        Class<T> myClass = codec.getInnerClass();
-        var defaultId = myClass.getName();
+        final @Nonnull BuilderCodec<T> codec
+    ) {
+        final Class<T> myClass = codec.getInnerClass();
+        final var defaultId = myClass.getName();
         console.log("Adding component " + defaultId + " -- from class " + myClass);
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }
 
-        ComponentType<EntityStore, T> component = this.getEntityStoreRegistry().registerComponent(
-                myClass,
-                defaultId,
-                codec);
+        final ComponentType<EntityStore, T> component = this.getEntityStoreRegistry().registerComponent(
+            myClass,
+            defaultId,
+            codec
+        );
 
         // Store our component in the global register
         TwunkLib.registerEntityComponentType(component, myClass, defaultId);
@@ -108,9 +121,9 @@ public abstract class ModPlugin extends JavaPlugin {
     }
 
     @Nonnull
-    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(@Nonnull final BuilderCodec<T> codec) {
-        Class<T> myClass = codec.getInnerClass();
-        var defaultId = myClass.getName();
+    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(final @Nonnull BuilderCodec<T> codec) {
+        final Class<T> myClass = codec.getInnerClass();
+        final var defaultId = myClass.getName();
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering interaction with codec " + codec);
         }
@@ -120,9 +133,10 @@ public abstract class ModPlugin extends JavaPlugin {
 
     @Nonnull
     public <T extends Interaction> Assets<Interaction, ?> registerInteraction(
-            @Nonnull final BuilderCodec<T> codec,
-            @Nonnull final String id) {
-        Class<T> myClass = codec.getInnerClass();
+        final @Nonnull BuilderCodec<T> codec,
+        final @Nonnull String id
+    ) {
+        final Class<T> myClass = codec.getInnerClass();
 
         console.log("Adding Interaction " + id + " -- from class " + myClass);
 

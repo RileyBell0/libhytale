@@ -56,7 +56,7 @@ public interface TickPlan {
         /**
          * Sleep for a given tick duration
          */
-        public Sleeping(int sleepForTicks) {
+        public Sleeping(final int sleepForTicks) {
             this.sleepForTicks = sleepForTicks;
         }
 
@@ -65,12 +65,12 @@ public interface TickPlan {
         }
 
         @Nonnull
-        public static Sleeping forSeconds(int seconds) {
+        public static Sleeping forSeconds(final int seconds) {
             return new Sleeping(30 * seconds);
         }
 
         @Nonnull
-        public static Sleeping forTicks(int ticks) {
+        public static Sleeping forTicks(final int ticks) {
             return new Sleeping(ticks);
         }
 

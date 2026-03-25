@@ -39,8 +39,8 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
     private final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> tickStateComponent;
 
     public TrackedEntities(
-        @Nonnull final String id,
-        @Nonnull final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> component
+        final @Nonnull String id,
+        final @Nonnull ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> component
     ) {
         this.id = id;
         this.tickStateComponent = component;
@@ -66,21 +66,21 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
     private final ArrayList<TrackedEntity<ECS_STORE>> broken = new ArrayList<>();
 
     public void track(
-        @Nonnull final Ref<ECS_STORE> ref,
-        @Nonnull final Store<ECS_STORE> store,
-        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // figure out the current/initial ticking state our entity has
-        var tickingInfo = this.loadEntityTickingState(ref, commandBuffer);
-        var initialState = tickingInfo.getTickingInfo(this.id);
+        final var tickingInfo = this.loadEntityTickingState(ref, commandBuffer);
+        final var initialState = tickingInfo.getTickingInfo(this.id);
 
         // Figure out which tick group we should put our entity in based on its
         // state
-        var area = this.getOwner(initialState);
+        final var area = this.getOwner(initialState);
 
         // prepare the variables/references we need to run our tick method
         // (whenever that tick happens)
-        var onTickCache = this.getTickVars(ref, store, area);
+        final var onTickCache = this.getTickVars(ref, store, area);
         if (onTickCache == null) {
             return;
         }
@@ -95,9 +95,9 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
     }
 
     public void untrack(
-        @Nonnull final Ref<ECS_STORE> ref,
-        @Nonnull final Store<ECS_STORE> store,
-        @Nonnull final RemoveReason reason
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull RemoveReason reason
     ) {
         store.getComponent(ref, this.tickStateComponent).drop(this.id, reason);
     }
@@ -107,32 +107,32 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
      */
     @Nullable
     private TrackedEntity<ECS_STORE> getTickVars(
-        @Nonnull final Ref<ECS_STORE> ref,
-        @Nonnull final Store<ECS_STORE> store,
-        @Nonnull final ArrayList<TrackedEntity<ECS_STORE>> area
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull ArrayList<TrackedEntity<ECS_STORE>> area
     ) {
         // We're going to spend a bunch of extra time in onEntityAdd to cache
         // all the information we'll need when this thing is ticking
         //
         // Most of this starts from the "info"
-        var world = store.getExternalData().getWorld();
+        final var world = store.getExternalData().getWorld();
 
         // lets get this all bundled up for easy re-use
-        var cache = new TrackedEntity<>(world, ref, area);
+        final var cache = new TrackedEntity<>(world, ref, area);
 
         return cache;
     }
 
     @Nonnull
     private INTERNAL_TickSchedulerComponent<ECS_STORE> loadEntityTickingState(
-        @Nonnull final Ref<ECS_STORE> ref,
-        @Nonnull final CommandBuffer<ECS_STORE> commandBuffer
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // Setup a tickingInfo component to track the state of our entitiy
         // so it can resume ticking/sleeping/etc when the server reboots. really
         // we just want to store shit so the lifetime extends past (NOW), and
         // so we can QUICKLY remove the entity again later
-        var tickingInfo = commandBuffer.ensureAndGetComponent(ref, this.tickStateComponent);
+        final var tickingInfo = commandBuffer.ensureAndGetComponent(ref, this.tickStateComponent);
         var systemState = tickingInfo.getTickingInfo(this.id);
         if (systemState == null) {
             systemState = new TickPlan.Active();

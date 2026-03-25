@@ -36,10 +36,10 @@ public abstract class ChunkUtils {
         public static final class Global {
 
             public static final void test(
-                @Nonnull final Ref<ChunkStore> blockRef,
-                @Nonnull final WorldChunk worldChunk,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
+                final @Nonnull Ref<ChunkStore> blockRef,
+                final @Nonnull WorldChunk worldChunk,
+                final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+                final @Nonnull Vector3i providedCoords
             ) {
                 final var blockX = providedCoords.x;
                 final var blockY = providedCoords.y;
@@ -104,7 +104,7 @@ public abstract class ChunkUtils {
 
             // With GLOBAL block coords
             @Nonnull
-            public static final ChunkCoordinates get(@Nonnull final Vector3i blockCoords) {
+            public static final ChunkCoordinates get(final @Nonnull Vector3i blockCoords) {
                 // see ChunkUtil.chunkCoordinate
                 return new ChunkCoordinates(blockCoords.x >> 5, blockCoords.z >> 5);
             }
@@ -126,7 +126,7 @@ public abstract class ChunkUtils {
              * returned "y" in vector is actually the chunk's "z" coordinate
              */
             @Nonnull
-            public static final Vector2i getVector2i(@Nonnull final Vector3i blockCoords) {
+            public static final Vector2i getVector2i(final @Nonnull Vector3i blockCoords) {
                 // see ChunkUtil.chunkCoordinate
                 return new Vector2i(blockCoords.x >> 5, blockCoords.z >> 5);
             }
@@ -140,10 +140,10 @@ public abstract class ChunkUtils {
         public static final class Index {
 
             public static final void test(
-                @Nonnull final Ref<ChunkStore> blockRef,
-                @Nonnull final WorldChunk worldChunk,
-                @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-                @Nonnull final Vector3i providedCoords
+                final @Nonnull Ref<ChunkStore> blockRef,
+                final @Nonnull WorldChunk worldChunk,
+                final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+                final @Nonnull Vector3i providedCoords
             ) {
                 final var blockX = providedCoords.x;
                 final var blockY = providedCoords.y;
@@ -220,7 +220,7 @@ public abstract class ChunkUtils {
             // #region getChunkIndex
 
             @Nullable
-            public static final Long get(@Nonnull final Ref<ChunkStore> anyRef) {
+            public static final Long get(final @Nonnull Ref<ChunkStore> anyRef) {
                 final var worldChunk = ChunkUtils.WorldChunk_.get(anyRef);
                 if (worldChunk == null) {
                     return null;
@@ -230,12 +230,12 @@ public abstract class ChunkUtils {
             }
 
             @Nullable
-            public static final Long get(@Nonnull final BlockStateInfo info) {
+            public static final Long get(final @Nonnull BlockStateInfo info) {
                 return ChunkUtils.Coords.Index.get_chunkRef(info.getChunkRef());
             }
 
             @Nullable
-            public static final Long get_chunkRef(@Nonnull final Ref<ChunkStore> chunkRef) {
+            public static final Long get_chunkRef(final @Nonnull Ref<ChunkStore> chunkRef) {
                 final var worldChunk = ChunkUtils.WorldChunk_.get_chunkRef(chunkRef);
                 if (worldChunk == null) {
                     return null;
@@ -245,7 +245,7 @@ public abstract class ChunkUtils {
             }
 
             @Nullable
-            public static final Long get_blockRef(@Nonnull final Ref<ChunkStore> blockRef) {
+            public static final Long get_blockRef(final @Nonnull Ref<ChunkStore> blockRef) {
                 final var worldChunk = ChunkUtils.WorldChunk_.get_blockRef(blockRef);
                 if (worldChunk == null) {
                     return null;
@@ -255,7 +255,7 @@ public abstract class ChunkUtils {
             }
 
             // TODO worldChunk.getIndex()  and      Chunk.Coords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ()) do the same thing
-            public static final long get(@Nonnull final WorldChunk worldChunk) {
+            public static final long get(final @Nonnull WorldChunk worldChunk) {
                 return worldChunk.getIndex();
             }
 
@@ -271,7 +271,7 @@ public abstract class ChunkUtils {
                 return ((long) (blockX >> 5) << 32) | ((long) (blockZ >> 5) & 4294967295L);
             }
 
-            public static final long get(@Nonnull final Vector3i blockCoords) {
+            public static final long get(final @Nonnull Vector3i blockCoords) {
                 // see ChunkUtil.indexChunkFromBlock
                 return ((long) (blockCoords.x >> 5) << 32) | ((long) (blockCoords.z >> 5) & 4294967295L);
             }
@@ -281,7 +281,7 @@ public abstract class ChunkUtils {
                 return ((long) chunkX << 32) | ((long) chunkZ & 4294967295L);
             }
 
-            public static final long get_chunkCoords(@Nonnull final ChunkCoordinates coords) {
+            public static final long get_chunkCoords(final @Nonnull ChunkCoordinates coords) {
                 // see ChunkUtil.indexChunkFromBlock
                 return ((long) coords.x << 32) | ((long) coords.z & 4294967295L);
             }
@@ -289,7 +289,7 @@ public abstract class ChunkUtils {
             /**
              * WARNING: the `y` value MUST be the `z` value for the chunk
              */
-            public static final long get_chunkCoords(@Nonnull final Vector2i chunkCoords) {
+            public static final long get_chunkCoords(final @Nonnull Vector2i chunkCoords) {
                 // see ChunkUtil.indexChunkFromBlock
                 return ((long) chunkCoords.x << 32) | ((long) chunkCoords.y & 4294967295L);
             }
@@ -306,10 +306,10 @@ public abstract class ChunkUtils {
          */
         @Nonnull
         public static final ArrayList<WorldChunk> test(
-            @Nonnull final Ref<ChunkStore> blockRef,
-            @Nonnull final WorldChunk worldChunk,
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull final Vector3i providedCoords
+            final @Nonnull Ref<ChunkStore> blockRef,
+            final @Nonnull WorldChunk worldChunk,
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull Vector3i providedCoords
         ) {
             final var blockX = providedCoords.x;
             final var blockY = providedCoords.y;
@@ -395,12 +395,12 @@ public abstract class ChunkUtils {
         // #region getWorldChunk
 
         @Nullable
-        public static final WorldChunk get_chunkRef(@Nonnull final Ref<ChunkStore> chunkRef) {
+        public static final WorldChunk get_chunkRef(final @Nonnull Ref<ChunkStore> chunkRef) {
             return ComponentUtils.get(chunkRef, WORLD_CHUNK_COMPONENT);
         }
 
         @Nullable
-        public static final WorldChunk get_blockRef(@Nonnull final Ref<ChunkStore> blockRef) {
+        public static final WorldChunk get_blockRef(final @Nonnull Ref<ChunkStore> blockRef) {
             final var info = BlockUtils.Info.get(blockRef);
             if (info == null) {
                 return null;
@@ -410,9 +410,9 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final Ref<ChunkStore> anyRef) {
+        public static final WorldChunk get(final @Nonnull Ref<ChunkStore> anyRef) {
             // Potential 1: The ref you passed me is a CHUNK ref. slay. thats the good shit. that's what we're after
-            var worldChunk = ComponentUtils.get(anyRef, WORLD_CHUNK_COMPONENT);
+            final var worldChunk = ComponentUtils.get(anyRef, WORLD_CHUNK_COMPONENT);
             if (worldChunk != null) {
                 return worldChunk;
             }
@@ -422,7 +422,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final BlockStateInfo info) {
+        public static final WorldChunk get(final @Nonnull BlockStateInfo info) {
             return ComponentUtils.get(info.getChunkRef(), WORLD_CHUNK_COMPONENT);
         }
 
@@ -442,15 +442,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final WorldProvider worldProvider,
-            @Nonnull final BlockChunk blockChunk
+            final @Nonnull WorldProvider worldProvider,
+            final @Nonnull BlockChunk blockChunk
         ) {
             return ChunkUtils.WorldChunk_.get(worldProvider, blockChunk.getIndex());
         }
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final WorldProvider worldProvider,
+            final @Nonnull WorldProvider worldProvider,
             final int blockX,
             final int blockZ
         ) {
@@ -459,15 +459,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final WorldProvider worldProvider,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull WorldProvider worldProvider,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.WorldChunk_.get(worldProvider, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final WorldChunk get_chunkCoords(
-            @Nonnull final WorldProvider worldProvider,
+            final @Nonnull WorldProvider worldProvider,
             final int chunkX,
             final int chunkZ
         ) {
@@ -475,7 +475,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final WorldProvider worldProvider, final long chunkIndex) {
+        public static final WorldChunk get(final @Nonnull WorldProvider worldProvider, final long chunkIndex) {
             return worldProvider.getWorld().getChunk(chunkIndex);
         }
 
@@ -486,27 +486,27 @@ public abstract class ChunkUtils {
         //   ==================================================================
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final World world, @Nonnull final BlockChunk blockChunk) {
+        public static final WorldChunk get(final @Nonnull World world, final @Nonnull BlockChunk blockChunk) {
             return ChunkUtils.WorldChunk_.get(world, blockChunk.getIndex());
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final World world, final int blockX, final int blockZ) {
+        public static final WorldChunk get(final @Nonnull World world, final int blockX, final int blockZ) {
             return ChunkUtils.WorldChunk_.get(world, ChunkUtils.Coords.Index.get(blockX, blockZ));
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final World world, @Nonnull final Vector3i blockCoords) {
+        public static final WorldChunk get(final @Nonnull World world, final @Nonnull Vector3i blockCoords) {
             return ChunkUtils.WorldChunk_.get(world, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
-        public static final WorldChunk get_chunkCoords(@Nonnull final World world, final int chunkX, final int chunkZ) {
+        public static final WorldChunk get_chunkCoords(final @Nonnull World world, final int chunkX, final int chunkZ) {
             return ChunkUtils.WorldChunk_.get(world, ChunkUtils.Coords.Index.get_chunkCoords(chunkX, chunkZ));
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final World world, final long chunkIndex) {
+        public static final WorldChunk get(final @Nonnull World world, final long chunkIndex) {
             return world.getChunk(chunkIndex);
         }
 
@@ -518,25 +518,25 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final Ref<ChunkStore> anyRef,
-            @Nonnull final BlockChunk blockChunk
+            final @Nonnull Ref<ChunkStore> anyRef,
+            final @Nonnull BlockChunk blockChunk
         ) {
             return ChunkUtils.WorldChunk_.get(anyRef, blockChunk.getIndex());
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final Ref<ChunkStore> anyRef, final int blockX, final int blockZ) {
+        public static final WorldChunk get(final @Nonnull Ref<ChunkStore> anyRef, final int blockX, final int blockZ) {
             return ChunkUtils.WorldChunk_.get(anyRef, ChunkUtils.Coords.Index.get(blockX, blockZ));
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final Ref<ChunkStore> anyRef, @Nonnull final Vector3i blockCoords) {
+        public static final WorldChunk get(final @Nonnull Ref<ChunkStore> anyRef, final @Nonnull Vector3i blockCoords) {
             return ChunkUtils.WorldChunk_.get(anyRef, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final WorldChunk get_chunkCoords(
-            @Nonnull final Ref<ChunkStore> anyRef,
+            final @Nonnull Ref<ChunkStore> anyRef,
             final int chunkX,
             final int chunkZ
         ) {
@@ -544,7 +544,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final Ref<ChunkStore> anyRef, final long chunkIndex) {
+        public static final WorldChunk get(final @Nonnull Ref<ChunkStore> anyRef, final long chunkIndex) {
             // TODO use this EVERYWHERE (oh my GOD this seems useful)
             return anyRef.getStore().getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
         }
@@ -556,7 +556,7 @@ public abstract class ChunkUtils {
         //   ==================================================================
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final BlockStateInfo info, @Nonnull final BlockChunk blockChunk) {
+        public static final WorldChunk get(final @Nonnull BlockStateInfo info, final @Nonnull BlockChunk blockChunk) {
             return ChunkUtils.WorldChunk_.get(info, blockChunk.getIndex());
         }
 
@@ -567,18 +567,18 @@ public abstract class ChunkUtils {
          * Then uses the world to get the WorldChunk at the coords provided
          */
         @Nullable
-        public static final WorldChunk get(@Nonnull final BlockStateInfo info, final int blockX, final int blockZ) {
+        public static final WorldChunk get(final @Nonnull BlockStateInfo info, final int blockX, final int blockZ) {
             return ChunkUtils.WorldChunk_.get(info, ChunkUtils.Coords.Index.get(blockX, blockZ));
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final BlockStateInfo info, @Nonnull final Vector3i blockCoords) {
+        public static final WorldChunk get(final @Nonnull BlockStateInfo info, final @Nonnull Vector3i blockCoords) {
             return ChunkUtils.WorldChunk_.get(info, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final WorldChunk get_chunkCoords(
-            @Nonnull final BlockStateInfo info,
+            final @Nonnull BlockStateInfo info,
             final int chunkX,
             final int chunkZ
         ) {
@@ -592,7 +592,7 @@ public abstract class ChunkUtils {
          * Then uses the world to get the WorldChunk at the coords provided
          */
         @Nullable
-        public static final WorldChunk get(@Nonnull final BlockStateInfo info, final long chunkIndex) {
+        public static final WorldChunk get(final @Nonnull BlockStateInfo info, final long chunkIndex) {
             return info.getChunkRef().getStore().getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
         }
 
@@ -604,8 +604,8 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
-            @Nonnull final BlockChunk blockChunk
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
+            final @Nonnull BlockChunk blockChunk
         ) {
             // but regardless we don't need the world to get the world chunk
             return ChunkUtils.WorldChunk_.get(commandBuffer, blockChunk.getIndex());
@@ -613,7 +613,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
             final int blockX,
             final int blockZ
         ) {
@@ -623,15 +623,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.WorldChunk_.get(commandBuffer, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final WorldChunk get_chunkCoords(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             final int chunkX,
             final int chunkZ
         ) {
@@ -640,7 +640,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer, // << Doesn't need to get the world, it can access components directly
             final long chunkIndex
         ) {
             // but regardless we don't need the world to get the world chunk
@@ -655,28 +655,28 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final Store<ChunkStore> store,
-            @Nonnull final BlockChunk blockChunk
+            final @Nonnull Store<ChunkStore> store,
+            final @Nonnull BlockChunk blockChunk
         ) {
             return ChunkUtils.WorldChunk_.get(store, blockChunk.getIndex());
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final Store<ChunkStore> store, final int blockX, final int blockZ) {
+        public static final WorldChunk get(final @Nonnull Store<ChunkStore> store, final int blockX, final int blockZ) {
             return ChunkUtils.WorldChunk_.get(store, ChunkUtils.Coords.Index.get(blockX, blockZ));
         }
 
         @Nullable
         public static final WorldChunk get(
-            @Nonnull final Store<ChunkStore> store,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull Store<ChunkStore> store,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.WorldChunk_.get(store, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final WorldChunk get_chunkCoords(
-            @Nonnull final Store<ChunkStore> store,
+            final @Nonnull Store<ChunkStore> store,
             final int chunkX,
             final int chunkZ
         ) {
@@ -684,7 +684,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final Store<ChunkStore> store, final long chunkIndex) {
+        public static final WorldChunk get(final @Nonnull Store<ChunkStore> store, final long chunkIndex) {
             return store.getExternalData().getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
         }
 
@@ -697,25 +697,25 @@ public abstract class ChunkUtils {
         // `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final ChunkStore chunkStore, @Nonnull final BlockChunk blockChunk) {
+        public static final WorldChunk get(final @Nonnull ChunkStore chunkStore, final @Nonnull BlockChunk blockChunk) {
             // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
             return ChunkUtils.WorldChunk_.get(chunkStore, blockChunk.getIndex());
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final ChunkStore chunkStore, final int blockX, final int blockZ) {
+        public static final WorldChunk get(final @Nonnull ChunkStore chunkStore, final int blockX, final int blockZ) {
             // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
             return ChunkUtils.WorldChunk_.get(chunkStore, ChunkUtils.Coords.Index.get(blockX, blockZ));
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final ChunkStore chunkStore, @Nonnull final Vector3i blockCoords) {
+        public static final WorldChunk get(final @Nonnull ChunkStore chunkStore, final @Nonnull Vector3i blockCoords) {
             return ChunkUtils.WorldChunk_.get(chunkStore, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final WorldChunk get_chunkCoords(
-            @Nonnull final ChunkStore chunkStore,
+            final @Nonnull ChunkStore chunkStore,
             final int chunkX,
             final int chunkZ
         ) {
@@ -723,7 +723,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final WorldChunk get(@Nonnull final ChunkStore chunkStore, final long chunkIndex) {
+        public static final WorldChunk get(final @Nonnull ChunkStore chunkStore, final long chunkIndex) {
             // ALT version: `chunkStore.getWorld().getChunk(blockChunk.getIndex());`
             return chunkStore.getChunkComponent(chunkIndex, WORLD_CHUNK_COMPONENT);
         }
@@ -741,10 +741,10 @@ public abstract class ChunkUtils {
          */
         @Nonnull
         public static final ArrayList<Ref<ChunkStore>> test(
-            @Nonnull final Ref<ChunkStore> blockRef,
-            @Nonnull final WorldChunk worldChunk,
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull final Vector3i providedCoords
+            final @Nonnull Ref<ChunkStore> blockRef,
+            final @Nonnull WorldChunk worldChunk,
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull Vector3i providedCoords
         ) {
             final var blockX = providedCoords.x;
             final var blockY = providedCoords.y;
@@ -850,18 +850,18 @@ public abstract class ChunkUtils {
         // ====================================================================
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final World world, @Nonnull final Vector3i blockCoords) {
+        public static final Ref<ChunkStore> get(final @Nonnull World world, final @Nonnull Vector3i blockCoords) {
             return ChunkUtils.Ref_.get(world, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final World world, final int blockX, final int blockZ) {
+        public static final Ref<ChunkStore> get(final @Nonnull World world, final int blockX, final int blockZ) {
             return ChunkUtils.Ref_.get(world, ChunkUtils.Coords.Index.get(blockX, blockZ));
         }
 
         @Nullable
         public static final Ref<ChunkStore> get_chunkCoords(
-            @Nonnull final World world,
+            final @Nonnull World world,
             final int chunkX,
             final int chunkZ
         ) {
@@ -869,7 +869,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final World world, final long chunkIndex) {
+        public static final Ref<ChunkStore> get(final @Nonnull World world, final long chunkIndex) {
             return world.getChunkStore().getChunkReference(chunkIndex);
         }
 
@@ -881,15 +881,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.Ref_.get(commandBuffer, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             final int blockX,
             final int blockZ
         ) {
@@ -898,7 +898,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get_chunkCoords(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             final int chunkX,
             final int chunkZ
         ) {
@@ -907,7 +907,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
+            final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
             final long chunkIndex
         ) {
             return commandBuffer.getExternalData().getChunkReference(chunkIndex);
@@ -921,15 +921,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final Store<ChunkStore> store,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull Store<ChunkStore> store,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.Ref_.get(store, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final Store<ChunkStore> store,
+            final @Nonnull Store<ChunkStore> store,
             final int blockX,
             final int blockZ
         ) {
@@ -938,7 +938,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get_chunkCoords(
-            @Nonnull final Store<ChunkStore> store,
+            final @Nonnull Store<ChunkStore> store,
             final int chunkX,
             final int chunkZ
         ) {
@@ -946,7 +946,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final Store<ChunkStore> store, final long chunkIndex) {
+        public static final Ref<ChunkStore> get(final @Nonnull Store<ChunkStore> store, final long chunkIndex) {
             return store.getExternalData().getChunkReference(chunkIndex);
         }
 
@@ -958,15 +958,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final ChunkStore chunkStore,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull ChunkStore chunkStore,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.Ref_.get(chunkStore, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final ChunkStore chunkStore,
+            final @Nonnull ChunkStore chunkStore,
             final int blockX,
             final int blockZ
         ) {
@@ -975,7 +975,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get_chunkCoords(
-            @Nonnull final ChunkStore chunkStore,
+            final @Nonnull ChunkStore chunkStore,
             final int chunkX,
             final int chunkZ
         ) {
@@ -983,7 +983,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final ChunkStore chunkStore, final long chunkIndex) {
+        public static final Ref<ChunkStore> get(final @Nonnull ChunkStore chunkStore, final long chunkIndex) {
             return chunkStore.getChunkReference(chunkIndex);
         }
 
@@ -992,15 +992,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final Ref<ChunkStore> chunkRef,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull Ref<ChunkStore> chunkRef,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.Ref_.get(chunkRef, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final Ref<ChunkStore> chunkRef,
+            final @Nonnull Ref<ChunkStore> chunkRef,
             final int blockX,
             final int blockZ
         ) {
@@ -1009,7 +1009,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get_chunkCoords(
-            @Nonnull final Ref<ChunkStore> chunkRef,
+            final @Nonnull Ref<ChunkStore> chunkRef,
             final int chunkX,
             final int chunkZ
         ) {
@@ -1017,7 +1017,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final Ref<ChunkStore> chunkRef, final long chunkIndex) {
+        public static final Ref<ChunkStore> get(final @Nonnull Ref<ChunkStore> chunkRef, final long chunkIndex) {
             return chunkRef.getStore().getExternalData().getChunkReference(chunkIndex);
         }
 
@@ -1029,15 +1029,15 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final BlockStateInfo info,
-            @Nonnull final Vector3i blockCoords
+            final @Nonnull BlockStateInfo info,
+            final @Nonnull Vector3i blockCoords
         ) {
             return ChunkUtils.Ref_.get(info, ChunkUtils.Coords.Index.get(blockCoords));
         }
 
         @Nullable
         public static final Ref<ChunkStore> get(
-            @Nonnull final BlockStateInfo info,
+            final @Nonnull BlockStateInfo info,
             final int blockX,
             final int blockZ
         ) {
@@ -1046,7 +1046,7 @@ public abstract class ChunkUtils {
 
         @Nullable
         public static final Ref<ChunkStore> get_chunkCoords(
-            @Nonnull final BlockStateInfo info,
+            final @Nonnull BlockStateInfo info,
             final int chunkX,
             final int chunkZ
         ) {
@@ -1054,7 +1054,7 @@ public abstract class ChunkUtils {
         }
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final BlockStateInfo info, final long chunkIndex) {
+        public static final Ref<ChunkStore> get(final @Nonnull BlockStateInfo info, final long chunkIndex) {
             return info.getChunkRef().getStore().getExternalData().getChunkReference(chunkIndex);
         }
 
@@ -1065,7 +1065,7 @@ public abstract class ChunkUtils {
         // ====================================================================
 
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final Ref<ChunkStore> blockRef) {
+        public static final Ref<ChunkStore> get(final @Nonnull Ref<ChunkStore> blockRef) {
             final var info = BlockUtils.Info.get(blockRef);
             if (info == null) {
                 return null;
@@ -1075,7 +1075,7 @@ public abstract class ChunkUtils {
 
         // please don't use this one for getting it from info... just here for completeness so you know you CAN get the chunk ref out of info - in fact, that's (in my understanding) the preferred way
         @Nullable
-        public static final Ref<ChunkStore> get(@Nonnull final BlockStateInfo info) {
+        public static final Ref<ChunkStore> get(final @Nonnull BlockStateInfo info) {
             return info.getChunkRef();
         }
 

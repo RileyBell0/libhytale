@@ -38,7 +38,7 @@ public class EntityTickSubSystem<ECS_STORE extends WorldProvider>
     @Nonnull
     public static <ECS_STORE extends WorldProvider, T extends EntityTickSubSystem<ECS_STORE>> EntityTickSubSystem<
         ECS_STORE
-    > newSubsystemFor(@Nonnull final IEntityTickSystem<ECS_STORE> parent) {
+    > newSubsystemFor(final @Nonnull IEntityTickSystem<ECS_STORE> parent) {
         return ISubSystem.__newSubSystem(EntityTickSubSystem.class, IEntityTickSystem.class, parent);
     }
 
@@ -48,11 +48,11 @@ public class EntityTickSubSystem<ECS_STORE extends WorldProvider>
     }
 
     public void tick(
-        float dt,
-        int index,
-        @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final float dt,
+        final int index,
+        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
         parent.onEntityTick(dt, index, archetypeChunk, store, commandBuffer);
     }

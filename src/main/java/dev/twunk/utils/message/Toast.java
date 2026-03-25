@@ -28,7 +28,7 @@ public class Toast extends NotificationUtil {
     @Nonnull
     public NotificationStyle style;
 
-    public Toast(@Nullable final Object message) {
+    public Toast(final @Nullable Object message) {
         this.message = Chat.parse(message);
         this.style = NotificationStyle.Default;
     }
@@ -42,28 +42,28 @@ public class Toast extends NotificationUtil {
         return new Toast();
     }
 
-    public static Toast build(@Nullable final Object message) {
+    public static Toast build(final @Nullable Object message) {
         return new Toast(Chat.parse(message));
     }
 
-    public static Toast build(@Nonnull final Object message, @Nonnull final Object secondaryMessage) {
+    public static Toast build(final @Nonnull Object message, final @Nonnull Object secondaryMessage) {
         return new Toast(message).setSecondaryMessage(secondaryMessage);
     }
 
     @Nonnull
-    public Toast setMessage(@Nullable final Object message) {
+    public Toast setMessage(final @Nullable Object message) {
         this.message = Chat.parse(message);
         return this;
     }
 
     @Nonnull
-    public Toast setPrimaryMessage(@Nullable final Object message) {
+    public Toast setPrimaryMessage(final @Nullable Object message) {
         this.message = Chat.parse(message);
         return this;
     }
 
     @Nonnull
-    public Toast setSecondaryMessage(@Nullable final Object secondaryMessage) {
+    public Toast setSecondaryMessage(final @Nullable Object secondaryMessage) {
         if (secondaryMessage == null) {
             this.secondaryMessage = null;
         } else {
@@ -73,19 +73,19 @@ public class Toast extends NotificationUtil {
     }
 
     @Nonnull
-    public Toast setIcon(@Nullable final String icon) {
+    public Toast setIcon(final @Nullable String icon) {
         this.icon = icon;
         return this;
     }
 
     @Nonnull
-    public Toast setItem(@Nullable final ItemWithAllMetadata item) {
+    public Toast setItem(final @Nullable ItemWithAllMetadata item) {
         this.item = item;
         return this;
     }
 
     @Nonnull
-    public Toast setStyle(@Nullable final NotificationStyle style) {
+    public Toast setStyle(final @Nullable NotificationStyle style) {
         if (style == null) {
             this.style = NotificationStyle.Default;
         } else {
@@ -113,20 +113,20 @@ public class Toast extends NotificationUtil {
     }
 
     public static void sendNotificationToPlayer(
-        @Nonnull final Player player,
-        @Nonnull final Message message,
-        @Nullable final Message secondaryMessage,
-        @Nullable final String icon,
-        @Nullable final ItemWithAllMetadata item,
-        @Nonnull final NotificationStyle style
+        final @Nonnull Player player,
+        final @Nonnull Message message,
+        final @Nullable Message secondaryMessage,
+        final @Nullable String icon,
+        final @Nullable ItemWithAllMetadata item,
+        final @Nonnull NotificationStyle style
     ) {
-        var ref = player.getReference();
+        final var ref = player.getReference();
         if (ref == null) {
             // failed to get player reference
             return;
         }
 
-        var playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+        final var playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
 
         Toast.sendNotification(playerRef.getPacketHandler(), message, secondaryMessage, icon, item, style);
     }

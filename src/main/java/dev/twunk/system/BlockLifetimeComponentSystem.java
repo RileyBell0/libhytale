@@ -41,38 +41,41 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
 
     private final @Nonnull ComponentType<ChunkStore, T> componentType;
 
-    public BlockLifetimeComponentSystem(@Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
+    public BlockLifetimeComponentSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
         super(Query.and(supplier.get()));
-        var component = supplier.get();
+        final var component = supplier.get();
         if (component == null) {
             throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
         }
         this.componentType = component;
+
         this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
     public BlockLifetimeComponentSystem(@Nonnull Class<T> componentClass) {
         super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
         this.componentType = TwunkLib.getChunkComponentType(componentClass);
+
         this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
     public BlockLifetimeComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
+
         this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
     @Override
     public void onEntityAdded(
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull AddReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        final @Nonnull Ref<ChunkStore> ref,
+        final @Nonnull AddReason reason,
+        final @Nonnull Store<ChunkStore> store,
+        final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = ComponentUtils.get(ref, this.componentType);
+        final var component = ComponentUtils.get(ref, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
@@ -86,14 +89,14 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
 
     @Override
     public void onEntityRemove(
-        @Nonnull Ref<ChunkStore> ref,
-        @Nonnull RemoveReason reason,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        final @Nonnull Ref<ChunkStore> ref,
+        final @Nonnull RemoveReason reason,
+        final @Nonnull Store<ChunkStore> store,
+        final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = ComponentUtils.get(ref, this.componentType);
+        final var component = ComponentUtils.get(ref, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing

@@ -40,7 +40,7 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
         .appendInherited(
             new KeyedCodec<>("Dir", Codec.STRING, false),
             (o, v) -> {
-                var dir = v.trim().toLowerCase();
+                final var dir = v.trim().toLowerCase();
                 if (
                     dir.equals("none") ||
                     dir.equals("up") ||
@@ -98,7 +98,7 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
                     return null;
                 }
 
-                int[] coords = { o.at.x, o.at.y, o.at.z };
+                final int[] coords = { o.at.x, o.at.y, o.at.z };
                 return coords;
             },
             (o, p) -> o.at = p.at
@@ -120,7 +120,7 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
         .build();
 
     @Nonnull
-    public static final Vector3i getDirectionOffset(@Nonnull final String direction) {
+    public static final Vector3i getDirectionOffset(final @Nonnull String direction) {
         switch (direction) {
             case "down":
                 return new Vector3i(0, -1, 0);
@@ -141,9 +141,9 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
 
     @Override
     protected void firstRun(
-        @Nonnull InteractionType interactionType,
-        @Nonnull InteractionContext interactionContext,
-        @Nonnull CooldownHandler cooldownHandler
+        final @Nonnull InteractionType interactionType,
+        final @Nonnull InteractionContext interactionContext,
+        final @Nonnull CooldownHandler cooldownHandler
     ) {
         final var commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {
@@ -189,7 +189,7 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
         return SpawnItemInteraction.CODEC;
     }
 
-    protected Assets<Interaction, ?> registerToPlugin(@Nonnull final ModPlugin plugin) {
+    protected Assets<Interaction, ?> registerToPlugin(final @Nonnull ModPlugin plugin) {
         return plugin.getCodecRegistry(Interaction.CODEC).register(this.getId(), this.getClass(), this.getCodec());
     }
 }

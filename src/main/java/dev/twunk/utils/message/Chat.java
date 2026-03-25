@@ -13,13 +13,13 @@ import javax.annotation.Nullable;
 public abstract class Chat {
 
     @Nonnull
-    public static final String getColor(@Nullable final Level level) {
+    public static final String getColor(final @Nullable Level level) {
         String color = null;
         if (level == null) {
             return "#00d9ed";
         }
 
-        var levelCode = level.intValue();
+        final var levelCode = level.intValue();
         if (levelCode <= Level.ALL.intValue()) {
             color = "#dadada";
         } else if (levelCode <= Level.FINEST.intValue()) {
@@ -44,7 +44,7 @@ public abstract class Chat {
     }
 
     @Nonnull
-    public static final Message parse(@Nullable final Object message) {
+    public static final Message parse(final @Nullable Object message) {
         if (message == null) {
             return Message.empty();
         }
@@ -54,7 +54,7 @@ public abstract class Chat {
         } else if (message instanceof String) {
             return Message.raw((String) message);
         } else {
-            var strVal = message.toString();
+            final var strVal = message.toString();
             if (strVal == null) {
                 return Message.empty();
             } else {
@@ -64,7 +64,7 @@ public abstract class Chat {
     }
 
     @Nonnull
-    public static final Message join(@Nullable final Object... messages) {
+    public static final Message join(final @Nullable Object... messages) {
         if (messages == null) {
             return Message.empty();
         }
@@ -83,12 +83,12 @@ public abstract class Chat {
     }
 
     @Nonnull
-    private static final Message constructLogMessage(@Nonnull final Message message) {
+    private static final Message constructLogMessage(final @Nonnull Message message) {
         return constructLogMessage(Level.INFO, message);
     }
 
     @Nonnull
-    private static final Message constructLogMessage(@Nullable Level level, @Nonnull final Message message) {
+    private static final Message constructLogMessage(@Nullable Level level, final @Nonnull Message message) {
         if (level == null) {
             level = Level.INFO;
         }
@@ -97,48 +97,48 @@ public abstract class Chat {
             return message.monospace(true);
         }
 
-        var prefix = Message.raw("[" + level.toString() + "] ").color(getColor(level)).bold(true).monospace(true);
+        final var prefix = Message.raw("[" + level.toString() + "] ").color(getColor(level)).bold(true).monospace(true);
 
         return Message.join(prefix, message.monospace(true)).monospace(true);
     }
 
-    public static void send(@Nonnull final Player player, @Nonnull final Object... messages) {
+    public static void send(final @Nonnull Player player, final @Nonnull Object... messages) {
         player.sendMessage(Chat.join(messages));
     }
 
-    public static void log(@Nonnull final Player player, @Nonnull final Object... messages) {
+    public static void log(final @Nonnull Player player, final @Nonnull Object... messages) {
         player.sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
     public static void log(
-        @Nonnull final Player player,
-        @Nonnull final Level level,
-        @Nonnull final Object... messages
+        final @Nonnull Player player,
+        final @Nonnull Level level,
+        final @Nonnull Object... messages
     ) {
         player.sendMessage(constructLogMessage(level, Chat.join(messages)));
     }
 
-    public static void send(@Nonnull final World world, @Nonnull final Object... messages) {
+    public static void send(final @Nonnull World world, final @Nonnull Object... messages) {
         world.sendMessage(Chat.join(messages));
     }
 
-    public static void log(@Nonnull final World world, @Nonnull final Object... messages) {
+    public static void log(final @Nonnull World world, final @Nonnull Object... messages) {
         world.sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
-    public static void log(@Nonnull final World world, @Nonnull final Level level, @Nonnull final Object... messages) {
+    public static void log(final @Nonnull World world, final @Nonnull Level level, final @Nonnull Object... messages) {
         world.sendMessage(constructLogMessage(level, Chat.join(messages)));
     }
 
-    public static void send(@Nonnull final Object... messages) {
+    public static void send(final @Nonnull Object... messages) {
         Universe.get().sendMessage(Chat.join(messages));
     }
 
-    public static void log(@Nonnull final Object... messages) {
+    public static void log(final @Nonnull Object... messages) {
         Universe.get().sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
-    public static void log(@Nonnull final Level level, @Nonnull final Object... messages) {
+    public static void log(final @Nonnull Level level, final @Nonnull Object... messages) {
         Universe.get().sendMessage(constructLogMessage(level, Chat.join(messages)));
     }
 }

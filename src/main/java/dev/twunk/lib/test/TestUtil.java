@@ -63,9 +63,9 @@ public final class TestUtil {
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     // public TestUtil(
-    //     @Nonnull final WorldChunk worldChunk,
-    //     @Nonnull final CommandBuffer<ChunkStore> commandBuffer,
-    //     @Nonnull final Vector3i blockCoords
+    //     final @Nonnull WorldChunk worldChunk,
+    //     final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+    //     final @Nonnull Vector3i blockCoords
     // ) {
     //     this.commandBuffer = commandBuffer;
 
@@ -130,7 +130,7 @@ public final class TestUtil {
      * @param commandBuffer
      * @param blockCoords
      */
-    public TestUtil(@Nonnull final CommandBuffer<ChunkStore> commandBuffer, @Nonnull final Vector3i blockCoords) {
+    public TestUtil(final @Nonnull CommandBuffer<ChunkStore> commandBuffer, final @Nonnull Vector3i blockCoords) {
         this.commandBuffer = commandBuffer;
 
         this.store = commandBuffer.getStore(); //  this works too
@@ -144,13 +144,13 @@ public final class TestUtil {
         this.world = commandBuffer.getExternalData().getWorld();
         // this.world = blockRef.getStore().getExternalData().getWorld(); // this works too
 
-        var worldChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(commandBuffer, blockCoords);
+        final var worldChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(commandBuffer, blockCoords);
         if (worldChunk == null) {
             throw new RuntimeException("ERROR: worldChunk was null!!!");
         }
         this.worldChunk = worldChunk;
 
-        var blockComponentChunk = worldChunk.getBlockComponentChunk();
+        final var blockComponentChunk = worldChunk.getBlockComponentChunk();
         if (blockComponentChunk == null) {
             throw new RuntimeException("ERROR: BlockChunk was null!!!");
         }
@@ -158,30 +158,30 @@ public final class TestUtil {
         this.blockComponentChunk = blockComponentChunk;
 
         // this.blockRef = blockRef; // this works too
-        var blockRef = dev.twunk.utils.BlockUtils.Ref_.get(commandBuffer, blockCoords);
+        final var blockRef = dev.twunk.utils.BlockUtils.Ref_.get(commandBuffer, blockCoords);
         if (blockRef == null) {
             throw new RuntimeException("ERROR: Failed to get ref for block at " + blockCoords);
         }
         this.blockRef = blockRef;
 
-        var chunkRef = worldChunk.getReference();
+        final var chunkRef = worldChunk.getReference();
         if (chunkRef == null) {
             throw new RuntimeException("ERROR: chunk ref was null!!");
         }
 
         this.chunkRef = chunkRef;
-        var info = blockRef.getStore().getComponent(blockRef, BLOCK_INFO_COMPONENT);
+        final var info = blockRef.getStore().getComponent(blockRef, BLOCK_INFO_COMPONENT);
         if (info == null) {
             throw new RuntimeException("ERROR: info was null");
         }
 
         // this works
-        var wlrdChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(info);
+        final var wlrdChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(info);
         if (wlrdChunk == null) {
             throw new RuntimeException("ERROR: wlrdChunk was null");
         }
 
-        var blockChunk = this.worldChunk.getBlockChunk();
+        final var blockChunk = this.worldChunk.getBlockChunk();
         if (blockChunk == null) {
             throw new RuntimeException("ERROR: blockChunk was null");
         }

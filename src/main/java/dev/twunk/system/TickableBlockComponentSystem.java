@@ -40,34 +40,37 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
 
     private final @Nonnull ComponentType<ChunkStore, T> componentType;
 
-    public TickableBlockComponentSystem(@Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
+    public TickableBlockComponentSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
         super(Query.and(supplier.get()));
-        var component = supplier.get();
+        final var component = supplier.get();
         if (component == null) {
             throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
         }
         this.componentType = component;
+
         this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
 
-    public TickableBlockComponentSystem(@Nonnull Class<T> componentClass) {
+    public TickableBlockComponentSystem(final @Nonnull Class<T> componentClass) {
         super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
         this.componentType = TwunkLib.getChunkComponentType(componentClass);
+
         this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
 
-    public TickableBlockComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
+    public TickableBlockComponentSystem(final @Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
+
         this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
 
     public void onEntityTick(
-        float dt,
-        int index,
-        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        final float dt,
+        final int index,
+        final @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+        final @Nonnull Store<ChunkStore> store,
+        final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // blockEntityRef --(has)-> blockInfo --(is in)-> worldChunk --(is in)-> world
         // blockInfo has local coords
@@ -76,7 +79,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         // ref to our block entity (ref to the entity at the current
         // index that matches the query - imagine the index as an arbtrary
         // `i` in a for loop. think nothing of it)
-        var blockRef = archetypeChunk.getReferenceTo(index);
+        final var blockRef = archetypeChunk.getReferenceTo(index);
 
         // From my understanding, this seems to be a sort of inherent component
         // on block entites. You can always seem to get it. This stores its LOCAL
@@ -88,7 +91,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = dev.twunk.utils.BlockUtils.Info.get(blockRef);
+        final var blockInfo = dev.twunk.utils.BlockUtils.Info.get(blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -98,7 +101,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(blockInfo);
+        final var worldChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(blockInfo);
         if (worldChunk == null) {
             return;
         }
@@ -107,15 +110,15 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         // the best way i've found so far to get the world that the entity is in
         // is to go
         // blockEntityRef --(has)-> blockInfo --(is in)-> worldChunk --(is in)-> world
-        var world = worldChunk.getWorld();
+        final var world = worldChunk.getWorld();
         if (world == null) {
             return;
         }
-        var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
+        final var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
 
         // Since our query is based on your component, we KNOW it has to have your
         // component, so, we just, get it
-        var component = ComponentUtils.get(blockRef, this.componentType);
+        final var component = ComponentUtils.get(blockRef, this.componentType);
         try {
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing

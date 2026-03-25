@@ -20,11 +20,11 @@ import javax.annotation.Nonnull;
  */
 public interface IBlockTick {
     public void onBlockTick(
-        @Nonnull Ref<ChunkStore> blockRef,
-        @Nonnull World world,
-        @Nonnull WorldChunk wc,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-        @Nonnull Vector3i worldCoords,
-        int blockId
+        final @Nonnull Ref<ChunkStore> blockRef,
+        final @Nonnull World world,
+        final @Nonnull WorldChunk wc,
+        final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
+        final @Nonnull Vector3i worldCoords,
+        final int blockId
     );
 }

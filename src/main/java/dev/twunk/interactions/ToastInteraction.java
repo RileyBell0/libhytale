@@ -75,7 +75,7 @@
 //     public final BuilderCodec<ToastInteraction> getCodec() {
 //         return ToastInteraction.CODEC;
 //     }
-//     protected Assets<Interaction, ?> registerToPlugin(@Nonnull final ModPlugin plugin) {
+//     protected Assets<Interaction, ?> registerToPlugin(final @Nonnull ModPlugin plugin) {
 //         return plugin.getCodecRegistry(Interaction.CODEC).register(this.getId(), this.getClass(), this.getCodec());
 //     }
 // }

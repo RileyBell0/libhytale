@@ -42,11 +42,11 @@ public abstract class EntityLifetimeSubSystem<ECS_STORE extends WorldProvider>
     public static <
         ECS_STORE extends WorldProvider,
         T extends EntityLifetimeSubSystem<ECS_STORE>
-    > EntityLifetimeSubSystem<ECS_STORE> newSubsystemFor(@Nonnull final IEntityLifetimeSystem<ECS_STORE> parent) {
+    > EntityLifetimeSubSystem<ECS_STORE> newSubsystemFor(final @Nonnull IEntityLifetimeSystem<ECS_STORE> parent) {
         return ISubSystem.__newSubSystem(EntityLifetimeSubSystem.class, IEntityLifetimeSystem.class, parent);
     }
 
-    protected EntityLifetimeSubSystem(@Nonnull final IEntityLifetimeSystem<ECS_STORE> parent) {
+    protected EntityLifetimeSubSystem(final @Nonnull IEntityLifetimeSystem<ECS_STORE> parent) {
         this.parent = parent;
         this.query = parent.getQuery();
     }

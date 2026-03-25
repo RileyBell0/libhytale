@@ -37,23 +37,24 @@ public class BlockTickSubSystem
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <T extends BlockTickSubSystem> BlockTickSubSystem newSubsystemFor(
-        @Nonnull final IBlockTickSystem parent
+        final @Nonnull IBlockTickSystem parent
     ) {
         return ISubSystem.__newSubSystem(BlockTickSubSystem.class, IBlockTickSystem.class, parent);
     }
 
-    protected BlockTickSubSystem(@Nonnull final IBlockTickSystem parent) {
+    protected BlockTickSubSystem(final @Nonnull IBlockTickSystem parent) {
         super(parent.getQuery());
-        this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
         this.parent = parent;
+
+        this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
 
     public void onEntityTick(
-        float dt,
-        int index,
-        @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        @Nonnull Store<ChunkStore> store,
-        @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        final float dt,
+        final int index,
+        final @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+        final @Nonnull Store<ChunkStore> store,
+        final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // blockEntityRef --(has)-> blockInfo --(is in)-> worldChunk --(is in)-> world
         // blockInfo has local coords
@@ -62,7 +63,7 @@ public class BlockTickSubSystem
         // ref to our block entity (ref to the entity at the current
         // index that matches the query - imagine the index as an arbtrary
         // `i` in a for loop. think nothing of it)
-        var blockRef = archetypeChunk.getReferenceTo(index);
+        final var blockRef = archetypeChunk.getReferenceTo(index);
 
         // From my understanding, this seems to be a sort of inherent component
         // on block entites. You can always seem to get it. This stores its LOCAL
@@ -74,7 +75,7 @@ public class BlockTickSubSystem
         //
         // note: ^^ above numbers made up, really never checked which order they
         // index their blocks into the chunk
-        var blockInfo = dev.twunk.utils.BlockUtils.Info.get(blockRef);
+        final var blockInfo = dev.twunk.utils.BlockUtils.Info.get(blockRef);
         if (blockInfo == null) {
             return;
         }
@@ -84,7 +85,7 @@ public class BlockTickSubSystem
         //
         // we need this to effectively just add its coordinates to our block
         // -> block local coords + chunk coords ~= global position
-        var worldChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(blockInfo);
+        final var worldChunk = dev.twunk.utils.ChunkUtils.WorldChunk_.get(blockInfo);
         if (worldChunk == null) {
             return;
         }
@@ -93,11 +94,11 @@ public class BlockTickSubSystem
         // the best way i've found so far to get the world that the entity is in
         // is to go
         // blockEntityRef --(has)-> blockInfo --(is in)-> worldChunk --(is in)-> world
-        var world = worldChunk.getWorld();
+        final var world = worldChunk.getWorld();
         if (world == null) {
             return;
         }
-        var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
+        final var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
 
         parent.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
     }

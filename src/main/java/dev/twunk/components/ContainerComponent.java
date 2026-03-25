@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
+    // TODO
     // private boolean canView = true;
     // private boolean canOpen = true;
 
@@ -62,7 +63,7 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
         this.container = new SimpleItemContainer(capacity);
     }
 
-    public ContainerComponent(@Nonnull final SimpleItemContainer container) {
+    public ContainerComponent(final @Nonnull SimpleItemContainer container) {
         this.container = new SimpleItemContainer(container);
     }
 

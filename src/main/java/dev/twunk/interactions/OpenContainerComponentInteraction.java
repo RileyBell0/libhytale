@@ -76,23 +76,23 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
     @Override
     protected void interactWithBlock(
-        @Nonnull World world2,
-        @Nonnull CommandBuffer<EntityStore> commandBuffer,
-        @Nonnull InteractionType type,
-        @Nonnull InteractionContext context,
-        @Nullable ItemStack itemInHand,
-        @Nonnull Vector3i pos,
-        @Nonnull CooldownHandler cooldownHandler
+        final @Nonnull World world2,
+        final @Nonnull CommandBuffer<EntityStore> commandBuffer,
+        final @Nonnull InteractionType type,
+        final @Nonnull InteractionContext context,
+        final @Nullable ItemStack itemInHand,
+        final @Nonnull Vector3i pos,
+        final @Nonnull CooldownHandler cooldownHandler
     ) {
-        ContainerUtils.open(commandBuffer, context, pos, this.componentType);
+        ContainerUtils.open(this.componentType, commandBuffer, context, pos);
     }
 
     @Override
     protected void simulateInteractWithBlock(
-        @Nonnull InteractionType type,
-        @Nonnull InteractionContext context,
-        @Nullable ItemStack itemInHand,
-        @Nonnull World world,
-        @Nonnull Vector3i targetBlock
+        final @Nonnull InteractionType type,
+        final @Nonnull InteractionContext context,
+        final @Nullable ItemStack itemInHand,
+        final @Nonnull World world,
+        final @Nonnull Vector3i targetBlock
     ) {}
 }

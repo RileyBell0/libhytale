@@ -13,20 +13,28 @@ import javax.annotation.Nullable;
 public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
 
     @Nonnull
-    public static final HashMap<Class<? extends Component<ChunkStore>>, ComponentType<ChunkStore, ? extends Component<ChunkStore>>> registeredChunkComponents = new HashMap<>();
+    public static final HashMap<
+        Class<? extends Component<ChunkStore>>,
+        ComponentType<ChunkStore, ? extends Component<ChunkStore>>
+    > registeredChunkComponents = new HashMap<>();
 
     @Nonnull
-    public static final HashMap<String, ComponentType<ChunkStore, ? extends Component<ChunkStore>>> registeredChunkComponentsById = new HashMap<>();
+    public static final HashMap<
+        String,
+        ComponentType<ChunkStore, ? extends Component<ChunkStore>>
+    > registeredChunkComponentsById = new HashMap<>();
 
     @Nonnull
     public final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getComponentType(
-            @Nonnull final Class<T> componentClass) {
+        final @Nonnull Class<T> componentClass
+    ) {
         return TwunkLib.getChunkComponentType(componentClass);
     }
 
     @Nullable
     public final ComponentType<ChunkStore, ? extends Component<ChunkStore>> getComponentType(
-            @Nonnull final String componentId) {
+        final @Nonnull String componentId
+    ) {
         return TwunkLib.getChunkComponentType(componentId);
     }
 
@@ -36,13 +44,14 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
      * about EVERYTHING above it WOOOO
      */
     public final <T extends Component<ChunkStore>> void registerComponentType(
-            @Nonnull final ComponentType<ChunkStore, T> componentType,
-            @Nonnull final Class<T> myClass,
-            @Nonnull final String id) {
+        final @Nonnull ComponentType<ChunkStore, T> componentType,
+        final @Nonnull Class<T> myClass,
+        final @Nonnull String id
+    ) {
         TwunkLib.registerChunkComponentType(componentType, myClass, id);
     }
 
-    public final void registerSystem(@Nonnull final ModPlugin plugin, @Nonnull final ISubSystem<ChunkStore> system) {
+    public final void registerSystem(final @Nonnull ModPlugin plugin, final @Nonnull ISubSystem<ChunkStore> system) {
         plugin.getChunkStoreRegistry().registerSystem(system);
     }
 }

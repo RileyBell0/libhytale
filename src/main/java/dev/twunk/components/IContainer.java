@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
+// TODO add canView and canOpen logic
 public interface IContainer {
     @Nonnull
     public Map<UUID, ContainerBlockWindow> getWindows();

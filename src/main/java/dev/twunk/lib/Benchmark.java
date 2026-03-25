@@ -23,42 +23,42 @@ public abstract class Benchmark {
     ////////////////////////
     ////////////////////////
 
-    public static final <T> T timeFuncExecution(@Nonnull String id, @Nonnull Supplier<T> func) {
+    public static final <T> T timeFuncExecution(final @Nonnull String id, final @Nonnull Supplier<T> func) {
         return timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, false);
     }
 
-    public static final void timeFuncExecution(@Nonnull String id, @Nonnull Runnable func) {
+    public static final void timeFuncExecution(final @Nonnull String id, final @Nonnull Runnable func) {
         timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, false);
     }
 
     public static final <T> T timeFuncExecutionWithFrequency(
-        @Nonnull String id,
-        @Nonnull Supplier<T> func,
-        int reportingFrequency
+        final @Nonnull String id,
+        final @Nonnull Supplier<T> func,
+        final int reportingFrequency
     ) {
         return timeFuncExecutionWithFrequency(id, func, reportingFrequency, false);
     }
 
     public static final void timeFuncExecutionWithFrequency(
-        @Nonnull String id,
-        @Nonnull Runnable func,
-        int reportingFrequency
+        final @Nonnull String id,
+        final @Nonnull Runnable func,
+        final int reportingFrequency
     ) {
         timeFuncExecutionWithFrequency(id, func, reportingFrequency, false);
     }
 
     public static final <T> T timeFuncExecutionWithFrequency(
-        @Nonnull String id,
-        @Nonnull Supplier<T> func,
-        boolean logEveryTick
+        final @Nonnull String id,
+        final @Nonnull Supplier<T> func,
+        final boolean logEveryTick
     ) {
         return timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, logEveryTick);
     }
 
     public static final void timeFuncExecutionWithFrequency(
-        @Nonnull String id,
-        @Nonnull Runnable func,
-        boolean logEveryTick
+        final @Nonnull String id,
+        final @Nonnull Runnable func,
+        final boolean logEveryTick
     ) {
         timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, logEveryTick);
     }
@@ -70,14 +70,14 @@ public abstract class Benchmark {
     ////////////////////////
 
     public static final <T> T timeFuncExecutionWithFrequency(
-        @Nonnull String id,
-        @Nonnull Supplier<T> func,
-        int reportingFrequency,
-        boolean logEveryTick
+        final @Nonnull String id,
+        final @Nonnull Supplier<T> func,
+        final int reportingFrequency,
+        final boolean logEveryTick
     ) {
         // run
-        var stats = getStats(id);
-        var res = _run(func, stats);
+        final var stats = getStats(id);
+        final var res = _run(func, stats);
         TIMINGS.put(id, stats);
 
         // log
@@ -86,13 +86,13 @@ public abstract class Benchmark {
     }
 
     public static final void timeFuncExecutionWithFrequency(
-        @Nonnull String id,
-        @Nonnull Runnable func,
-        int reportingFrequency,
-        boolean logEveryTick
+        final @Nonnull String id,
+        final @Nonnull Runnable func,
+        final int reportingFrequency,
+        final boolean logEveryTick
     ) {
         // run
-        var stats = getStats(id);
+        final var stats = getStats(id);
         _run(func, stats);
         TIMINGS.put(id, stats);
 
@@ -101,10 +101,10 @@ public abstract class Benchmark {
     }
 
     private static final void log(
-        @Nonnull String id,
-        @Nonnull ArrayList<Long> stats,
-        int reportingFrequency,
-        boolean logEveryTick
+        final @Nonnull String id,
+        final @Nonnull ArrayList<Long> stats,
+        final int reportingFrequency,
+        final boolean logEveryTick
     ) {
         if (stats.size() == 0) {
             return;
@@ -115,17 +115,17 @@ public abstract class Benchmark {
         }
 
         // compute long average
-        var size = stats.size();
+        final var size = stats.size();
         var total = 0;
         for (var i : stats) {
             total += i;
         }
-        double longAverage = total / (double) size;
+        final double longAverage = total / (double) size;
 
         // compute short average
         Double shortAverage = null;
         if (size >= SHORT_AVERAGE_TICKS) {
-            var shortData = stats.subList(size - SHORT_AVERAGE_TICKS - 1, size);
+            final var shortData = stats.subList(size - SHORT_AVERAGE_TICKS - 1, size);
             var shortTotal = 0;
             for (var i : shortData) {
                 shortTotal += i;
@@ -152,17 +152,17 @@ public abstract class Benchmark {
         return TIMINGS.getOrDefault(id, new ArrayList<Long>());
     }
 
-    private static final <T> T _run(@Nonnull Supplier<T> func, @Nonnull ArrayList<Long> stats) {
+    private static final <T> T _run(final @Nonnull Supplier<T> func, final @Nonnull ArrayList<Long> stats) {
         // start timer
-        var start = System.nanoTime();
+        final var start = System.nanoTime();
 
         // === USER FUNC ====
-        var res = func.get();
+        final var res = func.get();
         // ==================
 
         // end timer
-        var end = System.nanoTime();
-        var duration = end - start;
+        final var end = System.nanoTime();
+        final var duration = end - start;
 
         // store stats
         stats.add(duration);
@@ -170,17 +170,17 @@ public abstract class Benchmark {
         return res;
     }
 
-    private static final void _run(@Nonnull Runnable func, @Nonnull ArrayList<Long> stats) {
+    private static final void _run(final @Nonnull Runnable func, final @Nonnull ArrayList<Long> stats) {
         // start timer
-        var start = System.nanoTime();
+        final var start = System.nanoTime();
 
         // === USER FUNC ====
         func.run();
         // ==================
 
         // end timer
-        var end = System.nanoTime();
-        var duration = end - start;
+        final var end = System.nanoTime();
+        final var duration = end - start;
 
         // store stats
         stats.add(duration);

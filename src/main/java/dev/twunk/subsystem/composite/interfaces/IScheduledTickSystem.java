@@ -26,11 +26,11 @@ public interface IScheduledTickSystem<
 > extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
     @Nullable
     public abstract TickPlan onEntityTick(
-        @Nonnull World world,
-        @Nonnull Ref<ECS_STORE> ref,
-        float dt,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final @Nonnull World world,
+        final @Nonnull Ref<ECS_STORE> ref,
+        final float dt,
+        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     );
 
     /**

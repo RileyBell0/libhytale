@@ -27,7 +27,7 @@ import net.bytebuddy.utility.RandomString;
 public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS_STORE>, IRegistryProvider<ECS_STORE> {
     public static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
-    public default void registerTo(@Nonnull final ModPlugin plugin) {
+    public default void registerTo(final @Nonnull ModPlugin plugin) {
         this.getRegistry().registerSystem(plugin, this);
     }
 
@@ -38,9 +38,9 @@ public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS
         T extends ISubSystem<ECS_STORE>,
         Parent extends IQuery<ECS_STORE>
     > T __newSubSystem(
-        @Nonnull final Class<T> subSystemClass,
-        @Nonnull final Class<Parent> parentInterface,
-        @Nonnull final Parent parent
+        final @Nonnull Class<T> subSystemClass,
+        final @Nonnull Class<Parent> parentInterface,
+        final @Nonnull Parent parent
     ) {
         try {
             // Define constraints/link to parent class

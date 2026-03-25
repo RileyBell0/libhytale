@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
+import javax.annotation.Nullable;
 
 public class ExampleTickProcedure extends TickProcedure {
 
@@ -20,7 +21,14 @@ public class ExampleTickProcedure extends TickProcedure {
     }
 
     @Override
-    public BlockTickStrategy onTick(World arg0, WorldChunk arg1, int arg2, int arg3, int arg4, int arg5) {
+    public BlockTickStrategy onTick(
+        final @Nullable World arg0,
+        final @Nullable WorldChunk arg1,
+        final int arg2,
+        final int arg3,
+        final int arg4,
+        final int arg5
+    ) {
         return BlockTickStrategy.CONTINUE;
     }
 }
