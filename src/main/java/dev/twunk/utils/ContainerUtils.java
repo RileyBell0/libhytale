@@ -55,8 +55,9 @@ public abstract class ContainerUtils {
             return;
         }
 
+        // Ensure we can both VIEW and OPEN the container
         final var containerComponent = ComponentUtils.get(blockRef, containerComponentType);
-        if (containerComponent == null) {
+        if (containerComponent == null || !containerComponent.canView() || !containerComponent.canOpen()) {
             return;
         }
 
