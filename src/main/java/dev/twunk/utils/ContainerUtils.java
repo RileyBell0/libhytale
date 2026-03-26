@@ -83,13 +83,11 @@ public abstract class ContainerUtils {
 
         final Map<UUID, ContainerBlockWindow> windows = containerComponent.getWindows();
         if (windows.putIfAbsent(uuid, window) != null) {
-            // TODO
-            // itemContainerState.onOpen(ref, world, store);
+            containerComponent.onOpen(ref, world, store);
             return;
         }
         if (!playerComponent.getPageManager().setPageWithWindows(ref, store, Page.Bench, true, window)) {
-            // TODO
-            // itemContainerState.onOpen(ref, world, store);
+            containerComponent.onOpen(ref, world, store);
             windows.remove(uuid, window);
             return;
         }
@@ -141,7 +139,6 @@ public abstract class ContainerUtils {
         SoundUtil.playSoundEvent3d(ref, soundEventIndex, soundPos, commandBuffer);
         windows.remove(uuid, window);
 
-        // TODO
-        // itemContainerState.onOpen(ref, world, store);}
+        containerComponent.onOpen(ref, world, store);
     }
 }
