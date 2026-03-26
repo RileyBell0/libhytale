@@ -12,11 +12,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
-// TODO add a "timeout" for inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
+// TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
 // want to delete these items. Just gonna make SURE you're sure, by keeping them around for like, 30 seconds"
 //
-// and i wanna do that with ALL non-empty inventories that are put on a trash componnet
-// AND limit it to only be the player that opened it that can see those inventories
+// limit it to only be the player that opened it that can see those inventories.
+// make it QUEUE all inventories for stuff that was deleted. if you open the trash it should pause all inventory deletions
+// and resume the countdown when you close the trash
 public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -74,14 +75,21 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
     private static final short DEFAULT_CAPACITY = 45;
 
+    /////////////////////
+    // INSTANCE VARIABLES
+    /////////////////////
+    ///
+    private short capacity = DEFAULT_CAPACITY;
+
+    private boolean canView = true;
+    private boolean canOpen = true;
+
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
-    private short capacity = DEFAULT_CAPACITY;
-
-    // TODO write up canView and canOpen logic
-    private boolean canView = true;
-    private boolean canOpen = true;
+    /////////////////////
+    // Constructors
+    /////////////////////
 
     public TrashComponent() {
         this.capacity = DEFAULT_CAPACITY;
@@ -95,6 +103,12 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
         this.capacity = container.getCapacity();
     }
 
+    @Override
+    @Nonnull
+    public Map<UUID, ContainerBlockWindow> getWindows() {
+        return this.windows;
+    }
+
     @Nonnull
     @Override
     public SimpleItemContainer getContainer() {
@@ -106,14 +120,18 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
         return this.capacity;
     }
 
-    @Override
-    public TrashComponent<ECS_TYPE> clone() {
-        return new TrashComponent<ECS_TYPE>(this.capacity);
+    // IContainer::canView
+    public boolean canView() {
+        return this.canView;
+    }
+
+    // IContainer::canOpen
+    public boolean canOpen() {
+        return this.canOpen;
     }
 
     @Override
-    @Nonnull
-    public Map<UUID, ContainerBlockWindow> getWindows() {
-        return this.windows;
+    public TrashComponent<ECS_TYPE> clone() {
+        return new TrashComponent<ECS_TYPE>(this.capacity);
     }
 }

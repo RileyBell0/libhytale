@@ -25,4 +25,8 @@ public interface IContainer {
         @Nonnull InteractionContext context,
         @Nonnull Vector3i pos
     ) {}
+
+    // Hytale src code (deprecated) called this `isAllowViewing`
+    public boolean canView();
+    public boolean canOpen();
 }

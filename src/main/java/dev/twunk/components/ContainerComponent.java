@@ -1,5 +1,6 @@
 package dev.twunk.components;
 
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
@@ -13,19 +14,13 @@ import javax.annotation.Nonnull;
 
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
-    // TODO
-    // private boolean canView = true;
-    // private boolean canOpen = true;
-
-    @Nonnull
-    protected SimpleItemContainer container;
-
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
     private static final BuilderCodec<ContainerComponent> RAW_CODEC = BuilderCodec.builder(
         ContainerComponent.class,
         ContainerComponent::new
     )
+        // Container codec contains "Capacity" and "Items" fields
         .append(
             new KeyedCodec<SimpleItemContainer>("Container", SimpleItemContainer.CODEC),
             (self, container) -> {
@@ -34,6 +29,28 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
                 }
             },
             self -> self.container
+        )
+        .add()
+        .appendInherited(
+            new KeyedCodec<>("CanView", Codec.BOOLEAN),
+            (self, canView) -> {
+                if (canView != null) {
+                    self.canView = canView;
+                }
+            },
+            self -> self.canView,
+            (self, parent) -> self.canView = parent.canView
+        )
+        .add()
+        .appendInherited(
+            new KeyedCodec<>("CanOpen", Codec.BOOLEAN),
+            (self, canOpen) -> {
+                if (canOpen != null) {
+                    self.canOpen = canOpen;
+                }
+            },
+            self -> self.canOpen,
+            (self, parent) -> self.canOpen = parent.canOpen
         )
         .add()
         .build();
@@ -52,8 +69,22 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     private static final short DEFAULT_CAPACITY = 10;
 
+    /////////////////////
+    // INSTANCE VARIABLES
+    /////////////////////
+
+    private boolean canView = true;
+    private boolean canOpen = true;
+
+    @Nonnull
+    protected SimpleItemContainer container;
+
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
+
+    /////////////////////
+    // Constructors
+    /////////////////////
 
     public ContainerComponent() {
         this.container = new SimpleItemContainer(DEFAULT_CAPACITY);
@@ -79,6 +110,16 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     public short getCapacity() {
         return this.container.getCapacity();
+    }
+
+    // IContainer::canView
+    public boolean canView() {
+        return this.canView;
+    }
+
+    // IContainer::canOpen
+    public boolean canOpen() {
+        return this.canOpen;
     }
 
     public ContainerComponent<ECS_TYPE> clone() {
