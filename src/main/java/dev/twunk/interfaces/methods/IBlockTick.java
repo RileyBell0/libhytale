@@ -9,14 +9,21 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
 
 /**
- * Means: I've got a method that can be called for ticking blocks.
+ * Methods for my subsytem version of `ChunkBlockTickSystem.Ticking`
+ * @see com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem a waking nightmare
  *
  * Good for
  * - auto-ticking block components
  * - systems that tick blocks
  * - etc
  *
- * just giving a consistent interface for interfacing with block entities
+ * TODO:
+ * - overall goal here is to provide a consistent (and hopefully smaller) interface
+ *   for interacting with block components.
+ * - Might consider making a `blockRef` class that extends `Ref<ChunkStore>` that i
+ *   can instead store all these things in INDIRECTLY rather than computing them for
+ *   everything. not all `onBlockTick` implementations will require all these, so its
+ *   just wasted compute
  */
 public interface IBlockTick {
     public void onBlockTick(

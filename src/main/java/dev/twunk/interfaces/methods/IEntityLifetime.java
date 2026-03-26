@@ -8,6 +8,11 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import javax.annotation.Nonnull;
 
+/**
+ * Methods for my subsytem version of `RefSystem<ECS_Store>`
+ *
+ * @see com.hypixel.hytale.component.system.RefSystem Hytale's system that provides the `onEntityAdded` and `onEntityRemove` events
+ */
 public interface IEntityLifetime<ECS_STORE extends WorldProvider> {
     public void onEntityAdded(
         @Nonnull Ref<ECS_STORE> ref,

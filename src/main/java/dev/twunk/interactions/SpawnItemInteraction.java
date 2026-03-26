@@ -16,6 +16,10 @@ import dev.twunk.plugin.ModPlugin;
 import dev.twunk.utils.ItemUtils;
 import javax.annotation.Nonnull;
 
+/**
+ * @see com.hypixel.hytale.server.core.entity.ItemUtils I based most of my implementation on this
+ * @see dev.twunk.utils.ItemUtils I extended hytales ItemUtils a bit, so my implementation uses this alot
+ */
 public class SpawnItemInteraction extends SimpleInstantInteraction {
 
     @Nonnull

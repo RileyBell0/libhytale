@@ -11,7 +11,9 @@ import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.TwunkLib;
@@ -21,6 +23,12 @@ import dev.twunk.utils.ContainerUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Hytale's code that I based my implementation around
+ * @see ItemContainerState        The "BlockState" (deprecated) that seems to
+ *                                store container information
+ * @see OpenContainerInteraction  Their interaction that opens containers
+ */
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
     private static final @Nonnull String DEFAULT_COMPONENT_ID = "dev.twunk.components.ContainerComponent";

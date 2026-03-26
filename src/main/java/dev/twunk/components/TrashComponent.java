@@ -5,6 +5,8 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
+import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.Map;
@@ -12,12 +14,24 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
-// TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
-// want to delete these items. Just gonna make SURE you're sure, by keeping them around for like, 30 seconds"
-//
-// limit it to only be the player that opened it that can see those inventories.
-// make it QUEUE all inventories for stuff that was deleted. if you open the trash it should pause all inventory deletions
-// and resume the countdown when you close the trash
+/**
+ * TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
+ * want to delete these items. Just gonna make SURE you're sure, by keeping them around for like, 30 seconds"
+ *
+ * limit it to only be the player that opened it that can see those inventories.
+ * make it QUEUE all inventories for stuff that was deleted. if you open the trash it should pause all inventory deletions
+ * and resume the countdown when you close the trash
+ *
+ * My code
+ * @see ContainerComponent  A regular 'ol container without trash can schenanigans
+ * @see IContainer          My interface for methods I need containers to
+ *                          fulfil to show them in GUI
+ *
+ * Hytale's code
+ * @see ItemContainerState        The "BlockState" (deprecated) that seems to
+ *                                store container information
+ * @see OpenContainerInteraction  Their interaction that opens containers
+ */
 public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

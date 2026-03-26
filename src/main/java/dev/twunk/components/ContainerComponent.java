@@ -5,6 +5,8 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
+import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.Map;
@@ -12,6 +14,16 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
+/**
+ * My code
+ * @see IContainer  My interface for methods I need containers to fulfil to
+ *                  show them in GUI
+ *
+ * Hytale's code
+ * @see ItemContainerState        The "BlockState" (deprecated) that seems to
+ *                                store container information
+ * @see OpenContainerInteraction  Their interaction that opens containers
+ */
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
