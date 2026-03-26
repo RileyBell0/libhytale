@@ -20,9 +20,9 @@ public interface IContainer {
     public short getCapacity();
 
     public default void onOpen(
-        @Nonnull Ref<EntityStore> ref,
-        @Nonnull World world,
-        @Nonnull Store<EntityStore> store
+        final @Nonnull Ref<EntityStore> ref,
+        final @Nonnull World world,
+        final @Nonnull Store<EntityStore> store
     ) {}
 
     // Hytale src code (deprecated) called this `isAllowViewing`
