@@ -23,20 +23,10 @@ import javax.annotation.Nullable;
 
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
-    @Nonnull
-    private static final String DEFAULT_COMPONENT_ID = "dev.twunk.components.ContainerComponent";
+    private static final @Nonnull String DEFAULT_COMPONENT_ID = "dev.twunk.components.ContainerComponent";
 
     @SuppressWarnings("unchecked")
-    @Nonnull
-    private ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
-        TwunkLib.getChunkComponentType(ContainerComponent.class);
-
-    @Nonnull
-    private String componentId = DEFAULT_COMPONENT_ID;
-
-    @SuppressWarnings("unchecked")
-    @Nonnull
-    public static final BuilderCodec<OpenContainerComponentInteraction> CODEC = BuilderCodec.builder(
+    public static final @Nonnull BuilderCodec<OpenContainerComponentInteraction> CODEC = BuilderCodec.builder(
         OpenContainerComponentInteraction.class,
         OpenContainerComponentInteraction::new,
         SimpleBlockInteraction.CODEC
@@ -71,6 +61,37 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
         )
         .add()
         .build();
+
+    /////////////////////
+    // INSTANCE VARIABLES
+    /////////////////////
+
+    @SuppressWarnings("unchecked")
+    private @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
+        TwunkLib.getChunkComponentType(ContainerComponent.class);
+
+    /**
+     * The ID that identifies the specific container component to look for
+     *
+     * we have to do a sort of backwards join (i forget the name) from
+     * - Interactions are placed on block definitions (on disk, in json)
+     * - When we RUN an interaction for a block, we don't know what component
+     *   find & open (i don't want to define an interaction for each one), SO
+     *   we'll just have the caller write to disk the ID of the component
+     *   their `OpenContainer` interaction is targeting
+     *
+     * in the future, i plan to make some sort of registry when registering
+     * component types to keep track of inventory components, that way an interaction
+     * can show ALL inventories attached to a block/entity, not JUST a specific
+     * one (though that should likely be its own interaction OR a config option
+     * for this interaction)
+     */
+
+    private @Nonnull String componentId = DEFAULT_COMPONENT_ID;
+
+    /////////////////////
+    // Constructors (lmao)
+    /////////////////////
 
     public OpenContainerComponentInteraction() {}
 

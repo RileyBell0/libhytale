@@ -78,7 +78,7 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
     /////////////////////
     // INSTANCE VARIABLES
     /////////////////////
-    ///
+
     private short capacity = DEFAULT_CAPACITY;
 
     private boolean canView = true;
