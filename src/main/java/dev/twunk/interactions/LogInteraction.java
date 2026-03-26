@@ -18,9 +18,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class LogInteraction extends SimpleInstantInteraction {
 
+    /**
+     * Logs can be built up of several messages all concatenated together. This
+     * the codec for a single message. see the overall log codec to understand
+     * where to use this
+     */
     @Nonnull
     public static final BuilderCodec<LogInteraction> SINGLE_MESSAGE_CODEC = BuilderCodec.builder(
         LogInteraction.class,
@@ -63,15 +69,13 @@ public class LogInteraction extends SimpleInstantInteraction {
             (o, p) -> o.italic = p.italic
         )
         .add()
-        .appendInherited(
-            new KeyedCodec<>("IsLog", Codec.BOOLEAN, false),
-            (o, v) -> o.isLog = (v == null || (v != null && v.equals(false))),
-            o -> o.isLog,
-            (o, p) -> o.isLog = p.isLog
-        )
-        .add()
         .build();
 
+    /**
+     * The overall log itself
+     * Suppressing "null" from `Level.INFO`
+     */
+    @SuppressWarnings("null")
     @Nonnull
     public static final BuilderCodec<LogInteraction> CODEC = BuilderCodec.builder(
         LogInteraction.class,
@@ -111,7 +115,7 @@ public class LogInteraction extends SimpleInstantInteraction {
                     o.level = level;
                 }
             },
-            o -> o.level.toString(),
+            o -> o.level == null ? null : o.level.toString(),
             (o, p) -> o.level = p.level
         )
         .add()
@@ -136,32 +140,49 @@ public class LogInteraction extends SimpleInstantInteraction {
             (o, p) -> o.italic = p.italic
         )
         .add()
-        .appendInherited(
-            new KeyedCodec<>("IsLog", Codec.BOOLEAN, false),
-            (o, v) -> o.isLog = (v == null || (v != null && v.equals(false))),
-            o -> o.isLog,
-            (o, p) -> o.isLog = p.isLog
-        )
-        .add()
         .build();
 
+    /**
+     * All your messages (if you provided multiple).
+     * They'll be concatenated with Message.join before printing them
+     */
     private ArrayList<Message> messages = new ArrayList<>();
+
+    /**
+     * Your overarching message itself
+     */
     private String message;
-    private String color = null;
-    private String link = null;
+
+    /**
+     * OPTIONAL
+     * The text color of the message (as hex string, e.g. "#cacaca")
+     */
+    private @Nullable String color = null;
+
+    /**
+     * OPTIONAL
+     * A link to associate with your message
+     */
+    private @Nullable String link = null;
+
+    /**
+     * OPTIONAL
+     * If your message should be bold
+     */
     private boolean bold = false;
+
+    /**
+     * OPTIONAL
+     * If your message should be italic
+     */
     private boolean italic = false;
 
-    // "SEVERE";
-    // "WARNING";
-    // "INFO";
-    // "CONFIG";
-    // "FINE";
-    // "FINER";
-    // "FINEST";
-    private Level level = Level.INFO;
-
-    private boolean isLog = true;
+    /**
+     * Severity/level of your message. We'll prefix [LEVEL]
+     * SEVERE | WARNING | INFO | CONFIG | FINE | FINER | FINEST
+     */
+    @SuppressWarnings("null")
+    private @Nonnull Level level = Level.INFO;
 
     @Nonnull
     @SuppressWarnings("null")
@@ -178,6 +199,14 @@ public class LogInteraction extends SimpleInstantInteraction {
         return plugin.getCodecRegistry(Interaction.CODEC).register(this.getId(), this.getClass(), this.getCodec());
     }
 
+    /**
+     * Runs the interaction.
+     * This one's designed to be part of an interaction workflow, to effectively 'printf'
+     * debug your way through. Chuck it in part of any row of interactions and it'll log some
+     * stuff for you.
+     *
+     * SO. this writes a message to the chat for the player that started the interaction
+     */
     @Override
     protected void firstRun(
         final @Nonnull InteractionType interactionType,
@@ -216,10 +245,6 @@ public class LogInteraction extends SimpleInstantInteraction {
         msg = msg.bold(this.bold);
         msg = msg.italic(this.italic);
 
-        if (this.isLog) {
-            Chat.log(msg);
-        } else {
-            Chat.send(msg);
-        }
+        Chat.log(msg);
     }
 }
