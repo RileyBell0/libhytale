@@ -84,7 +84,7 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
         final @Nonnull Vector3i pos,
         final @Nonnull CooldownHandler cooldownHandler
     ) {
-        ContainerUtils.open(this.componentType, commandBuffer, context, pos);
+        ContainerUtils.openContainerGUI(this.componentType, commandBuffer, context, pos);
     }
 
     @Override

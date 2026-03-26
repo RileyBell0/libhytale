@@ -30,7 +30,7 @@ public abstract class ContainerUtils {
      *
      * Most of this comes from the hytale src code
      */
-    public static void open(
+    public static void openContainerGUI(
         final @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType,
         final @Nonnull CommandBuffer<EntityStore> commandBuffer,
         final @Nonnull InteractionContext context,
