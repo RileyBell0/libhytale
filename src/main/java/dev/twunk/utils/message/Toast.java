@@ -11,6 +11,9 @@ import com.hypixel.hytale.server.core.util.NotificationUtil;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * For displaying notifications (lil GUI popups in the bottom right ish)
+ */
 public class Toast extends NotificationUtil {
 
     @Nonnull

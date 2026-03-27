@@ -7,10 +7,12 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.TwunkLib;
 import dev.twunk.interfaces.component.IBlockLifetimeComponent;
+import dev.twunk.interfaces.methods.IEntityLifetime;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
@@ -20,17 +22,25 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 /**
- * Intended for re-use as is. Also intended for minimal usage (mainly testing etc)
+ * A reusable system for running onEntityAdded and onEntityRemove functions on
+ * block lifetime components. Reusable by ME really, just tbh its just the system
+ * that's auto-registered for block lifetime components
  *
- * GOAL: Tick ALL block entities that have the provided component
+ * GOAL: run the events `onEntityAdded` and `onEntityRemove` defined on a given
+ * component
  *
  * Marked as final since, this is really a one and done sorta deal, just clone
  * its src and edit if you need alterations, because, then its just not this
  * specific thing anymore.
  *
- * How to use:
- * - create a new instance `new TickableBlockComponent<YourComponent>(YourComponentType)`
- * - register the instance to your plugin
+ * My code
+ * @see IEntityLifetime       - Methods for listening to entity add/remove events
+ * @see IEntityLifetimeSystem - Additional requirements that an implementor of IEntityLifetime must satisfy
+ *                              in order to register a subsystem to run itself
+ * @see EntityLifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ *
+ * Hytale's code
+ * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
 public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
     extends SubSystemOwner<ChunkStore>

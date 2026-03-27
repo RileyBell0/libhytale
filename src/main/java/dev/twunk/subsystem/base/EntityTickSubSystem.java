@@ -4,8 +4,10 @@ import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.interfaces.methods.IEntityTick;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import dev.twunk.subsystem.composite.interfaces.IRegistry;
@@ -21,6 +23,19 @@ import javax.annotation.Nullable;
  * - N/A (this is a leaf)
  * PRODUCES:
  * - IEntityTickSystem runner
+ *
+ *
+ * My code
+ * @see IEntityTickSystem - Something that can be ticked by EntityTickSubSystem
+ *                          (satisfies IEntityTick)
+ * @see IEntityTick       - Underlying method for ticking an entity
+ *
+ * Hytale's code
+ * @see EntityTickingSystem    - Baseline hytale system for ticking entities.
+ *                               It's the underlying driver of IEntityTickSubSystem
+ * @see ArchetypeTickingSystem - Underlying sort of baseline ticking system (that i know how to implement).
+ *                               Runs ONCE per tick (global, not per matching entity, just runs a single
+ *                               time per tick) and has an inbuilt query
  */
 public class EntityTickSubSystem<ECS_STORE extends WorldProvider>
     extends EntityTickingSystem<ECS_STORE>

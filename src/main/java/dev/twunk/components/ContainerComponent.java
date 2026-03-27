@@ -16,13 +16,13 @@ import javax.annotation.Nonnull;
 
 /**
  * My code
- * @see IContainer  My interface for methods I need containers to fulfil to
- *                  show them in GUI
+ * @see IContainer - My interface for methods I need containers to fulfil to
+ *                   show them in GUI
  *
  * Hytale's code
- * @see ItemContainerState        The "BlockState" (deprecated) that seems to
- *                                store container information
- * @see OpenContainerInteraction  Their interaction that opens containers
+ * @see ItemContainerState       - The "BlockState" (deprecated) that seems to
+ *                                 store container information
+ * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 

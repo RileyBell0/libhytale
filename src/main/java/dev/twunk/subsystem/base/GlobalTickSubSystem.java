@@ -21,6 +21,13 @@ import javax.annotation.Nullable;
  * - N/A (this is a leaf)
  * PRODUCES:
  * - IGlobalTickSystem runner
+ *
+ * My code
+ * @see IGlobalTickSystem - Something that this subsystem can call and run.
+ *
+ * Hytale's code
+ * @see ArchetypeTickingSystem - I use this to run the subsystem. Only way i currently know
+ *                               of for getting a commandBuffer in a global tick
  */
 public class GlobalTickSubSystem<ECS_STORE extends WorldProvider>
     extends ArchetypeTickingSystem<ECS_STORE>

@@ -10,6 +10,12 @@ import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * for writing messages to the chat. Scoped.
+ * - universe OR
+ * - world OR
+ * - player
+ */
 public abstract class Chat {
 
     @Nonnull

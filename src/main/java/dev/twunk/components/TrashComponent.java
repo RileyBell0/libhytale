@@ -23,14 +23,16 @@ import javax.annotation.Nonnull;
  * and resume the countdown when you close the trash
  *
  * My code
- * @see ContainerComponent  A regular 'ol container without trash can schenanigans
- * @see IContainer          My interface for methods I need containers to
- *                          fulfil to show them in GUI
+ * @see OpenContainerComponentInteraction - the interaction i wrote that is capable of
+ *                                          opening a GUI for the block a trash can is on.
+ * @see ContainerComponent                - A regular 'ol container without trash can schenanigans
+ * @see IContainer                        - My interface for methods I need containers to
+ *                                          fulfil to show them in GUI
  *
  * Hytale's code
- * @see ItemContainerState        The "BlockState" (deprecated) that seems to
- *                                store container information
- * @see OpenContainerInteraction  Their interaction that opens containers
+ * @see ItemContainerState       - The "BlockState" (deprecated) that seems to
+ *                                 store container information
+ * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 

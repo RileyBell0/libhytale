@@ -7,7 +7,11 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
+import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
+import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.interfaces.methods.IEntityLifetime;
+import dev.twunk.interfaces.methods.IEntityTick;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
 import dev.twunk.subsystem.composite.interfaces.IRegistry;
@@ -24,6 +28,21 @@ import javax.annotation.Nullable;
  * - N/A (this is a leaf)
  * PRODUCES:
  * - ILifetimeSystem runner
+ *
+ * My code
+ * @see IEntityLifetime       - Methods for listening to entity add/remove events
+ * @see IEntityLifetimeSystem - Additional requirements that an implementor of IEntityLifetime must satisfy
+ *                              in order to register a subsystem to run itself
+ * @see EntityTickSubSystem   - Underlying SubSystem that powers the IEntityTick methods
+ *                              for IEntityTickSystems that register an EntityTickSubSystem
+ * @see IEntityTick           - Underlying method for ticking an entity
+ *
+ * Hytale's code
+ * @see EntityTickingSystem    - Baseline hytale system for ticking entities.
+ *                               It's the underlying driver of IEntityTickSubSystem
+ * @see ArchetypeTickingSystem - Underlying sort of baseline ticking system (that i know how to implement).
+ *                               Runs ONCE per tick (global, not per matching entity, just runs a single
+ *                               time per tick) and has an inbuilt query
  */
 public abstract class EntityLifetimeSubSystem<ECS_STORE extends WorldProvider>
     extends RefSystem<ECS_STORE>

@@ -18,16 +18,27 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.TwunkLib;
 import dev.twunk.components.ContainerComponent;
+import dev.twunk.components.IContainer;
 import dev.twunk.components.IContainerComponent;
+import dev.twunk.components.TrashComponent;
 import dev.twunk.utils.ContainerUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
+ * @see ContainerComponent                - a basic container. Effectively, a block + ContainerComponent
+ *                                          + OpenContainerComponentInteraction is effectively just a chest
+ * @see IContainerComponent               - IContainer + Component -> simplest form of a container in a component
+ * @see IContainer                        - The minimum requirements something needs to satisfy to be considered a container
+ * @see TrashComponent                    - an alternative implementation of IContainerComponent, showing you
+ *                                          other ways of utilising containers for more unique use-cases
+ * @see OpenContainerComponentInteraction - my interaction for opening a GUI for containers stored in a component
+ *                                          on a block (specifically extensions or implementors of IContainerComponent)
+ *
  * Hytale's code that I based my implementation around
- * @see ItemContainerState        The "BlockState" (deprecated) that seems to
- *                                store container information
- * @see OpenContainerInteraction  Their interaction that opens containers
+ * @see ItemContainerState       - The "BlockState" (deprecated) that seems to
+ *                                 store container information
+ * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 

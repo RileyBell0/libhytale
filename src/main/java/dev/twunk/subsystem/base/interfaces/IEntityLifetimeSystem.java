@@ -1,9 +1,11 @@
 package dev.twunk.subsystem.base.interfaces;
 
+import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.IRegistryProvider;
 import dev.twunk.interfaces.methods.IEntityLifetime;
 import dev.twunk.interfaces.methods.IQuery;
+import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
 
 /**
  * Gives your system the event handler function it needs to listen/react to
@@ -13,6 +15,15 @@ import dev.twunk.interfaces.methods.IQuery;
  * - implement ILifetimeSystem on your system
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
+ *
+ * My code
+ * @see IEntityLifetime              - Methods for listening to entity add/remove events
+ * @see IEntityLifetimeSystem        - Additional requirements that an implementor of IEntityLifetime must satisfy
+ *                                     in order to register a subsystem to run itself
+ * @see EntityLifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ *
+ * Hytale's code
+ * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
 public interface IEntityLifetimeSystem<
     ECS_STORE extends WorldProvider

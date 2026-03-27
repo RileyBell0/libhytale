@@ -19,7 +19,8 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 /**
- * Intended for re-use as is. Also intended for minimal usage (mainly testing etc)
+ * A reusable system for ticking block components. Reusable by ME really, just
+ * tbh its just the system that's auto-registered for tickable block components
  *
  * GOAL: Tick ALL block entities that have the provided component
  *

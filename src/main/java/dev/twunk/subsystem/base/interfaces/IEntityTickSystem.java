@@ -1,12 +1,12 @@
 package dev.twunk.subsystem.base.interfaces;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
+import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.IRegistryProvider;
+import dev.twunk.interfaces.methods.IEntityTick;
 import dev.twunk.interfaces.methods.IQuery;
-import javax.annotation.Nonnull;
+import dev.twunk.subsystem.base.EntityTickSubSystem;
 
 /**
  * Gives your system the event handler function it needs to listen/react to
@@ -16,15 +16,20 @@ import javax.annotation.Nonnull;
  * - implement IEntityTickSystem on your system
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
+ *
+ *
+ * My code
+ * @see EntityTickSubSystem - Underlying SubSystem that powers the IEntityTick methods
+ *                            for IEntityTickSystems that register an EntityTickSubSystem
+ * @see IEntityTick         - Underlying method for ticking an entity
+ *
+ * Hytale's code
+ * @see EntityTickingSystem    - Baseline hytale system for ticking entities.
+ *                               It's the underlying driver of IEntityTickSubSystem
+ * @see ArchetypeTickingSystem - Underlying sort of baseline ticking system (that i know how to implement).
+ *                               Runs ONCE per tick (global, not per matching entity, just runs a single
+ *                               time per tick) and has an inbuilt query
  */
 public interface IEntityTickSystem<
     ECS_STORE extends WorldProvider
-> extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
-    public void onEntityTick(
-        final float dt,
-        final int index,
-        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
-    );
-}
+> extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE>, IEntityTick<ECS_STORE> {}

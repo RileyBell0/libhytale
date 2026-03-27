@@ -13,15 +13,37 @@ import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
+import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.components.IContainer;
 import dev.twunk.components.IContainerComponent;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
+/**
+ * Currently just has a method for opening a GUI for a given container for a given player
+ *
+ * My code
+ * @see IContainer          - MY container interface. Defines the methods a class must
+ *                            satisfy to be able to be considered a container. Really base level.
+ *                            requires:
+ *                            - getCapacity of the container
+ *                            - getContainer - container itself (doesn't have to be the same one each time,
+ *                              e.g. for "trash" i just instantiate a new empty container each time
+ *                              someone tries to open it)
+ * @see IContainerComponent - is both IContainer and a Component. The absolte minimum
+ *                            requirements for my ContainerUtils code functions.
+ *
+ *
+ * Hytale's code
+ * @see SimpleItemContainer - THE underlying BASE item container. Just stores items
+ *                            and has a capacity. Really. if you need to store items
+ *                            in any capacity, probably just use this
+ */
 public abstract class ContainerUtils {
 
     /**

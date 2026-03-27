@@ -20,6 +20,12 @@ import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * An interaction that when run simply logs to the chat the message you included
+ * with the severity you specified.
+ *
+ * Useful for light printf debugging interactions in-game
+ */
 public class LogInteraction extends SimpleInstantInteraction {
 
     /**

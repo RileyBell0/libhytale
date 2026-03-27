@@ -20,6 +20,10 @@ import dev.twunk.subsystem.composite.interfaces.IScheduledTickSystem;
 import javax.annotation.Nonnull;
 
 /**
+ * TODO really not working that well atm, needs to be cleaned up BUT it worked
+ * well in concept and practice. Just, yeah, needs to be cleaned up and extended to support
+ * more advanced ticking ideas like "every x ticks" or "every x seconds" etc etc
+ *
  * Composite subsystem to allow the parent to run code on its elements every
  * tick in a smarter way
  *

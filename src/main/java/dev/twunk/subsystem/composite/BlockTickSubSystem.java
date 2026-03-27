@@ -5,6 +5,7 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.TwunkLib;
+import dev.twunk.interfaces.methods.IBlockTick;
 import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
@@ -24,6 +25,14 @@ import javax.annotation.Nonnull;
  * - EntityTickSubSystem -> allows us to tick all blocks that match our query
  * PRODUCES:
  * - IQueryTickingSystem runner
+ *
+ * @see EntityTickSubSystem - BlockTickSubSystem is simply an extension of EntityTickSubSystem
+ *                            that grabs some more block-related data out of a ref before calling
+ *                            the onBlockTick method your `IEntityTickSystem` provides
+ * @see IEntityTickSystem   - Something that EntityTickSubSystem can run (this)
+ * @see IBlockTick          - method i'll be calling on your class
+ * @see IBlockTickSystem    - your class must implement this. It will have an IBlockTick method
+ *                            that this sub system is going to be calling on it
  */
 public class BlockTickSubSystem
     extends SubSystemOwner<ChunkStore>
