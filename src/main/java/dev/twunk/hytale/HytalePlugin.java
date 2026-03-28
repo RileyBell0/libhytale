@@ -11,8 +11,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.interfaces.component.IAutoBlockTickComponent;
-import dev.twunk.interfaces.component.IAutoLifetimeComponent;
+import dev.twunk.interfaces.component.IBlockTickComponent;
+import dev.twunk.interfaces.component.ILifetimeComponent;
+import dev.twunk.interfaces.component.ITickComponent;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
 import javax.annotation.Nonnull;
@@ -81,16 +82,18 @@ public abstract class HytalePlugin extends JavaPlugin {
         // Store our component in the global register
         LibHytale.registerChunkComponentType(component, myClass, defaultId);
 
-        if (IAutoBlockTickComponent.class.isAssignableFrom(myClass)) {
-            // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
-            // just, suppressing unchecked conversions for now
-            new AutoBlockTickSystem(component).registerTo(this);
-        }
+        if (myClass.isAnnotationPresent(dev.twunk.annotations.HytaleComponent.class)) {
+            if (IBlockTickComponent.class.isAssignableFrom(myClass)) {
+                new AutoBlockTickSystem(component).registerTo(this);
+            }
 
-        if (IAutoLifetimeComponent.class.isAssignableFrom(myClass)) {
-            // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
-            // just, suppressing unchecked conversions for now
-            new AutoBlockLifetimeSystem(component).registerTo(this);
+            if (ITickComponent.class.isAssignableFrom(myClass)) {
+                // TODO
+            }
+
+            if (ILifetimeComponent.class.isAssignableFrom(myClass)) {
+                new AutoBlockLifetimeSystem(component).registerTo(this);
+            }
         }
 
         return component;

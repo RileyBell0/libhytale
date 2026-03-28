@@ -1,5 +1,21 @@
 # libhytale (WIP)
 
+TODO
+- learn annotations. Use annotations to define
+  - System IDs
+    - @ID("system-id-for-my-plugin")
+  - If we should auto register system(s) for your component
+    - @Component
+    - @Component("specificSystem")
+    - @Component({"specificSystem1", "willOnlyLoadThese"})
+  - If your component should be considered viable for just a single store. If omitted it'll be registered for both given it's got a generic named ECS_STORE (not sure if thats something i CAN check but we'll see)
+    - @ChunkComponent
+    - @EntityComponent
+  - if we should auto register the sub-systems required to run your subsystemowner
+    - @System | auto registers subsystems to run its events
+  - if an auto registering annotiation is added you can also add the following to NOT register systems for it
+    - @RegisterOnly
+
 ## PLAN for getting onUpdate sub system
 
 > [!IMPORTANT]

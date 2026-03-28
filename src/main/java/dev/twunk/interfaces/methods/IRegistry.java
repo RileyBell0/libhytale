@@ -1,9 +1,10 @@
-package dev.twunk.interfaces;
+package dev.twunk.interfaces.methods;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.interfaces.ISubSystem;
 import javax.annotation.Nonnull;
 
 /**

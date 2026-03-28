@@ -1,4 +1,4 @@
-package dev.twunk.interfaces;
+package dev.twunk.interfaces.methods;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;

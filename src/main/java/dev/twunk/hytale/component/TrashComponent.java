@@ -6,11 +6,13 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.interfaces.IContainer;
+import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.interfaces.component.IContainerComponent;
+import dev.twunk.interfaces.methods.IContainer;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +38,7 @@ import javax.annotation.Nonnull;
  *                                 store container information
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
-public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
+public class TrashComponent<ECS_STORE extends WorldProvider> implements IContainerComponent<ECS_STORE> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
@@ -149,7 +151,7 @@ public class TrashComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
     }
 
     @Override
-    public TrashComponent<ECS_TYPE> clone() {
-        return new TrashComponent<ECS_TYPE>(this.capacity);
+    public TrashComponent<ECS_STORE> clone() {
+        return new TrashComponent<ECS_STORE>(this.capacity);
     }
 }

@@ -20,8 +20,8 @@ import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.component.TrashComponent;
 import dev.twunk.hytale.utils.ContainerUtils;
-import dev.twunk.interfaces.IContainer;
 import dev.twunk.interfaces.component.IContainerComponent;
+import dev.twunk.interfaces.methods.IContainer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

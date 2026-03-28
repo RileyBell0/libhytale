@@ -3,7 +3,7 @@ package dev.twunk.interfaces.component;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
-import dev.twunk.interfaces.IContainer;
+import dev.twunk.interfaces.methods.IContainer;
 
 // import dev.twunk.hytale.components.IContainer;
 
