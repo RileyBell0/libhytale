@@ -10,14 +10,14 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.hytale.TwunkLib;
-import dev.twunk.hytale.interfaces.IRegistry;
-import dev.twunk.hytale.interfaces.component.IBlockLifetimeComponent;
-import dev.twunk.hytale.interfaces.methods.IEntityLifetime;
-import dev.twunk.hytale.interfaces.subsystem.IEntityLifetimeSystem;
-import dev.twunk.hytale.subsystem.SubSystemOwner;
-import dev.twunk.hytale.subsystem.base.EntityLifetimeSubSystem;
+import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.system.LifetimeSubSystem;
+import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.utils.ComponentUtils;
+import dev.twunk.interfaces.IRegistry;
+import dev.twunk.interfaces.component.ILifetimeComponent;
+import dev.twunk.interfaces.methods.ILifetime;
+import dev.twunk.interfaces.subsystem.ILifetimeSystem;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
@@ -34,17 +34,17 @@ import javax.annotation.Nonnull;
  * specific thing anymore.
  *
  * My code
- * @see IEntityLifetime       - Methods for listening to entity add/remove events
- * @see IEntityLifetimeSystem - Additional requirements that an implementor of IEntityLifetime must satisfy
+ * @see ILifetime       - Methods for listening to entity add/remove events
+ * @see ILifetimeSystem - Additional requirements that an implementor of IEntityLifetime must satisfy
  *                              in order to register a subsystem to run itself
- * @see EntityLifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ * @see LifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  *
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-public class AutoBlockLifetimeSystem<T extends IBlockLifetimeComponent>
+public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
     extends SubSystemOwner<ChunkStore>
-    implements IEntityLifetimeSystem<ChunkStore>
+    implements ILifetimeSystem<ChunkStore>
 {
 
     private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
@@ -59,21 +59,21 @@ public class AutoBlockLifetimeSystem<T extends IBlockLifetimeComponent>
         }
         this.componentType = component;
 
-        this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
+        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this));
     }
 
     public AutoBlockLifetimeSystem(@Nonnull Class<T> componentClass) {
-        super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
-        this.componentType = TwunkLib.getChunkComponentType(componentClass);
+        super(Query.and(LibHytale.getChunkComponentType(componentClass)));
+        this.componentType = LibHytale.getChunkComponentType(componentClass);
 
-        this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
+        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this));
     }
 
     public AutoBlockLifetimeSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
 
-        this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
+        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this));
     }
 
     @Override
@@ -120,6 +120,6 @@ public class AutoBlockLifetimeSystem<T extends IBlockLifetimeComponent>
 
     @Override
     public IRegistry<ChunkStore> getRegistry() {
-        return TwunkLib.CHUNK_REGISTRY;
+        return LibHytale.CHUNK_REGISTRY;
     }
 }

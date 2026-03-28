@@ -3,10 +3,10 @@ package dev.twunk.lib;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.hytale.TwunkLib;
-import dev.twunk.hytale.interfaces.IRegistry;
-import dev.twunk.hytale.interfaces.ISubSystem;
-import dev.twunk.hytale.plugin.ModPlugin;
+import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.hytale.LibHytale;
+import dev.twunk.interfaces.IRegistry;
+import dev.twunk.interfaces.ISubSystem;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,14 +29,14 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
     public final <T extends Component<EntityStore>> ComponentType<EntityStore, T> getComponentType(
         final @Nonnull Class<T> componentClass
     ) {
-        return TwunkLib.getEntityComponentType(componentClass);
+        return LibHytale.getEntityComponentType(componentClass);
     }
 
     @Nullable
     public final ComponentType<EntityStore, ? extends Component<EntityStore>> getComponentType(
         final @Nonnull String componentId
     ) {
-        return TwunkLib.getEntityComponentType(componentId);
+        return LibHytale.getEntityComponentType(componentId);
     }
 
     /**
@@ -49,10 +49,13 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
         final @Nonnull Class<T> myClass,
         final @Nonnull String id
     ) {
-        TwunkLib.registerEntityComponentType(componentType, myClass, id);
+        LibHytale.registerEntityComponentType(componentType, myClass, id);
     }
 
-    public final void registerSystem(final @Nonnull ModPlugin plugin, final @Nonnull ISubSystem<EntityStore> system) {
+    public final void registerSystem(
+        final @Nonnull HytalePlugin plugin,
+        final @Nonnull ISubSystem<EntityStore> system
+    ) {
         plugin.getEntityStoreRegistry().registerSystem(system);
     }
 }

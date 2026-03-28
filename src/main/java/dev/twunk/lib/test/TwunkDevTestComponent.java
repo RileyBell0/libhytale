@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.hytale.TwunkLib;
+import dev.twunk.hytale.LibHytale;
 import javax.annotation.Nonnull;
 
 public class TwunkDevTestComponent implements Component<ChunkStore> {
@@ -48,7 +48,7 @@ public class TwunkDevTestComponent implements Component<ChunkStore> {
 
     @Nonnull
     public static final ComponentType<ChunkStore, TwunkDevTestComponent> getComponentType() {
-        return (ComponentType<ChunkStore, TwunkDevTestComponent>) TwunkLib.getChunkComponentType(
+        return (ComponentType<ChunkStore, TwunkDevTestComponent>) LibHytale.getChunkComponentType(
             TwunkDevTestComponent.class
         );
     }

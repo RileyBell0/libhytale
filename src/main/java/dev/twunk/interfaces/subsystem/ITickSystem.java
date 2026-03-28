@@ -1,0 +1,35 @@
+package dev.twunk.interfaces.subsystem;
+
+import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
+import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.system.TickSubSystem;
+import dev.twunk.interfaces.IRegistryProvider;
+import dev.twunk.interfaces.methods.IQuery;
+import dev.twunk.interfaces.methods.ITick;
+
+/**
+ * Gives your system the event handler function it needs to listen/react to
+ * ticks for every entity that matches your query
+ *
+ * When you want your system to benefit from EntityTickSubSystem
+ * - implement IEntityTickSystem on your system
+ * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
+ * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
+ *
+ *
+ * My code
+ * @see TickSubSystem - Underlying SubSystem that powers the IEntityTick methods
+ *                            for IEntityTickSystems that register an EntityTickSubSystem
+ * @see ITick         - Underlying method for ticking an entity
+ *
+ * Hytale's code
+ * @see EntityTickingSystem    - Baseline hytale system for ticking entities.
+ *                               It's the underlying driver of IEntityTickSubSystem
+ * @see ArchetypeTickingSystem - Underlying sort of baseline ticking system (that i know how to implement).
+ *                               Runs ONCE per tick (global, not per matching entity, just runs a single
+ *                               time per tick) and has an inbuilt query
+ */
+public interface ITickSystem<
+    ECS_STORE extends WorldProvider
+> extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE>, ITick<ECS_STORE> {}

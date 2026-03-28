@@ -3,10 +3,10 @@ package dev.twunk.lib;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.hytale.TwunkLib;
-import dev.twunk.hytale.interfaces.IRegistry;
-import dev.twunk.hytale.interfaces.ISubSystem;
-import dev.twunk.hytale.plugin.ModPlugin;
+import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.hytale.LibHytale;
+import dev.twunk.interfaces.IRegistry;
+import dev.twunk.interfaces.ISubSystem;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,14 +29,14 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     public final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getComponentType(
         final @Nonnull Class<T> componentClass
     ) {
-        return TwunkLib.getChunkComponentType(componentClass);
+        return LibHytale.getChunkComponentType(componentClass);
     }
 
     @Nullable
     public final ComponentType<ChunkStore, ? extends Component<ChunkStore>> getComponentType(
         final @Nonnull String componentId
     ) {
-        return TwunkLib.getChunkComponentType(componentId);
+        return LibHytale.getChunkComponentType(componentId);
     }
 
     /**
@@ -49,10 +49,10 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         final @Nonnull Class<T> myClass,
         final @Nonnull String id
     ) {
-        TwunkLib.registerChunkComponentType(componentType, myClass, id);
+        LibHytale.registerChunkComponentType(componentType, myClass, id);
     }
 
-    public final void registerSystem(final @Nonnull ModPlugin plugin, final @Nonnull ISubSystem<ChunkStore> system) {
+    public final void registerSystem(final @Nonnull HytalePlugin plugin, final @Nonnull ISubSystem<ChunkStore> system) {
         plugin.getChunkStoreRegistry().registerSystem(system);
     }
 }
