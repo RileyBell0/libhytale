@@ -77,7 +77,7 @@ e.g.
             "Use": {
                 "Interactions": [
                     {
-                        "Type": "dev.twunk.interactions.OpenChestInteraction"
+                        "Type": "dev.twunk.hytale.interactions.OpenChestInteraction"
                     }
                 ]
             },

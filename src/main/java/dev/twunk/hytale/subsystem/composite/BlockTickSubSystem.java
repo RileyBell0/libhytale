@@ -1,67 +1,59 @@
-package dev.twunk.lib.system;
+package dev.twunk.hytale.subsystem.composite;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.TwunkLib;
 import dev.twunk.hytale.interfaces.IRegistry;
-import dev.twunk.hytale.interfaces.component.ITickableBlockComponent;
+import dev.twunk.hytale.interfaces.ISubSystem;
+import dev.twunk.hytale.interfaces.methods.IBlockTick;
+import dev.twunk.hytale.interfaces.subsystem.IBlockTickSystem;
 import dev.twunk.hytale.interfaces.subsystem.IEntityTickSystem;
 import dev.twunk.hytale.subsystem.SubSystemOwner;
 import dev.twunk.hytale.subsystem.base.EntityTickSubSystem;
 import dev.twunk.hytale.utils.BlockUtils;
-import dev.twunk.hytale.utils.ComponentUtils;
-import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 /**
- * A reusable system for ticking block components. Reusable by ME really, just
- * tbh its just the system that's auto-registered for tickable block components
+ * Composite subsystem to allow the parent to run code on its elements every
+ * tick in a smarter way
  *
- * GOAL: Tick ALL block entities that have the provided component
+ * GOAL: tick all block entities that match the given query.
  *
- * Marked as final since, this is really a one and done sorta deal, just clone
- * its src and edit if you need alterations, because, then its just not this
- * specific thing anymore.
+ * REQUIRES:
+ * - EntityTickSubSystem -> allows us to tick all blocks that match our query
+ * PRODUCES:
+ * - IQueryTickingSystem runner
  *
- * How to use:
- * - create a new instance `new TickableBlockComponent<YourComponent>(YourComponentType)`
- * - register the instance to your plugin
+ * @see EntityTickSubSystem - BlockTickSubSystem is simply an extension of EntityTickSubSystem
+ *                            that grabs some more block-related data out of a ref before calling
+ *                            the onBlockTick method your `IEntityTickSystem` provides
+ * @see IEntityTickSystem   - Something that EntityTickSubSystem can run (this)
+ * @see IBlockTick          - method i'll be calling on your class
+ * @see IBlockTickSystem    - your class must implement this. It will have an IBlockTick method
+ *                            that this sub system is going to be calling on it
  */
-public final class AutoBlockTickSystem<T extends ITickableBlockComponent>
+public class BlockTickSubSystem
     extends SubSystemOwner<ChunkStore>
-    implements IEntityTickSystem<ChunkStore>
+    implements IEntityTickSystem<ChunkStore>, ISubSystem<ChunkStore>
 {
 
-    private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+    private final @Nonnull IBlockTickSystem parent;
 
-    private final @Nonnull ComponentType<ChunkStore, T> componentType;
-
-    public AutoBlockTickSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
-        super(Query.and(supplier.get()));
-        final var component = supplier.get();
-        if (component == null) {
-            throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
-        }
-        this.componentType = component;
-
-        this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     */
+    public static <T extends BlockTickSubSystem> BlockTickSubSystem newSubsystemFor(
+        final @Nonnull IBlockTickSystem parent
+    ) {
+        return ISubSystem.__newSubSystem(BlockTickSubSystem.class, IBlockTickSystem.class, parent);
     }
 
-    public AutoBlockTickSystem(final @Nonnull Class<T> componentClass) {
-        super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
-        this.componentType = TwunkLib.getChunkComponentType(componentClass);
-
-        this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
-    }
-
-    public AutoBlockTickSystem(final @Nonnull ComponentType<ChunkStore, T> componentType) {
-        super(Query.and(componentType));
-        this.componentType = componentType;
+    protected BlockTickSubSystem(final @Nonnull IBlockTickSystem parent) {
+        super(parent.getQuery());
+        this.parent = parent;
 
         this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
@@ -117,18 +109,7 @@ public final class AutoBlockTickSystem<T extends ITickableBlockComponent>
         }
         final var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
 
-        // Since our query is based on your component, we KNOW it has to have your
-        // component, so, we just, get it
-        final var component = ComponentUtils.get(blockRef, this.componentType);
-        try {
-            // and call the tick method you defined on your component, which,
-            // i know is sort of heresy for ECS systems, but, it makes doing
-            // easy things easy. and i'm all for that
-            component.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
-        } catch (Throwable e) {
-            console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
-            return;
-        }
+        parent.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.components.ContainerComponent;
+import dev.twunk.hytale.components.ContainerComponent;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.lifetime.TrackedEntity;
 import java.util.HashMap;
