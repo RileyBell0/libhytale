@@ -7,16 +7,17 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.interfaces.IRegistry;
+import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.interfaces.subsystem.IEntityLifetimeSystem;
+import dev.twunk.interfaces.subsystem.IGlobalTickSystem;
+import dev.twunk.interfaces.subsystem.IScheduledTickSystem;
+import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.lib.lifetime.TrackedEntities;
-import dev.twunk.subsystem.ISubSystem;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
 import dev.twunk.subsystem.base.GlobalTickSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
-import dev.twunk.subsystem.base.interfaces.IGlobalTickSystem;
-import dev.twunk.subsystem.composite.interfaces.IRegistry;
-import dev.twunk.subsystem.composite.interfaces.IScheduledTickSystem;
 import javax.annotation.Nonnull;
 
 /**

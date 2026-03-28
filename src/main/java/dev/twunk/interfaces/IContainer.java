@@ -1,4 +1,4 @@
-package dev.twunk.components;
+package dev.twunk.interfaces;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.ser
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.components.ContainerComponent;
 import dev.twunk.interactions.OpenContainerComponentInteraction;
 import java.util.Map;
 import java.util.UUID;

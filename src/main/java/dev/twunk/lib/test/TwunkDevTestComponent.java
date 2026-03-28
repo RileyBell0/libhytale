@@ -1,4 +1,4 @@
-package dev.twunk.lib.component;
+package dev.twunk.lib.test;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;

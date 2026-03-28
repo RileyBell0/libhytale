@@ -1,9 +1,8 @@
-package dev.twunk.subsystem;
+package dev.twunk.interfaces;
 
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.IRegistryProvider;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.plugin.ModPlugin;
 import java.lang.invoke.MethodHandles;

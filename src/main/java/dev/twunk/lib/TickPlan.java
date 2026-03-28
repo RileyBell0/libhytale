@@ -1,4 +1,4 @@
-package dev.twunk.subsystem.composite;
+package dev.twunk.lib;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

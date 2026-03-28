@@ -7,10 +7,10 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.interfaces.IRegistry;
+import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IEntityTick;
-import dev.twunk.subsystem.ISubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.subsystem.composite.interfaces.IRegistry;
+import dev.twunk.interfaces.subsystem.IEntityTickSystem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

@@ -10,7 +10,7 @@ import dev.twunk.interactions.LogInteraction;
 import dev.twunk.interactions.OpenContainerComponentInteraction;
 import dev.twunk.interactions.SpawnItemInteraction;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
-import dev.twunk.lib.component.TwunkDevTestComponent;
+import dev.twunk.lib.test.TwunkDevTestComponent;
 import dev.twunk.plugin.ModPlugin;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

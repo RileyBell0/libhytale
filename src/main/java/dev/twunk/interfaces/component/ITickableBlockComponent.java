@@ -6,16 +6,16 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.methods.IBlockTick;
 import dev.twunk.interfaces.methods.IEntityTick;
+import dev.twunk.interfaces.subsystem.IEntityTickSystem;
+import dev.twunk.lib.system.AutoBlockTickSystem;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.system.TickableBlockComponentSystem;
 
 /**
  * A component that implements `IBlockTick`
  * - It has an `onBlockTick` method
  *
  * My code
- * @see TickableBlockComponentSystem - System for specifically ticking block entities (gets
+ * @see AutoBlockTickSystem - System for specifically ticking block entities (gets
  *                                     block position, id, etc. then gives that to your tick method)
  * @see IBlockTick                   - Definition of method for ticking a block entity
  * @see EntityTickSubSystem          - SubSystem used by TickableBlockComponentSystem

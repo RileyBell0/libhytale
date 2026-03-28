@@ -4,9 +4,9 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.methods.IEntityLifetime;
+import dev.twunk.interfaces.subsystem.IEntityLifetimeSystem;
+import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
-import dev.twunk.system.BlockLifetimeComponentSystem;
 
 /**
  * A component that implements `IEntityLifetime`
@@ -17,7 +17,7 @@ import dev.twunk.system.BlockLifetimeComponentSystem;
  * @see IEntityLifetimeSystem        - Additional requirements that an implementor of IEntityLifetime must satisfy
  *                                     in order to register a subsystem to run itself
  * @see EntityLifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
- * @see BlockLifetimeComponentSystem - A system I wrote that uses this. Runs onEntityAdded and onEntityRemove
+ * @see AutoBlockLifetimeSystem - A system I wrote that uses this. Runs onEntityAdded and onEntityRemove
  *                                     for a given query
  *
  *

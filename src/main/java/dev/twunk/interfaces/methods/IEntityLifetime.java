@@ -7,8 +7,8 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.interfaces.subsystem.IEntityLifetimeSystem;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
 import javax.annotation.Nonnull;
 
 /**

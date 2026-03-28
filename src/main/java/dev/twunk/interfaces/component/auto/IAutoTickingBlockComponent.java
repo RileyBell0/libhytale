@@ -5,16 +5,16 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import dev.twunk.interfaces.component.ITickableBlockComponent;
 import dev.twunk.interfaces.methods.IBlockTick;
 import dev.twunk.interfaces.methods.IEntityTick;
+import dev.twunk.interfaces.subsystem.IEntityTickSystem;
+import dev.twunk.lib.system.AutoBlockTickSystem;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.system.TickableBlockComponentSystem;
 
 /**
  * Any component that implements this (that you register via my lib code) will
  * have a system automatically spun up for it to run the onBlockTick code
  *
  * My code
- * @see TickableBlockComponentSystem - System for specifically ticking block entities (gets
+ * @see AutoBlockTickSystem - System for specifically ticking block entities (gets
  *                                     block position, id, etc. then gives that to your tick method)
  * @see IBlockTick                   - Definition of method for ticking a block entity
  *

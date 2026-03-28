@@ -1,4 +1,4 @@
-package dev.twunk._archive.strategy;
+package dev.twunk.lib._archive.strategy;
 
 public class TickStrategyFrequency extends TickStrategy {
 

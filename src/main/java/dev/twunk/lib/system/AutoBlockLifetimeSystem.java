@@ -1,4 +1,4 @@
-package dev.twunk.system;
+package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -11,12 +11,12 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.TwunkLib;
+import dev.twunk.interfaces.IRegistry;
 import dev.twunk.interfaces.component.IBlockLifetimeComponent;
 import dev.twunk.interfaces.methods.IEntityLifetime;
+import dev.twunk.interfaces.subsystem.IEntityLifetimeSystem;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityLifetimeSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityLifetimeSystem;
-import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import dev.twunk.utils.ComponentUtils;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -42,7 +42,7 @@ import javax.annotation.Nonnull;
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
+public class AutoBlockLifetimeSystem<T extends IBlockLifetimeComponent>
     extends SubSystemOwner<ChunkStore>
     implements IEntityLifetimeSystem<ChunkStore>
 {
@@ -51,7 +51,7 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
 
     private final @Nonnull ComponentType<ChunkStore, T> componentType;
 
-    public BlockLifetimeComponentSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
+    public AutoBlockLifetimeSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
         super(Query.and(supplier.get()));
         final var component = supplier.get();
         if (component == null) {
@@ -62,14 +62,14 @@ public class BlockLifetimeComponentSystem<T extends IBlockLifetimeComponent>
         this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
-    public BlockLifetimeComponentSystem(@Nonnull Class<T> componentClass) {
+    public AutoBlockLifetimeSystem(@Nonnull Class<T> componentClass) {
         super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
         this.componentType = TwunkLib.getChunkComponentType(componentClass);
 
         this.appendSubSystem(EntityLifetimeSubSystem.newSubsystemFor(this));
     }
 
-    public BlockLifetimeComponentSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
+    public AutoBlockLifetimeSystem(@Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
 

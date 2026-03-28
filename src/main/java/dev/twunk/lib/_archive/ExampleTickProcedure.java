@@ -1,4 +1,4 @@
-package dev.twunk._archive;
+package dev.twunk.lib._archive;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.logger.HytaleLogger;

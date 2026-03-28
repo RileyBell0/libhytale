@@ -9,9 +9,9 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.interfaces.subsystem.IEntityTickSystem;
+import dev.twunk.lib.system.AutoBlockTickSystem;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.system.TickableBlockComponentSystem;
 import javax.annotation.Nonnull;
 
 /**
@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  *                           the server code. Seems to be prone to errors)
  *
  * My code
- * @see TickableBlockComponentSystem - System for specifically ticking block entities (gets
+ * @see AutoBlockTickSystem - System for specifically ticking block entities (gets
  *                                     block position, id, etc. then gives that to your tick method)
  * @see EntityTickSubSystem          - SubSystem used by TickableBlockComponentSystem
  *                                     that ticks entities (in our case block entities)

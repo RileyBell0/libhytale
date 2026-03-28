@@ -1,9 +1,9 @@
-package dev.twunk.subsystem.base.interfaces;
+package dev.twunk.interfaces.subsystem;
 
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.IRegistryProvider;
+import dev.twunk.interfaces.IRegistryProvider;
 import dev.twunk.interfaces.methods.IEntityTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.subsystem.base.EntityTickSubSystem;

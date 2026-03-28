@@ -5,8 +5,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.interfaces.subsystem.IEntityTickSystem;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
 import javax.annotation.Nonnull;
 
 /**

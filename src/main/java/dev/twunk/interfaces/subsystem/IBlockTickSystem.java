@@ -1,4 +1,4 @@
-package dev.twunk.subsystem.composite.interfaces;
+package dev.twunk.interfaces.subsystem;
 
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
@@ -6,9 +6,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.interfaces.methods.IBlockTick;
 import dev.twunk.interfaces.methods.IEntityTick;
 import dev.twunk.interfaces.methods.IQuery;
+import dev.twunk.lib.system.AutoBlockTickSystem;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.system.TickableBlockComponentSystem;
 
 /**
  * Gives your system the event handler function it needs to run code for ticking
@@ -27,7 +26,7 @@ import dev.twunk.system.TickableBlockComponentSystem;
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  *
  * My code
- * @see TickableBlockComponentSystem - System for specifically ticking block entities (gets
+ * @see AutoBlockTickSystem - System for specifically ticking block entities (gets
  *                                     block position, id, etc. then gives that to your tick method)
  * @see EntityTickSubSystem          - SubSystem used by TickableBlockComponentSystem
  *                                     that ticks entities (in our case block entities)

@@ -14,8 +14,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.TwunkLib;
 import dev.twunk.interfaces.component.auto.IAutoBlockLifetimeComponent;
 import dev.twunk.interfaces.component.auto.IAutoTickingBlockComponent;
-import dev.twunk.system.BlockLifetimeComponentSystem;
-import dev.twunk.system.TickableBlockComponentSystem;
+import dev.twunk.lib.system.AutoBlockLifetimeSystem;
+import dev.twunk.lib.system.AutoBlockTickSystem;
 import javax.annotation.Nonnull;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
@@ -85,13 +85,13 @@ public abstract class ModPlugin extends JavaPlugin {
         if (IAutoTickingBlockComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
             // just, suppressing unchecked conversions for now
-            new TickableBlockComponentSystem(component).registerTo(this);
+            new AutoBlockTickSystem(component).registerTo(this);
         }
 
         if (IAutoBlockLifetimeComponent.class.isAssignableFrom(myClass)) {
             // Not sure how to fix this type issue in java, know it should work so i'm really not that worried but yeah...
             // just, suppressing unchecked conversions for now
-            new BlockLifetimeComponentSystem(component).registerTo(this);
+            new AutoBlockLifetimeSystem(component).registerTo(this);
         }
 
         return component;

@@ -2,7 +2,8 @@ package dev.twunk.subsystem;
 
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.IRegistryProvider;
+import dev.twunk.interfaces.IRegistryProvider;
+import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.plugin.ModPlugin;
 import java.util.ArrayList;

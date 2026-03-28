@@ -1,4 +1,4 @@
-package dev.twunk.system;
+package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -8,11 +8,11 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.TwunkLib;
+import dev.twunk.interfaces.IRegistry;
 import dev.twunk.interfaces.component.ITickableBlockComponent;
+import dev.twunk.interfaces.subsystem.IEntityTickSystem;
 import dev.twunk.subsystem.SubSystemOwner;
 import dev.twunk.subsystem.base.EntityTickSubSystem;
-import dev.twunk.subsystem.base.interfaces.IEntityTickSystem;
-import dev.twunk.subsystem.composite.interfaces.IRegistry;
 import dev.twunk.utils.BlockUtils;
 import dev.twunk.utils.ComponentUtils;
 import java.util.function.Supplier;
@@ -32,7 +32,7 @@ import javax.annotation.Nonnull;
  * - create a new instance `new TickableBlockComponent<YourComponent>(YourComponentType)`
  * - register the instance to your plugin
  */
-public final class TickableBlockComponentSystem<T extends ITickableBlockComponent>
+public final class AutoBlockTickSystem<T extends ITickableBlockComponent>
     extends SubSystemOwner<ChunkStore>
     implements IEntityTickSystem<ChunkStore>
 {
@@ -41,7 +41,7 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
 
     private final @Nonnull ComponentType<ChunkStore, T> componentType;
 
-    public TickableBlockComponentSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
+    public AutoBlockTickSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
         super(Query.and(supplier.get()));
         final var component = supplier.get();
         if (component == null) {
@@ -52,14 +52,14 @@ public final class TickableBlockComponentSystem<T extends ITickableBlockComponen
         this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
 
-    public TickableBlockComponentSystem(final @Nonnull Class<T> componentClass) {
+    public AutoBlockTickSystem(final @Nonnull Class<T> componentClass) {
         super(Query.and(TwunkLib.getChunkComponentType(componentClass)));
         this.componentType = TwunkLib.getChunkComponentType(componentClass);
 
         this.appendSubSystem(EntityTickSubSystem.newSubsystemFor(this));
     }
 
-    public TickableBlockComponentSystem(final @Nonnull ComponentType<ChunkStore, T> componentType) {
+    public AutoBlockTickSystem(final @Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
 
