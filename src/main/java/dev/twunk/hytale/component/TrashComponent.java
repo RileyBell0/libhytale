@@ -1,7 +1,5 @@
 package dev.twunk.hytale.component;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
@@ -10,7 +8,9 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.annotations.AutoCodec;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
+import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
 import java.util.Map;
@@ -41,44 +41,10 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
-    private static final BuilderCodec<TrashComponent> RAW_CODEC = BuilderCodec.builder(
+    private static final BuilderCodec<TrashComponent> RAW_CODEC = AutoCodecGenerator.build(
         TrashComponent.class,
         TrashComponent::new
-    )
-        .appendInherited(
-            new KeyedCodec<>("Capacity", Codec.SHORT),
-            (self, capacity) -> {
-                if (capacity != null) {
-                    self.capacity = capacity;
-                }
-            },
-            self -> self.capacity,
-            (self, parent) -> self.capacity = parent.capacity
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("CanView", Codec.BOOLEAN),
-            (self, canView) -> {
-                if (canView != null) {
-                    self.canView = canView;
-                }
-            },
-            self -> self.canView,
-            (self, parent) -> self.canView = parent.canView
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("CanOpen", Codec.BOOLEAN),
-            (self, canOpen) -> {
-                if (canOpen != null) {
-                    self.canOpen = canOpen;
-                }
-            },
-            self -> self.canOpen,
-            (self, parent) -> self.canOpen = parent.canOpen
-        )
-        .add()
-        .build();
+    );
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
@@ -97,10 +63,13 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     /////////////////////
     // INSTANCE VARIABLES
     /////////////////////
-
+    @AutoCodec
     private short capacity = DEFAULT_CAPACITY;
 
+    @AutoCodec
     private boolean canView = true;
+
+    @AutoCodec
     private boolean canOpen = true;
 
     @Nonnull
