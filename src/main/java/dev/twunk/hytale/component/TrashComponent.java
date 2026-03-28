@@ -7,7 +7,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBl
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
@@ -34,8 +35,6 @@ import javax.annotation.Nonnull;
  *                                          fulfil to show them in GUI
  *
  * Hytale's code
- * @see ItemContainerState       - The "BlockState" (deprecated) that seems to
- *                                 store container information
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public class TrashComponent<ECS_STORE extends WorldProvider> implements IContainerComponent<ECS_STORE> {
@@ -153,5 +152,14 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     @Override
     public TrashComponent<ECS_STORE> clone() {
         return new TrashComponent<ECS_STORE>(this.capacity);
+    }
+
+    @Override
+    public void setChunk(@Nullable WorldChunk worldChunk) {}
+
+    @Override
+    @Nullable
+    public WorldChunk getWorldChunk() {
+        return null;
     }
 }

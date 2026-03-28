@@ -13,7 +13,6 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.LibHytale;
@@ -36,8 +35,6 @@ import javax.annotation.Nullable;
  *                                          on a block (specifically extensions or implementors of IContainerComponent)
  *
  * Hytale's code that I based my implementation around
- * @see ItemContainerState       - The "BlockState" (deprecated) that seems to
- *                                 store container information
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {

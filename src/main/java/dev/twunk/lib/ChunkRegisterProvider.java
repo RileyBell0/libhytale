@@ -4,7 +4,6 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.HytalePlugin;
-import dev.twunk.hytale.LibHytale;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IRegistry;
 import java.util.HashMap;
@@ -26,17 +25,26 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     > registeredChunkComponentsById = new HashMap<>();
 
     @Nonnull
+    @SuppressWarnings("unchecked")
     public final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getComponentType(
         final @Nonnull Class<T> componentClass
     ) {
-        return LibHytale.getChunkComponentType(componentClass);
+        var componentType = registeredChunkComponents.get(componentClass);
+        if (componentType == null) {
+            throw new RuntimeException(
+                "Called getComponentType on class " + componentClass + " before initialising said class"
+            );
+        }
+
+        // casting is safe as long as i haven't stuffed something up
+        return (ComponentType<ChunkStore, T>) componentType;
     }
 
     @Nullable
     public final ComponentType<ChunkStore, ? extends Component<ChunkStore>> getComponentType(
         final @Nonnull String componentId
     ) {
-        return LibHytale.getChunkComponentType(componentId);
+        return registeredChunkComponentsById.get(componentId);
     }
 
     /**
@@ -49,7 +57,8 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         final @Nonnull Class<T> myClass,
         final @Nonnull String id
     ) {
-        LibHytale.registerChunkComponentType(componentType, myClass, id);
+        registeredChunkComponents.put(myClass, componentType);
+        registeredChunkComponentsById.put(id, componentType);
     }
 
     public final void registerSystem(final @Nonnull HytalePlugin plugin, final @Nonnull ISubSystem<ChunkStore> system) {

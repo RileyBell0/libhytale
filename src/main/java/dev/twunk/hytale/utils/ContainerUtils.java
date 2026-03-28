@@ -113,6 +113,7 @@ public abstract class ContainerUtils {
             windows.remove(uuid, window);
             return;
         }
+        containerComponent.setChunk(chunk);
 
         window.registerCloseEvent(event -> {
             windows.remove(uuid, window);

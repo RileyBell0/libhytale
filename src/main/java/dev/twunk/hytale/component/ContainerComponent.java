@@ -1,20 +1,23 @@
 package dev.twunk.hytale.component;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.annotations.AutoCodec;
+import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * My code
@@ -22,52 +25,16 @@ import javax.annotation.Nonnull;
  *                   show them in GUI
  *
  * Hytale's code
- * @see ItemContainerState       - The "BlockState" (deprecated) that seems to
- *                                 store container information
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
-    private static final BuilderCodec<ContainerComponent> RAW_CODEC = BuilderCodec.builder(
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static final BuilderCodec<ContainerComponent> RAW_CODEC = AutoCodecGenerator.build(
         ContainerComponent.class,
         ContainerComponent::new
-    )
-        // Container codec contains "Capacity" and "Items" fields
-        .append(
-            new KeyedCodec<SimpleItemContainer>("Container", SimpleItemContainer.CODEC),
-            (self, container) -> {
-                if (container != null) {
-                    self.container = container;
-                }
-            },
-            self -> self.container
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("CanView", Codec.BOOLEAN),
-            (self, canView) -> {
-                if (canView != null) {
-                    self.canView = canView;
-                }
-            },
-            self -> self.canView,
-            (self, parent) -> self.canView = parent.canView
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("CanOpen", Codec.BOOLEAN),
-            (self, canOpen) -> {
-                if (canOpen != null) {
-                    self.canOpen = canOpen;
-                }
-            },
-            self -> self.canOpen,
-            (self, parent) -> self.canOpen = parent.canOpen
-        )
-        .add()
-        .build();
+    );
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Nonnull
@@ -87,11 +54,21 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
     // INSTANCE VARIABLES
     /////////////////////
 
+    @AutoCodec
     private boolean canView = true;
+
+    @AutoCodec
     private boolean canOpen = true;
 
+    @Nullable
+    public WorldChunk worldChunk = null;
+
     @Nonnull
+    @AutoCodec
     protected SimpleItemContainer container;
+
+    @Nullable
+    private SimpleItemContainer registeredTo = null;
 
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
@@ -102,14 +79,33 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     public ContainerComponent() {
         this.container = new SimpleItemContainer(DEFAULT_CAPACITY);
+        this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
     }
 
     public ContainerComponent(final short capacity) {
         this.container = new SimpleItemContainer(capacity);
+        this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
     }
 
     public ContainerComponent(final @Nonnull SimpleItemContainer container) {
         this.container = new SimpleItemContainer(container);
+        this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
+    }
+
+    public void setChunk(@Nullable WorldChunk worldChunk) {
+        this.worldChunk = worldChunk;
+    }
+
+    public void onItemChange(ItemContainer.ItemContainerChangeEvent event) {
+        if (this.worldChunk == null) {
+            return;
+        }
+        this.worldChunk.markNeedsSaving();
+    }
+
+    public void setContainer(SimpleItemContainer container) {
+        container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
+        this.container = container;
     }
 
     @Nonnull
@@ -119,6 +115,11 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     @Nonnull
     public SimpleItemContainer getContainer() {
+        if (this.registeredTo != this.container) {
+            this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
+            this.registeredTo = this.container;
+        }
+
         return this.container;
     }
 
@@ -138,5 +139,11 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     public ContainerComponent<ECS_TYPE> clone() {
         return new ContainerComponent<>(this.container);
+    }
+
+    @Override
+    @Nullable
+    public WorldChunk getWorldChunk() {
+        return this.worldChunk;
     }
 }

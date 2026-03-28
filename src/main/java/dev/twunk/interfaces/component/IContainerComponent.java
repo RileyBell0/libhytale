@@ -2,7 +2,6 @@ package dev.twunk.interfaces.component;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import dev.twunk.interfaces.methods.IContainer;
 
 // import dev.twunk.hytale.components.IContainer;
@@ -16,8 +15,6 @@ import dev.twunk.interfaces.methods.IContainer;
  *                   show them in GUI
  *
  * Hytale's code
- * @see ItemContainerState       - The "BlockState" (deprecated) that seems to
- *                                 store container information
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public interface IContainerComponent<ECS_TYPE> extends IContainer, Component<ECS_TYPE> {}
