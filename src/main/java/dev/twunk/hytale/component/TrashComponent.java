@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
  */
 public class TrashComponent<ECS_STORE extends WorldProvider> implements IContainerComponent<ECS_STORE> {
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes" })
     @Nonnull
     private static final BuilderCodec<TrashComponent> RAW_CODEC = AutoCodecGenerator.build(
         TrashComponent.class,

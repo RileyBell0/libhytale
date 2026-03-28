@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
 
     @Nonnull
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes" })
     private static final BuilderCodec<ContainerComponent> RAW_CODEC = AutoCodecGenerator.build(
         ContainerComponent.class,
         ContainerComponent::new

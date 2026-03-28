@@ -12,7 +12,9 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
+import dev.twunk.annotations.AutoCodec;
 import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.hytale.utils.Chat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,47 +36,11 @@ public class LogInteraction extends SimpleInstantInteraction {
      * where to use this
      */
     @Nonnull
-    public static final BuilderCodec<LogInteraction> SINGLE_MESSAGE_CODEC = BuilderCodec.builder(
+    public static final BuilderCodec<LogInteraction> SINGLE_MESSAGE_CODEC = AutoCodecGenerator.process(
         LogInteraction.class,
-        LogInteraction::new,
-        SimpleInstantInteraction.CODEC
+        LogInteraction::new
     )
         .documentation("Debug interaction that sends a message on use.")
-        .appendInherited(
-            new KeyedCodec<>("Message", Codec.STRING, true),
-            (interaction, s) -> interaction.message = s,
-            interaction -> interaction.message,
-            (interaction, parent) -> interaction.message = parent.message
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Color", Codec.STRING, false),
-            (o, v) -> o.color = v,
-            o -> o.color,
-            (o, p) -> o.color = p.color
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Link", Codec.STRING, false),
-            (o, v) -> o.link = v,
-            o -> o.link,
-            (o, p) -> o.link = p.link
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Bold", Codec.BOOLEAN, false),
-            (o, v) -> o.bold = (v != null && v.equals(true)),
-            o -> o.bold,
-            (o, p) -> o.bold = p.bold
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Italic", Codec.BOOLEAN, false),
-            (o, v) -> o.italic = (v != null && v.equals(true)),
-            o -> o.italic,
-            (o, p) -> o.italic = p.italic
-        )
-        .add()
         .build();
 
     /**
@@ -98,20 +64,6 @@ public class LogInteraction extends SimpleInstantInteraction {
         )
         .add()
         .appendInherited(
-            new KeyedCodec<>("Message", Codec.STRING, true),
-            (interaction, s) -> interaction.message = s,
-            interaction -> interaction.message,
-            (interaction, parent) -> interaction.message = parent.message
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Color", Codec.STRING, false),
-            (o, v) -> o.color = v,
-            o -> o.color,
-            (o, p) -> o.color = p.color
-        )
-        .add()
-        .appendInherited(
             new KeyedCodec<>("Level", Codec.STRING, false),
             (o, v) -> {
                 final var level = Level.parse(v);
@@ -125,27 +77,6 @@ public class LogInteraction extends SimpleInstantInteraction {
             (o, p) -> o.level = p.level
         )
         .add()
-        .appendInherited(
-            new KeyedCodec<>("Link", Codec.STRING, false),
-            (o, v) -> o.link = v,
-            o -> o.link,
-            (o, p) -> o.link = p.link
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Bold", Codec.BOOLEAN, false),
-            (o, v) -> o.bold = (v != null && v.equals(true)),
-            o -> o.bold,
-            (o, p) -> o.bold = p.bold
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Italic", Codec.BOOLEAN, false),
-            (o, v) -> o.italic = (v != null && v.equals(true)),
-            o -> o.italic,
-            (o, p) -> o.italic = p.italic
-        )
-        .add()
         .build();
 
     /**
@@ -157,30 +88,35 @@ public class LogInteraction extends SimpleInstantInteraction {
     /**
      * Your overarching message itself
      */
+    @AutoCodec(required = true)
     private String message;
 
     /**
      * OPTIONAL
      * The text color of the message (as hex string, e.g. "#cacaca")
      */
+    @AutoCodec
     private @Nullable String color = null;
 
     /**
      * OPTIONAL
      * A link to associate with your message
      */
+    @AutoCodec
     private @Nullable String link = null;
 
     /**
      * OPTIONAL
      * If your message should be bold
      */
+    @AutoCodec
     private boolean bold = false;
 
     /**
      * OPTIONAL
      * If your message should be italic
      */
+    @AutoCodec
     private boolean italic = false;
 
     /**
