@@ -1,4 +1,4 @@
-package dev.twunk.utils.message;
+package dev.twunk.utils;
 
 import com.hypixel.hytale.protocol.ItemWithAllMetadata;
 import com.hypixel.hytale.protocol.packets.interface_.NotificationStyle;

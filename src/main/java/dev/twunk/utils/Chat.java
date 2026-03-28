@@ -1,4 +1,4 @@
-package dev.twunk.utils.message;
+package dev.twunk.utils;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;

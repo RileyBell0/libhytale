@@ -1,8 +1,9 @@
-package dev.twunk;
+package dev.twunk.lib;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.TwunkLib;
 import dev.twunk.interfaces.IRegistry;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.plugin.ModPlugin;

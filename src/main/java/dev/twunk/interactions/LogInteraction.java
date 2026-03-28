@@ -13,7 +13,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import dev.twunk.plugin.ModPlugin;
-import dev.twunk.utils.message.Chat;
+import dev.twunk.utils.Chat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;

@@ -9,6 +9,8 @@ import dev.twunk.components.TrashComponent;
 import dev.twunk.interactions.LogInteraction;
 import dev.twunk.interactions.OpenContainerComponentInteraction;
 import dev.twunk.interactions.SpawnItemInteraction;
+import dev.twunk.lib.ChunkRegisterProvider;
+import dev.twunk.lib.EntityRegisterProvider;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.lib.test.TwunkDevTestComponent;
 import dev.twunk.plugin.ModPlugin;
