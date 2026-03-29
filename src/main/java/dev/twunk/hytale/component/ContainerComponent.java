@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import dev.twunk.annotations.RegisteredComponent;
+import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * Hytale's code
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
-@RegisteredComponent
+@Serializable
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE>, IPersistentContainer {
 
     private static final short DEFAULT_CAPACITY = 10;

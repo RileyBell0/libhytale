@@ -4,7 +4,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBl
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.annotations.RegisteredComponent;
+import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.interfaces.component.IContainerComponent;
@@ -32,7 +32,7 @@ import javax.annotation.Nonnull;
  * Hytale's code
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
-@RegisteredComponent
+@Serializable
 public class TrashComponent<ECS_STORE extends WorldProvider> implements IContainerComponent<ECS_STORE> {
 
     private static final short DEFAULT_CAPACITY = 45;

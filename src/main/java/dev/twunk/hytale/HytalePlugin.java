@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.annotations.Serializable;
 import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.interfaces.component.IBlockTickComponent;
 import dev.twunk.interfaces.component.ILifetimeComponent;
@@ -86,7 +87,7 @@ public abstract class HytalePlugin extends JavaPlugin {
 
         this.initCommonSystemsFor(clazz, component);
 
-        if (clazz.isAnnotationPresent(dev.twunk.annotations.RegisteredComponent.class)) {
+        if (clazz.isAnnotationPresent(dev.twunk.annotations.Serializable.class)) {
             if (IBlockTickComponent.class.isAssignableFrom(clazz)) {
                 new AutoBlockTickSystem(component).registerTo(this);
             }
@@ -95,12 +96,28 @@ public abstract class HytalePlugin extends JavaPlugin {
         return component;
     }
 
+    @Nonnull
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
+        final @Nonnull Class<T> clazz
+    ) {
+        Object rawCodec;
+        rawCodec = AutoCodecGenerator.tryGetCodec(clazz);
+        if (!BuilderCodec.class.isAssignableFrom(rawCodec.getClass())) {
+            throw new RuntimeException("Failed to get codec for class " + clazz);
+        }
+
+        final BuilderCodec codec = (BuilderCodec) rawCodec;
+
+        return registerChunkComponent(codec);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> void initCommonSystemsFor(
         @Nonnull Class<T> clazz,
         @Nonnull ComponentType<ECS_STORE, T> componentType
     ) {
-        if (!clazz.isAnnotationPresent(dev.twunk.annotations.RegisteredComponent.class)) {
+        if (!clazz.isAnnotationPresent(Serializable.class)) {
             return;
         }
 
@@ -124,13 +141,10 @@ public abstract class HytalePlugin extends JavaPlugin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends Component> void registerCommonComponent(final @Nonnull Class<T> clazz) {
         final var defaultId = clazz.getName();
-        Object rawCodec;
-        rawCodec = AutoCodecGenerator.tryGetCodec(clazz);
-        if (!BuilderCodec.class.isAssignableFrom(rawCodec.getClass())) {
+        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
-
-        final BuilderCodec codec = (BuilderCodec) rawCodec;
 
         console.log("Adding component " + defaultId + " -- from class " + clazz);
         if (defaultId == null) {
@@ -138,14 +152,26 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
 
         // Store our component in the global register
-        var chunkComponent = this.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
+        final var chunkComponent = this.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
         LibHytale.registerChunkComponentType(chunkComponent, clazz, defaultId);
 
-        var entityComponent = this.getEntityStoreRegistry().registerComponent(clazz, defaultId, codec);
+        final var entityComponent = this.getEntityStoreRegistry().registerComponent(clazz, defaultId, codec);
         LibHytale.registerEntityComponentType(entityComponent, clazz, defaultId);
 
         this.initCommonSystemsFor(clazz, chunkComponent);
         this.initCommonSystemsFor(clazz, entityComponent);
+    }
+
+    @Nonnull
+    public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
+        final @Nonnull Class<T> clazz
+    ) {
+        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+            throw new RuntimeException("Failed to get codec for class " + clazz);
+        }
+
+        return registerEntityComponent(codec);
     }
 
     @Nonnull
@@ -171,6 +197,21 @@ public abstract class HytalePlugin extends JavaPlugin {
         this.initCommonSystemsFor(clazz, component);
 
         return component;
+    }
+
+    @Nonnull
+    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(final @Nonnull Class<T> clazz) {
+        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+            throw new RuntimeException("Failed to get codec for class " + clazz);
+        }
+
+        final var defaultId = clazz.getName();
+        if (defaultId == null) {
+            throw new RuntimeException("Failed to get classname while registering interaction with codec " + codec);
+        }
+
+        return registerInteraction(codec, defaultId);
     }
 
     @Nonnull

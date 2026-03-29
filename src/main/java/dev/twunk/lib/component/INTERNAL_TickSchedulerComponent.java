@@ -3,7 +3,7 @@ package dev.twunk.lib.component;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.annotations.RegisteredComponent;
+import dev.twunk.annotations.Serializable;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.lifetime.TrackedEntity;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  *
  * but to be fair, stupid stuff is fun stuff
  */
-@RegisteredComponent
+@Serializable
 public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> implements Component<ECS_STORE> {
 
     /**

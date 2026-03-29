@@ -35,12 +35,12 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *                      and run your MUTATION methods using the `store` within the lambda
      *                      you pass to `commandBuffer.run(...)`
      */
-    public void onEntityAdded(
+    public default void onEntityAdded(
         final @Nonnull Ref<ECS_STORE> ref,
         final @Nonnull AddReason reason,
         final @Nonnull Store<ECS_STORE> store,
         final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
-    );
+    ) {}
 
     /**
      * Event for when an entity is removed/unloaded from the world
@@ -54,10 +54,10 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *                      and run your MUTATION methods using the `store` within the lambda
      *                      you pass to `commandBuffer.run(...)`
      */
-    public void onEntityRemove(
+    public default void onEntityRemove(
         final @Nonnull Ref<ECS_STORE> ref,
         final @Nonnull RemoveReason reason,
         final @Nonnull Store<ECS_STORE> store,
         final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
-    );
+    ) {}
 }

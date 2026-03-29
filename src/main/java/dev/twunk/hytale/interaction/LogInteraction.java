@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
+import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.utils.AutoCodecGenerator;
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
  *
  * Useful for light printf debugging interactions in-game
  */
+@Serializable
 public class LogInteraction extends SimpleInstantInteraction {
 
     /**
@@ -36,7 +38,7 @@ public class LogInteraction extends SimpleInstantInteraction {
      * where to use this
      */
     @Nonnull
-    public static final BuilderCodec<LogInteraction> SINGLE_MESSAGE_CODEC = AutoCodecGenerator.process(
+    public static final BuilderCodec<LogInteraction> SINGLE_MESSAGE_CODEC = AutoCodecGenerator.builder(
         LogInteraction.class,
         LogInteraction::new
     )

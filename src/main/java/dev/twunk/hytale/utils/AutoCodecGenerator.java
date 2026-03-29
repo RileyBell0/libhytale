@@ -3,15 +3,19 @@ package dev.twunk.hytale.utils;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.Component;
-import dev.twunk.annotations.RegisteredComponent;
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.lang.model.type.NullType;
 
 public final class AutoCodecGenerator {
+
+    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     @Nonnull
     private static final String normaliseFieldName(Field field) {
@@ -23,15 +27,36 @@ public final class AutoCodecGenerator {
     }
 
     @Nonnull
-    public static final <T> BuilderCodec<T> build(Class<T> clazz, Supplier<T> supplier) {
-        return process(clazz, supplier).build();
+    public static final <T> BuilderCodec<T> build(@Nonnull Class<T> clazz, @Nonnull Supplier<T> supplier) {
+        return builder(clazz, supplier).build();
     }
 
     @Nonnull
-    public static final <T> BuilderCodec.Builder<T> process(Class<T> clazz, Supplier<T> supplier) {
+    public static final <T> BuilderCodec.Builder<T> builder(@Nonnull Class<T> clazz, @Nonnull Supplier<T> supplier) {
         var fields = clazz.getDeclaredFields();
+        console.log(clazz.toString());
+        var registeredComponent = clazz.getAnnotation(Serializable.class);
+        var inherits = registeredComponent.inherits();
 
-        var builder = BuilderCodec.builder(clazz, supplier);
+        if (!inherits.equals(NullType.class) && !inherits.isAssignableFrom(clazz)) {
+            throw new RuntimeException(
+                "ERROR: class of which this inherits a codec from MUST BE a superclass of the class you're in, fuck idk how to write this | " +
+                    inherits +
+                    " | " +
+                    clazz
+            );
+        }
+
+        var inheritedCodec = tryGetInheritedCodec((Class<? super T>) inherits, clazz);
+
+        @Nonnull
+        BuilderCodec.Builder<T> builder;
+        if (inheritedCodec == null) {
+            builder = BuilderCodec.builder(clazz, supplier);
+        } else {
+            builder = BuilderCodec.builder(clazz, supplier, inheritedCodec);
+        }
+
         for (var field : fields) {
             if (!field.isAnnotationPresent(Serialize.class)) {
                 continue;
@@ -64,10 +89,62 @@ public final class AutoCodecGenerator {
         return builder;
     }
 
-    private static final <T> BuilderCodec.Builder<T> appendCodec(
+    @Nullable
+    public static final <T extends U, U> BuilderCodec<U> tryGetInheritedCodec(
+        @Nonnull Class<U> clazz,
+        @Nonnull Class<T> parent
+    ) {
+        if (clazz.equals(NullType.class)) {
+            return null;
+        }
+        if (!parent.isAnnotationPresent(Serializable.class)) {
+            return null;
+        }
+
+        var parentSerializable = parent.getAnnotation(Serializable.class);
+
+        // Priority 1: if the class we're inherting a codec from has been annotated
+        // with RegisteredComponent, we'll recurse
+        if (clazz.isAnnotationPresent(Serializable.class)) {
+            return tryGetCodec(clazz);
+        }
+
+        // Priority 2: Look in the field with the name the parent assumed CODEC might be in
+        try {
+            var fieldName = parentSerializable.codecField();
+            var codecField = clazz.getField(fieldName);
+            if (!BuilderCodec.class.isAssignableFrom(codecField.getType())) {
+                return null;
+            }
+
+            // GOOD. We found a field which contains a codec
+            Object codec;
+            codec = codecField.get(clazz);
+            if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+                return null;
+            }
+
+            return (BuilderCodec<U>) codec;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nonnull
+    private static final <T, U> BuilderCodec.Builder<T> appendCodec(
         @Nonnull BuilderCodec.Builder<T> builder,
         @Nonnull Field field,
-        @Nonnull BuilderCodec codec
+        @Nonnull BuilderCodec<U> codec
     ) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
@@ -107,6 +184,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
+    @Nonnull
     private static final <T> BuilderCodec.Builder<T> appendBoolean(
         @Nonnull BuilderCodec.Builder<T> builder,
         @Nonnull Field field
@@ -147,6 +225,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
+    @Nonnull
     private static final <T> BuilderCodec.Builder<T> appendString(
         @Nonnull BuilderCodec.Builder<T> builder,
         @Nonnull Field field
@@ -187,6 +266,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
+    @Nonnull
     private static final <T> BuilderCodec.Builder<T> appendShort(
         @Nonnull BuilderCodec.Builder<T> builder,
         @Nonnull Field field
@@ -228,8 +308,8 @@ public final class AutoCodecGenerator {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static final <T extends Component> BuilderCodec<T> tryGetCodec(Class<T> clazz) {
-        if (!clazz.isAnnotationPresent(RegisteredComponent.class)) {
+    public static final <T> BuilderCodec<T> tryGetCodec(Class<T> clazz) {
+        if (!clazz.isAnnotationPresent(Serializable.class)) {
             return null;
         }
 
