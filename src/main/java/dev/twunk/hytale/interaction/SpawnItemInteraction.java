@@ -1,20 +1,14 @@
 package dev.twunk.hytale.interaction;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
-import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
-import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.utils.ItemUtils;
 import javax.annotation.Nonnull;
 
@@ -24,9 +18,6 @@ import javax.annotation.Nonnull;
  */
 @Serializable(inherits = SimpleInstantInteraction.class)
 public class SpawnItemInteraction extends SimpleInstantInteraction {
-
-    @Nonnull
-    private String direction = "none";
 
     @Nonnull
     @Serialize
@@ -41,54 +32,6 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
 
     @Serialize(min = 1)
     private int quantity = 1;
-
-    @Nonnull
-    public static final BuilderCodec<SpawnItemInteraction> CODEC = BuilderCodec.builder(
-        SpawnItemInteraction.class,
-        SpawnItemInteraction::new,
-        SimpleInstantInteraction.CODEC
-    )
-        .appendInherited(
-            new KeyedCodec<>("Dir", Codec.STRING, false),
-            (o, v) -> {
-                final var dir = v.trim().toLowerCase();
-                if (
-                    dir.equals("none") ||
-                    dir.equals("up") ||
-                    dir.equals("down") ||
-                    dir.equals("left") ||
-                    dir.equals("right") ||
-                    dir.equals("front") ||
-                    dir.equals("back")
-                ) {
-                    o.direction = dir;
-                }
-            },
-            o -> o.direction,
-            (o, p) -> o.direction = p.direction
-        )
-        .add()
-        .build();
-
-    @Nonnull
-    public static final Vector3i getDirectionOffset(final @Nonnull String direction) {
-        switch (direction) {
-            case "down":
-                return new Vector3i(0, -1, 0);
-            case "right":
-                return new Vector3i(1, 0, 0);
-            case "left":
-                return new Vector3i(-1, 0, 0);
-            case "front":
-                return new Vector3i(0, 0, 1);
-            case "back":
-                return new Vector3i(0, 0, -1);
-            case "up":
-                return new Vector3i(0, 1, 0);
-            default:
-                return new Vector3i(0, 0, 0);
-        }
-    }
 
     @Override
     protected void firstRun(
@@ -112,35 +55,20 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
         }
 
         @Nonnull
-        final Vector3i coords;
+        Vector3i coords;
         if (this.at != null) {
-            coords = this.at.add(getDirectionOffset(this.direction)).add(this.offset);
+            coords = this.at;
         } else {
             final var targetBlockPos = interactionContext.getTargetBlock();
             if (targetBlockPos == null) {
                 return;
             }
 
-            coords = new Vector3i(targetBlockPos.x, targetBlockPos.y, targetBlockPos.z)
-                .add(getDirectionOffset(this.direction))
-                .add(this.offset);
+            coords = new Vector3i(targetBlockPos.x, targetBlockPos.y, targetBlockPos.z);
         }
 
+        coords = coords.add(this.offset);
+
         ItemUtils.spawn(playerRef, commandBuffer, coords, new ItemStack(this.itemId, this.quantity));
-    }
-
-    @Nonnull
-    @SuppressWarnings("null")
-    public final String getId() {
-        return this.getClass().getName();
-    }
-
-    @Nonnull
-    public final BuilderCodec<SpawnItemInteraction> getCodec() {
-        return SpawnItemInteraction.CODEC;
-    }
-
-    protected Assets<Interaction, ?> registerToPlugin(final @Nonnull HytalePlugin plugin) {
-        return plugin.getCodecRegistry(Interaction.CODEC).register(this.getId(), this.getClass(), this.getCodec());
     }
 }
