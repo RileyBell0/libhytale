@@ -4,7 +4,6 @@ import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.FastRandom;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
@@ -22,9 +21,6 @@ import javax.annotation.Nullable;
  *
  */
 public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.ItemUtils {
-
-    @SuppressWarnings("unused")
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     private static final float DEFAULT_VELOCITY = 1.5F;
 

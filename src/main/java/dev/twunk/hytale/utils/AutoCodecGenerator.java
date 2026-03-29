@@ -307,13 +307,12 @@ public final class AutoCodecGenerator {
             .add();
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static final <T> BuilderCodec<T> tryGetCodec(Class<T> clazz) {
         if (!clazz.isAnnotationPresent(Serializable.class)) {
             return null;
         }
 
-        final Supplier supplier = () -> {
+        final Supplier<T> supplier = () -> {
             try {
                 return clazz.getConstructor().newInstance();
             } catch (InstantiationException e) {
@@ -336,6 +335,6 @@ public final class AutoCodecGenerator {
                 return null;
             }
         };
-        return (BuilderCodec<T>) (BuilderCodec) AutoCodecGenerator.build(clazz, supplier);
+        return AutoCodecGenerator.build(clazz, supplier);
     }
 }

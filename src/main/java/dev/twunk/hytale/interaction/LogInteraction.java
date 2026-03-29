@@ -9,12 +9,9 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
-import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
-import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.hytale.utils.Chat;
 import java.util.ArrayList;
@@ -127,21 +124,6 @@ public class LogInteraction extends SimpleInstantInteraction {
      */
     @SuppressWarnings("null")
     private @Nonnull Level level = Level.INFO;
-
-    @Nonnull
-    @SuppressWarnings("null")
-    public final String getId() {
-        return this.getClass().getName();
-    }
-
-    @Nonnull
-    public final BuilderCodec<LogInteraction> getCodec() {
-        return LogInteraction.CODEC;
-    }
-
-    protected Assets<Interaction, ?> registerToPlugin(final @Nonnull HytalePlugin plugin) {
-        return plugin.getCodecRegistry(Interaction.CODEC).register(this.getId(), this.getClass(), this.getCodec());
-    }
 
     /**
      * Runs the interaction.

@@ -97,17 +97,13 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     @Nonnull
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
         final @Nonnull Class<T> clazz
     ) {
-        Object rawCodec;
-        rawCodec = AutoCodecGenerator.tryGetCodec(clazz);
-        if (!BuilderCodec.class.isAssignableFrom(rawCodec.getClass())) {
+        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
-
-        final BuilderCodec codec = (BuilderCodec) rawCodec;
 
         return registerChunkComponent(codec);
     }
