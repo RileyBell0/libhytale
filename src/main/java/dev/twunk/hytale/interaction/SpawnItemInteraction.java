@@ -22,15 +22,17 @@ import javax.annotation.Nonnull;
  * @see com.hypixel.hytale.server.core.entity.ItemUtils I based most of my implementation on this
  * @see dev.twunk.hytale.utils.ItemUtils I extended hytales ItemUtils a bit, so my implementation uses this alot
  */
-@Serializable
+@Serializable(inherits = SimpleInstantInteraction.class)
 public class SpawnItemInteraction extends SimpleInstantInteraction {
 
     @Nonnull
     private String direction = "none";
 
     @Nonnull
+    @Serialize
     private Vector3i offset = new Vector3i(0, 0, 0);
 
+    @Serialize
     private Vector3i at = null;
 
     @Nonnull
@@ -64,40 +66,6 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
             },
             o -> o.direction,
             (o, p) -> o.direction = p.direction
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Offset", Codec.INT_ARRAY, false),
-            (o, v) -> {
-                if (v.length != 3) {
-                    return;
-                }
-                o.offset = new Vector3i(v[0], v[1], v[2]);
-            },
-            o -> {
-                int[] offsets = { o.offset.x, o.offset.y, o.offset.z };
-                return offsets;
-            },
-            (o, p) -> o.offset = p.offset
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("At", Codec.INT_ARRAY, false),
-            (o, v) -> {
-                if (v.length != 3) {
-                    return;
-                }
-                o.at = new Vector3i(v[0], v[1], v[2]);
-            },
-            o -> {
-                if (o.at == null) {
-                    return null;
-                }
-
-                final int[] coords = { o.at.x, o.at.y, o.at.z };
-                return coords;
-            },
-            (o, p) -> o.at = p.at
         )
         .add()
         .build();

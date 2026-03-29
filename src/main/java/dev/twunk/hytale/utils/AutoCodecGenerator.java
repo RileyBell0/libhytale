@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.math.vector.Vector3i;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.LibHytale;
@@ -76,6 +77,7 @@ public final class AutoCodecGenerator {
                 if (codec != null && BuilderCodec.class.isAssignableFrom(codec.getClass())) {
                     field.setAccessible(true);
                     builder = appendCodec(builder, field, (BuilderCodec) codec);
+                    continue;
                 }
             } catch (Exception e) {}
 
@@ -90,6 +92,8 @@ public final class AutoCodecGenerator {
                 builder = appendComponentType(builder, field);
             } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
                 builder = appendInt(builder, field);
+            } else if (fieldClass.equals(Vector3i.class)) {
+                builder = appendVector3i(builder, field);
             }
         }
 
@@ -266,7 +270,7 @@ public final class AutoCodecGenerator {
                 (self, val) -> {
                     if (val != null) {
                         try {
-                            field.set(self, (boolean) val);
+                            field.set(self, val);
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         } catch (IllegalAccessException e) {
@@ -276,7 +280,7 @@ public final class AutoCodecGenerator {
                 },
                 self -> {
                     try {
-                        return (Boolean) field.get(self);
+                        return field.getBoolean(self);
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
@@ -307,7 +311,7 @@ public final class AutoCodecGenerator {
                 (self, val) -> {
                     if (val != null) {
                         try {
-                            field.set(self, (String) val);
+                            field.set(self, val);
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         } catch (IllegalAccessException e) {
@@ -347,9 +351,9 @@ public final class AutoCodecGenerator {
             .append(
                 new KeyedCodec<>(name, Codec.SHORT, required),
                 (self, val) -> {
-                    if (val != null && (short) val >= minVal) {
+                    if (val != null && val >= minVal) {
                         try {
-                            field.set(self, (short) val);
+                            field.set(self, val);
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         } catch (IllegalAccessException e) {
@@ -359,7 +363,7 @@ public final class AutoCodecGenerator {
                 },
                 self -> {
                     try {
-                        return (short) field.get(self);
+                        return field.getShort(self);
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
@@ -389,9 +393,9 @@ public final class AutoCodecGenerator {
             .append(
                 new KeyedCodec<>(name, Codec.INTEGER, required),
                 (self, val) -> {
-                    if (val != null && (int) val >= minVal) {
+                    if (val != null && val >= minVal) {
                         try {
-                            field.set(self, (int) val);
+                            field.set(self, val);
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         } catch (IllegalAccessException e) {
@@ -401,7 +405,53 @@ public final class AutoCodecGenerator {
                 },
                 self -> {
                     try {
-                        return (int) field.get(self);
+                        return field.getInt(self);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
+    }
+
+    @Nonnull
+    private static final <T> BuilderCodec.Builder<T> appendVector3i(
+        @Nonnull BuilderCodec.Builder<T> builder,
+        @Nonnull Field field
+    ) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+
+        field.setAccessible(true);
+        return builder
+            .append(
+                new KeyedCodec<>(name, Codec.INT_ARRAY, required),
+                (self, val) -> {
+                    if (val.length != 3) {
+                        return;
+                    }
+
+                    try {
+                        field.set(self, new Vector3i(val[0], val[1], val[2]));
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                },
+                self -> {
+                    try {
+                        var vec = (Vector3i) field.get(self);
+
+                        final int[] coords = { vec.x, vec.y, vec.z };
+                        return coords;
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
