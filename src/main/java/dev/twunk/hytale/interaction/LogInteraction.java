@@ -12,8 +12,8 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
-import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.hytale.utils.Chat;
+import dev.twunk.lib.AutoCodecGenerator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;

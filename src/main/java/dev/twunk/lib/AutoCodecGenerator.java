@@ -1,11 +1,10 @@
-package dev.twunk.hytale.utils;
+package dev.twunk.lib;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3i;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.LibHytale;
@@ -17,9 +16,17 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.lang.model.type.NullType;
 
+/**
+ * Really handly util, takes the annotations i supply for serialization and turns them into codecs.
+ *
+ * Hiding it away in here since if you're actually trying to find this code, you will, and
+ * nobody else needs to be confused by it when they're learning programming (probably) and modding
+ * in general.
+ *
+ * I figure you've got a sense of what you're doing, so, yeah, welcome, enjoy your stay,
+ * and feel free to leave a PR or advice etc on how to make this less spaghetti and more, neat.
+ */
 public final class AutoCodecGenerator {
-
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     @Nonnull
     private static final String normaliseFieldName(Field field) {
@@ -38,7 +45,6 @@ public final class AutoCodecGenerator {
     @Nonnull
     public static final <T> BuilderCodec.Builder<T> builder(@Nonnull Class<T> clazz, @Nonnull Supplier<T> supplier) {
         var fields = clazz.getDeclaredFields();
-        console.log(clazz.toString());
         var registeredComponent = clazz.getAnnotation(Serializable.class);
         var inherits = registeredComponent.inherits();
 
@@ -127,8 +133,7 @@ public final class AutoCodecGenerator {
             }
 
             // GOOD. We found a field which contains a codec
-            Object codec;
-            codec = codecField.get(clazz);
+            Object codec = codecField.get(clazz);
             if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
                 return null;
             }
