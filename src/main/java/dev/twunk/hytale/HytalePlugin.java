@@ -67,34 +67,28 @@ public abstract class HytalePlugin extends JavaPlugin {
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
         final @Nonnull BuilderCodec<T> codec
     ) {
-        final Class<T> myClass = codec.getInnerClass();
-        final var defaultId = myClass.getName();
+        final Class<T> clazz = codec.getInnerClass();
+        final var defaultId = clazz.getName();
 
-        console.log("Adding component " + defaultId + " -- from class " + myClass);
+        console.log("Adding component " + defaultId + " -- from class " + clazz);
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }
 
         final ComponentType<ChunkStore, T> component = this.getChunkStoreRegistry().registerComponent(
-            myClass,
+            clazz,
             defaultId,
             codec
         );
 
         // Store our component in the global register
-        LibHytale.registerChunkComponentType(component, myClass, defaultId);
+        LibHytale.registerChunkComponentType(component, clazz, defaultId);
 
-        if (myClass.isAnnotationPresent(dev.twunk.annotations.RegisteredComponent.class)) {
-            if (IBlockTickComponent.class.isAssignableFrom(myClass)) {
+        this.initCommonSystemsFor(clazz, component);
+
+        if (clazz.isAnnotationPresent(dev.twunk.annotations.RegisteredComponent.class)) {
+            if (IBlockTickComponent.class.isAssignableFrom(clazz)) {
                 new AutoBlockTickSystem(component).registerTo(this);
-            }
-
-            if (ITickComponent.class.isAssignableFrom(myClass)) {
-                // TODO
-            }
-
-            if (ILifetimeComponent.class.isAssignableFrom(myClass)) {
-                new AutoBlockLifetimeSystem(component).registerTo(this);
             }
         }
 
@@ -158,21 +152,23 @@ public abstract class HytalePlugin extends JavaPlugin {
     public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
         final @Nonnull BuilderCodec<T> codec
     ) {
-        final Class<T> myClass = codec.getInnerClass();
-        final var defaultId = myClass.getName();
-        console.log("Adding component " + defaultId + " -- from class " + myClass);
+        final Class<T> clazz = codec.getInnerClass();
+        final var defaultId = clazz.getName();
+        console.log("Adding component " + defaultId + " -- from class " + clazz);
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }
 
         final ComponentType<EntityStore, T> component = this.getEntityStoreRegistry().registerComponent(
-            myClass,
+            clazz,
             defaultId,
             codec
         );
 
         // Store our component in the global register
-        LibHytale.registerEntityComponentType(component, myClass, defaultId);
+        LibHytale.registerEntityComponentType(component, clazz, defaultId);
+
+        this.initCommonSystemsFor(clazz, component);
 
         return component;
     }
