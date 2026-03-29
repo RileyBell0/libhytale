@@ -3,8 +3,11 @@ package dev.twunk.hytale.utils;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.Component;
+import dev.twunk.annotations.RegisteredComponent;
 import dev.twunk.annotations.Serialize;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
@@ -222,5 +225,37 @@ public final class AutoCodecGenerator {
                 }
             )
             .add();
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static final <T extends Component> BuilderCodec<T> tryGetCodec(Class<T> clazz) {
+        if (!clazz.isAnnotationPresent(RegisteredComponent.class)) {
+            return null;
+        }
+
+        final Supplier supplier = () -> {
+            try {
+                return clazz.getConstructor().newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return null;
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+                return null;
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+                return null;
+            } catch (SecurityException e) {
+                e.printStackTrace();
+                return null;
+            }
+        };
+        return (BuilderCodec<T>) (BuilderCodec) AutoCodecGenerator.build(clazz, supplier);
     }
 }

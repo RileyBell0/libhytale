@@ -1,16 +1,13 @@
 package dev.twunk.hytale.component;
 
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.annotations.RegisteredComponent;
 import dev.twunk.annotations.Serialize;
-import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
 import java.util.Map;
@@ -27,26 +24,8 @@ import javax.annotation.Nullable;
  * Hytale's code
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
+@RegisteredComponent
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
-
-    @Nonnull
-    @SuppressWarnings({ "rawtypes" })
-    private static final BuilderCodec<ContainerComponent> RAW_CODEC = AutoCodecGenerator.build(
-        ContainerComponent.class,
-        ContainerComponent::new
-    );
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Nonnull
-    public static final BuilderCodec<ContainerComponent<EntityStore>> ENTITY_CODEC = (BuilderCodec<
-        ContainerComponent<EntityStore>
-    >) ((BuilderCodec) RAW_CODEC);
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Nonnull
-    public static final BuilderCodec<ContainerComponent<ChunkStore>> CHUNK_CODEC = (BuilderCodec<
-        ContainerComponent<ChunkStore>
-    >) ((BuilderCodec) RAW_CODEC);
 
     private static final short DEFAULT_CAPACITY = 10;
 

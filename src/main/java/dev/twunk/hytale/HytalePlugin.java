@@ -9,8 +9,10 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.interfaces.component.IBlockTickComponent;
 import dev.twunk.interfaces.component.ILifetimeComponent;
 import dev.twunk.interfaces.component.ITickComponent;
@@ -82,7 +84,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         // Store our component in the global register
         LibHytale.registerChunkComponentType(component, myClass, defaultId);
 
-        if (myClass.isAnnotationPresent(dev.twunk.annotations.HytaleComponent.class)) {
+        if (myClass.isAnnotationPresent(dev.twunk.annotations.RegisteredComponent.class)) {
             if (IBlockTickComponent.class.isAssignableFrom(myClass)) {
                 new AutoBlockTickSystem(component).registerTo(this);
             }
@@ -97,6 +99,58 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
 
         return component;
+    }
+
+    private final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> void initCommonSystemsFor(
+        Class<T> clazz,
+        ComponentType<?, T> componentType
+    ) {
+        if (!clazz.isAnnotationPresent(dev.twunk.annotations.RegisteredComponent.class)) {
+            return;
+        }
+
+        if (ITickComponent.class.isAssignableFrom(clazz)) {
+            // TODO
+        }
+
+        if (ILifetimeComponent.class.isAssignableFrom(clazz)) {
+            new AutoBlockLifetimeSystem(componentType).registerTo(this);
+        }
+    }
+
+    /**
+     * Register the specified component via codec. Does NOT setup
+     * system/initialiser.
+     * Useful especially for non-ticking components
+     *
+     * If you want that to be auto-registered, call `registerTickingComponent`
+     * instead
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public <T extends Component> void registerCommonComponent(final @Nonnull Class<T> clazz) {
+        final var defaultId = clazz.getName();
+        Object rawCodec;
+        rawCodec = AutoCodecGenerator.tryGetCodec(clazz);
+        if (!BuilderCodec.class.isAssignableFrom(rawCodec.getClass())) {
+            throw new RuntimeException("Failed to get codec for class " + clazz);
+        }
+
+        final BuilderCodec codec = (BuilderCodec) rawCodec;
+
+        console.log("Adding component " + defaultId + " -- from class " + clazz);
+        if (defaultId == null) {
+            throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
+        }
+
+        // Store our component in the global register
+        var chunkComponent = this.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
+        LibHytale.registerChunkComponentType(chunkComponent, clazz, defaultId);
+
+        var entityComponent = this.getEntityStoreRegistry().registerComponent(clazz, defaultId, codec);
+        LibHytale.registerEntityComponentType(entityComponent, clazz, defaultId);
+
+        this.initCommonSystemsFor(clazz, chunkComponent);
+        this.initCommonSystemsFor(clazz, entityComponent);
     }
 
     @Nonnull

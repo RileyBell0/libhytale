@@ -66,8 +66,7 @@ public abstract class LibHytale {
 
         // i use this to tset some stuff
         TwunkDevTestComponent.COMPONENT_TYPE = plugin.registerChunkComponent(TwunkDevTestComponent.CODEC);
-        plugin.registerChunkComponent(ContainerComponent.CHUNK_CODEC);
-        plugin.registerEntityComponent(ContainerComponent.ENTITY_CODEC);
+        plugin.registerCommonComponent(ContainerComponent.class);
         plugin.registerChunkComponent(TrashComponent.CHUNK_CODEC);
         plugin.registerEntityComponent(TrashComponent.ENTITY_CODEC);
 
