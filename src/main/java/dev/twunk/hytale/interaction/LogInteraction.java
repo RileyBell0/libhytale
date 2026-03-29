@@ -46,7 +46,6 @@ public class LogInteraction extends SimpleInstantInteraction {
      * The overall log itself
      * Suppressing "null" from `Level.INFO`
      */
-    @SuppressWarnings("null")
     @Nonnull
     public static final BuilderCodec<LogInteraction> CODEC = BuilderCodec.builder(
         LogInteraction.class,
@@ -66,9 +65,7 @@ public class LogInteraction extends SimpleInstantInteraction {
             new KeyedCodec<>("Level", Codec.STRING, false),
             (o, v) -> {
                 final var level = Level.parse(v);
-                if (level == null) {
-                    o.level = Level.INFO;
-                } else {
+                if (level != null) {
                     o.level = level;
                 }
             },
