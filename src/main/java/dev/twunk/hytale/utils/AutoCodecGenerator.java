@@ -92,8 +92,6 @@ public final class AutoCodecGenerator {
                 builder = appendComponentType(builder, field);
             } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
                 builder = appendInt(builder, field);
-            } else if (fieldClass.equals(Vector3i.class)) {
-                builder = appendVector3i(builder, field);
             }
         }
 
@@ -406,52 +404,6 @@ public final class AutoCodecGenerator {
                 self -> {
                     try {
                         return field.getInt(self);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            )
-            .add();
-    }
-
-    @Nonnull
-    private static final <T> BuilderCodec.Builder<T> appendVector3i(
-        @Nonnull BuilderCodec.Builder<T> builder,
-        @Nonnull Field field
-    ) {
-        final var annotation = field.getAnnotation(Serialize.class);
-        var name = annotation.key();
-        var required = annotation.required();
-        if (name.isEmpty()) {
-            name = normaliseFieldName(field);
-        }
-
-        field.setAccessible(true);
-        return builder
-            .append(
-                new KeyedCodec<>(name, Codec.INT_ARRAY, required),
-                (self, val) -> {
-                    if (val.length != 3) {
-                        return;
-                    }
-
-                    try {
-                        field.set(self, new Vector3i(val[0], val[1], val[2]));
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                },
-                self -> {
-                    try {
-                        var vec = (Vector3i) field.get(self);
-
-                        final int[] coords = { vec.x, vec.y, vec.z };
-                        return coords;
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
