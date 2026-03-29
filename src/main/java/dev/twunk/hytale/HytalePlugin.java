@@ -101,9 +101,10 @@ public abstract class HytalePlugin extends JavaPlugin {
         return component;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> void initCommonSystemsFor(
-        Class<T> clazz,
-        ComponentType<?, T> componentType
+        @Nonnull Class<T> clazz,
+        @Nonnull ComponentType<ECS_STORE, T> componentType
     ) {
         if (!clazz.isAnnotationPresent(dev.twunk.annotations.RegisteredComponent.class)) {
             return;
