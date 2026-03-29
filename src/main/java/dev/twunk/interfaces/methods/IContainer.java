@@ -3,18 +3,15 @@ package dev.twunk.interfaces.methods;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
-import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * My code
@@ -43,20 +40,4 @@ public interface IContainer {
     // Hytale src code (deprecated) called this `isAllowViewing`
     public boolean canView();
     public boolean canOpen();
-
-    // for saving
-    public void setChunk(@Nullable WorldChunk worldChunk);
-
-    @Nullable
-    public WorldChunk getWorldChunk();
-
-    // for, well, saving
-    public default void onItemChange(ItemContainer.ItemContainerChangeEvent event) {
-        var worldChunk = this.getWorldChunk();
-        if (worldChunk == null) {
-            return;
-        }
-
-        worldChunk.markNeedsSaving();
-    }
 }

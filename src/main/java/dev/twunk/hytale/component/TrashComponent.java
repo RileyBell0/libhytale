@@ -4,7 +4,6 @@ import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBl
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import dev.twunk.annotations.RegisteredComponent;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
@@ -58,16 +56,10 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     // Constructors
     /////////////////////
 
-    public TrashComponent() {
-        this.capacity = DEFAULT_CAPACITY;
-    }
+    public TrashComponent() {}
 
     public TrashComponent(final short capacity) {
         this.capacity = capacity;
-    }
-
-    public TrashComponent(final @Nonnull SimpleItemContainer container) {
-        this.capacity = container.getCapacity();
     }
 
     @Override
@@ -100,14 +92,5 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     @Override
     public TrashComponent<ECS_STORE> clone() {
         return new TrashComponent<ECS_STORE>(this.capacity);
-    }
-
-    @Override
-    public void setChunk(@Nullable WorldChunk worldChunk) {}
-
-    @Override
-    @Nullable
-    public WorldChunk getWorldChunk() {
-        return null;
     }
 }

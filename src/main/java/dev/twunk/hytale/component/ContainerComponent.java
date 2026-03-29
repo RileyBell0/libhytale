@@ -10,6 +10,7 @@ import dev.twunk.annotations.RegisteredComponent;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
+import dev.twunk.interfaces.methods.IPersistentContainer;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,7 @@ import javax.annotation.Nullable;
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 @RegisteredComponent
-public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE> {
+public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE>, IPersistentContainer {
 
     private static final short DEFAULT_CAPACITY = 10;
 

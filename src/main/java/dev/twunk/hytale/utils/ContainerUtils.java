@@ -20,6 +20,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
+import dev.twunk.interfaces.methods.IPersistentContainer;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -113,7 +114,10 @@ public abstract class ContainerUtils {
             windows.remove(uuid, window);
             return;
         }
-        containerComponent.setChunk(chunk);
+
+        if (IPersistentContainer.class.isAssignableFrom(containerComponent.getClass())) {
+            ((IPersistentContainer) containerComponent).setChunk(chunk);
+        }
 
         window.registerCloseEvent(event -> {
             windows.remove(uuid, window);
