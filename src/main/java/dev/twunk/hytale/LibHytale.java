@@ -60,15 +60,15 @@ public abstract class LibHytale {
         }
         hasRegisteredLibComponents = true;
 
-        // per-system ticking
-        plugin.registerChunkComponent(INTERNAL_TickSchedulerComponent.CHUNK_CODEC);
-        plugin.registerEntityComponent(INTERNAL_TickSchedulerComponent.ENTITY_CODEC);
-
-        // i use this to tset some stuff
         TwunkDevTestComponent.COMPONENT_TYPE = plugin.registerChunkComponent(TwunkDevTestComponent.CODEC);
+
+        // some components i've got i want accessible in both entity and chunk stores
+        // since, well, i've got no real reason to restrict them to just one store rn
+        // - NOTE i am aware they don't WORK in both stores rn but they should theoretically
+        //   EXIST in both. I'll fix the bugs to get them working later TODO
+        plugin.registerCommonComponent(INTERNAL_TickSchedulerComponent.class);
         plugin.registerCommonComponent(ContainerComponent.class);
-        plugin.registerChunkComponent(TrashComponent.CHUNK_CODEC);
-        plugin.registerEntityComponent(TrashComponent.ENTITY_CODEC);
+        plugin.registerCommonComponent(TrashComponent.class);
 
         // Register interactions
         plugin.registerInteraction(LogInteraction.CODEC, "Log");

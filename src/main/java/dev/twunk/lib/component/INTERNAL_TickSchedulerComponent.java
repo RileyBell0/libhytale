@@ -1,12 +1,9 @@
 package dev.twunk.lib.component;
 
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.hytale.component.ContainerComponent;
+import dev.twunk.annotations.RegisteredComponent;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.lifetime.TrackedEntity;
 import java.util.HashMap;
@@ -29,27 +26,8 @@ import javax.annotation.Nullable;
  *
  * but to be fair, stupid stuff is fun stuff
  */
+@RegisteredComponent
 public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> implements Component<ECS_STORE> {
-
-    // serializing/deserializing your vars
-    @SuppressWarnings({ "rawtypes" })
-    @Nonnull
-    private static final BuilderCodec<INTERNAL_TickSchedulerComponent> RAW_CODEC = BuilderCodec.builder(
-        INTERNAL_TickSchedulerComponent.class,
-        INTERNAL_TickSchedulerComponent::new
-    ).build();
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Nonnull
-    public static final BuilderCodec<ContainerComponent<EntityStore>> ENTITY_CODEC = (BuilderCodec<
-        ContainerComponent<EntityStore>
-    >) ((BuilderCodec) RAW_CODEC);
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Nonnull
-    public static final BuilderCodec<ContainerComponent<ChunkStore>> CHUNK_CODEC = (BuilderCodec<
-        ContainerComponent<ChunkStore>
-    >) ((BuilderCodec) RAW_CODEC);
 
     /**
      * The idea is to only have 1x of this component per entity, thus, since my
