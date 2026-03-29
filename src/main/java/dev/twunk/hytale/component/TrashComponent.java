@@ -40,6 +40,7 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     /////////////////////
     // INSTANCE VARIABLES
     /////////////////////
+
     @Serialize
     private short capacity = DEFAULT_CAPACITY;
 
@@ -80,11 +81,13 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     }
 
     // IContainer::canView
+    @Override
     public boolean canView() {
         return this.canView;
     }
 
     // IContainer::canOpen
+    @Override
     public boolean canOpen() {
         return this.canOpen;
     }

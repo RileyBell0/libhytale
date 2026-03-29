@@ -38,6 +38,11 @@ public interface IContainer {
     ) {}
 
     // Hytale src code (deprecated) called this `isAllowViewing`
-    public boolean canView();
-    public boolean canOpen();
+    public default boolean canView() {
+        return true;
+    }
+
+    public default boolean canOpen() {
+        return true;
+    }
 }

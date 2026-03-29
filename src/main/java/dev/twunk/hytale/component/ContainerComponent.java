@@ -40,9 +40,11 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
     @Serialize
     private boolean canOpen = true;
 
-    @Nonnull
     @Serialize
+    @Nonnull
     protected SimpleItemContainer container;
+
+    // not-saved \/ \/
 
     @Nullable
     public WorldChunk worldChunk = null;
@@ -59,17 +61,10 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     public ContainerComponent() {
         this.container = new SimpleItemContainer(DEFAULT_CAPACITY);
-        this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
-    }
-
-    public ContainerComponent(final short capacity) {
-        this.container = new SimpleItemContainer(capacity);
-        this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
     }
 
     public ContainerComponent(final @Nonnull SimpleItemContainer container) {
         this.container = new SimpleItemContainer(container);
-        this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
     }
 
     public void setChunk(@Nullable WorldChunk worldChunk) {
@@ -80,12 +75,8 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
         if (this.worldChunk == null) {
             return;
         }
-        this.worldChunk.markNeedsSaving();
-    }
 
-    public void setContainer(SimpleItemContainer container) {
-        container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
-        this.container = container;
+        this.worldChunk.markNeedsSaving();
     }
 
     @Nonnull
@@ -108,22 +99,24 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
     }
 
     // IContainer::canView
+    @Override
     public boolean canView() {
         return this.canView;
     }
 
     // IContainer::canOpen
+    @Override
     public boolean canOpen() {
         return this.canOpen;
-    }
-
-    public ContainerComponent<ECS_TYPE> clone() {
-        return new ContainerComponent<>(this.container);
     }
 
     @Override
     @Nullable
     public WorldChunk getWorldChunk() {
         return this.worldChunk;
+    }
+
+    public ContainerComponent<ECS_TYPE> clone() {
+        return new ContainerComponent<>(this.container);
     }
 }
