@@ -12,7 +12,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
-import dev.twunk.annotations.AutoCodec;
+import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.hytale.utils.Chat;
@@ -88,35 +88,35 @@ public class LogInteraction extends SimpleInstantInteraction {
     /**
      * Your overarching message itself
      */
-    @AutoCodec(required = true)
+    @Serialize(required = true)
     private String message;
 
     /**
      * OPTIONAL
      * The text color of the message (as hex string, e.g. "#cacaca")
      */
-    @AutoCodec
+    @Serialize
     private @Nullable String color = null;
 
     /**
      * OPTIONAL
      * A link to associate with your message
      */
-    @AutoCodec
+    @Serialize
     private @Nullable String link = null;
 
     /**
      * OPTIONAL
      * If your message should be bold
      */
-    @AutoCodec
+    @Serialize
     private boolean bold = false;
 
     /**
      * OPTIONAL
      * If your message should be italic
      */
-    @AutoCodec
+    @Serialize
     private boolean italic = false;
 
     /**

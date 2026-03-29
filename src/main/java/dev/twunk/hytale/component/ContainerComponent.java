@@ -9,7 +9,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.ser
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.annotations.AutoCodec;
+import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
@@ -54,18 +54,18 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
     // INSTANCE VARIABLES
     /////////////////////
 
-    @AutoCodec
+    @Serialize
     private boolean canView = true;
 
-    @AutoCodec
+    @Serialize
     private boolean canOpen = true;
+
+    @Nonnull
+    @Serialize
+    protected SimpleItemContainer container;
 
     @Nullable
     public WorldChunk worldChunk = null;
-
-    @Nonnull
-    @AutoCodec
-    protected SimpleItemContainer container;
 
     @Nullable
     private SimpleItemContainer registeredTo = null;

@@ -3,7 +3,7 @@ package dev.twunk.hytale.utils;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import dev.twunk.annotations.AutoCodec;
+import dev.twunk.annotations.Serialize;
 import java.lang.reflect.Field;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -30,7 +30,7 @@ public final class AutoCodecGenerator {
 
         var builder = BuilderCodec.builder(clazz, supplier);
         for (var field : fields) {
-            if (!field.isAnnotationPresent(AutoCodec.class)) {
+            if (!field.isAnnotationPresent(Serialize.class)) {
                 continue;
             }
             var fieldClass = field.getType();
@@ -66,7 +66,7 @@ public final class AutoCodecGenerator {
         @Nonnull Field field,
         @Nonnull BuilderCodec codec
     ) {
-        final var annotation = field.getAnnotation(AutoCodec.class);
+        final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
         if (name.isEmpty()) {
@@ -108,7 +108,7 @@ public final class AutoCodecGenerator {
         @Nonnull BuilderCodec.Builder<T> builder,
         @Nonnull Field field
     ) {
-        final var annotation = field.getAnnotation(AutoCodec.class);
+        final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
         if (name.isEmpty()) {
@@ -148,7 +148,7 @@ public final class AutoCodecGenerator {
         @Nonnull BuilderCodec.Builder<T> builder,
         @Nonnull Field field
     ) {
-        final var annotation = field.getAnnotation(AutoCodec.class);
+        final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
         if (name.isEmpty()) {
@@ -188,7 +188,7 @@ public final class AutoCodecGenerator {
         @Nonnull BuilderCodec.Builder<T> builder,
         @Nonnull Field field
     ) {
-        final var annotation = field.getAnnotation(AutoCodec.class);
+        final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
         if (name.isEmpty()) {

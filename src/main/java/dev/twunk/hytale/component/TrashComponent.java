@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.annotations.AutoCodec;
+import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.hytale.utils.AutoCodecGenerator;
 import dev.twunk.interfaces.component.IContainerComponent;
@@ -63,13 +63,13 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     /////////////////////
     // INSTANCE VARIABLES
     /////////////////////
-    @AutoCodec
+    @Serialize
     private short capacity = DEFAULT_CAPACITY;
 
-    @AutoCodec
+    @Serialize
     private boolean canView = true;
 
-    @AutoCodec
+    @Serialize
     private boolean canOpen = true;
 
     @Nonnull

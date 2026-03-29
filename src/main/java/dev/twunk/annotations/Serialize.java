@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AutoCodec {
+public @interface Serialize {
     boolean required() default false;
 
     String key() default "";
