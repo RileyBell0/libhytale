@@ -18,4 +18,6 @@ public @interface Serializable {
     // name of the static field in which the codec is stored. OK for this to fail
     // - your class DOES NOT need to store this
     String codecField() default "CODEC";
+
+    String documentation() default "";
 }

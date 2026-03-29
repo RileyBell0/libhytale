@@ -197,17 +197,25 @@ public abstract class HytalePlugin extends JavaPlugin {
 
     @Nonnull
     public <T extends Interaction> Assets<Interaction, ?> registerInteraction(final @Nonnull Class<T> clazz) {
+        final var defaultId = clazz.getName();
+        if (defaultId == null) {
+            throw new RuntimeException("Failed to get classname while registering interaction with class " + clazz);
+        }
+
+        return registerInteraction(clazz, defaultId);
+    }
+
+    @Nonnull
+    public <T extends Interaction> Assets<Interaction, ?> registerInteraction(
+        final @Nonnull Class<T> clazz,
+        final @Nonnull String id
+    ) {
         final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
         if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
 
-        final var defaultId = clazz.getName();
-        if (defaultId == null) {
-            throw new RuntimeException("Failed to get classname while registering interaction with codec " + codec);
-        }
-
-        return registerInteraction(codec, defaultId);
+        return registerInteraction(codec, id);
     }
 
     @Nonnull

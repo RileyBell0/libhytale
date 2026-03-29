@@ -11,4 +11,6 @@ public @interface Serialize {
     boolean required() default false;
 
     String key() default "";
+
+    boolean inChunkStore() default true;
 }

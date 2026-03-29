@@ -1,10 +1,8 @@
 package dev.twunk.hytale.interaction;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -15,6 +13,8 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.ser
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.annotations.Serializable;
+import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.component.TrashComponent;
@@ -37,73 +37,20 @@ import javax.annotation.Nullable;
  * Hytale's code that I based my implementation around
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
+@Serializable(
+    inherits = SimpleBlockInteraction.class,
+    documentation = "Opens the container of the block currently being interacted with based on its ContainerComponent."
+)
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
-
-    private static final @Nonnull String DEFAULT_COMPONENT_ID = "dev.twunk.hytale.components.ContainerComponent";
-
-    @SuppressWarnings("unchecked")
-    public static final @Nonnull BuilderCodec<OpenContainerComponentInteraction> CODEC = BuilderCodec.builder(
-        OpenContainerComponentInteraction.class,
-        OpenContainerComponentInteraction::new,
-        SimpleBlockInteraction.CODEC
-    )
-        .documentation(
-            "Opens the container of the block currently being interacted with based on its ContainerComponent."
-        )
-        .append(
-            new KeyedCodec<String>("ComponentId", Codec.STRING),
-            (self, id) -> {
-                if (id == null) {
-                    return;
-                }
-                final var potentialComponentType = LibHytale.getChunkComponentType(id);
-                if (potentialComponentType == null) {
-                    // I'm deciding to crash gracefully here
-                    return;
-                }
-
-                final var innerClass = potentialComponentType.getTypeClass();
-                if (!IContainerComponent.class.isAssignableFrom(innerClass)) {
-                    return;
-                }
-
-                self.componentType = (ComponentType<
-                    ChunkStore,
-                    ? extends IContainerComponent<ChunkStore>
-                >) potentialComponentType;
-                self.componentId = id;
-            },
-            self -> self.componentId
-        )
-        .add()
-        .build();
 
     /////////////////////
     // INSTANCE VARIABLES
     /////////////////////
 
     @SuppressWarnings("unchecked")
+    @Serialize
     private @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
         LibHytale.getChunkComponentType(ContainerComponent.class);
-
-    /**
-     * The ID that identifies the specific container component to look for
-     *
-     * we have to do a sort of backwards join (i forget the name) from
-     * - Interactions are placed on block definitions (on disk, in json)
-     * - When we RUN an interaction for a block, we don't know what component
-     *   find & open (i don't want to define an interaction for each one), SO
-     *   we'll just have the caller write to disk the ID of the component
-     *   their `OpenContainer` interaction is targeting
-     *
-     * in the future, i plan to make some sort of registry when registering
-     * component types to keep track of inventory components, that way an interaction
-     * can show ALL inventories attached to a block/entity, not JUST a specific
-     * one (though that should likely be its own interaction OR a config option
-     * for this interaction)
-     */
-
-    private @Nonnull String componentId = DEFAULT_COMPONENT_ID;
 
     /////////////////////
     // Constructors (lmao)

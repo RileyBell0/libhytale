@@ -3,9 +3,12 @@ package dev.twunk.hytale.utils;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
+import dev.twunk.hytale.LibHytale;
+import dev.twunk.interfaces.component.IContainerComponent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
@@ -83,6 +86,8 @@ public final class AutoCodecGenerator {
                 builder = appendString(builder, field);
             } else if (fieldClass.equals(Short.class) || fieldClass.equals(short.class)) {
                 builder = appendShort(builder, field);
+            } else if (fieldClass.equals(ComponentType.class)) {
+                builder = appendComponentType(builder, field);
             }
         }
 
@@ -173,6 +178,62 @@ public final class AutoCodecGenerator {
                     try {
                         var val = field.get(self);
                         return val;
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
+    }
+
+    @Nonnull
+    private static final <T> BuilderCodec.Builder<T> appendComponentType(
+        @Nonnull BuilderCodec.Builder<T> builder,
+        @Nonnull Field field
+    ) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+        var inChunkStore = annotation.inChunkStore();
+
+        field.setAccessible(true);
+
+        return builder
+            .append(
+                new KeyedCodec<>(name, Codec.STRING, required),
+                (self, id) -> {
+                    if (id == null) {
+                        return;
+                    }
+                    final var potentialComponentType = inChunkStore
+                        ? LibHytale.getChunkComponentType(id)
+                        : LibHytale.getEntityComponentType(id);
+                    if (potentialComponentType == null) {
+                        // I'm deciding to crash gracefully here
+                        return;
+                    }
+
+                    final var innerClass = potentialComponentType.getTypeClass();
+                    if (!IContainerComponent.class.isAssignableFrom(innerClass)) {
+                        return;
+                    }
+                    try {
+                        field.set(self, potentialComponentType);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                },
+                self -> {
+                    try {
+                        return ((ComponentType<?, ?>) field.get(self)).getTypeClass().getName();
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
