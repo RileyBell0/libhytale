@@ -13,4 +13,6 @@ public @interface Serialize {
     String key() default "";
 
     boolean inChunkStore() default true;
+
+    int min() default Integer.MIN_VALUE;
 }

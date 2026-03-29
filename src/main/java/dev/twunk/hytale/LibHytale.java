@@ -72,7 +72,7 @@ public abstract class LibHytale {
 
         // Register interactions
         plugin.registerInteraction(LogInteraction.CODEC, "Log");
-        plugin.registerInteraction(SpawnItemInteraction.CODEC, "SpawnItem");
+        plugin.registerInteraction(SpawnItemInteraction.class, "SpawnItem");
         plugin.registerInteraction(OpenContainerComponentInteraction.class, "OpenMahContainerPls");
     }
 

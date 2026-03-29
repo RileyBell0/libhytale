@@ -88,6 +88,8 @@ public final class AutoCodecGenerator {
                 builder = appendShort(builder, field);
             } else if (fieldClass.equals(ComponentType.class)) {
                 builder = appendComponentType(builder, field);
+            } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
+                builder = appendInt(builder, field);
             }
         }
 
@@ -335,6 +337,7 @@ public final class AutoCodecGenerator {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
+        var minVal = annotation.min();
         if (name.isEmpty()) {
             name = normaliseFieldName(field);
         }
@@ -344,7 +347,7 @@ public final class AutoCodecGenerator {
             .append(
                 new KeyedCodec<>(name, Codec.SHORT, required),
                 (self, val) -> {
-                    if (val != null) {
+                    if (val != null && (short) val >= minVal) {
                         try {
                             field.set(self, (short) val);
                         } catch (IllegalArgumentException e) {
@@ -357,6 +360,48 @@ public final class AutoCodecGenerator {
                 self -> {
                     try {
                         return (short) field.get(self);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
+    }
+
+    @Nonnull
+    private static final <T> BuilderCodec.Builder<T> appendInt(
+        @Nonnull BuilderCodec.Builder<T> builder,
+        @Nonnull Field field
+    ) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        var minVal = annotation.min();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+
+        field.setAccessible(true);
+        return builder
+            .append(
+                new KeyedCodec<>(name, Codec.INTEGER, required),
+                (self, val) -> {
+                    if (val != null && (int) val >= minVal) {
+                        try {
+                            field.set(self, (int) val);
+                        } catch (IllegalArgumentException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                self -> {
+                    try {
+                        return (int) field.get(self);
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {

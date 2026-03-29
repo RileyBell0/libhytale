@@ -12,6 +12,8 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
+import dev.twunk.annotations.Serializable;
+import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.utils.ItemUtils;
 import javax.annotation.Nonnull;
@@ -20,6 +22,7 @@ import javax.annotation.Nonnull;
  * @see com.hypixel.hytale.server.core.entity.ItemUtils I based most of my implementation on this
  * @see dev.twunk.hytale.utils.ItemUtils I extended hytales ItemUtils a bit, so my implementation uses this alot
  */
+@Serializable
 public class SpawnItemInteraction extends SimpleInstantInteraction {
 
     @Nonnull
@@ -31,8 +34,10 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
     private Vector3i at = null;
 
     @Nonnull
+    @Serialize
     private String itemId = "Soil_Grass";
 
+    @Serialize(min = 1)
     private int quantity = 1;
 
     @Nonnull
@@ -77,19 +82,6 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
         )
         .add()
         .appendInherited(
-            new KeyedCodec<>("ItemId", Codec.STRING, false),
-            (o, v) -> {
-                if (v == null) {
-                    return;
-                }
-
-                o.itemId = v;
-            },
-            o -> o.itemId,
-            (o, p) -> o.itemId = p.itemId
-        )
-        .add()
-        .appendInherited(
             new KeyedCodec<>("At", Codec.INT_ARRAY, false),
             (o, v) -> {
                 if (v.length != 3) {
@@ -106,19 +98,6 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
                 return coords;
             },
             (o, p) -> o.at = p.at
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Quantity", Codec.INTEGER, false),
-            (o, v) -> {
-                if (v == null || v < 1) {
-                    return;
-                }
-
-                o.quantity = v;
-            },
-            o -> o.quantity,
-            (o, p) -> o.quantity = p.quantity
         )
         .add()
         .build();
