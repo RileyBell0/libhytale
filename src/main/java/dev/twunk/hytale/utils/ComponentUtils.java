@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.hytale.LibHytale;
 import dev.twunk.lib.test.TestUtil;
 import dev.twunk.lib.test.TwunkDevTestComponent;
 import java.util.function.Supplier;
@@ -38,6 +39,10 @@ public abstract class ComponentUtils {
     public static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT_TYPE =
         BlockStateInfo.getComponentType();
 
+    @Nonnull
+    public static final ComponentType<ChunkStore, TwunkDevTestComponent> TWUNK_DEV_TEST_COMPONENT_TYPE =
+        LibHytale.getChunkComponentType(TwunkDevTestComponent.class);
+
     /**
      * Tests all methods i've defined for getWorldChunk
      */
@@ -57,8 +62,8 @@ public abstract class ComponentUtils {
 
         final var chunkRef = test.chunkRef;
 
-        final var blockRefComponent = new TwunkDevTestComponent().setVal(1);
-        final var chunkRefComponent = new TwunkDevTestComponent().setVal(2);
+        final var blockRefComponent = new TwunkDevTestComponent().setValue(1);
+        final var chunkRefComponent = new TwunkDevTestComponent().setValue(2);
 
         // ensure BlockStateInfo is on the BlockRef
         Component<ChunkStore> component;
@@ -84,14 +89,14 @@ public abstract class ComponentUtils {
         }
 
         // validate the components AREN'T on there yet (BlockRef)
-        component = ComponentUtils.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
-        if (ComponentUtils.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) || component != null) {
+        component = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
+        if (ComponentUtils.has(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || component != null) {
             throw new RuntimeException("!! ERROR: BlockRef contained TwunkDevTestComponent before we added it");
         }
 
         // validate the components AREN'T on there yet (ChunkRef)
-        component = ComponentUtils.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
-        if (ComponentUtils.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) || component != null) {
+        component = ComponentUtils.get(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
+        if (ComponentUtils.has(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || component != null) {
             throw new RuntimeException("!! ERROR: ChunkRef contained TwunkDevTestComponent before we added it");
         }
 
@@ -99,30 +104,29 @@ public abstract class ComponentUtils {
         commandBuffer.run(componentAccessor -> {
             try {
                 try {
-                    componentAccessor.putComponent(blockRef, TwunkDevTestComponent.COMPONENT_TYPE, blockRefComponent);
+                    componentAccessor.putComponent(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE, blockRefComponent);
                 } catch (Exception e) {
                     throw new RuntimeException("!! !! ERROR: Failed to put component onto block");
                 }
 
                 // and we'll check that it's there
-                var blockRefComponentREFETCHED = ComponentUtils.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                var blockRefComponentREFETCHED = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
                 if (
-                    !ComponentUtils.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
-                    blockRefComponentREFETCHED == null
+                    !ComponentUtils.has(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || blockRefComponentREFETCHED == null
                 ) {
                     throw new RuntimeException("!! !! ERROR: Failed to get component we just added from blockRef");
                 }
 
-                if (blockRefComponent != blockRefComponentREFETCHED || blockRefComponentREFETCHED.getVal() != 1) {
+                if (blockRefComponent != blockRefComponentREFETCHED || blockRefComponentREFETCHED.getValue() != 1) {
                     throw new RuntimeException(
                         "new component on our block wasn't the same one we put on there " +
                             blockRefComponent +
                             " " +
-                            blockRefComponent.getVal() +
+                            blockRefComponent.getValue() +
                             " | new - " +
                             blockRefComponentREFETCHED +
                             " " +
-                            blockRefComponentREFETCHED.getVal()
+                            blockRefComponentREFETCHED.getValue()
                     );
                 }
 
@@ -130,49 +134,50 @@ public abstract class ComponentUtils {
                     componentAccessor
                         .getExternalData()
                         .getStore()
-                        .putComponent(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE, chunkRefComponent);
+                        .putComponent(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE, chunkRefComponent);
                 } catch (Exception e) {
                     throw new RuntimeException("!! !! ERROR: Failed to put component onto chunk");
                 }
 
-                var chunkRefComponentREFETCHED = ComponentUtils.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
+                var chunkRefComponentREFETCHED = ComponentUtils.get(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
                 if (
-                    !ComponentUtils.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
-                    chunkRefComponentREFETCHED == null
+                    !ComponentUtils.has(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || chunkRefComponentREFETCHED == null
                 ) {
                     throw new RuntimeException("!! !! ERROR: Failed to get component we just added from chunkRef");
                 }
 
-                if (chunkRefComponent != chunkRefComponentREFETCHED || chunkRefComponentREFETCHED.getVal() != 2) {
+                if (chunkRefComponent != chunkRefComponentREFETCHED || chunkRefComponentREFETCHED.getValue() != 2) {
                     throw new RuntimeException(
                         "new component on our chunk wasn't the same one we put on there " +
                             chunkRefComponent +
                             " " +
-                            chunkRefComponent.getVal() +
+                            chunkRefComponent.getValue() +
                             " | new - " +
                             chunkRefComponentREFETCHED +
                             " " +
-                            chunkRefComponentREFETCHED.getVal()
+                            chunkRefComponentREFETCHED.getValue()
                     );
                 }
 
                 // we'll mutate one and validate it is mutated on the other
-                blockRefComponent.setVal(3);
-                chunkRefComponent.setVal(4);
+                blockRefComponent.setValue(3);
+                chunkRefComponent.setValue(4);
                 if (
-                    blockRefComponent.getVal() != blockRefComponentREFETCHED.getVal() || blockRefComponent.getVal() != 3
+                    blockRefComponent.getValue() != blockRefComponentREFETCHED.getValue() ||
+                    blockRefComponent.getValue() != 3
                 ) {
                     throw new RuntimeException("new component on our block doesn't respond to updates");
                 }
                 if (
-                    chunkRefComponent.getVal() != chunkRefComponentREFETCHED.getVal() || chunkRefComponent.getVal() != 4
+                    chunkRefComponent.getValue() != chunkRefComponentREFETCHED.getValue() ||
+                    chunkRefComponent.getValue() != 4
                 ) {
                     throw new RuntimeException("new component on our chunk doesn't respond to updates");
                 }
 
                 var component2 = ComponentUtils.get_blockCoords(
                     test.world,
-                    TwunkDevTestComponent.COMPONENT_TYPE,
+                    TWUNK_DEV_TEST_COMPONENT_TYPE,
                     blockX,
                     blockY,
                     blockZ
@@ -184,7 +189,7 @@ public abstract class ComponentUtils {
                 final var localCoords = BlockUtils.Coords.Local.get(blockCoords);
                 var component3 = ComponentUtils.get_localCoords(
                     test.blockComponentChunk,
-                    TwunkDevTestComponent.COMPONENT_TYPE,
+                    TWUNK_DEV_TEST_COMPONENT_TYPE,
                     localCoords.x,
                     localCoords.y,
                     localCoords.z
@@ -195,26 +200,20 @@ public abstract class ComponentUtils {
 
                 // then we'll remove it from one, check its still on the other and not on the one we removed it from
                 // and then remove it from the other
-                blockRef.getStore().removeComponent(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                chunkRef.getStore().removeComponent(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                blockRefComponentREFETCHED = ComponentUtils.get(blockRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                chunkRefComponentREFETCHED = ComponentUtils.get(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE);
-                if (
-                    ComponentUtils.has(blockRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
-                    blockRefComponentREFETCHED != null
-                ) {
+                blockRef.getStore().removeComponent(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
+                chunkRef.getStore().removeComponent(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
+                blockRefComponentREFETCHED = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
+                chunkRefComponentREFETCHED = ComponentUtils.get(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
+                if (ComponentUtils.has(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || blockRefComponentREFETCHED != null) {
                     throw new RuntimeException("failed to remove our new component from the block lmao");
                 }
-                if (
-                    ComponentUtils.has(chunkRef, TwunkDevTestComponent.COMPONENT_TYPE) ||
-                    chunkRefComponentREFETCHED != null
-                ) {
+                if (ComponentUtils.has(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || chunkRefComponentREFETCHED != null) {
                     throw new RuntimeException("failed to remove our new component from the block lmao");
                 }
 
                 component2 = ComponentUtils.get_blockCoords(
                     test.world,
-                    TwunkDevTestComponent.COMPONENT_TYPE,
+                    TWUNK_DEV_TEST_COMPONENT_TYPE,
                     blockX,
                     blockY,
                     blockZ
@@ -227,7 +226,7 @@ public abstract class ComponentUtils {
 
                 component3 = ComponentUtils.get_localCoords(
                     test.blockComponentChunk,
-                    TwunkDevTestComponent.COMPONENT_TYPE,
+                    TWUNK_DEV_TEST_COMPONENT_TYPE,
                     localCoords.x,
                     localCoords.y,
                     localCoords.z

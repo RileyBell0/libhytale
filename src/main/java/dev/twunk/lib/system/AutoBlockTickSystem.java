@@ -15,7 +15,6 @@ import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.interfaces.component.IBlockTickComponent;
 import dev.twunk.interfaces.methods.IRegistry;
 import dev.twunk.interfaces.subsystem.ITickSystem;
-import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 /**
@@ -37,27 +36,9 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
     implements ITickSystem<ChunkStore>
 {
 
-    private static HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+    private static final HytaleLogger logger = HytaleLogger.forEnclosingClass();
 
     private final @Nonnull ComponentType<ChunkStore, T> componentType;
-
-    public AutoBlockTickSystem(final @Nonnull Supplier<ComponentType<ChunkStore, T>> supplier) {
-        super(Query.and(supplier.get()));
-        final var component = supplier.get();
-        if (component == null) {
-            throw new RuntimeException("Failed to get component type for Component Ticking System | " + supplier);
-        }
-        this.componentType = component;
-
-        this.appendSubSystem(TickSubSystem.newSubsystemFor(this));
-    }
-
-    public AutoBlockTickSystem(final @Nonnull Class<T> componentClass) {
-        super(Query.and(LibHytale.getChunkComponentType(componentClass)));
-        this.componentType = LibHytale.getChunkComponentType(componentClass);
-
-        this.appendSubSystem(TickSubSystem.newSubsystemFor(this));
-    }
 
     public AutoBlockTickSystem(final @Nonnull ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
@@ -126,7 +107,9 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
             // easy things easy. and i'm all for that
             component.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
         } catch (Throwable e) {
-            console.log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
+            logger
+                .atSevere()
+                .log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
             return;
         }
     }

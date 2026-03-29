@@ -60,7 +60,7 @@ public abstract class LibHytale {
         }
         hasRegisteredLibComponents = true;
 
-        TwunkDevTestComponent.COMPONENT_TYPE = plugin.registerChunkComponent(TwunkDevTestComponent.CODEC);
+        plugin.registerChunkComponent(TwunkDevTestComponent.class);
 
         // some components i've got i want accessible in both entity and chunk stores
         // since, well, i've got no real reason to restrict them to just one store rn
