@@ -42,20 +42,10 @@ import javax.annotation.Nullable;
 )
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
-    /////////////////////
-    // INSTANCE VARIABLES
-    /////////////////////
-
     @SuppressWarnings("unchecked")
     @Serialize
     private @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
         LibHytale.getChunkComponentType(ContainerComponent.class);
-
-    /////////////////////
-    // Constructors (lmao)
-    /////////////////////
-
-    public OpenContainerComponentInteraction() {}
 
     @Override
     protected void interactWithBlock(
