@@ -28,12 +28,6 @@ import javax.annotation.Nullable;
 @Serializable
 public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE>, IPersistentContainer {
 
-    private static final short DEFAULT_CAPACITY = 10;
-
-    /////////////////////
-    // INSTANCE VARIABLES
-    /////////////////////
-
     @Serialize
     private boolean canView = true;
 
@@ -42,9 +36,7 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     @Serialize
     @Nonnull
-    protected SimpleItemContainer container;
-
-    // not-saved \/ \/
+    protected SimpleItemContainer container = new SimpleItemContainer((short) 10);
 
     @Nullable
     public WorldChunk worldChunk = null;
@@ -55,36 +47,20 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
-    /////////////////////
-    // Constructors
-    /////////////////////
+    //////////
+    // Methods
+    //////////
 
-    public ContainerComponent() {
-        this.container = new SimpleItemContainer(DEFAULT_CAPACITY);
-    }
-
-    public ContainerComponent(final @Nonnull SimpleItemContainer container) {
-        this.container = new SimpleItemContainer(container);
-    }
-
-    public void setChunk(@Nullable WorldChunk worldChunk) {
-        this.worldChunk = worldChunk;
-    }
-
-    public void onItemChange(ItemContainer.ItemContainerChangeEvent event) {
-        if (this.worldChunk == null) {
-            return;
-        }
-
-        this.worldChunk.markNeedsSaving();
-    }
-
+    // IContainer::getWindows
     @Nonnull
+    @Override
     public Map<UUID, ContainerBlockWindow> getWindows() {
         return this.windows;
     }
 
+    // IContainer::getContainer
     @Nonnull
+    @Override
     public SimpleItemContainer getContainer() {
         if (this.registeredTo != this.container) {
             this.container.registerChangeEvent(EventPriority.LAST, this::onItemChange);
@@ -94,6 +70,24 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
         return this.container;
     }
 
+    // IPersistentContainer::onItemChange
+    @Override
+    public void onItemChange(ItemContainer.ItemContainerChangeEvent event) {
+        if (this.worldChunk == null) {
+            return;
+        }
+
+        this.worldChunk.markNeedsSaving();
+    }
+
+    // IPersistentContainer::setChunk
+    @Override
+    public void setChunk(@Nullable WorldChunk worldChunk) {
+        this.worldChunk = worldChunk;
+    }
+
+    // IContainer::getCapacity
+    @Override
     public short getCapacity() {
         return this.container.getCapacity();
     }
@@ -110,6 +104,7 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
         return this.canOpen;
     }
 
+    // IPersistentContainer::getWorldChunk
     @Override
     @Nullable
     public WorldChunk getWorldChunk() {
@@ -117,6 +112,11 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
     }
 
     public ContainerComponent<ECS_TYPE> clone() {
-        return new ContainerComponent<>(this.container);
+        var component = new ContainerComponent<ECS_TYPE>();
+        component.container = this.container.clone();
+        component.canView = this.canView;
+        component.canOpen = this.canOpen;
+
+        return component;
     }
 }

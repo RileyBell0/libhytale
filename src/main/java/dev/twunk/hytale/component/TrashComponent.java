@@ -35,14 +35,8 @@ import javax.annotation.Nonnull;
 @Serializable
 public class TrashComponent<ECS_STORE extends WorldProvider> implements IContainerComponent<ECS_STORE> {
 
-    private static final short DEFAULT_CAPACITY = 45;
-
-    /////////////////////
-    // INSTANCE VARIABLES
-    /////////////////////
-
     @Serialize
-    private short capacity = DEFAULT_CAPACITY;
+    private short capacity = 45;
 
     @Serialize
     private boolean canView = true;
@@ -53,28 +47,25 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
-    /////////////////////
-    // Constructors
-    /////////////////////
+    //////////
+    // Methods
+    //////////
 
-    public TrashComponent() {}
-
-    public TrashComponent(final short capacity) {
-        this.capacity = capacity;
-    }
-
+    // IContainer::getWindows
     @Override
     @Nonnull
     public Map<UUID, ContainerBlockWindow> getWindows() {
         return this.windows;
     }
 
+    // IContainer::getContainer
     @Nonnull
     @Override
     public SimpleItemContainer getContainer() {
         return new SimpleItemContainer(this.capacity);
     }
 
+    // IContainer::canView
     @Override
     public short getCapacity() {
         return this.capacity;
@@ -94,6 +85,11 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
 
     @Override
     public TrashComponent<ECS_STORE> clone() {
-        return new TrashComponent<ECS_STORE>(this.capacity);
+        var trash = new TrashComponent<ECS_STORE>();
+        trash.capacity = this.capacity;
+        trash.canOpen = this.canOpen;
+        trash.canView = this.canView;
+
+        return trash;
     }
 }

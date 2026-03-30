@@ -17,13 +17,15 @@ import javax.annotation.Nullable;
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public interface IPersistentContainer extends IContainer {
-    // for saving
+    // we tell the container what what chunk it's in so that it can tell said
+    // chunk that it needs saving later
     public void setChunk(@Nullable WorldChunk worldChunk);
 
+    // we tell the chunk to 'save' when we change the container's state
     @Nullable
     public WorldChunk getWorldChunk();
 
-    // for, well, saving
+    // detect changes to item contents, tells us we need to save
     public default void onItemChange(ItemContainer.ItemContainerChangeEvent event) {
         var worldChunk = this.getWorldChunk();
         if (worldChunk == null) {
