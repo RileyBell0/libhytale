@@ -16,7 +16,10 @@ import javax.annotation.Nonnull;
  * @see com.hypixel.hytale.server.core.entity.ItemUtils I based most of my implementation on this
  * @see dev.twunk.hytale.utils.ItemUtils I extended hytales ItemUtils a bit, so my implementation uses this alot
  */
-@Serializable(inherits = SimpleInstantInteraction.class)
+@Serializable(
+    inherits = SimpleInstantInteraction.class,
+    documentation = "Interaction that simply spawns an item when run at the location specified (defaults to position of target entity"
+)
 public class SpawnItemInteraction extends SimpleInstantInteraction {
 
     @Nonnull
