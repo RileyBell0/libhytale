@@ -35,18 +35,15 @@ So, instead of all that junk now you can define (for simple cases such as this e
 public class Example extends ILifetimeComponent, IBlockTickComponent {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    @Override
     public void onEntityAdded(AnyRef<ChunkStore> ref, AddReason reason, CommandBuffer<ChunkStore> commandBuffer) {
         LOGGER.atInfo.log("Added new example entity");
     }
 
 
-    @Override
     public void onBlockTick(BlockRef blockRef, CommandBuffer<ChunkStore> commandBuffer) {
         ItemUtils.spawn(blockRef, commandBuffer, blockRef.getGlobalCoords(), new ItemStack("Soil_Grass", 1));
     }
 
-    @Override
     public void onEntityRemove(AnyRef<ChunkStore> ref, RemoveReason reason, CommandBuffer<ChunkStore> commandBuffer) {
         LOGGER.atInfo.log("Removed example entity");
     }
