@@ -109,6 +109,14 @@ public abstract class ChunkUtils {
                 return new ChunkCoordinates(blockCoords.x >> 5, blockCoords.z >> 5);
             }
 
+            @Nonnull
+            public ChunkCoordinates get(long chunkIndex) {
+                final int chunkX = (int) (chunkIndex >> 32);
+                final int chunkZ = (int) (long) (chunkIndex);
+
+                return new ChunkCoordinates(chunkX, chunkZ);
+            }
+
             /**
              * With GLOBAL block coords
              *
@@ -130,6 +138,15 @@ public abstract class ChunkUtils {
                 // see ChunkUtil.chunkCoordinate
                 return new Vector2i(blockCoords.x >> 5, blockCoords.z >> 5);
             }
+
+            @Nonnull
+            public Vector2i getVector2i(long chunkIndex) {
+                final int chunkX = (int) (chunkIndex >> 32);
+                final int chunkZ = (int) (long) (chunkIndex);
+
+                return new Vector2i(chunkX, chunkZ);
+            }
+
             // #endregion getChunkCoords
         }
 
