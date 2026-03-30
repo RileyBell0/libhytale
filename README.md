@@ -1,134 +1,73 @@
-# libhytale (WIP)
+# LibHytale
 
-TODO
-- learn annotations. Use annotations to define
-  - System IDs
-    - @ID("system-id-for-my-plugin")
-  - If we should auto register system(s) for your component
-    - @Component
-    - @Component("specificSystem")
-    - @Component({"specificSystem1", "willOnlyLoadThese"})
-  - If your component should be considered viable for just a single store. If omitted it'll be registered for both given it's got a generic named ECS_STORE (not sure if thats something i CAN check but we'll see)
-    - @ChunkComponent
-    - @EntityComponent
-  - if we should auto register the sub-systems required to run your subsystemowner
-    - @System | auto registers subsystems to run its events
-  - if an auto registering annotiation is added you can also add the following to NOT register systems for it
-    - @RegisterOnly
+A library for modding [Hytale](https://hytale.com/) server-side code.
 
-## PLAN for getting onUpdate sub system
+No AI was harmed in the making of this project.
 
-> [!IMPORTANT]
-> Next plan
-> 
-> well, plan for like, idk, i need to figure out when a block updates WHAT systems to call. seriously, is there a way to do that efficiently? can i hook into another system somehow? maybe i just have a component i throw on called like "onUpdateComponent" yeah, ok that works, then i just need some way to talk back to all systems that OH systems can register THEMSELVES on the component right? idk. nah that doesn't really work, or, ooh ok onEntityAdded: i listen for THAT and when an entity comes in, i go somewhere the tick procedure can tell and yeah
-> 
-> entityAdded -> some library component (registers self)
-> 
-> THEN
-> 
-> TickProcedure -> SAME library component -> runs through all systems we had before, now, congrats, they can run onUpdate!! WOOO!
-> - remind systems to be KIND and assume other systems are running onUpdate too!!
+## The "Why"
 
-> [!NOTE]
-> OH and side note, ALSO need to generalise the idea of "I need to store some global data on an entity" e.g. scheduledTickSystem needs me to store on each entity that there's a system watching it (and equally i should remember to actually rmeove that when that list goes down to zero too lmao)
+Hytale's server side code (as of 31/03/2026) has no comments, making learning their systems a lengthy process for programmers entering into their ecosystem.
 
-## preamble (this library is super pre-alpha)
+This library serves to provide **documented** and **tested** utilities to make your journey coding within Hytale far easier.
 
-If you found this, uuh, it's very much really a work in progress.
+> [NOTE]
+> TODO: Add some side-by-side examples here
 
-Worth reading around to see how i do things if i happen to have solved or found
-areas of the code you're still figuring out (e.g. getting a block by coords)
+Hytale is designed around Entity Component Systems (ECS), meaning you've got Entities (anything in a world) that has Components (data). To then run code and respond to events on these you have Systems.
+
+Without this library, if you want to define a system that
+- Logs when an entity is added
+- Spawn a grass block at its position each tick
+- Logs when the entity is removed
+
+you'd need
+- 1x SYSTEM for entity add/remove events
+- 1x SYSTEM for running ticks on the specific entities you're interested in (entities that have your custom component)
+- 1x COMPONENT file for the component itself
+
+then you'd have to register all three into the right stores, etc, etc.
+
+It's a pain.
+
+So, instead of all that junk now you can define (for simple cases such as this example)
+```java
+@Serializable
+public class Example extends ILifetimeComponent, IBlockTickComponent {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
+    @Override
+    public void onEntityAdded(AnyRef<ChunkStore> ref, AddReason reason, CommandBuffer<ChunkStore> commandBuffer) {
+        LOGGER.atInfo.log("Added new example entity");
+    }
+
+
+    @Override
+    public void onBlockTick(BlockRef blockRef, CommandBuffer<ChunkStore> commandBuffer) {
+        ItemUtils.spawn(blockRef, commandBuffer, blockRef.getGlobalCoords(), new ItemStack("Soil_Grass", 1));
+    }
+
+    @Override
+    public void onEntityRemove(AnyRef<ChunkStore> ref, RemoveReason reason, CommandBuffer<ChunkStore> commandBuffer) {
+        LOGGER.atInfo.log("Removed example entity");
+    }
+}
+```
+
+Then in your plugin you run
+```
+this.registerChunkComponent(Example.class);
+```
+
+In my opinion that seems, alot easier
+
+
+## TODO
+
+1. Add onBlockBreak, onBlockAdd (etc) event handlers as subsystems. The overall goal is to figure out an "onBlockUpdate" subsystem
+2. Fix ScheduledTickSystem
+
+## Extra
 
 Got most of my resources from reading the src code directly and from <https://hytalemodding.dev/en/docs>
 
-highly reccomend <https://hytalemodding.dev/en/docs>, they're making TONS of changes and updates all the time, that's probably your best bet for learning this. Set an hour to read through their docs, then another day set aside another hour to read through their docs again.
-
-The "[Entity Component System](https://hytalemodding.dev/en/docs/guides/ecs/entity-component-system)" docs are by FAR the most important ones for you to understand. I'm pretty new to modding so at least, seemed incredibly important for me.
-
-Maybe come back in a few weeks or so when I've had the free time to finish more of this
-Don't expect the install instructions to work, honestly, if my computer carks it even I don't know how to install it yet
-
-What is this
-
-- Better API for hytale modding
-
-Better how?
-
-- Turns out its hard to do easy things in their API currently. Alot of this may just be due to there being no comments in their code currently, though regardless, its quite hard to use
-- Goal: make simple things easy to do (or really just easy to find)
-
-Like what?
-
-- Getting a block
-- Scheduling ticks on matches in systems
-- Easier getting world, world chunks, blocks, block info, etc
-
----
-
-## Ignore everything below here
-
-Why?
-
-uuh, i forked someone else's code originally but completely threw all piece by piece except the gradle stuff
-
-well, i say forked. More like downloaded their example i think? really not sure it was a while ago (and so much churn ago)
-
-if you DO happen to stumble upon this and read through it for some reason, PRs are welcome, but honestly feedback or requests are far more welcome because, well, as mentioned, this is super super early development
-
-oh, and importantly, I'm really very much in a churn stage of this project, still getting used to hytale's API itself and thus, everything i write here is subject to change (and currently is changing)
-
-### Option 1: From Hytale Launcher
-
-After installing the Hytale Launcher, you can find the server files in:
-
-| OS      | Path                                                            |
-|---------|-----------------------------------------------------------------|
-| Windows | `%appdata%\Hytale\install\release\package\game\latest`          |
-| Linux   | `$XDG_DATA_HOME/Hytale/install/release/package/game/latest`     |
-| macOS   | `~/Application Support/Hytale/install/release/package/game/latest` |
-
-Copy `HytaleServer.jar` from that directory into the `libs/` folder of this project.
-
-### Option 2: Hytale Downloader CLI
-
-For production servers, you can use the official **Hytale Downloader CLI** tool to download the latest server files. This requires OAuth2 authentication.
-
-For more details, see the official [Hytale Server Manual](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual).
-
-## Building
-
-1. Place `HytaleServer.jar` in the `libs/` directory
-2. Build with Gradle:
-
-```bash
-./gradlew build
-```
-
-The compiled plugin JAR will be located at `build/libs/HelloPlugin-1.0-SNAPSHOT.jar`.
-
-## Installation
-
-Copy the built JAR file to your Hytale server's `plugins/` directory.
-
-## Usage
-
-In-game, use the command:
-
-```
-/hello
-```
-
-This will display a title message saying "Hello world!" to the player.
-
-## Project Structure
-
-```
-src/main/java/dev.twunk/
-├── HelloPlugin.java    # Main plugin class
-└── HelloCommand.java   # Command implementation
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+I highly recommend checking out <https://hytalemodding.dev/en/docs> for an overview on Hytale's systems and some examples
