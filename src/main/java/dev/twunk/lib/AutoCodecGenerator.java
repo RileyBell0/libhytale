@@ -47,6 +47,7 @@ public final class AutoCodecGenerator {
         var fields = clazz.getDeclaredFields();
         var registeredComponent = clazz.getAnnotation(Serializable.class);
         var inherits = registeredComponent.inherits();
+        var docString = registeredComponent.documentation();
 
         if (!inherits.equals(NullType.class) && !inherits.isAssignableFrom(clazz)) {
             throw new RuntimeException(
@@ -65,6 +66,10 @@ public final class AutoCodecGenerator {
             builder = BuilderCodec.builder(clazz, supplier);
         } else {
             builder = BuilderCodec.builder(clazz, supplier, inheritedCodec);
+        }
+
+        if (!docString.isEmpty()) {
+            builder = builder.documentation(docString);
         }
 
         for (var field : fields) {
