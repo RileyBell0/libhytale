@@ -56,6 +56,12 @@ this.registerChunkComponent(Example.class);
 
 In my opinion that seems, alot easier
 
+## The "How"
+
+For now, fork the following repo (or clone it or do whatever really) and just delete my test code. It's a good basis
+https://github.com/RileyBell0/hytale-plugin
+
+^^ It's where I test LibHytale. It has some examples of some use cases (usually of whatever part I'm working on) but should be pretty easy to follow or follow on from
 
 ## TODO
 
