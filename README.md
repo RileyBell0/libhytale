@@ -39,7 +39,6 @@ public class Example extends ILifetimeComponent, IBlockTickComponent {
         LOGGER.atInfo.log("Added new example entity");
     }
 
-
     public void onBlockTick(BlockRef blockRef, CommandBuffer<ChunkStore> commandBuffer) {
         ItemUtils.spawn(blockRef, commandBuffer, blockRef.getGlobalCoords(), new ItemStack("Soil_Grass", 1));
     }
