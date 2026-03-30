@@ -67,6 +67,7 @@ https://github.com/RileyBell0/hytale-plugin
 
 1. Add onBlockBreak, onBlockAdd (etc) event handlers as subsystems. The overall goal is to figure out an "onBlockUpdate" subsystem
 2. Fix ScheduledTickSystem
+3. The team just added an `ItemContainerBlock` component, probably need to update my container utils to suit. might be able to extend that directly for containers
 
 ## Extra
 
