@@ -1,14 +1,12 @@
 package dev.twunk.interfaces.methods;
 
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
-import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
+import dev.twunk.hytale.refs.AnyRef;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -31,11 +29,7 @@ public interface IContainer {
 
     public short getCapacity();
 
-    public default void onOpen(
-        final @Nonnull Ref<EntityStore> ref,
-        final @Nonnull World world,
-        final @Nonnull Store<EntityStore> store
-    ) {}
+    public default <ECS_STORE extends WorldProvider> void onOpen(final @Nonnull AnyRef<ECS_STORE> ref) {}
 
     // Hytale src code (deprecated) called this `isAllowViewing`
     public default boolean canView() {

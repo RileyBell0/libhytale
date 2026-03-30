@@ -2,13 +2,10 @@ package dev.twunk.interfaces.methods;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
-import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.hytale.system.TickSubSystem;
 import dev.twunk.interfaces.subsystem.ITickSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
@@ -51,12 +48,5 @@ import javax.annotation.Nonnull;
  *   just wasted compute
  */
 public interface IBlockTick {
-    public void onBlockTick(
-        final @Nonnull Ref<ChunkStore> blockRef,
-        final @Nonnull World world,
-        final @Nonnull WorldChunk wc,
-        final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-        final @Nonnull Vector3i worldCoords,
-        final int blockId
-    );
+    public void onBlockTick(final @Nonnull BlockRef blockRef, final @Nonnull CommandBuffer<ChunkStore> commandBuffer);
 }

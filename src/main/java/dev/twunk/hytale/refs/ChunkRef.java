@@ -3,7 +3,6 @@ package dev.twunk.hytale.refs;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.utils.ChunkUtils;
@@ -16,8 +15,10 @@ import javax.annotation.Nullable;
  * Implements the SAME methods as Ref<ChunkStore> BUT also will include a bunch
  * more methods from Utils so that you can just take a ref and access the stuff
  * you want without having to go through a billion processes
+ * @see AnyRef
+ * @see Ref (Ref<ChunkStore>)
  */
-public class ChunkRef extends Ref<ChunkStore> {
+public class ChunkRef extends AnyRef<ChunkStore> {
 
     @Nonnull
     @SuppressWarnings("null")
@@ -28,13 +29,10 @@ public class ChunkRef extends Ref<ChunkStore> {
     private Long chunkIndex = null;
 
     @Nullable
-    private World world = null;
-
-    @Nullable
     private WorldChunk worldChunk = null;
 
     public ChunkRef(@Nonnull Ref<ChunkStore> ref) {
-        super(ref.getStore());
+        super(ref);
     }
 
     @Nullable
@@ -105,22 +103,8 @@ public class ChunkRef extends Ref<ChunkStore> {
     }
 
     @Nonnull
-    public World getWorld() {
-        if (this.world != null) {
-            return this.world;
-        }
-
-        this.world = this.getStore().getExternalData().getWorld();
-
-        return this.world;
-    }
-
-    @Nonnull
     @Override
     public String toString() {
-        String var10000 = String.valueOf(this.getStore().getClass());
-        return (
-            "ChunkRef{Ref{store=" + var10000 + "@" + this.getStore().hashCode() + ", index=" + this.getIndex() + "}}"
-        );
+        return "ChunkRef{" + super.toString() + "}";
     }
 }

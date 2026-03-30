@@ -18,6 +18,7 @@ import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
 import dev.twunk.interfaces.methods.IPersistentContainer;
@@ -106,11 +107,11 @@ public abstract class ContainerUtils {
 
         final Map<UUID, ContainerBlockWindow> windows = containerComponent.getWindows();
         if (windows.putIfAbsent(uuid, window) != null) {
-            containerComponent.onOpen(ref, world, store);
+            containerComponent.onOpen(new AnyRef<>(ref));
             return;
         }
         if (!playerComponent.getPageManager().setPageWithWindows(ref, store, Page.Bench, true, window)) {
-            containerComponent.onOpen(ref, world, store);
+            containerComponent.onOpen(new AnyRef<>(ref));
             windows.remove(uuid, window);
             return;
         }
@@ -166,6 +167,6 @@ public abstract class ContainerUtils {
         SoundUtil.playSoundEvent3d(ref, soundEventIndex, soundPos, commandBuffer);
         windows.remove(uuid, window);
 
-        containerComponent.onOpen(ref, world, store);
+        containerComponent.onOpen(new AnyRef<>(ref));
     }
 }

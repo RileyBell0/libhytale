@@ -8,6 +8,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.system.TickSubSystem;
 import dev.twunk.hytale.utils.BlockUtils;
@@ -54,62 +55,31 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
         final @Nonnull Store<ChunkStore> store,
         final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        // blockEntityRef --(has)-> blockInfo --(is in)-> worldChunk --(is in)-> world
-        // blockInfo has local coords
-        // blockInfo & worldChunk --(implies)-> global coords
-
-        // ref to our block entity (ref to the entity at the current
-        // index that matches the query - imagine the index as an arbtrary
-        // `i` in a for loop. think nothing of it)
+        // Get your component that implements IBlockTickComponent from the block
         final var blockRef = archetypeChunk.getReferenceTo(index);
-
-        // From my understanding, this seems to be a sort of inherent component
-        // on block entites. You can always seem to get it. This stores its LOCAL
-        // coordinates (sort of)
-        //
-        // It stores the `index` that the block is within its `chunk`. we do some
-        // funky maths to turn that 1 dimensional index (1, 2, 3...) into a 3 dimensional
-        // position [(x: 0, y: 0, z: 0), (x: 1, y: 0, z: 0)... etc]
-        //
-        // note: ^^ above numbers made up, really never checked which order they
-        // index their blocks into the chunk
-        final var blockInfo = dev.twunk.hytale.utils.BlockUtils.Info.get(blockRef);
-        if (blockInfo == null) {
-            return;
-        }
-
-        // you guessed it, the chunk the block is in. the chunk stores its own coordinates
-        // (as in where the chunk itself is located within the world at large)
-        //
-        // we need this to effectively just add its coordinates to our block
-        // -> block local coords + chunk coords ~= global position
-        final var worldChunk = dev.twunk.hytale.utils.ChunkUtils.WorldChunk_.get(blockInfo);
-        if (worldChunk == null) {
-            return;
-        }
-
-        // the world our chunk is in
-        // the best way i've found so far to get the world that the entity is in
-        // is to go
-        // blockEntityRef --(has)-> blockInfo --(is in)-> worldChunk --(is in)-> world
-        final var world = worldChunk.getWorld();
-        if (world == null) {
-            return;
-        }
-        final var coords = BlockUtils.Coords.Global.get(worldChunk, blockInfo);
-
-        // Since our query is based on your component, we KNOW it has to have your
-        // component, so, we just, get it
         final var component = ComponentUtils.get(blockRef, this.componentType);
+
         try {
-            // and call the tick method you defined on your component, which,
-            // i know is sort of heresy for ECS systems, but, it makes doing
-            // easy things easy. and i'm all for that
-            component.onBlockTick(blockRef, world, worldChunk, commandBuffer, coords, worldChunk.getBlock(coords));
+            // and call the tick method you defined on your component
+            component.onBlockTick(new BlockRef(blockRef), commandBuffer);
         } catch (Throwable e) {
-            logger
-                .atSevere()
-                .log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
+            final var coords = BlockUtils.Coords.Global.get(blockRef);
+            if (coords != null) {
+                logger
+                    .atSevere()
+                    .log(String.format("ERROR: Failed to tick block at (%d, %d, %d)", coords.x, coords.y, coords.z));
+            } else {
+                logger
+                    .atSevere()
+                    .log(
+                        String.format(
+                            "ERROR: Failed to tick block (and failed to get coords) | ref: " +
+                                blockRef +
+                                " | component: " +
+                                component
+                        )
+                    );
+            }
             return;
         }
     }

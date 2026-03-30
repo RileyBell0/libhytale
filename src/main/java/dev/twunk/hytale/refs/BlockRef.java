@@ -17,8 +17,10 @@ import javax.annotation.Nullable;
  * Implements the SAME methods as Ref<ChunkStore> BUT also will include a bunch
  * more methods from Utils so that you can just take a ref and access the stuff
  * you want without having to go through a billion processes
+ * @see AnyRef
+ * @see Ref (Ref<ChunkStore>)
  */
-public class BlockRef extends Ref<ChunkStore> {
+public class BlockRef extends AnyRef<ChunkStore> {
 
     @Nonnull
     @SuppressWarnings("null")
@@ -40,8 +42,8 @@ public class BlockRef extends Ref<ChunkStore> {
     @Nullable
     private BlockStateInfo info = null;
 
-    private BlockRef(@Nonnull Ref<ChunkStore> ref) {
-        super(ref.getStore());
+    public BlockRef(@Nonnull Ref<ChunkStore> ref) {
+        super(ref);
     }
 
     // suppressing "unchecked" but, really, i've checked it. silly java.
@@ -187,9 +189,6 @@ public class BlockRef extends Ref<ChunkStore> {
     @Nonnull
     @Override
     public String toString() {
-        String var10000 = String.valueOf(this.getStore().getClass());
-        return (
-            "BlockRef{Ref{store=" + var10000 + "@" + this.getStore().hashCode() + ", index=" + this.getIndex() + "}}"
-        );
+        return "BlockRef{" + super.toString() + "}";
     }
 }

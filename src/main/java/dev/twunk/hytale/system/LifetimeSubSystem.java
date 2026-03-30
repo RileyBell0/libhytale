@@ -10,6 +10,7 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.ILifetime;
 import dev.twunk.interfaces.methods.IRegistry;
@@ -76,7 +77,7 @@ public abstract class LifetimeSubSystem<ECS_STORE extends WorldProvider>
         @Nonnull Store<ECS_STORE> store,
         @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        parent.onEntityAdded(ref, reason, store, commandBuffer);
+        parent.onEntityAdded(new AnyRef<>(ref), reason, commandBuffer);
     }
 
     @Override
@@ -86,7 +87,7 @@ public abstract class LifetimeSubSystem<ECS_STORE extends WorldProvider>
         @Nonnull Store<ECS_STORE> store,
         @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        parent.onEntityRemove(ref, reason, store, commandBuffer);
+        parent.onEntityRemove(new AnyRef<>(ref), reason, commandBuffer);
     }
 
     @Override

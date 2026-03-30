@@ -2,11 +2,10 @@ package dev.twunk.interfaces.methods;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.LifetimeSubSystem;
 import dev.twunk.interfaces.subsystem.ILifetimeSystem;
 import javax.annotation.Nonnull;
@@ -28,7 +27,6 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *
      * @param ref           The entity that is being adeded/loaded
      * @param reason        WHY the entity was added (SPAWN|LOAD)
-     * @param store         The store that the entity is held within
      * @param commandBuffer Useful for interacting with the world at large (buffered,
      *                      most of its methods should be ignored tbh unless you're GETTING
      *                      data). Generally you just want to use `commandBuffer.run((store)->{...})`
@@ -36,9 +34,8 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityAdded(
-        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull AnyRef<ECS_STORE> ref,
         final @Nonnull AddReason reason,
-        final @Nonnull Store<ECS_STORE> store,
         final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {}
 
@@ -47,7 +44,6 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *
      * @param ref           The entity that is being removed/unloaded
      * @param reason        WHY the entity was added (REMOVE|UNLOAD)
-     * @param store         The store that the entity is/was held within
      * @param commandBuffer Useful for interacting with the world at large (buffered,
      *                      most of its methods should be ignored tbh unless you're GETTING
      *                      data). Generally you just want to use `commandBuffer.run((store)->{...})`
@@ -55,9 +51,8 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityRemove(
-        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull AnyRef<ECS_STORE> ref,
         final @Nonnull RemoveReason reason,
-        final @Nonnull Store<ECS_STORE> store,
         final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {}
 }

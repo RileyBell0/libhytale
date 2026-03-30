@@ -3,14 +3,13 @@ package dev.twunk.lib.system;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.LifetimeSubSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.utils.ComponentUtils;
@@ -59,9 +58,8 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
 
     @Override
     public void onEntityAdded(
-        final @Nonnull Ref<ChunkStore> ref,
+        final @Nonnull AnyRef<ChunkStore> ref,
         final @Nonnull AddReason reason,
-        final @Nonnull Store<ChunkStore> store,
         final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // Since our query is based on your component, we KNOW it has to have your
@@ -71,7 +69,7 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
             // easy things easy. and i'm all for that
-            component.onEntityAdded(ref, reason, store, commandBuffer);
+            component.onEntityAdded(ref, reason, commandBuffer);
         } catch (Throwable e) {
             logger.atSevere().log(String.format("ERROR: Failed to run onEntityAdded - " + e));
             return;
@@ -80,9 +78,8 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
 
     @Override
     public void onEntityRemove(
-        final @Nonnull Ref<ChunkStore> ref,
+        final @Nonnull AnyRef<ChunkStore> ref,
         final @Nonnull RemoveReason reason,
-        final @Nonnull Store<ChunkStore> store,
         final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // Since our query is based on your component, we KNOW it has to have your
@@ -92,7 +89,7 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
             // and call the tick method you defined on your component, which,
             // i know is sort of heresy for ECS systems, but, it makes doing
             // easy things easy. and i'm all for that
-            component.onEntityRemove(ref, reason, store, commandBuffer);
+            component.onEntityRemove(ref, reason, commandBuffer);
         } catch (Throwable e) {
             logger.atSevere().log(String.format("ERROR: Failed to run onEntityRemove - " + e));
             return;
