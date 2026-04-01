@@ -1,10 +1,9 @@
 package dev.twunk.hytale.system;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IBlockTick;
@@ -58,12 +57,10 @@ public class BlockTickSubSystem
 
     public void onEntityTick(
         final float dt,
-        final int index,
-        final @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        final @Nonnull Store<ChunkStore> store,
+        final @Nonnull AnyRef<ChunkStore> ref,
         final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
-        parent.onBlockTick(new BlockRef(archetypeChunk.getReferenceTo(index)), commandBuffer);
+        parent.onBlockTick(new BlockRef(ref), commandBuffer);
     }
 
     @Override

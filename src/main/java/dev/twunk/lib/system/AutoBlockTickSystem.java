@@ -1,13 +1,12 @@
 package dev.twunk.lib.system;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.system.TickSubSystem;
@@ -50,20 +49,17 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
 
     public void onEntityTick(
         final float dt,
-        final int index,
-        final @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
-        final @Nonnull Store<ChunkStore> store,
+        final @Nonnull AnyRef<ChunkStore> ref,
         final @Nonnull CommandBuffer<ChunkStore> commandBuffer
     ) {
         // Get your component that implements IBlockTickComponent from the block
-        final var blockRef = archetypeChunk.getReferenceTo(index);
-        final var component = ComponentUtils.get(blockRef, this.componentType);
+        final var component = ComponentUtils.get(ref, this.componentType);
 
         try {
             // and call the tick method you defined on your component
-            component.onBlockTick(new BlockRef(blockRef), commandBuffer);
+            component.onBlockTick(new BlockRef(ref), commandBuffer);
         } catch (Throwable e) {
-            final var coords = BlockUtils.Coords.Global.get(blockRef);
+            final var coords = BlockUtils.Coords.Global.get(ref);
             if (coords != null) {
                 logger
                     .atSevere()
@@ -74,7 +70,7 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
                     .log(
                         String.format(
                             "ERROR: Failed to tick block (and failed to get coords) | ref: " +
-                                blockRef +
+                                ref +
                                 " | component: " +
                                 component
                         )

@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IRegistry;
 import dev.twunk.interfaces.methods.ITick;
@@ -69,7 +70,7 @@ public class TickSubSystem<ECS_STORE extends WorldProvider>
         final @Nonnull Store<ECS_STORE> store,
         final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        parent.onEntityTick(dt, index, archetypeChunk, store, commandBuffer);
+        parent.onEntityTick(dt, new AnyRef<>(archetypeChunk.getReferenceTo(index)), commandBuffer);
     }
 
     @Override

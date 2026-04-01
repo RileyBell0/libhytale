@@ -143,16 +143,7 @@ public final class AutoCodecGenerator {
             }
 
             return (BuilderCodec<U>) codec;
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
-        } catch (SecurityException e) {
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
             e.printStackTrace();
             return null;
         }
@@ -180,9 +171,7 @@ public final class AutoCodecGenerator {
                         try {
                             field.set(self, val);
                             return;
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalArgumentException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     }
@@ -191,9 +180,7 @@ public final class AutoCodecGenerator {
                     try {
                         var val = field.get(self);
                         return val;
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                     return null;
@@ -238,18 +225,14 @@ public final class AutoCodecGenerator {
                     }
                     try {
                         field.set(self, potentialComponentType);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 },
                 self -> {
                     try {
                         return ((ComponentType<?, ?>) field.get(self)).getTypeClass().getName();
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                     return null;
@@ -278,9 +261,7 @@ public final class AutoCodecGenerator {
                     if (val != null) {
                         try {
                             field.set(self, val);
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalArgumentException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     }
@@ -288,9 +269,7 @@ public final class AutoCodecGenerator {
                 self -> {
                     try {
                         return field.getBoolean(self);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                     return null;
@@ -319,9 +298,7 @@ public final class AutoCodecGenerator {
                     if (val != null) {
                         try {
                             field.set(self, val);
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalArgumentException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     }
@@ -329,9 +306,7 @@ public final class AutoCodecGenerator {
                 self -> {
                     try {
                         return (String) field.get(self);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                     return null;
@@ -361,9 +336,7 @@ public final class AutoCodecGenerator {
                     if (val != null && val >= minVal) {
                         try {
                             field.set(self, val);
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalArgumentException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     }
@@ -371,9 +344,7 @@ public final class AutoCodecGenerator {
                 self -> {
                     try {
                         return field.getShort(self);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                     return null;
@@ -403,9 +374,7 @@ public final class AutoCodecGenerator {
                     if (val != null && val >= minVal) {
                         try {
                             field.set(self, val);
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalArgumentException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     }
@@ -413,9 +382,7 @@ public final class AutoCodecGenerator {
                 self -> {
                     try {
                         return field.getInt(self);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                     return null;
@@ -432,22 +399,14 @@ public final class AutoCodecGenerator {
         final Supplier<T> supplier = () -> {
             try {
                 return clazz.getConstructor().newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-                return null;
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                return null;
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-                return null;
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-                return null;
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-                return null;
-            } catch (SecurityException e) {
+            } catch (
+                InstantiationException
+                | IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException
+                | NoSuchMethodException
+                | SecurityException e
+            ) {
                 e.printStackTrace();
                 return null;
             }

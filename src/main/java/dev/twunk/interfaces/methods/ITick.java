@@ -1,10 +1,9 @@
 package dev.twunk.interfaces.methods;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.TickSubSystem;
 import dev.twunk.interfaces.subsystem.ITickSystem;
 import javax.annotation.Nonnull;
@@ -22,10 +21,7 @@ import javax.annotation.Nonnull;
 public interface ITick<ECS_STORE extends WorldProvider> {
     public void onEntityTick(
         final float dt,
-        // use `archetypeChunk.getReferenceTo(index)` to get a `Ref<ECS_STORE>`
-        final int index,
-        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        final @Nonnull Store<ECS_STORE> store,
+        final @Nonnull AnyRef<ECS_STORE> ref,
         final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
     );
 }
