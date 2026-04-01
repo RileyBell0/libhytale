@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 public interface ITick<ECS_STORE extends WorldProvider> {
     public void onEntityTick(
         final float dt,
+        // use `archetypeChunk.getReferenceTo(index)` to get a `Ref<ECS_STORE>`
         final int index,
         final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
         final @Nonnull Store<ECS_STORE> store,
