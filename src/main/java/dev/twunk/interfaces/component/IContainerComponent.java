@@ -2,6 +2,7 @@ package dev.twunk.interfaces.component;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.methods.IContainer;
 
 // import dev.twunk.hytale.components.IContainer;
@@ -17,4 +18,4 @@ import dev.twunk.interfaces.methods.IContainer;
  * Hytale's code
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
-public interface IContainerComponent<ECS_TYPE> extends IContainer, Component<ECS_TYPE> {}
+public interface IContainerComponent<ECS_STORE extends WorldProvider> extends IContainer, Component<ECS_STORE> {}

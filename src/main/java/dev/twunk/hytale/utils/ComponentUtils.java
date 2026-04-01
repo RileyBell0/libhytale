@@ -8,6 +8,7 @@ import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
@@ -256,9 +257,9 @@ public abstract class ComponentUtils {
         });
     }
 
-    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> boolean has(
-        final @Nonnull Ref<ECS_TYPE> ref,
-        final @Nonnull Supplier<ComponentType<ECS_TYPE, T>> getComponentType
+    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> boolean has(
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull Supplier<ComponentType<ECS_STORE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -268,9 +269,9 @@ public abstract class ComponentUtils {
         return ComponentUtils.has(ref, componentType);
     }
 
-    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> boolean has(
-        final @Nonnull Ref<ECS_TYPE> ref,
-        final @Nonnull ComponentType<ECS_TYPE, T> componentType
+    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> boolean has(
+        final @Nonnull Ref<ECS_STORE> ref,
+        final @Nonnull ComponentType<ECS_STORE, T> componentType
     ) {
         return (T) ref.getStore().getComponent(ref, componentType) != null;
     }
@@ -279,9 +280,9 @@ public abstract class ComponentUtils {
     // Get another component that's ON the same ref you passed in
     // ====================================================================
 
-    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> T get(
-        final @Nonnull Ref<ECS_TYPE> anyRef,
-        final @Nonnull Supplier<ComponentType<ECS_TYPE, T>> getComponentType
+    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> T get(
+        final @Nonnull Ref<ECS_STORE> anyRef,
+        final @Nonnull Supplier<ComponentType<ECS_STORE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -291,9 +292,9 @@ public abstract class ComponentUtils {
         return anyRef.getStore().getComponent(anyRef, componentType);
     }
 
-    public static final <ECS_TYPE, T extends Component<ECS_TYPE>> T get(
-        final @Nonnull Ref<ECS_TYPE> anyRef,
-        final @Nonnull ComponentType<ECS_TYPE, T> componentType
+    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> T get(
+        final @Nonnull Ref<ECS_STORE> anyRef,
+        final @Nonnull ComponentType<ECS_STORE, T> componentType
     ) {
         return anyRef.getStore().getComponent(anyRef, componentType);
     }

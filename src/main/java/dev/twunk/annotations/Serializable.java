@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 import javax.lang.model.type.NullType;
 
 /**
- * When a component is annotated with this, i'll auto-register the relevant
- * systems to run its methods it defines (based on the interfaces it implements)
+ * Annotate a class with this to have its codec auto-generated. Define properties
+ * on this annotation to customise the behaviour
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

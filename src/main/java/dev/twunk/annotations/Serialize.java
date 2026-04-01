@@ -19,7 +19,6 @@ public @interface Serialize {
      * itself with an uppercase letter
      *
      * e.g. java variable named `myField` will be stored in the codec under "MyField": <>
-     * @return
      */
     String key() default "";
 

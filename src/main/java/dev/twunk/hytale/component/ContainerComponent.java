@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBl
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
@@ -26,7 +27,9 @@ import javax.annotation.Nullable;
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 @Serializable
-public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYPE>, IPersistentContainer {
+public class ContainerComponent<
+    ECS_STORE extends WorldProvider
+> implements IContainerComponent<ECS_STORE>, IPersistentContainer {
 
     @Serialize
     private boolean canView = true;
@@ -46,10 +49,6 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
 
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
-
-    //////////
-    // Methods
-    //////////
 
     // IContainer::getWindows
     @Nonnull
@@ -111,8 +110,8 @@ public class ContainerComponent<ECS_TYPE> implements IContainerComponent<ECS_TYP
         return this.worldChunk;
     }
 
-    public ContainerComponent<ECS_TYPE> clone() {
-        var component = new ContainerComponent<ECS_TYPE>();
+    public ContainerComponent<ECS_STORE> clone() {
+        var component = new ContainerComponent<ECS_STORE>();
         component.container = this.container.clone();
         component.canView = this.canView;
         component.canOpen = this.canOpen;
