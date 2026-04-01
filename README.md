@@ -10,8 +10,21 @@ Hytale's server side code (as of 31/03/2026) has no comments, making learning th
 
 This library serves to provide **documented** and **tested** utilities to make your journey coding within Hytale far easier.
 
-> [NOTE]
-> TODO: Add some side-by-side examples here
+> [!NOTE]
+> ## TODO
+> 
+> ### Docs
+> - Add some side-by-side examples here
+> - Add an example for the same poison system example they've got in the hytale docs
+>
+> ### Features / Fixes
+> - Fix up the LogInteraction and such's codecs - need to support nested ish codecs you see, or rather probably just need to fix up logInteraction to actually use multiple classes
+> - Add onBlockBreak, onBlockAdd (etc) event handlers as subsystems. The overall goal is to figure out an "onBlockUpdate" subsystem
+> - Fix ScheduledTickSystem
+> - The team just added an `ItemContainerBlock` component, probably need to update my container utils to suit. might be able to extend that directly for containers
+>
+> ### Stretch goals
+> - Fix up my definitions so they only NEED anything of type Object, because, well, theoretically i want my functions to just work and figure stuff out based on the props and interfaces something has, something that REALLY doesn't need annotations to work, so, may as well just make it work. Importantly, this means if you EXTEND component -> we're good, i'll register you as a component, if you DON'T extend component, i'll just not register you. Really i should ONLY throw exceptions or rather blocks of warnings for "you tried to register objects but nothing happened"
 
 Hytale is designed around Entity Component Systems (ECS), meaning you've got Entities (anything in a world) that has Components (data). To then run code and respond to events on these you have Systems.
 
@@ -117,12 +130,6 @@ For now, fork the following repo (or clone it or do whatever really) and just de
 https://github.com/RileyBell0/hytale-plugin
 
 ^^ It's where I test LibHytale. It has some examples of some use cases (usually of whatever part I'm working on) but should be pretty easy to follow or follow on from
-
-## TODO
-
-1. Add onBlockBreak, onBlockAdd (etc) event handlers as subsystems. The overall goal is to figure out an "onBlockUpdate" subsystem
-2. Fix ScheduledTickSystem
-3. The team just added an `ItemContainerBlock` component, probably need to update my container utils to suit. might be able to extend that directly for containers
 
 ## Extra
 

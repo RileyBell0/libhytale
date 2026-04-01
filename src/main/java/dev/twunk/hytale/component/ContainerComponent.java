@@ -50,6 +50,10 @@ public class ContainerComponent<
     @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
+    //////////
+    // Methods
+    //////////
+
     // IContainer::getWindows
     @Nonnull
     @Override
