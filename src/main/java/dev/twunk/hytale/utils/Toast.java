@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.io.PacketHandler;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -16,7 +15,6 @@ import javax.annotation.Nullable;
  */
 public class Toast extends NotificationUtil {
 
-    @Nonnull
     public Message message;
 
     @Nullable
@@ -28,7 +26,6 @@ public class Toast extends NotificationUtil {
     @Nullable
     public ItemWithAllMetadata item;
 
-    @Nonnull
     public NotificationStyle style;
 
     public Toast(final @Nullable Object message) {
@@ -49,23 +46,20 @@ public class Toast extends NotificationUtil {
         return new Toast(Chat.parse(message));
     }
 
-    public static Toast build(final @Nonnull Object message, final @Nonnull Object secondaryMessage) {
+    public static Toast build(final Object message, final Object secondaryMessage) {
         return new Toast(message).setSecondaryMessage(secondaryMessage);
     }
 
-    @Nonnull
     public Toast setMessage(final @Nullable Object message) {
         this.message = Chat.parse(message);
         return this;
     }
 
-    @Nonnull
     public Toast setPrimaryMessage(final @Nullable Object message) {
         this.message = Chat.parse(message);
         return this;
     }
 
-    @Nonnull
     public Toast setSecondaryMessage(final @Nullable Object secondaryMessage) {
         if (secondaryMessage == null) {
             this.secondaryMessage = null;
@@ -75,19 +69,16 @@ public class Toast extends NotificationUtil {
         return this;
     }
 
-    @Nonnull
     public Toast setIcon(final @Nullable String icon) {
         this.icon = icon;
         return this;
     }
 
-    @Nonnull
     public Toast setItem(final @Nullable ItemWithAllMetadata item) {
         this.item = item;
         return this;
     }
 
-    @Nonnull
     public Toast setStyle(final @Nullable NotificationStyle style) {
         if (style == null) {
             this.style = NotificationStyle.Default;
@@ -101,27 +92,27 @@ public class Toast extends NotificationUtil {
         Toast.sendNotificationToUniverse(this.message, this.secondaryMessage, this.icon, this.item, this.style);
     }
 
-    public void send(@Nonnull PacketHandler handler) {
+    public void send(PacketHandler handler) {
         Toast.sendNotification(handler, this.message, this.secondaryMessage, this.icon, this.item, this.style);
     }
 
-    public void send(@Nonnull Player player) {
+    public void send(Player player) {
         Toast.sendNotificationToPlayer(player, this.message, this.secondaryMessage, this.icon, this.item, this.style);
     }
 
-    public void send(@Nonnull World world) {
+    public void send(World world) {
         for (PlayerRef playerRefComponent : world.getPlayerRefs()) {
             this.send(playerRefComponent.getPacketHandler());
         }
     }
 
     public static void sendNotificationToPlayer(
-        final @Nonnull Player player,
-        final @Nonnull Message message,
+        final Player player,
+        final Message message,
         final @Nullable Message secondaryMessage,
         final @Nullable String icon,
         final @Nullable ItemWithAllMetadata item,
-        final @Nonnull NotificationStyle style
+        final NotificationStyle style
     ) {
         final var ref = player.getReference();
         if (ref == null) {

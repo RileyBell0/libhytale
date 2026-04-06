@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.subsystem;
+package dev.twunk.interfaces.methods;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -6,9 +6,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.system.UniverseTickSubSystem;
-import dev.twunk.interfaces.IRegistryProvider;
-import dev.twunk.interfaces.methods.IQuery;
-import javax.annotation.Nonnull;
 
 /**
  * Gives your system the event handler function it needs to run some code every
@@ -28,13 +25,11 @@ import javax.annotation.Nonnull;
  * @see ArchetypeTickingSystem - I use this to run GlobalTickSubSystem(s). Only way i currently know
  *                               of for getting a commandBuffer in a global tick
  */
-public interface IUniverseTickSystem<
-    ECS_STORE extends WorldProvider
-> extends IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
+public interface IUniverseTick<ECS_STORE extends WorldProvider> {
     public void onSystemTick(
         final float dt,
-        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final Store<ECS_STORE> store,
+        final CommandBuffer<ECS_STORE> commandBuffer
     );
 }

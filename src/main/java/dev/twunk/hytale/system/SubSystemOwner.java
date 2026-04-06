@@ -3,11 +3,9 @@ package dev.twunk.hytale.system;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
-import dev.twunk.interfaces.IRegistryProvider;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IQuery;
 import java.util.ArrayList;
-import javax.annotation.Nonnull;
 
 /**
  * Nice-to-have wrapper for making a system OR composite subsystem
@@ -22,32 +20,26 @@ import javax.annotation.Nonnull;
  * Forces the parent to provide a `query` that its subsystems will use. That's
  * the most handy part honestly
  */
-public abstract class SubSystemOwner<
-    ECS_STORE extends WorldProvider
-> implements IQuery<ECS_STORE>, IRegistryProvider<ECS_STORE> {
+public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements IQuery<ECS_STORE> {
 
-    @Nonnull
     private final ArrayList<ISubSystem<ECS_STORE>> subSystems = new ArrayList<>();
-
-    @Nonnull
     private final Query<ECS_STORE> query;
 
-    public SubSystemOwner(final @Nonnull Query<ECS_STORE> query) {
+    public SubSystemOwner(final Query<ECS_STORE> query) {
         this.query = query;
     }
 
-    protected void appendSubSystem(final @Nonnull ISubSystem<ECS_STORE> system) {
+    protected void appendSubSystem(final ISubSystem<ECS_STORE> system) {
         this.subSystems.add(system);
     }
 
-    public void registerTo(final @Nonnull HytalePlugin plugin) {
+    public void registerTo(final HytalePlugin plugin) {
         for (final var system : subSystems) {
             system.registerTo(plugin);
         }
     }
 
     @Override
-    @Nonnull
     public Query<ECS_STORE> getQuery() {
         return this.query;
     }

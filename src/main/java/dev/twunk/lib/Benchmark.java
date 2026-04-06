@@ -8,9 +8,9 @@ import javax.annotation.Nonnull;
 
 public abstract class Benchmark {
 
-    @Nonnull
     private static final HashMap<String, ArrayList<Long>> TIMINGS = new HashMap<>();
 
+    @SuppressWarnings("null")
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     // report every X times the function is called
@@ -23,41 +23,41 @@ public abstract class Benchmark {
     ////////////////////////
     ////////////////////////
 
-    public static final <T> T timeFuncExecution(final @Nonnull String id, final @Nonnull Supplier<T> func) {
+    public static final <T> T timeFuncExecution(final String id, final Supplier<T> func) {
         return timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, false);
     }
 
-    public static final void timeFuncExecution(final @Nonnull String id, final @Nonnull Runnable func) {
+    public static final void timeFuncExecution(final String id, final Runnable func) {
         timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, false);
     }
 
     public static final <T> T timeFuncExecutionWithFrequency(
-        final @Nonnull String id,
-        final @Nonnull Supplier<T> func,
+        final String id,
+        final Supplier<T> func,
         final int reportingFrequency
     ) {
         return timeFuncExecutionWithFrequency(id, func, reportingFrequency, false);
     }
 
     public static final void timeFuncExecutionWithFrequency(
-        final @Nonnull String id,
-        final @Nonnull Runnable func,
+        final String id,
+        final Runnable func,
         final int reportingFrequency
     ) {
         timeFuncExecutionWithFrequency(id, func, reportingFrequency, false);
     }
 
     public static final <T> T timeFuncExecutionWithFrequency(
-        final @Nonnull String id,
-        final @Nonnull Supplier<T> func,
+        final String id,
+        final Supplier<T> func,
         final boolean logEveryTick
     ) {
         return timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, logEveryTick);
     }
 
     public static final void timeFuncExecutionWithFrequency(
-        final @Nonnull String id,
-        final @Nonnull Runnable func,
+        final String id,
+        final Runnable func,
         final boolean logEveryTick
     ) {
         timeFuncExecutionWithFrequency(id, func, REPORTING_FREQUENCY, logEveryTick);
@@ -70,8 +70,8 @@ public abstract class Benchmark {
     ////////////////////////
 
     public static final <T> T timeFuncExecutionWithFrequency(
-        final @Nonnull String id,
-        final @Nonnull Supplier<T> func,
+        final String id,
+        final Supplier<T> func,
         final int reportingFrequency,
         final boolean logEveryTick
     ) {
@@ -86,8 +86,8 @@ public abstract class Benchmark {
     }
 
     public static final void timeFuncExecutionWithFrequency(
-        final @Nonnull String id,
-        final @Nonnull Runnable func,
+        final String id,
+        final Runnable func,
         final int reportingFrequency,
         final boolean logEveryTick
     ) {
@@ -101,8 +101,8 @@ public abstract class Benchmark {
     }
 
     private static final void log(
-        final @Nonnull String id,
-        final @Nonnull ArrayList<Long> stats,
+        final String id,
+        final ArrayList<Long> stats,
         final int reportingFrequency,
         final boolean logEveryTick
     ) {
@@ -146,13 +146,12 @@ public abstract class Benchmark {
         console.log(res);
     }
 
-    @Nonnull
     @SuppressWarnings("null")
     private static ArrayList<Long> getStats(String id) {
         return TIMINGS.getOrDefault(id, new ArrayList<Long>());
     }
 
-    private static final <T> T _run(final @Nonnull Supplier<T> func, final @Nonnull ArrayList<Long> stats) {
+    private static final <@Nonnull T> T _run(final Supplier<T> func, final ArrayList<Long> stats) {
         // start timer
         final var start = System.nanoTime();
 
@@ -170,7 +169,7 @@ public abstract class Benchmark {
         return res;
     }
 
-    private static final void _run(final @Nonnull Runnable func, final @Nonnull ArrayList<Long> stats) {
+    private static final void _run(final Runnable func, final ArrayList<Long> stats) {
         // start timer
         final var start = System.nanoTime();
 

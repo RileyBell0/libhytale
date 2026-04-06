@@ -13,7 +13,6 @@ import dev.twunk.lib.ChunkRegisterProvider;
 import dev.twunk.lib.EntityRegisterProvider;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.lib.test.TwunkDevTestComponent;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -45,16 +44,14 @@ import javax.annotation.Nullable;
  */
 public abstract class LibHytale {
 
-    @Nonnull
     public static final EntityRegisterProvider ENTITY_REGISTRY = new EntityRegisterProvider();
 
-    @Nonnull
     public static final ChunkRegisterProvider CHUNK_REGISTRY = new ChunkRegisterProvider();
 
     private static boolean hasRegisteredLibComponents = false;
 
     // Called automatically when you load a mod plugin
-    public static void init(final @Nonnull HytalePlugin plugin) {
+    public static void init(final HytalePlugin plugin) {
         if (hasRegisteredLibComponents) {
             return;
         }
@@ -81,9 +78,8 @@ public abstract class LibHytale {
      *          Types are stored on registration, thus, they're not there before
      *          registration...
      */
-    @Nonnull
     public static <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getChunkComponentType(
-        final @Nonnull Class<T> componentClass
+        final Class<T> componentClass
     ) {
         return CHUNK_REGISTRY.getComponentType(componentClass);
     }
@@ -95,7 +91,7 @@ public abstract class LibHytale {
      */
     @Nullable
     public static ComponentType<ChunkStore, ? extends Component<ChunkStore>> getChunkComponentType(
-        final @Nonnull String componentId
+        final String componentId
     ) {
         return CHUNK_REGISTRY.getComponentType(componentId);
     }
@@ -105,9 +101,8 @@ public abstract class LibHytale {
      *          Types are stored on registration, thus, they're not there before
      *          registration...
      */
-    @Nonnull
     public static <T extends Component<EntityStore>> ComponentType<EntityStore, T> getEntityComponentType(
-        final @Nonnull Class<T> componentClass
+        final Class<T> componentClass
     ) {
         return ENTITY_REGISTRY.getComponentType(componentClass);
     }
@@ -119,7 +114,7 @@ public abstract class LibHytale {
      */
     @Nullable
     public static ComponentType<EntityStore, ? extends Component<EntityStore>> getEntityComponentType(
-        final @Nonnull String componentId
+        final String componentId
     ) {
         return ENTITY_REGISTRY.getComponentType(componentId);
     }
@@ -128,17 +123,17 @@ public abstract class LibHytale {
      * Register component type to both its Class, and to its ID
      */
     public static <T extends Component<ChunkStore>> void registerChunkComponentType(
-        final @Nonnull ComponentType<ChunkStore, T> componentType,
-        final @Nonnull Class<T> myClass,
-        final @Nonnull String id
+        final ComponentType<ChunkStore, T> componentType,
+        final Class<T> myClass,
+        final String id
     ) {
         CHUNK_REGISTRY.registerComponentType(componentType, myClass, id);
     }
 
     public static <T extends Component<EntityStore>> void registerEntityComponentType(
-        final @Nonnull ComponentType<EntityStore, T> componentType,
-        final @Nonnull Class<T> myClass,
-        final @Nonnull String id
+        final ComponentType<EntityStore, T> componentType,
+        final Class<T> myClass,
+        final String id
     ) {
         ENTITY_REGISTRY.registerComponentType(componentType, myClass, id);
     }

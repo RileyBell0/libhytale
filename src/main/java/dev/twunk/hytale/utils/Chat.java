@@ -7,7 +7,6 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -18,7 +17,6 @@ import javax.annotation.Nullable;
  */
 public abstract class Chat {
 
-    @Nonnull
     public static final String getColor(final @Nullable Level level) {
         String color = null;
         if (level == null) {
@@ -49,7 +47,6 @@ public abstract class Chat {
         return color;
     }
 
-    @Nonnull
     public static final Message parse(final @Nullable Object message) {
         if (message == null) {
             return Message.empty();
@@ -69,7 +66,6 @@ public abstract class Chat {
         }
     }
 
-    @Nonnull
     public static final Message join(final @Nullable Object... messages) {
         if (messages == null) {
             return Message.empty();
@@ -88,13 +84,11 @@ public abstract class Chat {
         return Message.join(asArray);
     }
 
-    @Nonnull
-    private static final Message constructLogMessage(final @Nonnull Message message) {
+    private static final Message constructLogMessage(final Message message) {
         return constructLogMessage(Level.INFO, message);
     }
 
-    @Nonnull
-    private static final Message constructLogMessage(@Nullable Level level, final @Nonnull Message message) {
+    private static final Message constructLogMessage(@Nullable Level level, final Message message) {
         if (level == null) {
             level = Level.INFO;
         }
@@ -108,43 +102,39 @@ public abstract class Chat {
         return Message.join(prefix, message.monospace(true)).monospace(true);
     }
 
-    public static void send(final @Nonnull Player player, final @Nonnull Object... messages) {
+    public static void send(final Player player, final Object... messages) {
         player.sendMessage(Chat.join(messages));
     }
 
-    public static void log(final @Nonnull Player player, final @Nonnull Object... messages) {
+    public static void log(final Player player, final Object... messages) {
         player.sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
-    public static void log(
-        final @Nonnull Player player,
-        final @Nonnull Level level,
-        final @Nonnull Object... messages
-    ) {
+    public static void log(final Player player, final Level level, final Object... messages) {
         player.sendMessage(constructLogMessage(level, Chat.join(messages)));
     }
 
-    public static void send(final @Nonnull World world, final @Nonnull Object... messages) {
+    public static void send(final World world, final Object... messages) {
         world.sendMessage(Chat.join(messages));
     }
 
-    public static void log(final @Nonnull World world, final @Nonnull Object... messages) {
+    public static void log(final World world, final Object... messages) {
         world.sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
-    public static void log(final @Nonnull World world, final @Nonnull Level level, final @Nonnull Object... messages) {
+    public static void log(final World world, final Level level, final Object... messages) {
         world.sendMessage(constructLogMessage(level, Chat.join(messages)));
     }
 
-    public static void send(final @Nonnull Object... messages) {
+    public static void send(final Object... messages) {
         Universe.get().sendMessage(Chat.join(messages));
     }
 
-    public static void log(final @Nonnull Object... messages) {
+    public static void log(final Object... messages) {
         Universe.get().sendMessage(constructLogMessage(Chat.join(messages)));
     }
 
-    public static void log(final @Nonnull Level level, final @Nonnull Object... messages) {
+    public static void log(final Level level, final Object... messages) {
         Universe.get().sendMessage(constructLogMessage(level, Chat.join(messages)));
     }
 }

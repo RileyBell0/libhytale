@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.lib.coords.ChunkCoordinates;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -20,7 +19,6 @@ import javax.annotation.Nullable;
  */
 public class ChunkRef extends AnyRef<ChunkStore> {
 
-    @Nonnull
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, WorldChunk> WORLD_CHUNK_COMPONENT_TYPE =
         WorldChunk.getComponentType();
@@ -31,7 +29,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     @Nullable
     private WorldChunk worldChunk = null;
 
-    public ChunkRef(@Nonnull Ref<ChunkStore> ref) {
+    public ChunkRef(Ref<ChunkStore> ref) {
         super(ref);
     }
 
@@ -76,6 +74,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
 
     // suppressing "unchecked" but, really, i've checked it. silly java.
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T extends Component<ChunkStore>> T getComponent(@Nullable ComponentType<ChunkStore, T> componentType) {
         if (componentType == null) {
             return null;
@@ -102,7 +101,6 @@ public class ChunkRef extends AnyRef<ChunkStore> {
         return this.worldChunk;
     }
 
-    @Nonnull
     @Override
     public String toString() {
         return "ChunkRef{" + super.toString() + "}";

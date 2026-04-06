@@ -3,7 +3,7 @@ package dev.twunk.lib.lifetime;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.World;
 import java.util.ArrayList;
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Information about the block that's being ticked, cached between calls to
@@ -59,23 +59,16 @@ public class TrackedEntity<ECS_STORE> {
     /**
      * The world that your entity is in
      */
-    @Nonnull
     public final World world;
 
     /**
      * The ref for your entity
      */
-    @Nonnull
     public final Ref<ECS_STORE> ref;
 
-    @Nonnull
     private ArrayList<TrackedEntity<ECS_STORE>> currentAreaRef;
 
-    public TrackedEntity(
-        @Nonnull World world,
-        @Nonnull Ref<ECS_STORE> ref,
-        @Nonnull ArrayList<TrackedEntity<ECS_STORE>> currentAreaRef
-    ) {
+    public TrackedEntity(World world, Ref<ECS_STORE> ref, ArrayList<TrackedEntity<ECS_STORE>> currentAreaRef) {
         this.lifetimeId = ++nextLifetimeId;
         this.world = world;
         this.ref = ref;
@@ -90,7 +83,7 @@ public class TrackedEntity<ECS_STORE> {
      * We'll say they're the same if they have the same ref. should make removal easy
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj instanceof TrackedEntity) {
             return ((TrackedEntity<?>) obj).ref == this.ref;
         }

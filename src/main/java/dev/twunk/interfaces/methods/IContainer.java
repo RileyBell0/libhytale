@@ -9,7 +9,6 @@ import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.hytale.refs.AnyRef;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 
 /**
  * My code
@@ -21,15 +20,13 @@ import javax.annotation.Nonnull;
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 public interface IContainer {
-    @Nonnull
     public Map<UUID, ContainerBlockWindow> getWindows();
 
-    @Nonnull
     public SimpleItemContainer getContainer();
 
     public short getCapacity();
 
-    public default <ECS_STORE extends WorldProvider> void onOpen(final @Nonnull AnyRef<ECS_STORE> ref) {}
+    public default <ECS_STORE extends WorldProvider> void onOpen(final AnyRef<ECS_STORE> ref) {}
 
     // Hytale src code (deprecated) called this `isAllowViewing`
     public default boolean canView() {

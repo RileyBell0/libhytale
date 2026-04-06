@@ -9,7 +9,6 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import java.util.ArrayList;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // TODO make a heap kinda thing with constant time access by assigning
@@ -35,12 +34,11 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
     // what state they held
     private final String id;
 
-    @Nonnull
     private final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> tickStateComponent;
 
     public TrackedEntities(
-        final @Nonnull String id,
-        final @Nonnull ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> component
+        final String id,
+        final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> component
     ) {
         this.id = id;
         this.tickStateComponent = component;
@@ -50,25 +48,20 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
     // Non-static implementation begins
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-    @Nonnull
     public final ArrayList<TrackedEntity<ECS_STORE>> ticking = new ArrayList<>();
 
-    @Nonnull
     private final ArrayList<TrackedEntity<ECS_STORE>> sleeping = new ArrayList<>();
 
-    @Nonnull
     private final ArrayList<TrackedEntity<ECS_STORE>> comatose = new ArrayList<>();
 
-    @Nonnull
     private final ArrayList<TrackedEntity<ECS_STORE>> stopped = new ArrayList<>();
 
-    @Nonnull
     private final ArrayList<TrackedEntity<ECS_STORE>> broken = new ArrayList<>();
 
     public void track(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final Ref<ECS_STORE> ref,
+        final Store<ECS_STORE> store,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // figure out the current/initial ticking state our entity has
         final var tickingInfo = this.loadEntityTickingState(ref, commandBuffer);
@@ -94,11 +87,7 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
         tickingInfo._setMemoryLocation(this.id, onTickCache);
     }
 
-    public void untrack(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull RemoveReason reason
-    ) {
+    public void untrack(final Ref<ECS_STORE> ref, final Store<ECS_STORE> store, final RemoveReason reason) {
         store.getComponent(ref, this.tickStateComponent).drop(this.id, reason);
     }
 
@@ -107,9 +96,9 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
      */
     @Nullable
     private TrackedEntity<ECS_STORE> getTickVars(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull ArrayList<TrackedEntity<ECS_STORE>> area
+        final Ref<ECS_STORE> ref,
+        final Store<ECS_STORE> store,
+        final ArrayList<TrackedEntity<ECS_STORE>> area
     ) {
         // We're going to spend a bunch of extra time in onEntityAdd to cache
         // all the information we'll need when this thing is ticking
@@ -123,10 +112,9 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
         return cache;
     }
 
-    @Nonnull
     private INTERNAL_TickSchedulerComponent<ECS_STORE> loadEntityTickingState(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final Ref<ECS_STORE> ref,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // Setup a tickingInfo component to track the state of our entitiy
         // so it can resume ticking/sleeping/etc when the server reboots. really
@@ -147,8 +135,7 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
      * current ticking state (active, sleeping, stopped etc)
      * @return
      */
-    @Nonnull
-    private ArrayList<TrackedEntity<ECS_STORE>> getOwner(TickPlan currentState) {
+    private ArrayList<TrackedEntity<ECS_STORE>> getOwner(@Nullable TickPlan currentState) {
         // and finally, we'll store it in the right place
         if (currentState instanceof TickPlan.Active) {
             return ticking;

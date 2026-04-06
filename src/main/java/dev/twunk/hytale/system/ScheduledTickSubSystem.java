@@ -6,16 +6,16 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.interfaces.methods.ILifetime;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.subsystem.ILifetimeSystem;
-import dev.twunk.interfaces.subsystem.IScheduledTickSystem;
-import dev.twunk.interfaces.subsystem.IUniverseTickSystem;
+import dev.twunk.interfaces.methods.IScheduledTick;
+import dev.twunk.interfaces.methods.IUniverseTick;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.lib.lifetime.TrackedEntities;
-import javax.annotation.Nonnull;
 
 /**
  * TODO really not working that well atm, needs to be cleaned up BUT it worked
@@ -38,47 +38,49 @@ import javax.annotation.Nonnull;
  */
 public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
     extends SubSystemOwner<ECS_STORE>
-    implements ILifetimeSystem<ECS_STORE>, IUniverseTickSystem<ECS_STORE>, ISubSystem<ECS_STORE>
+    implements ILifetime<ECS_STORE>, IUniverseTick<ECS_STORE>, ISubSystem<ECS_STORE>
 {
 
-    @Nonnull
     private final TrackedEntities<ECS_STORE> entities;
-
-    @Nonnull
-    private final IScheduledTickSystem<ECS_STORE> parent;
+    private final IScheduledTick<ECS_STORE> listener;
+    private final IRegistry<ECS_STORE> registry;
 
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     @SuppressWarnings("unchecked")
-    @Nonnull
     public <T extends ScheduledTickSubSystem<ECS_STORE>> ScheduledTickSubSystem<ECS_STORE> newSubsystemFor(
-        final @Nonnull IScheduledTickSystem<ECS_STORE> parent
+        final IScheduledTick<ECS_STORE> listener,
+        final Query<ECS_STORE> query,
+        final IRegistry<ECS_STORE> registry
     ) {
-        return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, IScheduledTickSystem.class, parent);
+        return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, IScheduledTick.class, listener, query);
     }
 
-    protected ScheduledTickSubSystem(final @Nonnull IScheduledTickSystem<ECS_STORE> parent) {
-        super(parent.getQuery());
-        this.parent = parent;
+    protected ScheduledTickSubSystem(
+        final IScheduledTick<ECS_STORE> listener,
+        final Query<ECS_STORE> query,
+        final IRegistry<ECS_STORE> registry
+    ) {
+        super(query);
+        this.listener = listener;
+        this.registry = registry;
 
         @SuppressWarnings("unchecked")
-        final var componentType = parent
-            .getRegistry()
-            .getComponentType(
-                (Class<INTERNAL_TickSchedulerComponent<ECS_STORE>>) (Class<?>) INTERNAL_TickSchedulerComponent.class
-            );
+        final var componentType = registry.getComponentType(
+            (Class<INTERNAL_TickSchedulerComponent<ECS_STORE>>) (Class<?>) INTERNAL_TickSchedulerComponent.class
+        );
         if (componentType == null) {
             throw new RuntimeException("Failed to get component type for " + INTERNAL_TickSchedulerComponent.class);
         }
         // Init our module for tracking and persisting how our entities are
         // ticking/sleeping/etc
-        this.entities = new TrackedEntities<ECS_STORE>(parent.getId(), componentType);
+        this.entities = new TrackedEntities<ECS_STORE>(listener.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this));
-        this.appendSubSystem(UniverseTickSubSystem.newSubsystemFor(this));
+        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, query));
+        this.appendSubSystem(UniverseTickSubSystem.newSubsystemFor(this, query));
     }
 
     /**
@@ -89,10 +91,10 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * that'll set it up to be easily tickable for us later.
      */
     public void onEntityAdded(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull AddReason reason,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final Ref<ECS_STORE> ref,
+        final AddReason reason,
+        final Store<ECS_STORE> store,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         entities.track(ref, store, commandBuffer);
     }
@@ -105,10 +107,10 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * Removes the entity from our TrackedEntities tracker.
      */
     public void onEntityRemove(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull RemoveReason reason,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final Ref<ECS_STORE> ref,
+        final RemoveReason reason,
+        final Store<ECS_STORE> store,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         // drop the entity from our tracker
         entities.untrack(ref, store, reason);
@@ -123,18 +125,14 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      */
     public void onSystemTick(
         final float dt,
-        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final Store<ECS_STORE> store,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {
         for (// Java doesn't believe us when we assert that items inside an arraylist are nonnull.
         // Don't worry, they are, that's the only reason we suppress null here
-        @Nonnull
-        @SuppressWarnings("null")
         final var ticker : entities.ticking) {
-            // TODO - need to make it so that we check if the ref is still valid
-            // at this stage (eventually)
-            final var res = parent.onEntityTick(ticker.world, ticker.ref, dt, store, commandBuffer);
+            final var res = listener.onEntityTick(ticker.world, ticker.ref, dt, store, commandBuffer);
 
             // Transition to the state returned by the block
             if (res != null) {
@@ -151,6 +149,6 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
 
     @Override
     public IRegistry<ECS_STORE> getRegistry() {
-        return parent.getRegistry();
+        return this.registry;
     }
 }

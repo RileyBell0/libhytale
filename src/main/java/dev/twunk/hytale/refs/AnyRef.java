@@ -6,7 +6,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.utils.ComponentUtils;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -19,7 +18,7 @@ public class AnyRef<ECS_STORE extends WorldProvider> extends Ref<ECS_STORE> {
     @Nullable
     protected World world;
 
-    public AnyRef(@Nonnull Ref<ECS_STORE> ref) {
+    public AnyRef(Ref<ECS_STORE> ref) {
         super(ref.getStore());
     }
 
@@ -32,7 +31,6 @@ public class AnyRef<ECS_STORE extends WorldProvider> extends Ref<ECS_STORE> {
         return ComponentUtils.get(this, componentType);
     }
 
-    @Nonnull
     public final World getWorld() {
         if (this.world != null) {
             return this.world;
@@ -43,7 +41,6 @@ public class AnyRef<ECS_STORE extends WorldProvider> extends Ref<ECS_STORE> {
         return this.world;
     }
 
-    @Nonnull
     @Override
     public String toString() {
         return "AnyRef{" + super.toString() + "}";

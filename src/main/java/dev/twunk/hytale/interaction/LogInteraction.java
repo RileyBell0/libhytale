@@ -17,7 +17,6 @@ import dev.twunk.lib.AutoCodecGenerator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -34,7 +33,6 @@ public class LogInteraction extends SimpleInstantInteraction {
      * the codec for a single message. see the overall log codec to understand
      * where to use this
      */
-    @Nonnull
     public static final BuilderCodec<LogInteraction> SINGLE_MESSAGE_CODEC = AutoCodecGenerator.builder(
         LogInteraction.class,
         LogInteraction::new
@@ -46,7 +44,6 @@ public class LogInteraction extends SimpleInstantInteraction {
      * The overall log itself
      * Suppressing "null" from `Level.INFO`
      */
-    @Nonnull
     public static final BuilderCodec<LogInteraction> CODEC = BuilderCodec.builder(
         LogInteraction.class,
         LogInteraction::new,
@@ -85,7 +82,7 @@ public class LogInteraction extends SimpleInstantInteraction {
      * Your overarching message itself
      */
     @Serialize(required = true)
-    private String message;
+    private String message = "";
 
     /**
      * OPTIONAL
@@ -120,7 +117,7 @@ public class LogInteraction extends SimpleInstantInteraction {
      * SEVERE | WARNING | INFO | CONFIG | FINE | FINER | FINEST
      */
     @SuppressWarnings("null")
-    private @Nonnull Level level = Level.INFO;
+    private Level level = Level.INFO;
 
     /**
      * Runs the interaction.
@@ -132,9 +129,9 @@ public class LogInteraction extends SimpleInstantInteraction {
      */
     @Override
     protected void firstRun(
-        final @Nonnull InteractionType interactionType,
-        final @Nonnull InteractionContext interactionContext,
-        final @Nonnull CooldownHandler cooldownHandler
+        final InteractionType interactionType,
+        final InteractionContext interactionContext,
+        final CooldownHandler cooldownHandler
     ) {
         final var commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {

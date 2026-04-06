@@ -20,7 +20,6 @@ import dev.twunk.hytale.component.TrashComponent;
 import dev.twunk.hytale.utils.ContainerUtils;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -44,28 +43,28 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
     @SuppressWarnings("unchecked")
     @Serialize
-    private @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
+    private ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
         LibHytale.getChunkComponentType(ContainerComponent.class);
 
     @Override
     protected void interactWithBlock(
-        final @Nonnull World world2,
-        final @Nonnull CommandBuffer<EntityStore> commandBuffer,
-        final @Nonnull InteractionType type,
-        final @Nonnull InteractionContext context,
+        final World world2,
+        final CommandBuffer<EntityStore> commandBuffer,
+        final InteractionType type,
+        final InteractionContext context,
         final @Nullable ItemStack itemInHand,
-        final @Nonnull Vector3i pos,
-        final @Nonnull CooldownHandler cooldownHandler
+        final Vector3i pos,
+        final CooldownHandler cooldownHandler
     ) {
         ContainerUtils.openContainerGUI(this.componentType, commandBuffer, context, pos);
     }
 
     @Override
     protected void simulateInteractWithBlock(
-        final @Nonnull InteractionType type,
-        final @Nonnull InteractionContext context,
+        final InteractionType type,
+        final InteractionContext context,
         final @Nullable ItemStack itemInHand,
-        final @Nonnull World world,
-        final @Nonnull Vector3i targetBlock
+        final World world,
+        final Vector3i targetBlock
     ) {}
 }

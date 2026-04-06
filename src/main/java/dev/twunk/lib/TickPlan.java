@@ -1,6 +1,5 @@
 package dev.twunk.lib;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public interface TickPlan {
@@ -9,19 +8,14 @@ public interface TickPlan {
     public static final String TYPE_STOP = "stop";
     public static final String TYPE_BROKEN = "broken";
 
-    @Nonnull
     public String getType();
 
-    @Nonnull
     public static final TickPlan CONTINUE = (TickPlan) new Active();
 
-    @Nonnull
     public static final TickPlan SLEEP = (TickPlan) new Sleeping();
 
-    @Nonnull
     public static final TickPlan STOP = (TickPlan) new Stopped();
 
-    @Nonnull
     public static final TickPlan BROKEN = (TickPlan) new Unknown();
 
     /**
@@ -30,7 +24,6 @@ public interface TickPlan {
     public class Active implements TickPlan {
 
         @Override
-        @Nonnull
         public String getType() {
             return TickPlan.TYPE_CONTINUE;
         }
@@ -64,23 +57,19 @@ public interface TickPlan {
             return this.sleepForTicks == null;
         }
 
-        @Nonnull
         public static Sleeping forSeconds(final int seconds) {
             return new Sleeping(30 * seconds);
         }
 
-        @Nonnull
         public static Sleeping forTicks(final int ticks) {
             return new Sleeping(ticks);
         }
 
-        @Nonnull
         public static Sleeping forEternity() {
             return new Sleeping();
         }
 
         @Override
-        @Nonnull
         public String getType() {
             return TickPlan.TYPE_SLEEP;
         }
@@ -92,7 +81,6 @@ public interface TickPlan {
     public class Stopped implements TickPlan {
 
         @Override
-        @Nonnull
         public String getType() {
             return TickPlan.TYPE_STOP;
         }
@@ -110,7 +98,6 @@ public interface TickPlan {
     public class Unknown implements TickPlan {
 
         @Override
-        @Nonnull
         public String getType() {
             return TickPlan.TYPE_BROKEN;
         }

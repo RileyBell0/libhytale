@@ -4,7 +4,6 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -13,59 +12,42 @@ import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import javax.annotation.Nonnull;
 
 public final class TestUtil {
 
     @SuppressWarnings("null")
-    @Nonnull
     private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_INFO_COMPONENT =
         BlockStateInfo.getComponentType();
 
     // @SuppressWarnings("null")
-    // @Nonnull
     // private static final ComponentType<ChunkStore, BlockChunk> BLOCK_CHUNK_COMPONENT = BlockChunk.getComponentType();
 
-    @Nonnull
     public final WorldProvider worldProvider;
 
-    @Nonnull
     public final World world;
 
-    @Nonnull
     public final CommandBuffer<ChunkStore> commandBuffer;
 
-    @Nonnull
     public final BlockStateInfo info;
 
-    @Nonnull
     public final Ref<ChunkStore> chunkRef;
 
-    @Nonnull
     public final Store<ChunkStore> store;
 
-    @Nonnull
     public final ChunkStore chunkStore;
 
-    @Nonnull
     public final Ref<ChunkStore> blockRef;
 
-    @Nonnull
     public final WorldChunk worldChunk;
 
-    @Nonnull
     public final BlockComponentChunk blockComponentChunk;
 
-    @Nonnull
     public final BlockChunk blockChunk;
 
-    @SuppressWarnings("unused")
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
-
     // public TestUtil(
-    //     final @Nonnull WorldChunk worldChunk,
-    //     final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-    //     final @Nonnull Vector3i blockCoords
+    //     final WorldChunk worldChunk,
+    //     final CommandBuffer<ChunkStore> commandBuffer,
+    //     final Vector3i blockCoords
     // ) {
     //     this.commandBuffer = commandBuffer;
 
@@ -130,7 +112,7 @@ public final class TestUtil {
      * @param commandBuffer
      * @param blockCoords
      */
-    public TestUtil(final @Nonnull CommandBuffer<ChunkStore> commandBuffer, final @Nonnull Vector3i blockCoords) {
+    public TestUtil(final CommandBuffer<ChunkStore> commandBuffer, final Vector3i blockCoords) {
         this.commandBuffer = commandBuffer;
 
         this.store = commandBuffer.getStore(); //  this works too

@@ -12,7 +12,6 @@ import com.hypixel.hytale.server.core.event.events.ecs.DropItemEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -24,16 +23,15 @@ public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.It
 
     private static final float DEFAULT_VELOCITY = 1.5F;
 
-    @Nonnull
     @SuppressWarnings("null")
     private static final Vector3f ZERO_VEC = Vector3f.ZERO;
 
     @Nullable
     public static Ref<EntityStore> spawn(
-        final @Nonnull Ref<EntityStore> eventOwnerRef,
-        final @Nonnull ComponentAccessor<EntityStore> store,
-        final @Nonnull Vector3i throwPosition,
-        final @Nonnull ItemStack itemsToSpawn
+        final Ref<EntityStore> eventOwnerRef,
+        final ComponentAccessor<EntityStore> store,
+        final Vector3i throwPosition,
+        final ItemStack itemsToSpawn
     ) {
         // Dispatch a drop event (found in hytale code, not entirely sure what it does yet)
         final DropItemEvent.Drop event = new DropItemEvent.Drop(itemsToSpawn, DEFAULT_VELOCITY);
@@ -67,12 +65,12 @@ public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.It
 
     @Nullable
     public static Ref<EntityStore> spawn(
-        final @Nonnull Ref<EntityStore> eventOwnerRef,
-        final @Nonnull ComponentAccessor<EntityStore> store,
-        final @Nonnull Vector3d throwPosition,
-        final @Nonnull Vector3d throwDirection,
+        final Ref<EntityStore> eventOwnerRef,
+        final ComponentAccessor<EntityStore> store,
+        final Vector3d throwPosition,
+        final Vector3d throwDirection,
         final float throwSpeed,
-        final @Nonnull ItemStack itemStack
+        final ItemStack itemStack
     ) {
         if (!eventOwnerRef.isValid()) {
             LOGGER.atWarning().log(
@@ -110,9 +108,9 @@ public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.It
 
     @Nullable
     public static Ref<EntityStore> throwItemFromEntity(
-        final @Nonnull Ref<EntityStore> ref,
-        final @Nonnull ItemStack itemStack,
-        final @Nonnull ComponentAccessor<EntityStore> componentAccessor
+        final Ref<EntityStore> ref,
+        final ItemStack itemStack,
+        final ComponentAccessor<EntityStore> componentAccessor
     ) {
         return com.hypixel.hytale.server.core.entity.ItemUtils.throwItem(
             ref,

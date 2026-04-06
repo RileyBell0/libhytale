@@ -16,7 +16,6 @@ import dev.twunk.hytale.LibHytale;
 import dev.twunk.lib.test.TestUtil;
 import dev.twunk.lib.test.TwunkDevTestComponent;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // TESTS ADDED AND VERIFIED
@@ -26,21 +25,17 @@ public abstract class ComponentUtils {
     // Component types (trust me bro, i swear they're not null)
     // ==================================================
 
-    @Nonnull
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, WorldChunk> WORLD_CHUNK_COMPONENT = WorldChunk.getComponentType();
 
-    @Nonnull
     @SuppressWarnings("null")
     public static final ComponentType<ChunkStore, BlockComponentChunk> BLOCK_COMPONENT_CHUNK =
         BlockComponentChunk.getComponentType();
 
-    @Nonnull
     @SuppressWarnings("null")
     public static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT_TYPE =
         BlockStateInfo.getComponentType();
 
-    @Nonnull
     public static final ComponentType<ChunkStore, TwunkDevTestComponent> TWUNK_DEV_TEST_COMPONENT_TYPE =
         LibHytale.getChunkComponentType(TwunkDevTestComponent.class);
 
@@ -48,10 +43,10 @@ public abstract class ComponentUtils {
      * Tests all methods i've defined for getWorldChunk
      */
     public static final void test(
-        final @Nonnull Ref<ChunkStore> blockRef,
-        final @Nonnull WorldChunk worldChunk,
-        final @Nonnull CommandBuffer<ChunkStore> commandBuffer,
-        final @Nonnull Vector3i providedCoords,
+        final Ref<ChunkStore> blockRef,
+        final WorldChunk worldChunk,
+        final CommandBuffer<ChunkStore> commandBuffer,
+        final Vector3i providedCoords,
         final @Nullable Boolean verbose
     ) {
         final var blockX = providedCoords.x;
@@ -258,8 +253,8 @@ public abstract class ComponentUtils {
     }
 
     public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> boolean has(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull Supplier<ComponentType<ECS_STORE, T>> getComponentType
+        final Ref<ECS_STORE> ref,
+        final Supplier<ComponentType<ECS_STORE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -270,8 +265,8 @@ public abstract class ComponentUtils {
     }
 
     public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> boolean has(
-        final @Nonnull Ref<ECS_STORE> ref,
-        final @Nonnull ComponentType<ECS_STORE, T> componentType
+        final Ref<ECS_STORE> ref,
+        final ComponentType<ECS_STORE, T> componentType
     ) {
         return (T) ref.getStore().getComponent(ref, componentType) != null;
     }
@@ -280,9 +275,10 @@ public abstract class ComponentUtils {
     // Get another component that's ON the same ref you passed in
     // ====================================================================
 
+    @Nullable
     public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> T get(
-        final @Nonnull Ref<ECS_STORE> anyRef,
-        final @Nonnull Supplier<ComponentType<ECS_STORE, T>> getComponentType
+        final Ref<ECS_STORE> anyRef,
+        final Supplier<ComponentType<ECS_STORE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -292,9 +288,10 @@ public abstract class ComponentUtils {
         return anyRef.getStore().getComponent(anyRef, componentType);
     }
 
+    @Nullable
     public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> T get(
-        final @Nonnull Ref<ECS_STORE> anyRef,
-        final @Nonnull ComponentType<ECS_STORE, T> componentType
+        final Ref<ECS_STORE> anyRef,
+        final ComponentType<ECS_STORE, T> componentType
     ) {
         return anyRef.getStore().getComponent(anyRef, componentType);
     }
@@ -303,9 +300,10 @@ public abstract class ComponentUtils {
      * Get a component from a chunk, can either provide the ref to the chunk itself OR
      * a ref to the block that's in the chunk
      */
+    @Nullable
     public static final <T extends Component<ChunkStore>> T getChunkComponent(
-        final @Nonnull Ref<ChunkStore> anyRef,
-        final @Nonnull ComponentType<ChunkStore, T> componentType
+        final Ref<ChunkStore> anyRef,
+        final ComponentType<ChunkStore, T> componentType
     ) {
         if (BlockUtils.isChunkRef(anyRef)) {
             return ComponentUtils.get(anyRef, componentType);
@@ -325,7 +323,7 @@ public abstract class ComponentUtils {
     }
 
     @Nullable
-    public static final BlockComponentChunk getBlockComponentChunk(final @Nonnull Ref<ChunkStore> anyRef) {
+    public static final BlockComponentChunk getBlockComponentChunk(final Ref<ChunkStore> anyRef) {
         if (BlockUtils.isChunkRef(anyRef)) {
             return anyRef.getStore().getComponent(anyRef, BLOCK_COMPONENT_CHUNK);
         } else if (BlockUtils.isBlockRef(anyRef)) {
@@ -348,8 +346,8 @@ public abstract class ComponentUtils {
 
     @Nullable
     public static final <T extends Component<ChunkStore>> T get_blockCoords(
-        final @Nonnull World world,
-        final @Nonnull ComponentType<ChunkStore, T> componentType,
+        final World world,
+        final ComponentType<ChunkStore, T> componentType,
         final int blockX,
         final int blockY,
         final int blockZ
@@ -379,9 +377,10 @@ public abstract class ComponentUtils {
     // Get a component from a block at the given LOCAL coords
     // ====================================================================
 
+    @Nullable
     public static final <T extends Component<ChunkStore>> T get_localCoords(
-        final @Nonnull BlockComponentChunk chunk,
-        final @Nonnull Supplier<ComponentType<ChunkStore, T>> getComponentType,
+        final BlockComponentChunk chunk,
+        final Supplier<ComponentType<ChunkStore, T>> getComponentType,
         final int localX,
         final int localY,
         final int localZ
@@ -400,8 +399,8 @@ public abstract class ComponentUtils {
 
     @Nullable
     public static final <T extends Component<ChunkStore>> T get_localCoords(
-        final @Nonnull BlockComponentChunk chunk,
-        final @Nonnull ComponentType<ChunkStore, T> componentType,
+        final BlockComponentChunk chunk,
+        final ComponentType<ChunkStore, T> componentType,
         final int localX,
         final int localY,
         final int localZ

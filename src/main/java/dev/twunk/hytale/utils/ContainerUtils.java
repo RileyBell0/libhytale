@@ -24,7 +24,6 @@ import dev.twunk.interfaces.methods.IContainer;
 import dev.twunk.interfaces.methods.IPersistentContainer;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 
 /**
  * Currently just has a method for opening a GUI for a given container for a given player
@@ -55,10 +54,10 @@ public abstract class ContainerUtils {
      * Most of this comes from the hytale src code
      */
     public static void openContainerGUI(
-        final @Nonnull ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType,
-        final @Nonnull CommandBuffer<EntityStore> commandBuffer,
-        final @Nonnull InteractionContext context,
-        final @Nonnull Vector3i pos
+        final ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType,
+        final CommandBuffer<EntityStore> commandBuffer,
+        final InteractionContext context,
+        final Vector3i pos
     ) {
         final Ref<EntityStore> ref = context.getEntity();
         final Store<EntityStore> store = ref.getStore();

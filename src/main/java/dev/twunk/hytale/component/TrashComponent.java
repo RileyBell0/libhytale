@@ -12,7 +12,6 @@ import dev.twunk.interfaces.methods.IContainer;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nonnull;
 
 /**
  * TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
@@ -44,7 +43,6 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     @Serialize
     private boolean canOpen = true;
 
-    @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
     //////////
@@ -53,13 +51,11 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
 
     // IContainer::getWindows
     @Override
-    @Nonnull
     public Map<UUID, ContainerBlockWindow> getWindows() {
         return this.windows;
     }
 
     // IContainer::getContainer
-    @Nonnull
     @Override
     public SimpleItemContainer getContainer() {
         return new SimpleItemContainer(this.capacity);

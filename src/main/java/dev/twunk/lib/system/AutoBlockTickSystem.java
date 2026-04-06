@@ -14,8 +14,7 @@ import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.interfaces.component.IBlockTickComponent;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.subsystem.ITickSystem;
-import javax.annotation.Nonnull;
+import dev.twunk.interfaces.methods.ITick;
 
 /**
  * A reusable system for ticking block components. Reusable by ME really, just
@@ -33,32 +32,29 @@ import javax.annotation.Nonnull;
  */
 public final class AutoBlockTickSystem<T extends IBlockTickComponent>
     extends SubSystemOwner<ChunkStore>
-    implements ITickSystem<ChunkStore>
+    implements ITick<ChunkStore>
 {
 
     private static final HytaleLogger logger = HytaleLogger.forEnclosingClass();
 
-    private final @Nonnull ComponentType<ChunkStore, T> componentType;
+    private final ComponentType<ChunkStore, T> componentType;
 
-    public AutoBlockTickSystem(final @Nonnull ComponentType<ChunkStore, T> componentType) {
+    public AutoBlockTickSystem(final ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
 
-        this.appendSubSystem(TickSubSystem.newSubsystemFor(this));
+        this.appendSubSystem(TickSubSystem.newSubsystemFor(this, Query.and(componentType), this.getRegistry()));
     }
 
     public void onEntityTick(
         final float dt,
-        final @Nonnull AnyRef<ChunkStore> ref,
-        final @Nonnull CommandBuffer<ChunkStore> commandBuffer
+        final AnyRef<ChunkStore> ref,
+        final CommandBuffer<ChunkStore> commandBuffer
     ) {
         // Get your component that implements IBlockTickComponent from the block
         final var component = ComponentUtils.get(ref, this.componentType);
 
-        try {
-            // and call the tick method you defined on your component
-            component.onBlockTick(new BlockRef(ref), commandBuffer);
-        } catch (Throwable e) {
+        if (component == null) {
             final var coords = BlockUtils.Coords.Global.get(ref);
             if (coords != null) {
                 logger
@@ -78,9 +74,11 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
             }
             return;
         }
+
+        // and call the tick method you defined on your component
+        component.onBlockTick(new BlockRef(ref), commandBuffer);
     }
 
-    @Override
     public IRegistry<ChunkStore> getRegistry() {
         return LibHytale.CHUNK_REGISTRY;
     }

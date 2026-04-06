@@ -7,15 +7,11 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.LifetimeSubSystem;
-import dev.twunk.interfaces.subsystem.ILifetimeSystem;
-import javax.annotation.Nonnull;
 
 /**
  * Methods for my subsytem version of `RefSystem<ECS_Store>`
  *
  * My code
- * @see ILifetimeSystem        - Additional requirements that an implementor of IEntityLifetime must satisfy
- *                                     in order to register a subsystem to run itself
  * @see LifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  *
  * Hytale's code
@@ -34,9 +30,9 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityAdded(
-        final @Nonnull AnyRef<ECS_STORE> ref,
-        final @Nonnull AddReason reason,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final AnyRef<ECS_STORE> ref,
+        final AddReason reason,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {}
 
     /**
@@ -51,8 +47,8 @@ public interface ILifetime<ECS_STORE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityRemove(
-        final @Nonnull AnyRef<ECS_STORE> ref,
-        final @Nonnull RemoveReason reason,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final AnyRef<ECS_STORE> ref,
+        final RemoveReason reason,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {}
 }

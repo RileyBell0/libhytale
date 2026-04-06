@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.ArrayList;
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Information about the block that's being ticked, cached between calls to
@@ -62,22 +62,18 @@ public class TrackedBlockEntity {
     /**
      * The world that your block entity is in
      */
-    @Nonnull
     public final World world;
 
     /**
      * The chunk that your block entity is in (within the given world)
      */
-    @Nonnull
     public final WorldChunk chunk;
 
     /**
      * The ref for your entity
      */
-    @Nonnull
     public final Ref<ChunkStore> ref;
 
-    @Nonnull
     private ArrayList<TrackedBlockEntity> currentAreaRef;
 
     /**
@@ -87,7 +83,6 @@ public class TrackedBlockEntity {
      * - `blockY`
      * - `blockZ`
      */
-    @Nonnull
     public final Vector3i pos;
 
     /**
@@ -96,12 +91,12 @@ public class TrackedBlockEntity {
     public final int blockId;
 
     public TrackedBlockEntity(
-        final @Nonnull World world,
-        final @Nonnull WorldChunk chunk,
-        final @Nonnull Ref<ChunkStore> ref,
-        final @Nonnull Vector3i coords,
+        final World world,
+        final WorldChunk chunk,
+        final Ref<ChunkStore> ref,
+        final Vector3i coords,
         final int blockId,
-        final @Nonnull ArrayList<TrackedBlockEntity> currentAreaRef
+        final ArrayList<TrackedBlockEntity> currentAreaRef
     ) {
         this.lifetimeId = ++nextLifetimeId;
         this.pos = coords;
@@ -120,7 +115,7 @@ public class TrackedBlockEntity {
      * We'll say they're the same if they have the same ref. should make removal easy
      */
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj instanceof TrackedBlockEntity) {
             return ((TrackedBlockEntity) obj).ref == this.ref;
         }

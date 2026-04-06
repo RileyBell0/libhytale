@@ -10,7 +10,6 @@ import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.lib.coords.ChunkCoordinates;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -22,7 +21,6 @@ import javax.annotation.Nullable;
  */
 public class BlockRef extends AnyRef<ChunkStore> {
 
-    @Nonnull
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT_TYPE =
         BlockStateInfo.getComponentType();
@@ -42,12 +40,13 @@ public class BlockRef extends AnyRef<ChunkStore> {
     @Nullable
     private BlockStateInfo info = null;
 
-    public BlockRef(@Nonnull Ref<ChunkStore> ref) {
+    public BlockRef(Ref<ChunkStore> ref) {
         super(ref);
     }
 
     // suppressing "unchecked" but, really, i've checked it. silly java.
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T extends Component<ChunkStore>> T getComponent(@Nullable ComponentType<ChunkStore, T> componentType) {
         if (componentType == null) {
             return null;
@@ -112,7 +111,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public Integer getOtherBlockId(@Nonnull Vector3i otherBlockCoords) {
+    public Integer getOtherBlockId(Vector3i otherBlockCoords) {
         // block ID can only be found via world chunk
         var chunkRef = this.getChunkRef();
         if (chunkRef == null) {
@@ -186,7 +185,6 @@ public class BlockRef extends AnyRef<ChunkStore> {
         return new ChunkCoordinates(chunkX, chunkZ);
     }
 
-    @Nonnull
     @Override
     public String toString() {
         return "BlockRef{" + super.toString() + "}";

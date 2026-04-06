@@ -10,7 +10,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.utils.ItemUtils;
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @see com.hypixel.hytale.server.core.entity.ItemUtils I based most of my implementation on this
@@ -22,14 +22,13 @@ import javax.annotation.Nonnull;
 )
 public class SpawnItemInteraction extends SimpleInstantInteraction {
 
-    @Nonnull
     @Serialize
     private Vector3i offset = new Vector3i(0, 0, 0);
 
     @Serialize
+    @Nullable
     private Vector3i at = null;
 
-    @Nonnull
     @Serialize
     private String itemId = "Soil_Grass";
 
@@ -38,9 +37,9 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
 
     @Override
     protected void firstRun(
-        final @Nonnull InteractionType interactionType,
-        final @Nonnull InteractionContext interactionContext,
-        final @Nonnull CooldownHandler cooldownHandler
+        final InteractionType interactionType,
+        final InteractionContext interactionContext,
+        final CooldownHandler cooldownHandler
     ) {
         final var commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {
@@ -57,7 +56,6 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        @Nonnull
         Vector3i coords;
         if (this.at != null) {
             coords = this.at;

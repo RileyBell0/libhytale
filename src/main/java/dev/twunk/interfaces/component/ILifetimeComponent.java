@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.system.LifetimeSubSystem;
 import dev.twunk.interfaces.methods.ILifetime;
-import dev.twunk.interfaces.subsystem.ILifetimeSystem;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 
 /**
@@ -14,8 +13,6 @@ import dev.twunk.lib.system.AutoBlockLifetimeSystem;
  *
  * My code
  * @see ILifetime              - Methods for listening to entity add/remove events
- * @see ILifetimeSystem        - Additional requirements that an implementor of IEntityLifetime must satisfy
- *                                     in order to register a subsystem to run itself
  * @see LifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  * @see AutoBlockLifetimeSystem - A system I wrote that uses this. Runs onEntityAdded and onEntityRemove
  *                                     for a given query

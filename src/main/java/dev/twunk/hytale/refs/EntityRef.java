@@ -2,7 +2,6 @@ package dev.twunk.hytale.refs;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import javax.annotation.Nonnull;
 
 /**
  * Implements the SAME methods as Ref<ChunkStore> BUT also will include a bunch
@@ -13,11 +12,10 @@ import javax.annotation.Nonnull;
  */
 public class EntityRef extends AnyRef<EntityStore> {
 
-    public EntityRef(@Nonnull Ref<EntityStore> ref) {
+    public EntityRef(Ref<EntityStore> ref) {
         super(ref);
     }
 
-    @Nonnull
     @Override
     public String toString() {
         return "EntityRef{" + super.toString() + "}";

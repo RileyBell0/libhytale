@@ -7,7 +7,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.system.TickSubSystem;
 import dev.twunk.interfaces.methods.IBlockTick;
 import dev.twunk.interfaces.methods.ITick;
-import dev.twunk.interfaces.subsystem.ITickSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
 
 /**
@@ -20,8 +19,6 @@ import dev.twunk.lib.system.AutoBlockTickSystem;
  * @see IBlockTick                   - Definition of method for ticking a block entity
  * @see TickSubSystem          - SubSystem used by TickableBlockComponentSystem
  *                                     that ticks entities (in our case block entities)
- * @see ITickSystem            - Something that can be ticked by EntityTickSubSystem
- *                                     (satisfies IEntityTick)
  * @see ITick                  - Underlying method for ticking an entity
  *
  * Hytale's code

@@ -11,7 +11,6 @@ import dev.twunk.interfaces.component.IContainerComponent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.lang.model.type.NullType;
 
@@ -27,7 +26,6 @@ import javax.lang.model.type.NullType;
  */
 public final class AutoCodecGenerator {
 
-    @Nonnull
     private static final String normaliseFieldName(Field field) {
         // first letter must be capitalised in codec key
         var name = field.getName();
@@ -36,13 +34,11 @@ public final class AutoCodecGenerator {
         return name;
     }
 
-    @Nonnull
-    public static final <T> BuilderCodec<T> build(@Nonnull Class<T> clazz, @Nonnull Supplier<T> supplier) {
+    public static final <T> BuilderCodec<T> build(Class<T> clazz, Supplier<T> supplier) {
         return builder(clazz, supplier).build();
     }
 
-    @Nonnull
-    public static final <T> BuilderCodec.Builder<T> builder(@Nonnull Class<T> clazz, @Nonnull Supplier<T> supplier) {
+    public static final <T> BuilderCodec.Builder<T> builder(Class<T> clazz, Supplier<T> supplier) {
         var fields = clazz.getDeclaredFields();
         var registeredComponent = clazz.getAnnotation(Serializable.class);
         var inherits = registeredComponent.inherits();
@@ -59,7 +55,6 @@ public final class AutoCodecGenerator {
 
         var inheritedCodec = tryGetInheritedCodec((Class<? super T>) inherits, clazz);
 
-        @Nonnull
         BuilderCodec.Builder<T> builder;
         if (inheritedCodec == null) {
             builder = BuilderCodec.builder(clazz, supplier);
@@ -109,10 +104,7 @@ public final class AutoCodecGenerator {
     }
 
     @Nullable
-    public static final <T extends U, U> BuilderCodec<U> tryGetInheritedCodec(
-        @Nonnull Class<U> clazz,
-        @Nonnull Class<T> parent
-    ) {
+    public static final <T extends U, U> BuilderCodec<U> tryGetInheritedCodec(Class<U> clazz, Class<T> parent) {
         if (clazz.equals(NullType.class)) {
             return null;
         }
@@ -149,11 +141,10 @@ public final class AutoCodecGenerator {
         }
     }
 
-    @Nonnull
     private static final <T, U> BuilderCodec.Builder<T> appendCodec(
-        @Nonnull BuilderCodec.Builder<T> builder,
-        @Nonnull Field field,
-        @Nonnull BuilderCodec<U> codec
+        BuilderCodec.Builder<T> builder,
+        Field field,
+        BuilderCodec<U> codec
     ) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
@@ -189,11 +180,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
-    @Nonnull
-    private static final <T> BuilderCodec.Builder<T> appendComponentType(
-        @Nonnull BuilderCodec.Builder<T> builder,
-        @Nonnull Field field
-    ) {
+    private static final <T> BuilderCodec.Builder<T> appendComponentType(BuilderCodec.Builder<T> builder, Field field) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
@@ -241,11 +228,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
-    @Nonnull
-    private static final <T> BuilderCodec.Builder<T> appendBoolean(
-        @Nonnull BuilderCodec.Builder<T> builder,
-        @Nonnull Field field
-    ) {
+    private static final <T> BuilderCodec.Builder<T> appendBoolean(BuilderCodec.Builder<T> builder, Field field) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
@@ -278,11 +261,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
-    @Nonnull
-    private static final <T> BuilderCodec.Builder<T> appendString(
-        @Nonnull BuilderCodec.Builder<T> builder,
-        @Nonnull Field field
-    ) {
+    private static final <T> BuilderCodec.Builder<T> appendString(BuilderCodec.Builder<T> builder, Field field) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
@@ -315,11 +294,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
-    @Nonnull
-    private static final <T> BuilderCodec.Builder<T> appendShort(
-        @Nonnull BuilderCodec.Builder<T> builder,
-        @Nonnull Field field
-    ) {
+    private static final <T> BuilderCodec.Builder<T> appendShort(BuilderCodec.Builder<T> builder, Field field) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
@@ -353,11 +328,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
-    @Nonnull
-    private static final <T> BuilderCodec.Builder<T> appendInt(
-        @Nonnull BuilderCodec.Builder<T> builder,
-        @Nonnull Field field
-    ) {
+    private static final <T> BuilderCodec.Builder<T> appendInt(BuilderCodec.Builder<T> builder, Field field) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
         var required = annotation.required();
@@ -391,6 +362,7 @@ public final class AutoCodecGenerator {
             .add();
     }
 
+    @Nullable
     public static final <T> BuilderCodec<T> tryGetCodec(Class<T> clazz) {
         if (!clazz.isAnnotationPresent(Serializable.class)) {
             return null;

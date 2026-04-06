@@ -7,27 +7,23 @@ import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IRegistry;
 import java.util.HashMap;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class EntityRegisterProvider implements IRegistry<EntityStore> {
 
-    @Nonnull
     public static final HashMap<
         Class<? extends Component<EntityStore>>,
         ComponentType<EntityStore, ? extends Component<EntityStore>>
     > registeredEntityComponents = new HashMap<>();
 
-    @Nonnull
     public static final HashMap<
         String,
         ComponentType<EntityStore, ? extends Component<EntityStore>>
     > registeredEntityComponentsById = new HashMap<>();
 
-    @Nonnull
     @SuppressWarnings("unchecked")
     public final <T extends Component<EntityStore>> ComponentType<EntityStore, T> getComponentType(
-        final @Nonnull Class<T> componentClass
+        final Class<T> componentClass
     ) {
         var componentType = registeredEntityComponents.get(componentClass);
         if (componentType == null) {
@@ -42,7 +38,7 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
 
     @Nullable
     public final ComponentType<EntityStore, ? extends Component<EntityStore>> getComponentType(
-        final @Nonnull String componentId
+        final String componentId
     ) {
         return registeredEntityComponentsById.get(componentId);
     }
@@ -53,18 +49,15 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
      * about EVERYTHING above it WOOOO
      */
     public final <T extends Component<EntityStore>> void registerComponentType(
-        final @Nonnull ComponentType<EntityStore, T> componentType,
-        final @Nonnull Class<T> myClass,
-        final @Nonnull String id
+        final ComponentType<EntityStore, T> componentType,
+        final Class<T> myClass,
+        final String id
     ) {
         registeredEntityComponents.put(myClass, componentType);
         registeredEntityComponentsById.put(id, componentType);
     }
 
-    public final void registerSystem(
-        final @Nonnull HytalePlugin plugin,
-        final @Nonnull ISubSystem<EntityStore> system
-    ) {
+    public final void registerSystem(final HytalePlugin plugin, final ISubSystem<EntityStore> system) {
         plugin.getEntityStoreRegistry().registerSystem(system);
     }
 }

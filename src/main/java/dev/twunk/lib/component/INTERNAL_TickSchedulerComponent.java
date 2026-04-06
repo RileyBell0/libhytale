@@ -7,7 +7,6 @@ import dev.twunk.annotations.Serializable;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.lifetime.TrackedEntity;
 import java.util.HashMap;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -43,14 +42,12 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      *
      * and god knows, block games really have alot of blocks
      */
-    @Nonnull
     private final HashMap<String, TickPlan> tickingState = new HashMap<>();
 
     /**
      * Map from SystemID to locations where the item is stored (memory only,
      * not stored to disk)
      */
-    @Nonnull
     private final HashMap<String, TrackedEntity<ECS_STORE>> memoryLocation = new HashMap<>();
 
     /**
@@ -60,7 +57,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      * Returns the previously set state (if one was already there)
      */
     @Nullable
-    public TickPlan setTickingInfo(String systemId, @Nonnull TickPlan state) {
+    public TickPlan setTickingInfo(String systemId, TickPlan state) {
         return this.tickingState.put(systemId, state);
     }
 
@@ -83,7 +80,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedEntity<ECS_STORE> _setMemoryLocation(String systemId, @Nonnull TrackedEntity<ECS_STORE> state) {
+    public TrackedEntity<ECS_STORE> _setMemoryLocation(String systemId, TrackedEntity<ECS_STORE> state) {
         return memoryLocation.put(systemId, state);
     }
 
@@ -114,7 +111,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
         return memoryLocation.remove(systemId);
     }
 
-    public void drop(String systemId, @Nonnull RemoveReason reason) {
+    public void drop(String systemId, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
@@ -122,7 +119,6 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
         cache.drop();
     }
 
-    @Nonnull
     public INTERNAL_TickSchedulerComponent<ECS_STORE> clone() {
         return new INTERNAL_TickSchedulerComponent<>();
     }

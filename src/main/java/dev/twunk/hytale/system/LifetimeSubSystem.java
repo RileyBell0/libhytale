@@ -13,11 +13,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.ILifetime;
-import dev.twunk.interfaces.methods.IRegistry;
 import dev.twunk.interfaces.methods.ITick;
-import dev.twunk.interfaces.subsystem.ILifetimeSystem;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Tiny Subsystem to simply tell our parent system when we added/removed entities
@@ -32,8 +28,6 @@ import javax.annotation.Nullable;
  *
  * My code
  * @see ILifetime       - Methods for listening to entity add/remove events
- * @see ILifetimeSystem - Additional requirements that an implementor of IEntityLifetime must satisfy
- *                              in order to register a subsystem to run itself
  * @see TickSubSystem   - Underlying SubSystem that powers the IEntityTick methods
  *                              for IEntityTickSystems that register an EntityTickSubSystem
  * @see ITick           - Underlying method for ticking an entity
@@ -50,52 +44,47 @@ public abstract class LifetimeSubSystem<ECS_STORE extends WorldProvider>
     implements ISubSystem<ECS_STORE>
 {
 
-    private final @Nonnull ILifetimeSystem<ECS_STORE> parent;
-    private final @Nullable Query<ECS_STORE> query;
+    private final ILifetime<ECS_STORE> listener;
+    private final Query<ECS_STORE> query;
 
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     @SuppressWarnings("unchecked")
-    @Nonnull
     public static <ECS_STORE extends WorldProvider, T extends LifetimeSubSystem<ECS_STORE>> LifetimeSubSystem<
         ECS_STORE
-    > newSubsystemFor(final @Nonnull ILifetimeSystem<ECS_STORE> parent) {
-        return ISubSystem.__newSubSystem(LifetimeSubSystem.class, ILifetimeSystem.class, parent);
+    > newSubsystemFor(final ILifetime<ECS_STORE> listener, final Query<ECS_STORE> query) {
+        return ISubSystem.__newSubSystem(LifetimeSubSystem.class, ILifetime.class, listener, query);
     }
 
-    protected LifetimeSubSystem(final @Nonnull ILifetimeSystem<ECS_STORE> parent) {
-        this.parent = parent;
-        this.query = parent.getQuery();
+    protected LifetimeSubSystem(final ILifetime<ECS_STORE> listener, final Query<ECS_STORE> query) {
+        this.listener = listener;
+        this.query = query;
     }
 
     @Override
     public void onEntityAdded(
-        @Nonnull Ref<ECS_STORE> ref,
-        @Nonnull AddReason reason,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        Ref<ECS_STORE> ref,
+        AddReason reason,
+        Store<ECS_STORE> store,
+        CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        parent.onEntityAdded(new AnyRef<>(ref), reason, commandBuffer);
+        listener.onEntityAdded(new AnyRef<>(ref), reason, commandBuffer);
     }
 
     @Override
     public void onEntityRemove(
-        @Nonnull Ref<ECS_STORE> ref,
-        @Nonnull RemoveReason reason,
-        @Nonnull Store<ECS_STORE> store,
-        @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        Ref<ECS_STORE> ref,
+        RemoveReason reason,
+        Store<ECS_STORE> store,
+        CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        parent.onEntityRemove(new AnyRef<>(ref), reason, commandBuffer);
+        listener.onEntityRemove(new AnyRef<>(ref), reason, commandBuffer);
     }
 
     @Override
     public Query<ECS_STORE> getQuery() {
         return this.query;
-    }
-
-    public IRegistry<ECS_STORE> getRegistry() {
-        return this.parent.getRegistry();
     }
 }

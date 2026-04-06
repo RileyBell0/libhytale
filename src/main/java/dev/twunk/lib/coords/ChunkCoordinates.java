@@ -1,6 +1,7 @@
 package dev.twunk.lib.coords;
 
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 public final class ChunkCoordinates {
 
@@ -13,7 +14,7 @@ public final class ChunkCoordinates {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         // self check
         if (this == o) return true;
         // null check

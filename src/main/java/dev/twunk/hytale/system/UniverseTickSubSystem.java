@@ -8,8 +8,7 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.subsystem.IUniverseTickSystem;
-import javax.annotation.Nonnull;
+import dev.twunk.interfaces.methods.IUniverseTick;
 import javax.annotation.Nullable;
 
 /**
@@ -34,24 +33,29 @@ public class UniverseTickSubSystem<ECS_STORE extends WorldProvider>
     implements ISubSystem<ECS_STORE>
 {
 
-    private final @Nonnull IUniverseTickSystem<ECS_STORE> parent;
+    private final IUniverseTick<ECS_STORE> listener;
     private final @Nullable Query<ECS_STORE> query;
+    private final IRegistry<ECS_STORE> registry;
 
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     @SuppressWarnings("unchecked")
-    @Nonnull
     public static <ECS_STORE extends WorldProvider, T extends UniverseTickSubSystem<ECS_STORE>> UniverseTickSubSystem<
         ECS_STORE
-    > newSubsystemFor(final @Nonnull IUniverseTickSystem<ECS_STORE> parent) {
-        return ISubSystem.__newSubSystem(UniverseTickSubSystem.class, IUniverseTickSystem.class, parent);
+    > newSubsystemFor(final IUniverseTick<ECS_STORE> listener, final Query<ECS_STORE> query) {
+        return ISubSystem.__newSubSystem(UniverseTickSubSystem.class, IUniverseTick.class, listener, query);
     }
 
-    protected UniverseTickSubSystem(final @Nonnull IUniverseTickSystem<ECS_STORE> parent) {
-        this.parent = parent;
-        this.query = parent.getQuery();
+    protected UniverseTickSubSystem(
+        final IUniverseTick<ECS_STORE> listener,
+        final Query<ECS_STORE> query,
+        final IRegistry<ECS_STORE> registry
+    ) {
+        this.listener = listener;
+        this.query = query;
+        this.registry = registry;
     }
 
     /**
@@ -62,11 +66,11 @@ public class UniverseTickSubSystem<ECS_STORE extends WorldProvider>
     @Override
     public void tick(
         final float dt,
-        final @Nonnull ArchetypeChunk<ECS_STORE> archetypeChunk,
-        final @Nonnull Store<ECS_STORE> store,
-        final @Nonnull CommandBuffer<ECS_STORE> commandBuffer
+        final ArchetypeChunk<ECS_STORE> archetypeChunk,
+        final Store<ECS_STORE> store,
+        final CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        parent.onSystemTick(dt, archetypeChunk, store, commandBuffer);
+        listener.onSystemTick(dt, archetypeChunk, store, commandBuffer);
     }
 
     @Override
@@ -77,6 +81,6 @@ public class UniverseTickSubSystem<ECS_STORE extends WorldProvider>
 
     @Override
     public IRegistry<ECS_STORE> getRegistry() {
-        return parent.getRegistry();
+        return this.registry;
     }
 }

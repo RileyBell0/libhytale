@@ -5,7 +5,7 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.interfaces.ISubSystem;
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Hytale seperates the components and systems i can register out by two types
@@ -23,19 +23,17 @@ import javax.annotation.Nonnull;
  * case it'll do the same but for chunks etc)
  */
 public interface IRegistry<ECS_STORE extends WorldProvider> {
-    public <T extends Component<ECS_STORE>> ComponentType<ECS_STORE, T> getComponentType(
-        final @Nonnull Class<T> componentClass
-    );
+    @Nullable
+    public <T extends Component<ECS_STORE>> ComponentType<ECS_STORE, T> getComponentType(final Class<T> componentClass);
 
-    public ComponentType<ECS_STORE, ? extends Component<ECS_STORE>> getComponentType(
-        final @Nonnull String componentClass
-    );
+    @Nullable
+    public ComponentType<ECS_STORE, ? extends Component<ECS_STORE>> getComponentType(final String componentClass);
 
     public <T extends Component<ECS_STORE>> void registerComponentType(
-        final @Nonnull ComponentType<ECS_STORE, T> componentType,
-        final @Nonnull Class<T> myClass,
-        final @Nonnull String id
+        final ComponentType<ECS_STORE, T> componentType,
+        final Class<T> myClass,
+        final String id
     );
 
-    public void registerSystem(final @Nonnull HytalePlugin plugin, final @Nonnull ISubSystem<ECS_STORE> system);
+    public void registerSystem(final HytalePlugin plugin, final ISubSystem<ECS_STORE> system);
 }

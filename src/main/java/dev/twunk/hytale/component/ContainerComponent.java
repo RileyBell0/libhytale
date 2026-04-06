@@ -15,7 +15,6 @@ import dev.twunk.interfaces.methods.IPersistentContainer;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -38,7 +37,6 @@ public class ContainerComponent<
     private boolean canOpen = true;
 
     @Serialize
-    @Nonnull
     protected SimpleItemContainer container = new SimpleItemContainer((short) 10);
 
     @Nullable
@@ -47,7 +45,6 @@ public class ContainerComponent<
     @Nullable
     private SimpleItemContainer registeredTo = null;
 
-    @Nonnull
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
     //////////
@@ -55,14 +52,12 @@ public class ContainerComponent<
     //////////
 
     // IContainer::getWindows
-    @Nonnull
     @Override
     public Map<UUID, ContainerBlockWindow> getWindows() {
         return this.windows;
     }
 
     // IContainer::getContainer
-    @Nonnull
     @Override
     public SimpleItemContainer getContainer() {
         if (this.registeredTo != this.container) {
