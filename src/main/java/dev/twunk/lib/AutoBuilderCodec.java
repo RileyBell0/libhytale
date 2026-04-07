@@ -24,7 +24,7 @@ import javax.lang.model.type.NullType;
  * I figure you've got a sense of what you're doing, so, yeah, welcome, enjoy your stay,
  * and feel free to leave a PR or advice etc on how to make this less spaghetti and more, neat.
  */
-public final class AutoCodecGenerator {
+public final class AutoBuilderCodec {
 
     private static final String normaliseFieldName(Field field) {
         // first letter must be capitalised in codec key
@@ -32,6 +32,27 @@ public final class AutoCodecGenerator {
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
 
         return name;
+    }
+
+    public static final <T> BuilderCodec<T> build(Class<T> clazz) {
+        return builder(clazz, () -> {
+            try {
+                return clazz.getConstructor().newInstance();
+            } catch (
+                InstantiationException
+                | IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException
+                | NoSuchMethodException
+                | SecurityException e
+            ) {
+                e.printStackTrace();
+                throw new RuntimeException(
+                    "ERROR: you passed a class without a default constructor to AutoCodecGenerator::build. I need a default constructor. Thats the entire point of this shorthand. CLASS IN QUESTION: " +
+                        clazz
+                );
+            }
+        }).build();
     }
 
     public static final <T> BuilderCodec<T> build(Class<T> clazz, Supplier<T> supplier) {
@@ -383,6 +404,6 @@ public final class AutoCodecGenerator {
                 return null;
             }
         };
-        return AutoCodecGenerator.build(clazz, supplier);
+        return AutoBuilderCodec.build(clazz, supplier);
     }
 }

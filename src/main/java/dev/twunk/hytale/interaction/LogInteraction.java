@@ -13,7 +13,6 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.utils.Chat;
-import dev.twunk.lib.AutoCodecGenerator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -27,18 +26,6 @@ import javax.annotation.Nullable;
  */
 @Serializable
 public class LogInteraction extends SimpleInstantInteraction {
-
-    /**
-     * Logs can be built up of several messages all concatenated together. This
-     * the codec for a single message. see the overall log codec to understand
-     * where to use this
-     */
-    public static final BuilderCodec<LogInteraction> SINGLE_MESSAGE_CODEC = AutoCodecGenerator.builder(
-        LogInteraction.class,
-        LogInteraction::new
-    )
-        .documentation("Debug interaction that sends a message on use.")
-        .build();
 
     /**
      * The overall log itself
