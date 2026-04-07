@@ -49,19 +49,28 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    @SuppressWarnings("unchecked")
-    public <T extends ScheduledTickSubSystem<ECS_STORE>> ScheduledTickSubSystem<ECS_STORE> newSubsystemFor(
-        final IScheduledTick<ECS_STORE> listener,
-        final Query<ECS_STORE> query,
-        final IRegistry<ECS_STORE> registry
+    public ScheduledTickSubSystem<ECS_STORE> newSubsystemFor(
+        IScheduledTick<ECS_STORE> listener,
+        Query<ECS_STORE> query,
+        IRegistry<ECS_STORE> registry
     ) {
-        return ISubSystem.__newSubSystem(ScheduledTickSubSystem.class, IScheduledTick.class, listener, query);
+        return ISubSystem.__construct(
+            ISubSystem.__dupeClassAndGetConstructor(
+                ScheduledTickSubSystem.class,
+                IScheduledTick.class,
+                Query.class,
+                IRegistry.class
+            ),
+            listener,
+            query,
+            registry
+        );
     }
 
     protected ScheduledTickSubSystem(
-        final IScheduledTick<ECS_STORE> listener,
-        final Query<ECS_STORE> query,
-        final IRegistry<ECS_STORE> registry
+        IScheduledTick<ECS_STORE> listener,
+        Query<ECS_STORE> query,
+        IRegistry<ECS_STORE> registry
     ) {
         super(query);
         this.listener = listener;
@@ -79,8 +88,8 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
         this.entities = new TrackedEntities<ECS_STORE>(listener.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, query));
-        this.appendSubSystem(UniverseTickSubSystem.newSubsystemFor(this, query));
+        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, query, this.registry));
+        this.appendSubSystem(UniverseTickSubSystem.newSubsystemFor(this, query, this.registry));
     }
 
     /**

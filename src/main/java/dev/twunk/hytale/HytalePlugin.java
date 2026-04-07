@@ -83,7 +83,6 @@ public abstract class HytalePlugin extends JavaPlugin {
 
         // Store our component in the global register
         LibHytale.registerChunkComponentType(component, clazz, defaultId);
-
         this.initCommonSystemsFor(clazz, component);
 
         if (clazz.isAnnotationPresent(dev.twunk.annotations.Serializable.class)) {
@@ -150,7 +149,6 @@ public abstract class HytalePlugin extends JavaPlugin {
         final var chunkComponent = this.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
         LibHytale.registerChunkComponentType(chunkComponent, clazz, defaultId);
 
-        this.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
         final var entityComponent = this.getEntityStoreRegistry().registerComponent(clazz, defaultId, codec);
         LibHytale.registerEntityComponentType(entityComponent, clazz, defaultId);
 

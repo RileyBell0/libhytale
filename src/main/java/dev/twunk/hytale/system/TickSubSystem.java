@@ -46,11 +46,15 @@ public class TickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    @SuppressWarnings("unchecked")
     public static final <ECS_STORE extends WorldProvider, T extends TickSubSystem<ECS_STORE>> TickSubSystem<
         ECS_STORE
     > newSubsystemFor(ITick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
-        return ISubSystem.__newSubSystem(TickSubSystem.class, ITick.class, listener, query);
+        return ISubSystem.__construct(
+            ISubSystem.__dupeClassAndGetConstructor(TickSubSystem.class, ITick.class, Query.class, IRegistry.class),
+            listener,
+            query,
+            registry
+        );
     }
 
     protected TickSubSystem(ITick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {

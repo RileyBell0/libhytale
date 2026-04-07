@@ -4,5 +4,5 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.methods.IRegistry;
 
 public interface IRegistryProvider<ECS_STORE extends WorldProvider> {
-    public IRegistry<ECS_STORE> getRegistry();
+    public abstract IRegistry<ECS_STORE> getRegistry();
 }

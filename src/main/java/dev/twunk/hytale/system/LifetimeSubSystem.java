@@ -13,6 +13,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.ILifetime;
+import dev.twunk.interfaces.methods.IRegistry;
 import dev.twunk.interfaces.methods.ITick;
 
 /**
@@ -39,28 +40,39 @@ import dev.twunk.interfaces.methods.ITick;
  *                               Runs ONCE per tick (global, not per matching entity, just runs a single
  *                               time per tick) and has an inbuilt query
  */
-public abstract class LifetimeSubSystem<ECS_STORE extends WorldProvider>
+public class LifetimeSubSystem<ECS_STORE extends WorldProvider>
     extends RefSystem<ECS_STORE>
     implements ISubSystem<ECS_STORE>
 {
 
     private final ILifetime<ECS_STORE> listener;
     private final Query<ECS_STORE> query;
+    private final IRegistry<ECS_STORE> registry;
 
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    @SuppressWarnings("unchecked")
     public static <ECS_STORE extends WorldProvider, T extends LifetimeSubSystem<ECS_STORE>> LifetimeSubSystem<
         ECS_STORE
-    > newSubsystemFor(final ILifetime<ECS_STORE> listener, final Query<ECS_STORE> query) {
-        return ISubSystem.__newSubSystem(LifetimeSubSystem.class, ILifetime.class, listener, query);
+    > newSubsystemFor(ILifetime<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+        return ISubSystem.__construct(
+            ISubSystem.__dupeClassAndGetConstructor(
+                LifetimeSubSystem.class,
+                ILifetime.class,
+                Query.class,
+                IRegistry.class
+            ),
+            listener,
+            query,
+            registry
+        );
     }
 
-    protected LifetimeSubSystem(final ILifetime<ECS_STORE> listener, final Query<ECS_STORE> query) {
+    protected LifetimeSubSystem(ILifetime<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
         this.listener = listener;
         this.query = query;
+        this.registry = registry;
     }
 
     @Override
@@ -86,5 +98,10 @@ public abstract class LifetimeSubSystem<ECS_STORE extends WorldProvider>
     @Override
     public Query<ECS_STORE> getQuery() {
         return this.query;
+    }
+
+    @Override
+    public IRegistry<ECS_STORE> getRegistry() {
+        return this.registry;
     }
 }

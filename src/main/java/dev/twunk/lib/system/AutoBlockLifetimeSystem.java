@@ -8,6 +8,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.LifetimeSubSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
@@ -47,7 +48,7 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
         super(Query.and(componentType));
         this.componentType = componentType;
 
-        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, Query.and(componentType)));
+        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, super.getQuery(), LibHytale.CHUNK_REGISTRY));
     }
 
     @Override
