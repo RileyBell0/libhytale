@@ -14,13 +14,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
- * want to delete these items. Just gonna make SURE you're sure, by keeping them around for like, 30 seconds"
- *
- * limit it to only be the player that opened it that can see those inventories.
- * make it QUEUE all inventories for stuff that was deleted. if you open the trash it should pause all inventory deletions
- * and resume the countdown when you close the trash
- *
  * My code
  * @see OpenContainerComponentInteraction - the interaction i wrote that is capable of
  *                                          opening a GUI for the block a trash can is on.

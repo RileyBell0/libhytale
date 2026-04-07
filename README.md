@@ -22,7 +22,16 @@ This library serves to provide **documented** and **tested** utilities to make y
 > - Add onBlockBreak, onBlockAdd (etc) event handlers as subsystems. The overall goal is to figure out an "onBlockUpdate" subsystem
 > - Fix ScheduledTickSystem
 > - The team just added an `ItemContainerBlock` component, probably need to update my container utils to suit. might be able to extend that directly for containers
->
+> ```java
+> /**
+>  * TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
+>  * want to delete these items. Just gonna make SURE you're sure, by keeping them around for like, 30 seconds"
+>  *
+>  * limit it to only be the player that opened it that can see those inventories.
+>  * make it QUEUE all inventories for stuff that was deleted. if you open the trash it should pause all inventory deletions
+>  * and resume the countdown when you close the trash
+>  */
+> ```
 > ### Stretch goals
 > - Fix up my definitions so they only NEED anything of type Object, because, well, theoretically i want my functions to just work and figure stuff out based on the props and interfaces something has, something that REALLY doesn't need annotations to work, so, may as well just make it work. Importantly, this means if you EXTEND component -> we're good, i'll register you as a component, if you DON'T extend component, i'll just not register you. Really i should ONLY throw exceptions or rather blocks of warnings for "you tried to register objects but nothing happened"
 
