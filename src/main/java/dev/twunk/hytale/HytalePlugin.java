@@ -3,7 +3,6 @@ package dev.twunk.hytale;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
@@ -14,16 +13,12 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.annotations.Serializable;
-import dev.twunk.annotations.System;
 import dev.twunk.interfaces.component.IBlockTickComponent;
 import dev.twunk.interfaces.component.ILifetimeComponent;
 import dev.twunk.interfaces.component.ITickComponent;
 import dev.twunk.lib.AutoCodecGenerator;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
-import java.lang.reflect.InvocationTargetException;
-import javax.annotation.Nullable;
-import javax.lang.model.type.NullType;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
@@ -100,95 +95,9 @@ public abstract class HytalePlugin extends JavaPlugin {
         return component;
     }
 
-    // TODO no clue what i was adding here atm, so many files to review...
-    @Nullable
-    public SystemGroup<?> getSystemGroup(Class<?> clazz, Class<?> systemClass) {
-        final var fields = clazz.getDeclaredFields();
-        SystemGroup<?> bestSoFar = null;
-        for (final var field : fields) {
-            if (!field.isAnnotationPresent(System.Group.class)) {
-                continue;
-            }
-            final var annotation = field.getAnnotation(System.Group.class);
-
-            // Not for us if it's been specified as a class that ISNT us
-            if (annotation.value() != NullType.class && annotation.value() != systemClass) {
-                continue;
-            }
-
-            // since it was either NULL or was our system, we can carry on and just assert that it IS for us
-            field.setAccessible(true);
-            final Object res;
-            try {
-                res = field.get(systemClass);
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-                continue;
-            }
-
-            if (!SystemGroup.class.isAssignableFrom(res.getClass())) {
-                throw new RuntimeException(
-                    "You put @System.Group on a field that can't be statically accessed when passing the class in. HINT: pass an INSTANCE of the class in instead, or change the field to be `static`"
-                );
-            }
-
-            bestSoFar = (SystemGroup<?>) res;
-
-            // We'll also cascade so there's specificity based priority
-            // -> if you leave it blank it acts as a default
-            // -> we'll still check everything else to see if there's a more specific version
-            // NOTE: we'll just exit early for specific versions, so please don't break my code
-            // by putting several tags in there, idk if its sorted or anything
-            if (annotation.value() == systemClass) {
-                return bestSoFar;
-            }
-        }
-
-        final var methods = clazz.getDeclaredMethods();
-        for (final var method : methods) {
-            if (!method.isAnnotationPresent(System.Group.class)) {
-                continue;
-            }
-            final var annotation = method.getAnnotation(System.Group.class);
-
-            // Not for us if it's been specified as a class that ISNT us
-            if (annotation.value() != NullType.class && annotation.value() != systemClass) {
-                continue;
-            }
-
-            // since it was either NULL or was our system, we can carry on and just assert that it IS for us
-            method.setAccessible(true);
-            final Object res;
-            try {
-                res = method.invoke(systemClass);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                continue;
-            }
-            if (!SystemGroup.class.isAssignableFrom(res.getClass())) {
-                throw new RuntimeException(
-                    "You put @System.Group on a method that can't be statically accessed when passing the class in. HINT: pass an INSTANCE of the class in instead, or change the method to be `static`"
-                );
-            }
-
-            bestSoFar = (SystemGroup<?>) res;
-
-            // We'll also cascade so there's specificity based priority
-            // -> if you leave it blank it acts as a default
-            // -> we'll still check everything else to see if there's a more specific version
-            // NOTE: we'll just exit early for specific versions, so please don't break my code
-            // by putting several tags in there, idk if its sorted or anything
-            if (annotation.value() == systemClass) {
-                return bestSoFar;
-            }
-        }
-
-        return bestSoFar;
-    }
-
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(final Class<T> clazz) {
         final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
-        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
 
@@ -228,7 +137,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     public <T extends Component> void registerCommonComponent(final Class<T> clazz) {
         final var defaultId = clazz.getName();
         final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
-        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
 
@@ -253,7 +162,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         final Class<T> clazz
     ) {
         final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
-        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
 
@@ -295,7 +204,7 @@ public abstract class HytalePlugin extends JavaPlugin {
 
     public <T extends Interaction> Assets<Interaction, ?> registerInteraction(final Class<T> clazz, final String id) {
         final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
-        if (!BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
 
