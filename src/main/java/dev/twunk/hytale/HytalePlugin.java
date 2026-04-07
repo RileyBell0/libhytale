@@ -16,7 +16,7 @@ import dev.twunk.annotations.Serializable;
 import dev.twunk.interfaces.component.IBlockTickComponent;
 import dev.twunk.interfaces.component.ILifetimeComponent;
 import dev.twunk.interfaces.component.ITickComponent;
-import dev.twunk.lib.AutoCodecGenerator;
+import dev.twunk.lib.AutoBuilderCodec;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
 
@@ -96,7 +96,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(final Class<T> clazz) {
-        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
@@ -136,7 +136,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends Component> void registerCommonComponent(final Class<T> clazz) {
         final var defaultId = clazz.getName();
-        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
@@ -161,7 +161,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
         final Class<T> clazz
     ) {
-        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
@@ -203,7 +203,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     public <T extends Interaction> Assets<Interaction, ?> registerInteraction(final Class<T> clazz, final String id) {
-        final BuilderCodec<T> codec = AutoCodecGenerator.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
