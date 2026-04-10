@@ -21,6 +21,10 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         ComponentType<ChunkStore, ? extends Component<ChunkStore>>
     > registeredChunkComponentsById = new HashMap<>();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     @SuppressWarnings("unchecked")
     public final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getComponentType(
         final Class<T> componentClass

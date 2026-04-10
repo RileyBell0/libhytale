@@ -21,6 +21,10 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
         ComponentType<EntityStore, ? extends Component<EntityStore>>
     > registeredEntityComponentsById = new HashMap<>();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     @SuppressWarnings("unchecked")
     public final <T extends Component<EntityStore>> ComponentType<EntityStore, T> getComponentType(
         final Class<T> componentClass

@@ -25,21 +25,33 @@ public class BlockRef extends AnyRef<ChunkStore> {
     private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT_TYPE =
         BlockStateInfo.getComponentType();
 
+    /** Index of the block within its chunk (local coords) */
     @Nullable
     private Integer blockIndex = null;
 
+    /** Index of the chunk within its world */
     @Nullable
     private Long chunkIndex = null;
 
+    /** Reference to the chunk containing this block */
     @Nullable
     private ChunkRef chunkRef = null;
 
+    /** Global coordinates of the block */
     @Nullable
     private Vector3i blockCoords = null;
 
+    /**
+     * BlockStateInfo is great for getting coordinates and access to the chunk.
+     * Cached because it's a really common thing to fetch for a block (in my experience
+     * thus far)
+     */
     @Nullable
     private BlockStateInfo info = null;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
     public BlockRef(Ref<ChunkStore> ref) {
         super(ref);
     }

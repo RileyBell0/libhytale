@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
+import dev.twunk.hytale.codec.MessageCodec;
 import dev.twunk.hytale.utils.Chat;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -23,53 +24,45 @@ import javax.annotation.Nullable;
 public class LogInteraction extends SimpleInstantInteraction {
 
     /**
-     * All your messages (if you provided multiple).
+     * Severity/level of your message. Will prefix [LEVEL].
+     * One of SEVERE | WARNING | INFO | CONFIG | FINE | FINER | FINEST
+     */
+    @Serialize
+    @SuppressWarnings("null")
+    private Level level = Level.INFO;
+
+    /** Your overarching message itself */
+    @Serialize(required = true)
+    private String message = "";
+
+    /** The text color of the message (as hex string, e.g. "#cacaca") */
+    @Serialize
+    private @Nullable String color = null;
+
+    /** A link to associate with your message */
+    @Serialize
+    private @Nullable String link = null;
+
+    /** If your message should be bold */
+    @Serialize
+    private boolean bold = false;
+
+    /** If your message should be italic */
+    @Serialize
+    private boolean italic = false;
+
+    /**
+     * Exra messages that will be joined to the end of the log. Useful for
+     * formatting or having text with different colors etc
+     *
      * They'll be concatenated with Message.join before printing them
      */
     @Serialize
     private ArrayList<MessageCodec> messages = new ArrayList<>();
 
-    /**
-     * Your overarching message itself
-     */
-    @Serialize(required = true)
-    private String message = "";
-
-    /**
-     * OPTIONAL
-     * The text color of the message (as hex string, e.g. "#cacaca")
-     */
-    @Serialize
-    private @Nullable String color = null;
-
-    /**
-     * OPTIONAL
-     * A link to associate with your message
-     */
-    @Serialize
-    private @Nullable String link = null;
-
-    /**
-     * OPTIONAL
-     * If your message should be bold
-     */
-    @Serialize
-    private boolean bold = false;
-
-    /**
-     * OPTIONAL
-     * If your message should be italic
-     */
-    @Serialize
-    private boolean italic = false;
-
-    /**
-     * Severity/level of your message. We'll prefix [LEVEL]
-     * SEVERE | WARNING | INFO | CONFIG | FINE | FINER | FINEST
-     */
-    @Serialize
-    @SuppressWarnings("null")
-    private Level level = Level.INFO;
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     /**
      * Runs the interaction.

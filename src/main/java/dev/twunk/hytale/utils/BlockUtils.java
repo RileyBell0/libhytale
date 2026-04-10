@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
 // Utils for blocks. Slowly figuring out what this should look like
 // NOTE - its current state is broken
 
-// TESTS ADDED AND VERIFIED
 public abstract class BlockUtils {
 
     // ==================================================
@@ -68,12 +67,10 @@ public abstract class BlockUtils {
         return refs;
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final boolean isBlockRef(final Ref<ChunkStore> ref) {
         return ComponentUtils.has(ref, BLOCK_STATE_INFO_COMPONENT_TYPE);
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final boolean isChunkRef(final Ref<ChunkStore> ref) {
         return ComponentUtils.has(ref, WORLD_CHUNK_COMPONENT);
     }
@@ -83,10 +80,9 @@ public abstract class BlockUtils {
     /// -> get ID               (int)
     /// -> get BlockType
 
-    // TESTS ADDED AND VERIFIED
     public static final class Coords {
 
-        // TESTS ADDED AND VERIFIED        /// -> get LOCAL coordinates within chunk    (Vector3i)
+        /// -> get LOCAL coordinates within chunk    (Vector3i)
         public static final class Local {
 
             public static final void test(
@@ -218,7 +214,6 @@ public abstract class BlockUtils {
             // #endregion get
         }
 
-        // TESTS ADDED AND VERIFIED
         /// -> get LOCAL index                       (int | Integer) (returns Integer so it can be nullable on method that can fail)
         public static final class Index {
 
@@ -297,7 +292,6 @@ public abstract class BlockUtils {
             // #endregion getLocalIndex}
         }
 
-        // TESTS ADDED AND VERIFIED
         /// -> get GLOBAL coordinates                (Vector3i)
         public static final class Global {
 
@@ -669,7 +663,6 @@ public abstract class BlockUtils {
         }
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final class Ref_ {
 
         /**
@@ -1544,7 +1537,6 @@ public abstract class BlockUtils {
         // #endregion getRef
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final class Info {
 
         /**
@@ -2245,7 +2237,6 @@ public abstract class BlockUtils {
         // #endregion getInfo
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final class Id {
 
         /**
@@ -2584,7 +2575,6 @@ public abstract class BlockUtils {
         }
     }
 
-    // TESTS ADDED AND VERIFIED
     // Not even sure what BlockType is or what i was using it for
     public static final class Type {
 
@@ -2620,7 +2610,6 @@ public abstract class BlockUtils {
         }
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final boolean set(final World world, final Vector3i blockCoords, final int blockId) {
         var chunk = ChunkUtils.WorldChunk_.get(world, blockCoords);
         if (chunk == null) {
@@ -2630,12 +2619,10 @@ public abstract class BlockUtils {
         return set0(chunk, blockCoords, blockId);
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final boolean set0(final WorldChunk chunk, final Vector3i blockCoords, final int blockId) {
         return chunk.setBlock(blockCoords.x, blockCoords.y, blockCoords.z, blockId);
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final int get(final World world, final Vector3i blockCoords) {
         var chunk = ChunkUtils.WorldChunk_.get(world, blockCoords);
         if (chunk == null) {
@@ -2645,7 +2632,6 @@ public abstract class BlockUtils {
         return get0(chunk, blockCoords);
     }
 
-    // TESTS ADDED AND VERIFIED
     public static final int get0(final WorldChunk chunk, final Vector3i blockCoords) {
         return chunk.getBlock(blockCoords);
     }

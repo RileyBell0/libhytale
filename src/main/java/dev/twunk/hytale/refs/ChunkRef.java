@@ -29,6 +29,10 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     @Nullable
     private WorldChunk worldChunk = null;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public ChunkRef(Ref<ChunkStore> ref) {
         super(ref);
     }

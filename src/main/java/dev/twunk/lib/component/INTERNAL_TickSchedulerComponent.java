@@ -50,6 +50,10 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      */
     private final HashMap<String, TrackedEntity<ECS_STORE>> memoryLocation = new HashMap<>();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     /**
      * Store the current ticking state we've got for the given system (e.g. awake,
      * sleeping, etc)

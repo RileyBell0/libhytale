@@ -16,6 +16,10 @@ public class ExampleTickProcedure extends TickProcedure {
         TickProcedure.BASE_CODEC
     ).build();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public ExampleTickProcedure() {
         HytaleLogger.forEnclosingClass().atInfo().log("CONSTRUCTING INHERENT TICK PROCEDURE");
     }

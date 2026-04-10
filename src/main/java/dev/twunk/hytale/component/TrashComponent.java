@@ -27,6 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Serializable
 public class TrashComponent<ECS_STORE extends WorldProvider> implements IContainerComponent<ECS_STORE> {
 
+    //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
+    //==> Codec
+
     @Serialize
     private short capacity = 45;
 
@@ -36,11 +39,13 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     @Serialize
     private boolean canOpen = true;
 
+    //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
+
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
-    //////////
-    // Methods
-    //////////
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     // IContainer::getWindows
     @Override

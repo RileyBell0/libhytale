@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.ComponentType;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.hytale.interaction.Codecs;
+import dev.twunk.hytale.codec.Codecs;
 import dev.twunk.interfaces.component.IContainerComponent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -39,6 +39,10 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
 
     private final ComponentType<ChunkStore, T> componentType;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public AutoBlockTickSystem(final ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;

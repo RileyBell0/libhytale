@@ -25,6 +25,10 @@ public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements
     private final ArrayList<ISubSystem<ECS_STORE>> subSystems = new ArrayList<>();
     private final Query<ECS_STORE> query;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public SubSystemOwner(final Query<ECS_STORE> query) {
         this.query = query;
     }

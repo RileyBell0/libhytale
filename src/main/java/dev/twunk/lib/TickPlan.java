@@ -18,6 +18,10 @@ public interface TickPlan {
 
     public static final TickPlan BROKEN = (TickPlan) new Unknown();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     /**
      * Keep ticking at the same frequency as before
      */

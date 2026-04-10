@@ -44,6 +44,10 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
 
     private final ComponentType<ChunkStore, T> componentType;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public AutoBlockLifetimeSystem(ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;

@@ -11,6 +11,10 @@ public class TickStrategyFrequency extends TickStrategy {
     // its first tick gets run
     public final int initialDelay;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public TickStrategyFrequency() {
         // tick every single tick
         this.tickFrequency = 1;

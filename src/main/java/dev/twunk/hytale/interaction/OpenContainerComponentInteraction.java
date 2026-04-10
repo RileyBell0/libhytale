@@ -41,10 +41,23 @@ import javax.annotation.Nullable;
 )
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
+    //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
+    //==> Codec
+
+    /**
+     * Pass in the ID of the container component that this interaction will search for
+     * and open on the interacted entity
+     */
     @SuppressWarnings("unchecked")
     @Serialize
     private ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
         LibHytale.getChunkComponentType(ContainerComponent.class);
+
+    //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     protected void interactWithBlock(

@@ -16,6 +16,10 @@ public class TransformCodec<T> implements Codec<T> {
     private final Function<T, String> encoder;
     private final Function<String, T> decoder;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public TransformCodec(Function<T, String> encoder, Function<String, T> decoder) {
         this.encoder = encoder;
         this.decoder = decoder;

@@ -18,7 +18,6 @@ import dev.twunk.lib.test.TwunkDevTestComponent;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
-// TESTS ADDED AND VERIFIED
 public abstract class ComponentUtils {
 
     // ==================================================

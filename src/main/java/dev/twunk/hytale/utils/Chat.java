@@ -4,7 +4,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
-import dev.twunk.hytale.interaction.MessageCodec;
+import dev.twunk.hytale.codec.MessageCodec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;

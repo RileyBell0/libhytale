@@ -19,6 +19,10 @@ public class TickStrategyFrequencySynced extends TickStrategy {
     // AFTER `initialDelay` ticks have passed
     public final int initialDelay;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     public TickStrategyFrequencySynced() {
         // default: from the first tick onwards
         this.tickOffset = 0;

@@ -17,7 +17,6 @@ import dev.twunk.lib.test.TestUtil;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
 
-// TESTS ADDED AND VERIFIED
 public abstract class ChunkUtils {
 
     // ==================================================
@@ -27,7 +26,6 @@ public abstract class ChunkUtils {
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, WorldChunk> WORLD_CHUNK_COMPONENT = WorldChunk.getComponentType();
 
-    // TESTS ADDED AND VERIFIED
     public static final class Coords {
 
         /// -> get CHUNK coordinates                 (long | Vector2i | ChunkCoordinates)
@@ -306,7 +304,6 @@ public abstract class ChunkUtils {
         }
     }
 
-    // TESTS ADDED AND VERIFIED
     /// -> get WorldChunk
     public static final class WorldChunk_ {
 
@@ -714,7 +711,6 @@ public abstract class ChunkUtils {
         // #endregion getWorldChunk
     }
 
-    // TESTS ADDED AND VERIFIED
     /// -> get Ref<ChunkStore>  (ChunkRef)
     public static final class Ref_ {
 

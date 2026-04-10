@@ -1,10 +1,8 @@
-package dev.twunk.hytale.interaction;
+package dev.twunk.hytale.codec;
 
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
-import dev.twunk.lib.AutoBuilderCodec;
 import javax.annotation.Nullable;
 
 /**
@@ -14,8 +12,6 @@ import javax.annotation.Nullable;
  */
 @Serializable(documentation = "Debug interaction that sends a message on use.")
 public class MessageCodec {
-
-    public static final BuilderCodec<MessageCodec> CODEC = AutoBuilderCodec.build(MessageCodec.class);
 
     /**
      * Your overarching message itself
@@ -50,6 +46,10 @@ public class MessageCodec {
      */
     @Serialize
     private boolean italic = false;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     public Message toMessage() {
         var msg = Message.raw(this.message).bold(this.bold).italic(this.italic);

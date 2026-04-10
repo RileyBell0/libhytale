@@ -30,6 +30,9 @@ public class ContainerComponent<
     ECS_STORE extends WorldProvider
 > implements IContainerComponent<ECS_STORE>, IPersistentContainer {
 
+    //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
+    //==> Codec
+
     @Serialize
     private boolean canView = true;
 
@@ -39,6 +42,8 @@ public class ContainerComponent<
     @Serialize
     protected SimpleItemContainer container = new SimpleItemContainer((short) 10);
 
+    //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
+
     @Nullable
     public WorldChunk worldChunk = null;
 
@@ -47,9 +52,9 @@ public class ContainerComponent<
 
     private final Map<UUID, ContainerBlockWindow> windows = new ConcurrentHashMap<>();
 
-    //////////
-    // Methods
-    //////////
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     // IContainer::getWindows
     @Override

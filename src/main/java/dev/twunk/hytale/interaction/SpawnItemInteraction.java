@@ -1,6 +1,6 @@
 package dev.twunk.hytale.interaction;
 
-import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -22,19 +22,31 @@ import javax.annotation.Nullable;
 )
 public class SpawnItemInteraction extends SimpleInstantInteraction {
 
+    /** X, Y, Z Offset from the interacted block */
     @Serialize
-    private Vector3i offset = new Vector3i(0, 0, 0);
+    private Vector3d offset = new Vector3d(0, 0, 0);
 
+    /**
+     * Position to spawn item. If value is null, will spawn at the location
+     * of the interacted block + offset
+     */
     @Serialize
     @Nullable
-    private Vector3i at = null;
+    private Vector3d at = null;
 
+    /** ID of the item to spawn */
     @Serialize
     private String itemId = "Soil_Grass";
 
+    /** Quantity of items (within the item stack) to spawns */
     @Serialize(min = 1)
     private int quantity = 1;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
+    /** Function that's run when the interaction is activated */
     @Override
     protected void firstRun(
         final InteractionType interactionType,
@@ -56,7 +68,7 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        Vector3i coords;
+        Vector3d coords;
         if (this.at != null) {
             coords = this.at;
         } else {
@@ -65,7 +77,7 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
                 return;
             }
 
-            coords = new Vector3i(targetBlockPos.x, targetBlockPos.y, targetBlockPos.z);
+            coords = new Vector3d(targetBlockPos.x, targetBlockPos.y, targetBlockPos.z);
         }
 
         coords = coords.add(this.offset);

@@ -15,9 +15,13 @@ import javax.annotation.Nullable;
  */
 public class AnyRef<ECS_TYPE extends WorldProvider> extends Ref<ECS_TYPE> {
 
+    /** World that the entity is in (lazily evaluated) */
     @Nullable
     protected World world;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
     public AnyRef(Ref<ECS_TYPE> ref) {
         super(ref.getStore(), ref.getIndex());
     }

@@ -1,4 +1,4 @@
-package dev.twunk.hytale.interaction;
+package dev.twunk.hytale.codec;
 
 import com.hypixel.hytale.codec.Codec;
 import dev.twunk.lib.TransformCodec;
