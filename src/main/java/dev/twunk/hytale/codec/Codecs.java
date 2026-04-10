@@ -23,9 +23,11 @@ public class Codecs {
         allCodecs.put(clazz, codec);
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
     public static final <T> Codec<T> tryGetCodec(Class<T> clazz) {
-        return (Codec<T>) allCodecs.get(clazz);
+        @SuppressWarnings("unchecked")
+        var codec = (Codec<T>) allCodecs.get(clazz);
+
+        return codec;
     }
 }

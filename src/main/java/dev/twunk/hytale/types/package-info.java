@@ -1,2 +1,2 @@
 @dev.twunk.EverythingIsNonnullByDefault
-package dev.twunk.lib.coords;
+package dev.twunk.hytale.types;

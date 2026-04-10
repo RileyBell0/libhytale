@@ -12,7 +12,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.lib.coords.ChunkCoordinates;
+import dev.twunk.hytale.types.ChunkCoordinates;
 import dev.twunk.lib.test.TestUtil;
 import java.util.ArrayList;
 import javax.annotation.Nullable;

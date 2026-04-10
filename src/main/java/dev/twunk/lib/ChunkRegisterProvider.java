@@ -25,7 +25,6 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("unchecked")
     public final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getComponentType(
         final Class<T> componentClass
     ) {
@@ -37,7 +36,10 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         }
 
         // casting is safe as long as i haven't stuffed something up
-        return (ComponentType<ChunkStore, T>) componentType;
+        @SuppressWarnings("unchecked")
+        var res = (ComponentType<ChunkStore, T>) componentType;
+
+        return res;
     }
 
     @Nullable

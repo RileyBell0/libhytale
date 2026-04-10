@@ -6,10 +6,10 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.hytale.types.ChunkCoordinates;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.lib.coords.ChunkCoordinates;
 import javax.annotation.Nullable;
 
 /**
@@ -52,12 +52,12 @@ public class BlockRef extends AnyRef<ChunkStore> {
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
+
     public BlockRef(Ref<ChunkStore> ref) {
         super(ref);
     }
 
     // suppressing "unchecked" but, really, i've checked it. silly java.
-    @SuppressWarnings("unchecked")
     @Nullable
     public <T extends Component<ChunkStore>> T getComponent(@Nullable ComponentType<ChunkStore, T> componentType) {
         if (componentType == null) {
@@ -68,7 +68,10 @@ public class BlockRef extends AnyRef<ChunkStore> {
         // frequent enough slip up that i'd prefer to just cache `info` rather
         // than keep computing it
         if (componentType == BLOCK_STATE_INFO_COMPONENT_TYPE) {
-            return (T) this.getInfo();
+            @SuppressWarnings("unchecked")
+            var info = (T) this.getInfo();
+
+            return info;
         }
 
         return ComponentUtils.get(this, componentType);

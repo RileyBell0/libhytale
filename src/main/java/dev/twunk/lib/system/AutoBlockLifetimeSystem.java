@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.hytale.LibHytale;
+import dev.twunk.annotations.EventRunners;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.LifetimeSubSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
@@ -35,6 +35,7 @@ import dev.twunk.interfaces.methods.ILifetime;
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
+@EventRunners.Chunk(LifetimeSubSystem.class)
 public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
     extends SubSystemOwner<ChunkStore>
     implements ILifetime<ChunkStore>
@@ -52,7 +53,8 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
         super(Query.and(componentType));
         this.componentType = componentType;
 
-        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, super.getQuery(), LibHytale.CHUNK_REGISTRY));
+        // TODO remove this when the subsystem attachement / events system is working
+        // this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, super.getQuery(), LibHytale.CHUNK_REGISTRY));
     }
 
     @Override

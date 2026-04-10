@@ -1,4 +1,4 @@
-package dev.twunk.lib.coords;
+package dev.twunk.hytale.types;
 
 import java.util.Objects;
 import javax.annotation.Nullable;

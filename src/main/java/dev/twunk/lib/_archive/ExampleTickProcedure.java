@@ -1,28 +1,14 @@
 package dev.twunk.lib._archive;
 
-import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
+import dev.twunk.annotations.Serializable;
 import javax.annotation.Nullable;
 
+@Serializable(inherits = TickProcedure.class, codecField = "BASE_CODEC")
 public class ExampleTickProcedure extends TickProcedure {
-
-    public static final BuilderCodec<ExampleTickProcedure> CODEC = BuilderCodec.builder(
-        ExampleTickProcedure.class,
-        ExampleTickProcedure::new,
-        TickProcedure.BASE_CODEC
-    ).build();
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    public ExampleTickProcedure() {
-        HytaleLogger.forEnclosingClass().atInfo().log("CONSTRUCTING INHERENT TICK PROCEDURE");
-    }
 
     @Override
     public BlockTickStrategy onTick(

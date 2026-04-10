@@ -2,6 +2,7 @@ package dev.twunk.hytale.system;
 
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.annotations.EventRunners;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IQuery;
@@ -31,6 +32,21 @@ public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements
 
     public SubSystemOwner(final Query<ECS_STORE> query) {
         this.query = query;
+
+        this.init();
+    }
+
+    protected void init() {
+        // look for event annotations on self
+        EventRunners.Chunk chunkEvents;
+        if ((chunkEvents = this.getClass().getAnnotation(EventRunners.Chunk.class)) != null) {
+            for (var clazz : chunkEvents.value()) {}
+        }
+
+        EventRunners.Entity entityEvents;
+        if ((entityEvents = this.getClass().getAnnotation(EventRunners.Entity.class)) != null) {
+            for (var clazz : entityEvents.value()) {}
+        }
     }
 
     protected void appendSubSystem(final ISubSystem<ECS_STORE> system) {
