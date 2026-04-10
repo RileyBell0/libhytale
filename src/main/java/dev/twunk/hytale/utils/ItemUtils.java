@@ -7,7 +7,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.util.FastRandom;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
-import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.event.events.ecs.DropItemEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
@@ -30,7 +29,7 @@ public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.It
     public static Ref<EntityStore> spawn(
         final Ref<EntityStore> eventOwnerRef,
         final ComponentAccessor<EntityStore> store,
-        final Vector3i throwPosition,
+        final Vector3d throwPosition,
         final ItemStack itemsToSpawn
     ) {
         // Dispatch a drop event (found in hytale code, not entirely sure what it does yet)
@@ -56,7 +55,7 @@ public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.It
         return ItemUtils.spawn(
             eventOwnerRef,
             store,
-            throwPosition.toVector3d().add(0.5d, 0.5d, 0.5d), // center spawn in block position
+            throwPosition.add(0.5d, 0.5d, 0.5d), // center spawn in block position
             throwDirection,
             event.getThrowSpeed(),
             items
