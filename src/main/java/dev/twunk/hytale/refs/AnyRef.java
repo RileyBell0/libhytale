@@ -13,17 +13,17 @@ import javax.annotation.Nullable;
  * more methods from Utils so that you can just take a ref and access the stuff
  * you want without having to go through a billion processes
  */
-public class AnyRef<ECS_STORE extends WorldProvider> extends Ref<ECS_STORE> {
+public class AnyRef<ECS_TYPE extends WorldProvider> extends Ref<ECS_TYPE> {
 
     @Nullable
     protected World world;
 
-    public AnyRef(Ref<ECS_STORE> ref) {
-        super(ref.getStore());
+    public AnyRef(Ref<ECS_TYPE> ref) {
+        super(ref.getStore(), ref.getIndex());
     }
 
     @Nullable
-    public <T extends Component<ECS_STORE>> T getComponent(@Nullable ComponentType<ECS_STORE, T> componentType) {
+    public <T extends Component<ECS_TYPE>> T getComponent(@Nullable ComponentType<ECS_TYPE, T> componentType) {
         if (componentType == null) {
             return null;
         }
