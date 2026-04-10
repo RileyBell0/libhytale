@@ -1,9 +1,5 @@
 package dev.twunk.hytale.interaction;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -14,7 +10,6 @@ import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.utils.Chat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 
@@ -24,46 +19,15 @@ import javax.annotation.Nullable;
  *
  * Useful for light printf debugging interactions in-game
  */
-@Serializable
+@Serializable(documentation = "Debug interaction that sends a message on use.")
 public class LogInteraction extends SimpleInstantInteraction {
-
-    /**
-     * The overall log itself
-     * Suppressing "null" from `Level.INFO`
-     */
-    public static final BuilderCodec<LogInteraction> CODEC = BuilderCodec.builder(
-        LogInteraction.class,
-        LogInteraction::new,
-        SimpleInstantInteraction.CODEC
-    )
-        .documentation("Debug interaction that sends a message on use.")
-        .append(
-            new KeyedCodec<>("Messages", new ArrayCodec<>(Message.CODEC, Message[]::new)),
-            (self, messages) -> {
-                self.messages.addAll(Arrays.asList(messages));
-            },
-            self -> self.messages.toArray(Message[]::new)
-        )
-        .add()
-        .appendInherited(
-            new KeyedCodec<>("Level", Codec.STRING, false),
-            (o, v) -> {
-                final var level = Level.parse(v);
-                if (level != null) {
-                    o.level = level;
-                }
-            },
-            o -> o.level == null ? null : o.level.toString(),
-            (o, p) -> o.level = p.level
-        )
-        .add()
-        .build();
 
     /**
      * All your messages (if you provided multiple).
      * They'll be concatenated with Message.join before printing them
      */
-    private ArrayList<Message> messages = new ArrayList<>();
+    @Serialize
+    private ArrayList<MessageCodec> messages = new ArrayList<>();
 
     /**
      * Your overarching message itself
@@ -103,6 +67,7 @@ public class LogInteraction extends SimpleInstantInteraction {
      * Severity/level of your message. We'll prefix [LEVEL]
      * SEVERE | WARNING | INFO | CONFIG | FINE | FINER | FINEST
      */
+    @Serialize
     @SuppressWarnings("null")
     private Level level = Level.INFO;
 
@@ -136,9 +101,9 @@ public class LogInteraction extends SimpleInstantInteraction {
         }
 
         Message msg;
-        final var messages = this.messages.toArray(Message[]::new);
+        final var messages = this.messages.stream().map(MessageCodec::toMessage).toArray(Message[]::new);
         if (messages == null) {
-            msg = Chat.parse(message);
+            msg = Chat.parse(this.message);
         } else {
             msg = Message.join(Chat.parse(message), Message.join(messages));
         }

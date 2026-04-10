@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import dev.twunk.hytale.interaction.MessageCodec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,6 +57,8 @@ public abstract class Chat {
             return (Message) message;
         } else if (message instanceof String) {
             return Message.raw((String) message);
+        } else if (message instanceof MessageCodec) {
+            return ((MessageCodec) message).toMessage();
         } else {
             final var strVal = message.toString();
             if (strVal == null) {

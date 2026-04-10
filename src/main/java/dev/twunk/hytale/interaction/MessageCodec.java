@@ -1,6 +1,7 @@
 package dev.twunk.hytale.interaction;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.server.core.Message;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.lib.AutoBuilderCodec;
@@ -19,7 +20,7 @@ public class MessageCodec {
     /**
      * Your overarching message itself
      */
-    @Serialize(required = true)
+    @Serialize
     private String message = "";
 
     /**
@@ -49,4 +50,16 @@ public class MessageCodec {
      */
     @Serialize
     private boolean italic = false;
+
+    public Message toMessage() {
+        var msg = Message.raw(this.message).bold(this.bold).italic(this.italic);
+        if (this.color != null) {
+            msg = msg.color(this.color);
+        }
+        if (this.link != null) {
+            msg.link(this.link);
+        }
+
+        return msg;
+    }
 }

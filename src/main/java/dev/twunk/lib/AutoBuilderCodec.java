@@ -3,13 +3,19 @@ package dev.twunk.lib;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.component.ComponentType;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.annotations.Serialize;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.interaction.Codecs;
 import dev.twunk.interfaces.component.IContainerComponent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.lang.model.type.NullType;
@@ -93,7 +99,16 @@ public final class AutoBuilderCodec {
             }
             var fieldClass = field.getType();
 
-            // First: in case the type is something like `SimpleItemContainer`, we'll check if there's an
+            // First: check if i've specifically defined a codec for that class
+            try {
+                var codec = Codecs.tryGetCodec(clazz);
+                if (codec != null) {
+                    builder = appendRawCodec(builder, field, codec);
+                    continue;
+                }
+            } catch (Exception e) {}
+
+            // Next: in case the type is something like `SimpleItemContainer`, we'll check if there's an
             //        existing codec on the class itself for the type of the var we're handling that we
             //        can use
             try {
@@ -102,7 +117,7 @@ public final class AutoBuilderCodec {
 
                 if (codec != null && BuilderCodec.class.isAssignableFrom(codec.getClass())) {
                     field.setAccessible(true);
-                    builder = appendCodec(builder, field, (BuilderCodec) codec);
+                    builder = appendCodec(builder, field, (BuilderCodec<?>) codec);
                     continue;
                 }
             } catch (Exception e) {}
@@ -118,10 +133,84 @@ public final class AutoBuilderCodec {
                 builder = appendComponentType(builder, field);
             } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
                 builder = appendInt(builder, field);
+            } else if (List.class.isAssignableFrom(fieldClass)) {
+                var genericType = field.getGenericType();
+                if (!(genericType instanceof ParameterizedType)) {
+                    continue;
+                }
+
+                ParameterizedType pType = (ParameterizedType) genericType;
+
+                Type[] fieldArgTypes = pType.getActualTypeArguments();
+                if (fieldArgTypes.length != 1) {
+                    continue;
+                }
+
+                var arrayValueType = fieldArgTypes[0];
+                if (!(arrayValueType instanceof Class)) {
+                    continue;
+                }
+                Class<?> innerClass = (Class<?>) arrayValueType;
+
+                builder = appendArray(builder, field, innerClass);
             }
         }
 
         return builder;
+    }
+
+    private static final <T, U> BuilderCodec.Builder<T> appendArray(
+        BuilderCodec.Builder<T> builder,
+        Field field,
+        Class<U> innerClass
+    ) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+        var codec = Codecs.tryGetCodec(innerClass);
+        if (codec == null) {
+            codec = tryGetCodec(innerClass);
+            if (codec == null) {
+                throw new RuntimeException("Failed to get codec for class " + innerClass);
+            }
+        }
+
+        field.setAccessible(true);
+        return builder
+            .append(
+                new KeyedCodec<U[]>(
+                    name,
+                    new ArrayCodec<U>((Codec<U>) codec, (int len) -> {
+                        return (U[]) new Object[len];
+                    }),
+                    required
+                ),
+                (self, val) -> {
+                    if (val == null) {
+                        return;
+                    }
+                    try {
+                        final List<U> actualField = (List<U>) field.get(self);
+                        actualField.addAll(Arrays.asList(val));
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                },
+                self -> {
+                    try {
+                        final List<U> actualField = (List<U>) field.get(self);
+
+                        return (U[]) actualField.toArray();
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
     }
 
     @Nullable
@@ -166,6 +255,46 @@ public final class AutoBuilderCodec {
         BuilderCodec.Builder<T> builder,
         Field field,
         BuilderCodec<U> codec
+    ) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+
+        field.setAccessible(true);
+        return builder
+            .append(
+                (KeyedCodec<Object>) new KeyedCodec(name, codec, required),
+                (self, val) -> {
+                    if (val == null) {
+                        return;
+                    }
+                    try {
+                        field.set(self, val);
+                        return;
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                },
+                self -> {
+                    try {
+                        var val = field.get(self);
+                        return val;
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
+    }
+
+    private static final <T, U> BuilderCodec.Builder<T> appendRawCodec(
+        BuilderCodec.Builder<T> builder,
+        Field field,
+        Codec<U> codec
     ) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
