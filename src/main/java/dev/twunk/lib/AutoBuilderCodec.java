@@ -1,3 +1,6 @@
+/**
+ * TODO this file is pretty uuh, repetitive, and hard to verify. needs a redo eventually
+ */
 package dev.twunk.lib;
 
 import com.hypixel.hytale.codec.Codec;
