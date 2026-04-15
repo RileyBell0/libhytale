@@ -54,7 +54,7 @@ public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
         this.componentType = componentType;
 
         // TODO remove this when the subsystem attachement / events system is working
-        // this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, super.getQuery(), LibHytale.CHUNK_REGISTRY));
+        // this.appendSubSystem(LifetimeSubSystem.constructNewSystemClass(this, super.getQuery(), LibHytale.CHUNK_REGISTRY));
     }
 
     @Override

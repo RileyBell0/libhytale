@@ -47,7 +47,7 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
         super(Query.and(componentType));
         this.componentType = componentType;
 
-        this.appendSubSystem(TickSubSystem.newSubsystemFor(this, Query.and(componentType), this.getRegistry()));
+        this.appendSubSystem(TickSubSystem.constructNewSystemClass(this, Query.and(componentType), this.getRegistry()));
     }
 
     public void onEntityTick(

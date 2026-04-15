@@ -42,7 +42,7 @@ public class BlockTickSubSystem
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static BlockTickSubSystem newSubsystemFor(IBlockTick listener, Query<ChunkStore> query) {
+    public static BlockTickSubSystem constructNewSystemClass(IBlockTick listener, Query<ChunkStore> query) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(BlockTickSubSystem.class, IBlockTick.class, Query.class),
             listener,
@@ -54,7 +54,7 @@ public class BlockTickSubSystem
         super(query);
         this.listener = listener;
 
-        this.appendSubSystem(TickSubSystem.newSubsystemFor(this, query, this.getRegistry()));
+        this.appendSubSystem(TickSubSystem.constructNewSystemClass(this, query, this.getRegistry()));
     }
 
     public void onEntityTick(float dt, AnyRef<ChunkStore> ref, CommandBuffer<ChunkStore> commandBuffer) {

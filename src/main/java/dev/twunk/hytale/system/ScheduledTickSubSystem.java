@@ -53,7 +53,7 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public ScheduledTickSubSystem<ECS_STORE> newSubsystemFor(
+    public ScheduledTickSubSystem<ECS_STORE> constructNewSystemClass(
         IScheduledTick<ECS_STORE> listener,
         Query<ECS_STORE> query,
         IRegistry<ECS_STORE> registry
@@ -92,8 +92,8 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
         this.entities = new TrackedEntities<ECS_STORE>(listener.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(LifetimeSubSystem.newSubsystemFor(this, query, this.registry));
-        this.appendSubSystem(UniverseTickSubSystem.newSubsystemFor(this, query, this.registry));
+        this.appendSubSystem(LifetimeSubSystem.constructNewSystemClass(this, query, this.registry));
+        this.appendSubSystem(UniverseTickSubSystem.constructNewSystemClass(this, query, this.registry));
     }
 
     /**

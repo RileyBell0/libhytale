@@ -59,7 +59,7 @@ public class LifetimeSubSystem<ECS_STORE extends WorldProvider>
      */
     public static <ECS_STORE extends WorldProvider, T extends LifetimeSubSystem<ECS_STORE>> LifetimeSubSystem<
         ECS_STORE
-    > newSubsystemFor(ILifetime<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    > constructNewSystemClass(ILifetime<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
                 LifetimeSubSystem.class,

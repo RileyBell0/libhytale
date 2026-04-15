@@ -52,7 +52,7 @@ public class TickSubSystem<ECS_STORE extends WorldProvider>
      */
     public static final <ECS_STORE extends WorldProvider, T extends TickSubSystem<ECS_STORE>> TickSubSystem<
         ECS_STORE
-    > newSubsystemFor(ITick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    > constructNewSystemClass(ITick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(TickSubSystem.class, ITick.class, Query.class, IRegistry.class),
             listener,

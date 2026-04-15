@@ -45,7 +45,7 @@ public class UniverseTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <ECS_STORE extends WorldProvider> UniverseTickSubSystem<ECS_STORE> newSubsystemFor(
+    public static <ECS_STORE extends WorldProvider> UniverseTickSubSystem<ECS_STORE> constructNewSystemClass(
         IUniverseTick<ECS_STORE> listener,
         Query<ECS_STORE> query,
         IRegistry<ECS_STORE> registry
