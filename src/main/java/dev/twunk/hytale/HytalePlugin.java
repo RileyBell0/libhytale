@@ -13,9 +13,9 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.annotations.Serializable;
-import dev.twunk.interfaces.component.IOnAddRemoveComponent;
-import dev.twunk.interfaces.component.IOnBlockTickComponent;
-import dev.twunk.interfaces.component.IOnTickComponent;
+import dev.twunk.interfaces.methods.IOnAddRemove;
+import dev.twunk.interfaces.methods.IOnBlockTick;
+import dev.twunk.interfaces.methods.IOnTick;
 import dev.twunk.lib.AutoBuilderCodec;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
@@ -86,8 +86,10 @@ public abstract class HytalePlugin extends JavaPlugin {
         this.initCommonSystemsFor(clazz, component);
 
         if (clazz.isAnnotationPresent(dev.twunk.annotations.Serializable.class)) {
-            if (IOnBlockTickComponent.class.isAssignableFrom(clazz)) {
-                new AutoBlockTickSystem(component).registerTo(this);
+            if (Component.class.isAssignableFrom(clazz)) {
+                if (IOnBlockTick.class.isAssignableFrom(clazz)) {
+                    new AutoBlockTickSystem(component).registerTo(this);
+                }
             }
         }
 
@@ -113,14 +115,16 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
         // need to make a hashmap for annotations
 
-        if (IOnTickComponent.class.isAssignableFrom(clazz)) {
-            // var config = getSystemConfig(clazz, ITickComponent.class);
-            new AutoBlockTickSystem(componentType).registerTo(this);
-        }
+        if (Component.class.isAssignableFrom(clazz)) {
+            if (IOnTick.class.isAssignableFrom(clazz)) {
+                // var config = getSystemConfig(clazz, ITickComponent.class);
+                new AutoBlockTickSystem(componentType).registerTo(this);
+            }
 
-        if (IOnAddRemoveComponent.class.isAssignableFrom(clazz)) {
-            // var config = getSystemConfig(clazz, ILifetimeComponent.class);
-            new AutoBlockLifetimeSystem(componentType).registerTo(this);
+            if (IOnAddRemove.class.isAssignableFrom(clazz)) {
+                // var config = getSystemConfig(clazz, ILifetimeComponent.class);
+                new AutoBlockLifetimeSystem(componentType).registerTo(this);
+            }
         }
     }
 

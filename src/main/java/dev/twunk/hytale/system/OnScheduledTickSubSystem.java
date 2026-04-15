@@ -9,7 +9,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IOnLifetime;
+import dev.twunk.interfaces.methods.IOnAddRemove;
 import dev.twunk.interfaces.methods.IOnScheduledTick;
 import dev.twunk.interfaces.methods.IOnUniverseTick;
 import dev.twunk.interfaces.methods.IRegistry;
@@ -38,7 +38,7 @@ import dev.twunk.lib.lifetime.TrackedEntities;
  */
 public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
     extends SubSystemOwner<ECS_STORE>
-    implements IOnLifetime<ECS_STORE>, IOnUniverseTick<ECS_STORE>, ISubSystem<ECS_STORE>
+    implements IOnAddRemove<ECS_STORE>, IOnUniverseTick<ECS_STORE>, ISubSystem<ECS_STORE>
 {
 
     private final TrackedEntities<ECS_STORE> entities;

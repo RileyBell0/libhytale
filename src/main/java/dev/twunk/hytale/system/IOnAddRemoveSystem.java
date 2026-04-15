@@ -12,7 +12,7 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IOnLifetime;
+import dev.twunk.interfaces.methods.IOnAddRemove;
 import dev.twunk.interfaces.methods.IOnTick;
 import dev.twunk.interfaces.methods.IRegistry;
 
@@ -28,7 +28,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  * - ILifetimeSystem runner
  *
  * My code
- * @see IOnLifetime       - Methods for listening to entity add/remove events
+ * @see IOnAddRemove       - Methods for listening to entity add/remove events
  * @see OnTickSystem   - Underlying SubSystem that powers the IEntityTick methods
  *                              for IEntityTickSystems that register an EntityTickSubSystem
  * @see IOnTick           - Underlying method for ticking an entity
@@ -45,7 +45,7 @@ public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
     implements ISubSystem<ECS_STORE>
 {
 
-    private final IOnLifetime<ECS_STORE> listener;
+    private final IOnAddRemove<ECS_STORE> listener;
     private final Query<ECS_STORE> query;
     private final IRegistry<ECS_STORE> registry;
 
@@ -59,11 +59,11 @@ public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
      */
     public static <ECS_STORE extends WorldProvider, T extends IOnAddRemoveSystem<ECS_STORE>> IOnAddRemoveSystem<
         ECS_STORE
-    > constructNewSystemClass(IOnLifetime<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    > constructNewSystemClass(IOnAddRemove<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
                 IOnAddRemoveSystem.class,
-                IOnLifetime.class,
+                IOnAddRemove.class,
                 Query.class,
                 IRegistry.class
             ),
@@ -74,7 +74,7 @@ public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
     }
 
     protected IOnAddRemoveSystem(
-        IOnLifetime<ECS_STORE> listener,
+        IOnAddRemove<ECS_STORE> listener,
         Query<ECS_STORE> query,
         IRegistry<ECS_STORE> registry
     ) {

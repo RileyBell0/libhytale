@@ -17,7 +17,7 @@ import dev.twunk.hytale.system.IOnAddRemoveSystem;
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-public interface IOnLifetime<ECS_STORE extends WorldProvider> {
+public interface IOnAddRemove<ECS_STORE extends WorldProvider> {
     /**
      * Event for when an entity is added/loaded into the world
      *

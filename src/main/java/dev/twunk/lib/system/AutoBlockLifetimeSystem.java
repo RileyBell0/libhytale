@@ -14,7 +14,7 @@ import dev.twunk.hytale.system.IOnAddRemoveSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.interfaces.component.IOnAddRemoveComponent;
-import dev.twunk.interfaces.methods.IOnLifetime;
+import dev.twunk.interfaces.methods.IOnAddRemove;
 
 /**
  * A reusable system for running onEntityAdded and onEntityRemove functions on
@@ -29,7 +29,7 @@ import dev.twunk.interfaces.methods.IOnLifetime;
  * specific thing anymore.
  *
  * My code
- * @see IOnLifetime       - Methods for listening to entity add/remove events
+ * @see IOnAddRemove       - Methods for listening to entity add/remove events
  * @see IOnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  *
  * Hytale's code
@@ -38,7 +38,7 @@ import dev.twunk.interfaces.methods.IOnLifetime;
 @EventRunners.Chunk(IOnAddRemoveSystem.class)
 public class AutoBlockLifetimeSystem<T extends IOnAddRemoveComponent<ChunkStore>>
     extends SubSystemOwner<ChunkStore>
-    implements IOnLifetime<ChunkStore>
+    implements IOnAddRemove<ChunkStore>
 {
 
     private static final HytaleLogger logger = HytaleLogger.forEnclosingClass();
