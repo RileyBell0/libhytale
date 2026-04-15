@@ -9,10 +9,10 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.ILifetime;
+import dev.twunk.interfaces.methods.IOnLifetime;
+import dev.twunk.interfaces.methods.IOnScheduledTick;
+import dev.twunk.interfaces.methods.IOnUniverseTick;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.methods.IScheduledTick;
-import dev.twunk.interfaces.methods.IUniverseTick;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.lib.lifetime.TrackedEntities;
@@ -36,13 +36,13 @@ import dev.twunk.lib.lifetime.TrackedEntities;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
+public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
     extends SubSystemOwner<ECS_STORE>
-    implements ILifetime<ECS_STORE>, IUniverseTick<ECS_STORE>, ISubSystem<ECS_STORE>
+    implements IOnLifetime<ECS_STORE>, IOnUniverseTick<ECS_STORE>, ISubSystem<ECS_STORE>
 {
 
     private final TrackedEntities<ECS_STORE> entities;
-    private final IScheduledTick<ECS_STORE> listener;
+    private final IOnScheduledTick<ECS_STORE> listener;
     private final IRegistry<ECS_STORE> registry;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -53,15 +53,15 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public ScheduledTickSubSystem<ECS_STORE> constructNewSystemClass(
-        IScheduledTick<ECS_STORE> listener,
+    public OnScheduledTickSubSystem<ECS_STORE> constructNewSystemClass(
+        IOnScheduledTick<ECS_STORE> listener,
         Query<ECS_STORE> query,
         IRegistry<ECS_STORE> registry
     ) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
-                ScheduledTickSubSystem.class,
-                IScheduledTick.class,
+                OnScheduledTickSubSystem.class,
+                IOnScheduledTick.class,
                 Query.class,
                 IRegistry.class
             ),
@@ -71,8 +71,8 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
         );
     }
 
-    protected ScheduledTickSubSystem(
-        IScheduledTick<ECS_STORE> listener,
+    protected OnScheduledTickSubSystem(
+        IOnScheduledTick<ECS_STORE> listener,
         Query<ECS_STORE> query,
         IRegistry<ECS_STORE> registry
     ) {
@@ -92,8 +92,8 @@ public class ScheduledTickSubSystem<ECS_STORE extends WorldProvider>
         this.entities = new TrackedEntities<ECS_STORE>(listener.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(LifetimeSubSystem.constructNewSystemClass(this, query, this.registry));
-        this.appendSubSystem(UniverseTickSubSystem.constructNewSystemClass(this, query, this.registry));
+        this.appendSubSystem(IOnAddRemoveSystem.constructNewSystemClass(this, query, this.registry));
+        this.appendSubSystem(OnUniverseTickSystem.constructNewSystemClass(this, query, this.registry));
     }
 
     /**

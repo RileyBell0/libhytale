@@ -6,7 +6,7 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.refs.BlockRef;
-import dev.twunk.hytale.system.TickSubSystem;
+import dev.twunk.hytale.system.OnTickSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
 
 /**
@@ -19,9 +19,9 @@ import dev.twunk.lib.system.AutoBlockTickSystem;
  * My code
  * @see AutoBlockTickSystem - System for specifically ticking block entities (gets
  *                                     block position, id, etc. then gives that to your tick method)
- * @see TickSubSystem          - SubSystem used by TickableBlockComponentSystem
+ * @see OnTickSystem          - SubSystem used by TickableBlockComponentSystem
  *                                     that ticks entities (in our case block entities)
- * @see ITick                  - Underlying method for ticking an entity
+ * @see IOnTick                  - Underlying method for ticking an entity
  *
  * Hytale's code
  * @see EntityTickingSystem    - Baseline hytale system for ticking entities.
@@ -43,6 +43,6 @@ import dev.twunk.lib.system.AutoBlockTickSystem;
  *   everything. not all `onBlockTick` implementations will require all these, so its
  *   just wasted compute
  */
-public interface IBlockTick {
+public interface IOnBlockTick {
     public void onBlockTick(final BlockRef blockRef, final CommandBuffer<ChunkStore> commandBuffer);
 }

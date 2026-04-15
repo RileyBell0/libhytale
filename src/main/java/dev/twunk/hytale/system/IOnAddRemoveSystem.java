@@ -1,30 +1,37 @@
 package dev.twunk.hytale.system;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.interfaces.methods.IOnLifetime;
+import dev.twunk.interfaces.methods.IOnTick;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.methods.ITick;
 
 /**
- * Subsystem for calling `onEntityTick` on the parent system every tick
+ * Tiny Subsystem to simply tell our parent system when we added/removed entities
+ * that match our parent's query
  *
- * GOAL: run code on entities every tick
+ * GOAL: Need to know when entities load/unload (and optionally why they got added/removed)
  *
  * REQUIRES:
  * - N/A (this is a leaf)
  * PRODUCES:
- * - IEntityTickSystem runner
- *
+ * - ILifetimeSystem runner
  *
  * My code
- * @see ITick       - Underlying method for ticking an entity
+ * @see IOnLifetime       - Methods for listening to entity add/remove events
+ * @see OnTickSystem   - Underlying SubSystem that powers the IEntityTick methods
+ *                              for IEntityTickSystems that register an EntityTickSubSystem
+ * @see IOnTick           - Underlying method for ticking an entity
  *
  * Hytale's code
  * @see EntityTickingSystem    - Baseline hytale system for ticking entities.
@@ -33,12 +40,12 @@ import dev.twunk.interfaces.methods.ITick;
  *                               Runs ONCE per tick (global, not per matching entity, just runs a single
  *                               time per tick) and has an inbuilt query
  */
-public class TickSubSystem<ECS_STORE extends WorldProvider>
-    extends EntityTickingSystem<ECS_STORE>
+public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
+    extends RefSystem<ECS_STORE>
     implements ISubSystem<ECS_STORE>
 {
 
-    private final ITick<ECS_STORE> listener;
+    private final IOnLifetime<ECS_STORE> listener;
     private final Query<ECS_STORE> query;
     private final IRegistry<ECS_STORE> registry;
 
@@ -50,31 +57,50 @@ public class TickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static final <ECS_STORE extends WorldProvider, T extends TickSubSystem<ECS_STORE>> TickSubSystem<
+    public static <ECS_STORE extends WorldProvider, T extends IOnAddRemoveSystem<ECS_STORE>> IOnAddRemoveSystem<
         ECS_STORE
-    > constructNewSystemClass(ITick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    > constructNewSystemClass(IOnLifetime<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
         return ISubSystem.__construct(
-            ISubSystem.__dupeClassAndGetConstructor(TickSubSystem.class, ITick.class, Query.class, IRegistry.class),
+            ISubSystem.__dupeClassAndGetConstructor(
+                IOnAddRemoveSystem.class,
+                IOnLifetime.class,
+                Query.class,
+                IRegistry.class
+            ),
             listener,
             query,
             registry
         );
     }
 
-    protected TickSubSystem(ITick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    protected IOnAddRemoveSystem(
+        IOnLifetime<ECS_STORE> listener,
+        Query<ECS_STORE> query,
+        IRegistry<ECS_STORE> registry
+    ) {
         this.listener = listener;
         this.query = query;
         this.registry = registry;
     }
 
-    public void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ECS_STORE> archetypeChunk,
+    @Override
+    public void onEntityAdded(
+        Ref<ECS_STORE> ref,
+        AddReason reason,
         Store<ECS_STORE> store,
         CommandBuffer<ECS_STORE> commandBuffer
     ) {
-        listener.onEntityTick(dt, new AnyRef<>(archetypeChunk.getReferenceTo(index)), commandBuffer);
+        listener.onEntityAdded(new AnyRef<>(ref), reason, commandBuffer);
+    }
+
+    @Override
+    public void onEntityRemove(
+        Ref<ECS_STORE> ref,
+        RemoveReason reason,
+        Store<ECS_STORE> store,
+        CommandBuffer<ECS_STORE> commandBuffer
+    ) {
+        listener.onEntityRemove(new AnyRef<>(ref), reason, commandBuffer);
     }
 
     @Override

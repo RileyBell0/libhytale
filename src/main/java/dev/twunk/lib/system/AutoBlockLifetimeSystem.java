@@ -10,11 +10,11 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.annotations.EventRunners;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.LifetimeSubSystem;
+import dev.twunk.hytale.system.IOnAddRemoveSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.interfaces.component.ILifetimeComponent;
-import dev.twunk.interfaces.methods.ILifetime;
+import dev.twunk.interfaces.component.IOnAddRemoveComponent;
+import dev.twunk.interfaces.methods.IOnLifetime;
 
 /**
  * A reusable system for running onEntityAdded and onEntityRemove functions on
@@ -29,16 +29,16 @@ import dev.twunk.interfaces.methods.ILifetime;
  * specific thing anymore.
  *
  * My code
- * @see ILifetime       - Methods for listening to entity add/remove events
- * @see LifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ * @see IOnLifetime       - Methods for listening to entity add/remove events
+ * @see IOnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  *
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-@EventRunners.Chunk(LifetimeSubSystem.class)
-public class AutoBlockLifetimeSystem<T extends ILifetimeComponent<ChunkStore>>
+@EventRunners.Chunk(IOnAddRemoveSystem.class)
+public class AutoBlockLifetimeSystem<T extends IOnAddRemoveComponent<ChunkStore>>
     extends SubSystemOwner<ChunkStore>
-    implements ILifetime<ChunkStore>
+    implements IOnLifetime<ChunkStore>
 {
 
     private static final HytaleLogger logger = HytaleLogger.forEnclosingClass();

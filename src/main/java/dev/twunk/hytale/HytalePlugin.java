@@ -13,9 +13,9 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.annotations.Serializable;
-import dev.twunk.interfaces.component.IBlockTickComponent;
-import dev.twunk.interfaces.component.ILifetimeComponent;
-import dev.twunk.interfaces.component.ITickComponent;
+import dev.twunk.interfaces.component.IOnAddRemoveComponent;
+import dev.twunk.interfaces.component.IOnBlockTickComponent;
+import dev.twunk.interfaces.component.IOnTickComponent;
 import dev.twunk.lib.AutoBuilderCodec;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
@@ -86,7 +86,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         this.initCommonSystemsFor(clazz, component);
 
         if (clazz.isAnnotationPresent(dev.twunk.annotations.Serializable.class)) {
-            if (IBlockTickComponent.class.isAssignableFrom(clazz)) {
+            if (IOnBlockTickComponent.class.isAssignableFrom(clazz)) {
                 new AutoBlockTickSystem(component).registerTo(this);
             }
         }
@@ -113,12 +113,12 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
         // need to make a hashmap for annotations
 
-        if (ITickComponent.class.isAssignableFrom(clazz)) {
+        if (IOnTickComponent.class.isAssignableFrom(clazz)) {
             // var config = getSystemConfig(clazz, ITickComponent.class);
             new AutoBlockTickSystem(componentType).registerTo(this);
         }
 
-        if (ILifetimeComponent.class.isAssignableFrom(clazz)) {
+        if (IOnAddRemoveComponent.class.isAssignableFrom(clazz)) {
             // var config = getSystemConfig(clazz, ILifetimeComponent.class);
             new AutoBlockLifetimeSystem(componentType).registerTo(this);
         }

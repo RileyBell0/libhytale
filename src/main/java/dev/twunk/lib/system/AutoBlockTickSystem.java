@@ -8,13 +8,13 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.refs.BlockRef;
+import dev.twunk.hytale.system.OnTickSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
-import dev.twunk.hytale.system.TickSubSystem;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.interfaces.component.IBlockTickComponent;
+import dev.twunk.interfaces.component.IOnBlockTickComponent;
+import dev.twunk.interfaces.methods.IOnTick;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.methods.ITick;
 
 /**
  * A reusable system for ticking block components. Reusable by ME really, just
@@ -30,9 +30,9 @@ import dev.twunk.interfaces.methods.ITick;
  * - create a new instance `new TickableBlockComponent<YourComponent>(YourComponentType)`
  * - register the instance to your plugin
  */
-public final class AutoBlockTickSystem<T extends IBlockTickComponent>
+public final class AutoBlockTickSystem<T extends IOnBlockTickComponent>
     extends SubSystemOwner<ChunkStore>
-    implements ITick<ChunkStore>
+    implements IOnTick<ChunkStore>
 {
 
     private static final HytaleLogger logger = HytaleLogger.forEnclosingClass();
@@ -47,7 +47,7 @@ public final class AutoBlockTickSystem<T extends IBlockTickComponent>
         super(Query.and(componentType));
         this.componentType = componentType;
 
-        this.appendSubSystem(TickSubSystem.constructNewSystemClass(this, Query.and(componentType), this.getRegistry()));
+        this.appendSubSystem(OnTickSystem.constructNewSystemClass(this, Query.and(componentType), this.getRegistry()));
     }
 
     public void onEntityTick(

@@ -3,8 +3,8 @@ package dev.twunk.interfaces.component;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.system.LifetimeSubSystem;
-import dev.twunk.interfaces.methods.ILifetime;
+import dev.twunk.hytale.system.IOnAddRemoveSystem;
+import dev.twunk.interfaces.methods.IOnLifetime;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 
 /**
@@ -12,8 +12,8 @@ import dev.twunk.lib.system.AutoBlockLifetimeSystem;
  * - It has `onEntityAdded` and `onEntityRemove` methods
  *
  * My code
- * @see ILifetime              - Methods for listening to entity add/remove events
- * @see LifetimeSubSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ * @see IOnLifetime              - Methods for listening to entity add/remove events
+ * @see IOnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  * @see AutoBlockLifetimeSystem - A system I wrote that uses this. Runs onEntityAdded and onEntityRemove
  *                                     for a given query
  *
@@ -21,6 +21,6 @@ import dev.twunk.lib.system.AutoBlockLifetimeSystem;
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-public interface ILifetimeComponent<
+public interface IOnAddRemoveComponent<
     ECS_STORE extends WorldProvider
-> extends ILifetime<ECS_STORE>, Component<ECS_STORE> {}
+> extends IOnLifetime<ECS_STORE>, Component<ECS_STORE> {}

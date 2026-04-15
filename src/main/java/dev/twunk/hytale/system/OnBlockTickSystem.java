@@ -7,9 +7,9 @@ import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IBlockTick;
+import dev.twunk.interfaces.methods.IOnBlockTick;
+import dev.twunk.interfaces.methods.IOnTick;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.methods.ITick;
 
 /**
  * Composite subsystem to allow the parent to run code on its elements every
@@ -22,17 +22,17 @@ import dev.twunk.interfaces.methods.ITick;
  * PRODUCES:
  * - IQueryTickingSystem runner
  *
- * @see TickSubSystem - BlockTickSubSystem is simply an extension of EntityTickSubSystem
+ * @see OnTickSystem - BlockTickSubSystem is simply an extension of EntityTickSubSystem
  *                            that grabs some more block-related data out of a ref before calling
  *                            the onBlockTick method your `IEntityTickSystem` provides
- * @see IBlockTick          - method i'll be calling on your class
+ * @see IOnBlockTick          - method i'll be calling on your class
  */
-public class BlockTickSubSystem
+public class OnBlockTickSystem
     extends SubSystemOwner<ChunkStore>
-    implements ITick<ChunkStore>, ISubSystem<ChunkStore>
+    implements IOnTick<ChunkStore>, ISubSystem<ChunkStore>
 {
 
-    private final IBlockTick listener;
+    private final IOnBlockTick listener;
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -42,19 +42,19 @@ public class BlockTickSubSystem
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static BlockTickSubSystem constructNewSystemClass(IBlockTick listener, Query<ChunkStore> query) {
+    public static OnBlockTickSystem constructNewSystemClass(IOnBlockTick listener, Query<ChunkStore> query) {
         return ISubSystem.__construct(
-            ISubSystem.__dupeClassAndGetConstructor(BlockTickSubSystem.class, IBlockTick.class, Query.class),
+            ISubSystem.__dupeClassAndGetConstructor(OnBlockTickSystem.class, IOnBlockTick.class, Query.class),
             listener,
             query
         );
     }
 
-    protected BlockTickSubSystem(IBlockTick listener, Query<ChunkStore> query) {
+    protected OnBlockTickSystem(IOnBlockTick listener, Query<ChunkStore> query) {
         super(query);
         this.listener = listener;
 
-        this.appendSubSystem(TickSubSystem.constructNewSystemClass(this, query, this.getRegistry()));
+        this.appendSubSystem(OnTickSystem.constructNewSystemClass(this, query, this.getRegistry()));
     }
 
     public void onEntityTick(float dt, AnyRef<ChunkStore> ref, CommandBuffer<ChunkStore> commandBuffer) {

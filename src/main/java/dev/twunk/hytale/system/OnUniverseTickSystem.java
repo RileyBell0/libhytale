@@ -7,8 +7,8 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.interfaces.methods.IOnUniverseTick;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.interfaces.methods.IUniverseTick;
 import javax.annotation.Nullable;
 
 /**
@@ -28,12 +28,12 @@ import javax.annotation.Nullable;
  * @see ArchetypeTickingSystem - I use this to run the subsystem. Only way i currently know
  *                               of for getting a commandBuffer in a global tick
  */
-public class UniverseTickSubSystem<ECS_STORE extends WorldProvider>
+public class OnUniverseTickSystem<ECS_STORE extends WorldProvider>
     extends ArchetypeTickingSystem<ECS_STORE>
     implements ISubSystem<ECS_STORE>
 {
 
-    private final IUniverseTick<ECS_STORE> listener;
+    private final IOnUniverseTick<ECS_STORE> listener;
     private final @Nullable Query<ECS_STORE> query;
     private final IRegistry<ECS_STORE> registry;
 
@@ -45,15 +45,15 @@ public class UniverseTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <ECS_STORE extends WorldProvider> UniverseTickSubSystem<ECS_STORE> constructNewSystemClass(
-        IUniverseTick<ECS_STORE> listener,
+    public static <ECS_STORE extends WorldProvider> OnUniverseTickSystem<ECS_STORE> constructNewSystemClass(
+        IOnUniverseTick<ECS_STORE> listener,
         Query<ECS_STORE> query,
         IRegistry<ECS_STORE> registry
     ) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
-                UniverseTickSubSystem.class,
-                IUniverseTick.class,
+                OnUniverseTickSystem.class,
+                IOnUniverseTick.class,
                 Query.class,
                 IRegistry.class
             ),
@@ -63,8 +63,8 @@ public class UniverseTickSubSystem<ECS_STORE extends WorldProvider>
         );
     }
 
-    protected UniverseTickSubSystem(
-        IUniverseTick<ECS_STORE> listener,
+    protected OnUniverseTickSystem(
+        IOnUniverseTick<ECS_STORE> listener,
         Query<ECS_STORE> query,
         IRegistry<ECS_STORE> registry
     ) {

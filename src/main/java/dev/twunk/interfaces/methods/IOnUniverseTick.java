@@ -5,7 +5,7 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.system.UniverseTickSubSystem;
+import dev.twunk.hytale.system.OnUniverseTickSystem;
 
 /**
  * Gives your system the event handler function it needs to run some code every
@@ -18,14 +18,14 @@ import dev.twunk.hytale.system.UniverseTickSubSystem;
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  *
  * My code
- * @see UniverseTickSubSystem    - runs IGlobalTickSystem implementors (given that the implementors
+ * @see OnUniverseTickSystem    - runs IGlobalTickSystem implementors (given that the implementors
  *                               themselves load a GlobalTickSubSystem for themselves)
  *
  * Hytale's code
  * @see ArchetypeTickingSystem - I use this to run GlobalTickSubSystem(s). Only way i currently know
  *                               of for getting a commandBuffer in a global tick
  */
-public interface IUniverseTick<ECS_STORE extends WorldProvider> {
+public interface IOnUniverseTick<ECS_STORE extends WorldProvider> {
     public void onSystemTick(
         final float dt,
         final ArchetypeChunk<ECS_STORE> archetypeChunk,
