@@ -53,7 +53,7 @@ public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public OnScheduledTickEventDriver<ECS_TYPE> constructNewSystemClass(
+    public OnScheduledTickEventDriver<ECS_TYPE> newUninitialised(
         IOnScheduledTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
@@ -92,8 +92,8 @@ public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
         this.entities = new TrackedEntities<ECS_TYPE>(listener.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(OnAddRemoveEventDriver.ForListener.constructNewSystemClass(this, query, this.registry));
-        this.appendSubSystem(OnUniverseTickEventDriver.constructNewSystemClass(this, query, this.registry));
+        this.appendSubSystem(OnAddRemoveEventDriver.ForListener.newUninitialised(this, query, this.registry));
+        this.appendSubSystem(OnUniverseTickEventDriver.newUninitialised(this, query, this.registry));
     }
 
     /**

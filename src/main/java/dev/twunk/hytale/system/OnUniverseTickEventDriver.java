@@ -45,7 +45,7 @@ public class OnUniverseTickEventDriver<ECS_TYPE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <ECS_TYPE extends WorldProvider> OnUniverseTickEventDriver<ECS_TYPE> constructNewSystemClass(
+    public static <ECS_TYPE extends WorldProvider> OnUniverseTickEventDriver<ECS_TYPE> newUninitialised(
         IOnUniverseTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry

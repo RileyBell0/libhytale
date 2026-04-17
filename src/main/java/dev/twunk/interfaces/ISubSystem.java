@@ -26,7 +26,7 @@ import net.bytebuddy.utility.RandomString;
  * No touchy.
  */
 public interface ISubSystem<ECS_TYPE extends WorldProvider> extends ISystem<ECS_TYPE>, IRegistryProvider<ECS_TYPE> {
-    public static final @Nullable HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+    static final @Nullable HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     public default void registerTo(final HytalePlugin plugin) {
         this.getRegistry().registerSystem(plugin, this);

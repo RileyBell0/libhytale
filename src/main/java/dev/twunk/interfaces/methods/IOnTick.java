@@ -15,5 +15,5 @@ import dev.twunk.hytale.system.OnTickEventDriver;
  *                            It's the underlying driver of IEntityTickSubSystem
  */
 public interface IOnTick<ECS_TYPE extends WorldProvider> {
-    public void onEntityTick(final float dt, final AnyRef<ECS_TYPE> ref, final CommandBuffer<ECS_TYPE> commandBuffer);
+    public void onTick(final float dt, final AnyRef<ECS_TYPE> ref, final CommandBuffer<ECS_TYPE> commandBuffer);
 }

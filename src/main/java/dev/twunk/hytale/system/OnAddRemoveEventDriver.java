@@ -16,6 +16,7 @@ import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IOnAddRemove;
 import dev.twunk.interfaces.methods.IOnTick;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
 
 /**
@@ -31,8 +32,8 @@ import dev.twunk.interfaces.methods.IRegistry;
  *
  * My code
  * @see IOnAddRemove       - Methods for listening to entity add/remove events
- * @see OnTickEventDriver   - Underlying SubSystem that powers the IEntityTick methods
- *                              for IEntityTickSystems that register an EntityTickSubSystem
+ * @see OnTickEventDriver  - Underlying SubSystem that powers the IEntityTick methods
+ *                             for IEntityTickSystems that register an EntityTickSubSystem
  * @see IOnTick           - Underlying method for ticking an entity
  *
  * Hytale's code
@@ -50,14 +51,14 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
     private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
 
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
     protected OnAddRemoveEventDriver(Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.query = query;
         this.registry = registry;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     /**
      * To be defined in the subclasses
@@ -113,13 +114,20 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
         private final IOnAddRemove<ECS_TYPE> listener;
 
         /**
+         * Shim around other method for reducing boilerplate if i define a query on my class
+         */
+        public static final <
+            ECS_TYPE extends WorldProvider,
+            T extends IOnAddRemove<ECS_TYPE> & IQuery<ECS_TYPE>
+        > OnAddRemoveEventDriver<ECS_TYPE> newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
+            return newUninitialised(listener, listener.getQuery(), registry);
+        }
+
+        /**
          * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
          * of subsystems, each one must secretly create a new class each and every time you call it
          */
-        public static <
-            ECS_TYPE extends WorldProvider,
-            T extends OnAddRemoveEventDriver<ECS_TYPE>
-        > OnAddRemoveEventDriver<ECS_TYPE> constructNewSystemClass(
+        public static <ECS_TYPE extends WorldProvider> OnAddRemoveEventDriver<ECS_TYPE> newUninitialised(
             IOnAddRemove<ECS_TYPE> listener,
             Query<ECS_TYPE> query,
             IRegistry<ECS_TYPE> registry
@@ -141,6 +149,10 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
             super(query, registry);
             this.listener = listener;
         }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // \/======================\/-  Methods  -\/==========================\/ //
+        ///////////////////////////////////////////////////////////////////////////
 
         @Override
         public void onEntityAdded(
@@ -181,7 +193,7 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
         public static <
             ECS_TYPE extends WorldProvider,
             T extends IOnAddRemove<ECS_TYPE> & Component<ECS_TYPE>
-        > OnAddRemoveEventDriver<ECS_TYPE> constructNewSystemClass(
+        > OnAddRemoveEventDriver<ECS_TYPE> construct(
             ComponentType<ECS_TYPE, T> componentType,
             IRegistry<ECS_TYPE> registry
         ) {
@@ -201,6 +213,10 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
             this.componentType = componentType;
         }
 
+        ///////////////////////////////////////////////////////////////////////////
+        // \/======================\/-  Methods  -\/==========================\/ //
+        ///////////////////////////////////////////////////////////////////////////
+
         @Override
         public void onEntityAdded(
             Ref<ECS_TYPE> ref,
@@ -210,7 +226,7 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
         ) {
             var anyRef = new AnyRef<>(ref);
 
-            // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `constructNewSystemClass` define
+            // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `init` define
             // this bound for me (because i can if its on a static method???) and then i'll just cast it here which IS SAFE given i've got that
             // bound guarnateed earlier
             @SuppressWarnings("unchecked")
@@ -231,7 +247,7 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
         ) {
             var anyRef = new AnyRef<>(ref);
 
-            // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `constructNewSystemClass` define
+            // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `init` define
             // this bound for me (because i can if its on a static method???) and then i'll just cast it here which IS SAFE given i've got that
             // bound guarnateed earlier
             @SuppressWarnings("unchecked")

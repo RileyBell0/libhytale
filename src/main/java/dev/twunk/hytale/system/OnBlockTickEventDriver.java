@@ -1,15 +1,17 @@
 package dev.twunk.hytale.system;
 
+import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IOnBlockTick;
-import dev.twunk.interfaces.methods.IOnTick;
-import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.interfaces.methods.IQuery;
 
 /**
  * Composite subsystem to allow the parent to run code on its elements every
@@ -25,44 +27,113 @@ import dev.twunk.interfaces.methods.IRegistry;
  * @see OnTickEventDriver - BlockTickSubSystem is simply an extension of EntityTickSubSystem
  *                            that grabs some more block-related data out of a ref before calling
  *                            the onBlockTick method your `IEntityTickSystem` provides
- * @see IOnBlockTick          - method i'll be calling on your class
+ * @see IOnBlockTick      - method i'll be calling on your class
  */
-public class OnBlockTickEventDriver
-    extends SubSystemOwner<ChunkStore>
-    implements IOnTick<ChunkStore>, ISubSystem<ChunkStore>
-{
+public abstract class OnBlockTickEventDriver extends OnTickEventDriver<ChunkStore> {
 
-    private final IOnBlockTick listener;
+    protected OnBlockTickEventDriver(Query<ChunkStore> query) {
+        super(query, LibHytale.CHUNK_REGISTRY);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
-     * of subsystems, each one must secretly create a new class each and every time you call it
-     */
-    public static OnBlockTickEventDriver constructNewSystemClass(IOnBlockTick listener, Query<ChunkStore> query) {
-        return ISubSystem.__construct(
-            ISubSystem.__dupeClassAndGetConstructor(OnBlockTickEventDriver.class, IOnBlockTick.class, Query.class),
-            listener,
-            query
-        );
-    }
-
-    protected OnBlockTickEventDriver(IOnBlockTick listener, Query<ChunkStore> query) {
-        super(query);
-        this.listener = listener;
-
-        this.appendSubSystem(OnTickEventDriver.constructNewSystemClass(this, query, this.getRegistry()));
-    }
-
-    public void onEntityTick(float dt, AnyRef<ChunkStore> ref, CommandBuffer<ChunkStore> commandBuffer) {
-        listener.onBlockTick(new BlockRef(ref), commandBuffer);
-    }
-
     @Override
-    public IRegistry<ChunkStore> getRegistry() {
-        return LibHytale.CHUNK_REGISTRY;
+    public abstract void tick(
+        float dt,
+        int index,
+        ArchetypeChunk<ChunkStore> archetypeChunk,
+        Store<ChunkStore> store,
+        CommandBuffer<ChunkStore> commandBuffer
+    );
+
+    public final class ForListener<T extends IOnBlockTick> extends OnBlockTickEventDriver {
+
+        private final T listener;
+
+        protected ForListener(T listener, Query<ChunkStore> query) {
+            super(query);
+            this.listener = listener;
+        }
+
+        /**
+         * Shim around other method for reducing boilerplate if i define a query on my class
+         */
+        public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTickEventDriver newUninitialised(
+            T listener
+        ) {
+            return newUninitialised(listener, listener.getQuery());
+        }
+
+        public static final OnBlockTickEventDriver newUninitialised(IOnBlockTick listener, Query<ChunkStore> query) {
+            return ISubSystem.__construct(
+                ISubSystem.__dupeClassAndGetConstructor(
+                    OnBlockTickEventDriver.ForListener.class,
+                    IOnBlockTick.class,
+                    Query.class
+                ),
+                listener,
+                query
+            );
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // \/======================\/-  Methods  -\/==========================\/ //
+        ///////////////////////////////////////////////////////////////////////////
+
+        public final void tick(
+            float dt,
+            int index,
+            ArchetypeChunk<ChunkStore> archetypeChunk,
+            Store<ChunkStore> store,
+            CommandBuffer<ChunkStore> commandBuffer
+        ) {
+            listener.onBlockTick(new BlockRef(archetypeChunk.getReferenceTo(index)), commandBuffer);
+        }
+    }
+
+    public final class ForComponent<T extends Component<ChunkStore>> extends OnBlockTickEventDriver {
+
+        private final ComponentType<ChunkStore, T> componentType;
+
+        /**
+         * Bound for T fully defined here
+         */
+        public static <T extends IOnBlockTick & Component<ChunkStore>> OnBlockTickEventDriver init(
+            ComponentType<ChunkStore, T> componentType
+        ) {
+            return ISubSystem.__construct(
+                ISubSystem.__dupeClassAndGetConstructor(OnBlockTickEventDriver.ForComponent.class, ComponentType.class),
+                componentType
+            );
+        }
+
+        protected ForComponent(ComponentType<ChunkStore, T> componentType) {
+            super(Query.and(componentType));
+            this.componentType = componentType;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // \/======================\/-  Methods  -\/==========================\/ //
+        ///////////////////////////////////////////////////////////////////////////
+
+        @Override
+        public final void tick(
+            float dt,
+            int index,
+            ArchetypeChunk<ChunkStore> archetypeChunk,
+            Store<ChunkStore> store,
+            CommandBuffer<ChunkStore> commandBuffer
+        ) {
+            var ref = new BlockRef(archetypeChunk.getReferenceTo(index));
+
+            var component = (IOnBlockTick) ref.getComponent(componentType);
+            if (component == null) {
+                return;
+            }
+
+            component.onBlockTick(ref, commandBuffer);
+        }
     }
 }
