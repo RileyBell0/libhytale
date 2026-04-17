@@ -6,7 +6,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnWorldTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
@@ -31,7 +32,7 @@ import javax.annotation.Nullable;
  */
 public abstract class OnWorldTickEventDriver<ECS_TYPE extends WorldProvider>
     extends ArchetypeTickingSystem<ECS_TYPE> // hytale's underlying driver for my code
-    implements ISubSystem<ECS_TYPE>
+    implements IEventDriver<ECS_TYPE>
 {
 
     private final @Nullable Query<ECS_TYPE> query;
@@ -46,8 +47,8 @@ public abstract class OnWorldTickEventDriver<ECS_TYPE extends WorldProvider>
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
     ) {
-        return ISubSystem.__construct(
-            ISubSystem.__dupeClassAndGetConstructor(
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
                 OnWorldTickEventDriver.class,
                 IOnWorldTick.class,
                 Query.class,
@@ -80,6 +81,11 @@ public abstract class OnWorldTickEventDriver<ECS_TYPE extends WorldProvider>
         final Store<ECS_TYPE> store,
         final CommandBuffer<ECS_TYPE> commandBuffer
     );
+
+    @Override
+    public final void onRegister(HytalePlugin plugin) {
+        this.getRegistry().registerSystem(plugin, this);
+    }
 
     @Override
     @Nullable
@@ -116,8 +122,8 @@ public abstract class OnWorldTickEventDriver<ECS_TYPE extends WorldProvider>
             Query<ECS_TYPE> query,
             IRegistry<ECS_TYPE> registry
         ) {
-            return ISubSystem.__construct(
-                ISubSystem.__dupeClassAndGetConstructor(
+            return IEventDriver.__construct(
+                IEventDriver.__dupeClassAndGetConstructor(
                     OnWorldTickEventDriver.ForListener.class,
                     IOnWorldTick.class,
                     Query.class,

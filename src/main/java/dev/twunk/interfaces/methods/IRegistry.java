@@ -2,9 +2,10 @@ package dev.twunk.interfaces.methods;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
-import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.interfaces.IEventDriver;
 import javax.annotation.Nullable;
 
 /**
@@ -24,16 +25,18 @@ import javax.annotation.Nullable;
  */
 public interface IRegistry<ECS_TYPE extends WorldProvider> {
     @Nullable
-    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(final Class<T> componentClass);
+    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(Class<T> componentClass);
 
     @Nullable
-    public ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>> getComponentType(final String componentClass);
+    public ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>> getComponentType(String componentClass);
 
     public <T extends Component<ECS_TYPE>> void registerComponentType(
-        final ComponentType<ECS_TYPE, T> componentType,
-        final Class<T> myClass,
-        final String id
+        ComponentType<ECS_TYPE, T> componentType,
+        Class<T> myClass,
+        String id
     );
 
-    public void registerSystem(final HytalePlugin plugin, final ISubSystem<ECS_TYPE> system);
+    public void registerSystem(HytalePlugin plugin, ISystem<ECS_TYPE> system);
+
+    public default void bindEventListeners(HytalePlugin plugin, IEventDriver<ECS_TYPE> mything) {}
 }

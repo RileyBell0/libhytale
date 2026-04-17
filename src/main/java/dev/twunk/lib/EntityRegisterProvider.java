@@ -2,9 +2,9 @@ package dev.twunk.lib;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.HytalePlugin;
-import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IRegistry;
 import java.util.HashMap;
 import javax.annotation.Nullable;
@@ -61,7 +61,7 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
         registeredEntityComponentsById.put(id, componentType);
     }
 
-    public final void registerSystem(final HytalePlugin plugin, final ISubSystem<EntityStore> system) {
+    public final void registerSystem(final HytalePlugin plugin, final ISystem<EntityStore> system) {
         plugin.getEntityStoreRegistry().registerSystem(system);
     }
 }

@@ -1,6 +1,5 @@
 package dev.twunk.interfaces;
 
-import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
@@ -25,12 +24,8 @@ import net.bytebuddy.utility.RandomString;
  *
  * No touchy.
  */
-public interface ISubSystem<ECS_TYPE extends WorldProvider> extends ISystem<ECS_TYPE>, IRegistryProvider<ECS_TYPE> {
+public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryProvider<ECS_TYPE> {
     static final @Nullable HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
-
-    public default void registerTo(final HytalePlugin plugin) {
-        this.getRegistry().registerSystem(plugin, this);
-    }
 
     /**
      * It will ALWAYS return a new class, one that didn't exist before. don't abuse this method. it's prefixed with
@@ -53,7 +48,7 @@ public interface ISubSystem<ECS_TYPE extends WorldProvider> extends ISystem<ECS_
                     new NamingStrategy.PrefixingRandom(subSystemClass.getName()) {
                         @Override
                         protected String name(TypeDescription superClass) {
-                            return ISubSystem.class.getName() + "$" + new RandomString().nextString();
+                            return IEventDriver.class.getName() + "$" + new RandomString().nextString();
                         }
                     }
                 )
@@ -104,7 +99,7 @@ public interface ISubSystem<ECS_TYPE extends WorldProvider> extends ISystem<ECS_
                     new NamingStrategy.PrefixingRandom(subSystemClass.getName()) {
                         @Override
                         protected String name(TypeDescription superClass) {
-                            return ISubSystem.class.getName() + "$" + new RandomString().nextString();
+                            return IEventDriver.class.getName() + "$" + new RandomString().nextString();
                         }
                     }
                 )
@@ -181,4 +176,9 @@ public interface ISubSystem<ECS_TYPE extends WorldProvider> extends ISystem<ECS_
             throw new RuntimeException(e);
         }
     }
+
+    public abstract void onRegister(HytalePlugin plugin);
+    // {
+    //     this.getRegistry().bindEventListeners(plugin, this);
+    // }
 }

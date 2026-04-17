@@ -9,8 +9,9 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
@@ -38,7 +39,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  */
 public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
     extends EntityTickingSystem<ECS_TYPE> // EntityTickingSystem is hytale's underlying code that powers this
-    implements ISubSystem<ECS_TYPE>
+    implements IEventDriver<ECS_TYPE>
 {
 
     private final Query<ECS_TYPE> query;
@@ -61,6 +62,11 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     );
+
+    @Override
+    public final void onRegister(HytalePlugin plugin) {
+        this.getRegistry().registerSystem(plugin, this);
+    }
 
     @Override
     public final Query<ECS_TYPE> getQuery() {
@@ -96,8 +102,8 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
             Query<ECS_TYPE> query,
             IRegistry<ECS_TYPE> registry
         ) {
-            return ISubSystem.__construct(
-                ISubSystem.__dupeClassAndGetConstructor(
+            return IEventDriver.__construct(
+                IEventDriver.__dupeClassAndGetConstructor(
                     OnTickEventDriver.ForListener.class,
                     IOnTick.class,
                     Query.class,
@@ -135,8 +141,8 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
             ECS_TYPE extends WorldProvider,
             T extends IOnTick<ECS_TYPE> & Component<ECS_TYPE>
         > OnTickEventDriver<ECS_TYPE> init(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-            return ISubSystem.__construct(
-                ISubSystem.__dupeClassAndGetConstructor(
+            return IEventDriver.__construct(
+                IEventDriver.__dupeClassAndGetConstructor(
                     OnTickEventDriver.ForComponent.class,
                     ComponentType.class,
                     IRegistry.class

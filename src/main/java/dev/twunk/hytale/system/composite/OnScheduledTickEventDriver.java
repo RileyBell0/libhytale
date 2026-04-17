@@ -8,7 +8,8 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.interfaces.ISubSystem;
+import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnScheduledTick;
 import dev.twunk.interfaces.events.IOnWorldTick;
@@ -38,7 +39,7 @@ import dev.twunk.lib.lifetime.TrackedEntities;
  */
 public class OnScheduledTickEventDriver<
     ECS_TYPE extends WorldProvider
-> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, ISubSystem<ECS_TYPE> {
+> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IEventDriver<ECS_TYPE> {
 
     private final TrackedEntities<ECS_TYPE> entities;
     private final IOnScheduledTick<ECS_TYPE> listener;
@@ -127,6 +128,11 @@ public class OnScheduledTickEventDriver<
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public final void onRegister(HytalePlugin plugin) {
+        this.getRegistry().bindEventListeners(plugin, this);
+    }
 
     @Override
     public IRegistry<ECS_TYPE> getRegistry() {
