@@ -22,12 +22,12 @@ import dev.twunk.interfaces.methods.IRegistry;
  * PRODUCES:
  * - IQueryTickingSystem runner
  *
- * @see OnTickSystem - BlockTickSubSystem is simply an extension of EntityTickSubSystem
+ * @see OnTickEventDriver - BlockTickSubSystem is simply an extension of EntityTickSubSystem
  *                            that grabs some more block-related data out of a ref before calling
  *                            the onBlockTick method your `IEntityTickSystem` provides
  * @see IOnBlockTick          - method i'll be calling on your class
  */
-public class OnBlockTickSystem
+public class OnBlockTickEventDriver
     extends SubSystemOwner<ChunkStore>
     implements IOnTick<ChunkStore>, ISubSystem<ChunkStore>
 {
@@ -42,19 +42,19 @@ public class OnBlockTickSystem
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static OnBlockTickSystem constructNewSystemClass(IOnBlockTick listener, Query<ChunkStore> query) {
+    public static OnBlockTickEventDriver constructNewSystemClass(IOnBlockTick listener, Query<ChunkStore> query) {
         return ISubSystem.__construct(
-            ISubSystem.__dupeClassAndGetConstructor(OnBlockTickSystem.class, IOnBlockTick.class, Query.class),
+            ISubSystem.__dupeClassAndGetConstructor(OnBlockTickEventDriver.class, IOnBlockTick.class, Query.class),
             listener,
             query
         );
     }
 
-    protected OnBlockTickSystem(IOnBlockTick listener, Query<ChunkStore> query) {
+    protected OnBlockTickEventDriver(IOnBlockTick listener, Query<ChunkStore> query) {
         super(query);
         this.listener = listener;
 
-        this.appendSubSystem(OnTickSystem.constructNewSystemClass(this, query, this.getRegistry()));
+        this.appendSubSystem(OnTickEventDriver.constructNewSystemClass(this, query, this.getRegistry()));
     }
 
     public void onEntityTick(float dt, AnyRef<ChunkStore> ref, CommandBuffer<ChunkStore> commandBuffer) {

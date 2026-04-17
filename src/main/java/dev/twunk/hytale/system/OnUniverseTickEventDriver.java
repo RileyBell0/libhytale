@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * @see ArchetypeTickingSystem - I use this to run the subsystem. Only way i currently know
  *                               of for getting a commandBuffer in a global tick
  */
-public class OnUniverseTickSystem<ECS_TYPE extends WorldProvider>
+public class OnUniverseTickEventDriver<ECS_TYPE extends WorldProvider>
     extends ArchetypeTickingSystem<ECS_TYPE>
     implements ISubSystem<ECS_TYPE>
 {
@@ -45,14 +45,14 @@ public class OnUniverseTickSystem<ECS_TYPE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <ECS_TYPE extends WorldProvider> OnUniverseTickSystem<ECS_TYPE> constructNewSystemClass(
+    public static <ECS_TYPE extends WorldProvider> OnUniverseTickEventDriver<ECS_TYPE> constructNewSystemClass(
         IOnUniverseTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
     ) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
-                OnUniverseTickSystem.class,
+                OnUniverseTickEventDriver.class,
                 IOnUniverseTick.class,
                 Query.class,
                 IRegistry.class
@@ -63,7 +63,7 @@ public class OnUniverseTickSystem<ECS_TYPE extends WorldProvider>
         );
     }
 
-    protected OnUniverseTickSystem(
+    protected OnUniverseTickEventDriver(
         IOnUniverseTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry

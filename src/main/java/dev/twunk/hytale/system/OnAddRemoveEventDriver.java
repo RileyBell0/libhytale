@@ -31,7 +31,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  *
  * My code
  * @see IOnAddRemove       - Methods for listening to entity add/remove events
- * @see OnTickSystem   - Underlying SubSystem that powers the IEntityTick methods
+ * @see OnTickEventDriver   - Underlying SubSystem that powers the IEntityTick methods
  *                              for IEntityTickSystems that register an EntityTickSubSystem
  * @see IOnTick           - Underlying method for ticking an entity
  *

@@ -6,7 +6,7 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.refs.BlockRef;
-import dev.twunk.hytale.system.OnTickSystem;
+import dev.twunk.hytale.system.OnTickEventDriver;
 
 /**
  * Methods for my subsytem version of `ChunkBlockTickSystem.Ticking`
@@ -16,7 +16,7 @@ import dev.twunk.hytale.system.OnTickSystem;
  *                           the server code. Seems to be prone to errors)
  *
  * My code
- * @see OnTickSystem          - SubSystem used by TickableBlockComponentSystem
+ * @see OnTickEventDriver          - SubSystem used by TickableBlockComponentSystem
  *                                     that ticks entities (in our case block entities)
  * @see IOnTick                  - Underlying method for ticking an entity
  *

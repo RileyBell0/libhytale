@@ -36,7 +36,7 @@ import dev.twunk.lib.lifetime.TrackedEntities;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class OnScheduledTickSubSystem<ECS_TYPE extends WorldProvider>
+public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
     extends SubSystemOwner<ECS_TYPE>
     implements IOnAddRemove<ECS_TYPE>, IOnUniverseTick<ECS_TYPE>, ISubSystem<ECS_TYPE>
 {
@@ -53,14 +53,14 @@ public class OnScheduledTickSubSystem<ECS_TYPE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public OnScheduledTickSubSystem<ECS_TYPE> constructNewSystemClass(
+    public OnScheduledTickEventDriver<ECS_TYPE> constructNewSystemClass(
         IOnScheduledTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
     ) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
-                OnScheduledTickSubSystem.class,
+                OnScheduledTickEventDriver.class,
                 IOnScheduledTick.class,
                 Query.class,
                 IRegistry.class
@@ -71,7 +71,7 @@ public class OnScheduledTickSubSystem<ECS_TYPE extends WorldProvider>
         );
     }
 
-    protected OnScheduledTickSubSystem(
+    protected OnScheduledTickEventDriver(
         IOnScheduledTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
@@ -93,7 +93,7 @@ public class OnScheduledTickSubSystem<ECS_TYPE extends WorldProvider>
 
         // IMPORTANTLY the order in which these subsystems are created
         this.appendSubSystem(OnAddRemoveEventDriver.ForListener.constructNewSystemClass(this, query, this.registry));
-        this.appendSubSystem(OnUniverseTickSystem.constructNewSystemClass(this, query, this.registry));
+        this.appendSubSystem(OnUniverseTickEventDriver.constructNewSystemClass(this, query, this.registry));
     }
 
     /**

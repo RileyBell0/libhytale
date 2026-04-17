@@ -5,7 +5,7 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.system.OnUniverseTickSystem;
+import dev.twunk.hytale.system.OnUniverseTickEventDriver;
 
 /**
  * Gives your system the event handler function it needs to run some code every
@@ -18,7 +18,7 @@ import dev.twunk.hytale.system.OnUniverseTickSystem;
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  *
  * My code
- * @see OnUniverseTickSystem    - runs IGlobalTickSystem implementors (given that the implementors
+ * @see OnUniverseTickEventDriver    - runs IGlobalTickSystem implementors (given that the implementors
  *                               themselves load a GlobalTickSubSystem for themselves)
  *
  * Hytale's code

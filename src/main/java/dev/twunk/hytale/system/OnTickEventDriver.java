@@ -33,7 +33,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  *                               Runs ONCE per tick (global, not per matching entity, just runs a single
  *                               time per tick) and has an inbuilt query
  */
-public class OnTickSystem<ECS_TYPE extends WorldProvider>
+public class OnTickEventDriver<ECS_TYPE extends WorldProvider>
     extends EntityTickingSystem<ECS_TYPE>
     implements ISubSystem<ECS_TYPE>
 {
@@ -50,18 +50,23 @@ public class OnTickSystem<ECS_TYPE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static final <ECS_TYPE extends WorldProvider, T extends OnTickSystem<ECS_TYPE>> OnTickSystem<
+    public static final <ECS_TYPE extends WorldProvider, T extends OnTickEventDriver<ECS_TYPE>> OnTickEventDriver<
         ECS_TYPE
     > constructNewSystemClass(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         return ISubSystem.__construct(
-            ISubSystem.__dupeClassAndGetConstructor(OnTickSystem.class, IOnTick.class, Query.class, IRegistry.class),
+            ISubSystem.__dupeClassAndGetConstructor(
+                OnTickEventDriver.class,
+                IOnTick.class,
+                Query.class,
+                IRegistry.class
+            ),
             listener,
             query,
             registry
         );
     }
 
-    protected OnTickSystem(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnTickEventDriver(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.listener = listener;
         this.query = query;
         this.registry = registry;
