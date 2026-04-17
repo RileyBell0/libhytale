@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.methods;
+package dev.twunk.interfaces.events;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -40,6 +40,7 @@ import dev.twunk.hytale.system.OnTickEventDriver;
  *   everything. not all `onBlockTick` implementations will require all these, so its
  *   just wasted compute
  */
+@FunctionalInterface
 public interface IOnBlockTick {
     public void onBlockTick(final BlockRef blockRef, final CommandBuffer<ChunkStore> commandBuffer);
 }

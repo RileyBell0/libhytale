@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.methods;
+package dev.twunk.interfaces.events;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;

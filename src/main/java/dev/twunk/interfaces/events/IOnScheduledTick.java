@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.methods;
+package dev.twunk.interfaces.events;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  */
 public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> {
     @Nullable
-    public abstract TickPlan onEntityTick(
+    public abstract TickPlan onScheduledTick(
         final World world,
         final Ref<ECS_TYPE> ref,
         final float dt,
