@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IOnUniverseTick;
+import dev.twunk.interfaces.methods.IOnWorldTick;
 import dev.twunk.interfaces.methods.IRegistry;
 import javax.annotation.Nullable;
 
@@ -33,7 +33,7 @@ public class OnUniverseTickEventDriver<ECS_TYPE extends WorldProvider>
     implements ISubSystem<ECS_TYPE>
 {
 
-    private final IOnUniverseTick<ECS_TYPE> listener;
+    private final IOnWorldTick<ECS_TYPE> listener;
     private final @Nullable Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
 
@@ -46,14 +46,14 @@ public class OnUniverseTickEventDriver<ECS_TYPE extends WorldProvider>
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnUniverseTickEventDriver<ECS_TYPE> newUninitialised(
-        IOnUniverseTick<ECS_TYPE> listener,
+        IOnWorldTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
     ) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
                 OnUniverseTickEventDriver.class,
-                IOnUniverseTick.class,
+                IOnWorldTick.class,
                 Query.class,
                 IRegistry.class
             ),
@@ -64,7 +64,7 @@ public class OnUniverseTickEventDriver<ECS_TYPE extends WorldProvider>
     }
 
     protected OnUniverseTickEventDriver(
-        IOnUniverseTick<ECS_TYPE> listener,
+        IOnWorldTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
     ) {
@@ -85,7 +85,7 @@ public class OnUniverseTickEventDriver<ECS_TYPE extends WorldProvider>
         final Store<ECS_TYPE> store,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onSystemTick(dt, archetypeChunk, store, commandBuffer);
+        listener.onWorldTick(dt, archetypeChunk, store, commandBuffer);
     }
 
     @Override
