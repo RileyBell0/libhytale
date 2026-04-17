@@ -48,11 +48,11 @@ public abstract class OnBlockTickEventDriver extends OnTickEventDriver<ChunkStor
         CommandBuffer<ChunkStore> commandBuffer
     );
 
-    public final class ForListener<T extends IOnBlockTick> extends OnBlockTickEventDriver {
+    public final class ForListener extends OnBlockTickEventDriver {
 
-        private final T listener;
+        private final IOnBlockTick listener;
 
-        protected ForListener(T listener, Query<ChunkStore> query) {
+        protected ForListener(IOnBlockTick listener, Query<ChunkStore> query) {
             super(query);
             this.listener = listener;
         }

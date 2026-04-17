@@ -73,11 +73,11 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
         return this.registry;
     }
 
-    public final class ForListener<T extends IOnTick<ECS_TYPE>> extends OnTickEventDriver<ECS_TYPE> {
+    public class ForListener extends OnTickEventDriver<ECS_TYPE> {
 
-        private final T listener;
+        private final IOnTick<ECS_TYPE> listener;
 
-        protected ForListener(T listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+        protected ForListener(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
             super(query, registry);
             this.listener = listener;
         }
