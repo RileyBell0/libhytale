@@ -46,13 +46,13 @@ public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
 > implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IEventDriver<ECS_TYPE> {
 
-    private final TrackedEntities<ECS_TYPE> entities;
+    private final TrackedEntities<ECS_TYPE> inMemoryTrackedEntities;
     private final IRegistry<ECS_TYPE> registry;
 
     protected OnScheduledTick(String id, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.registry = registry;
 
-        this.entities = new TrackedEntities<ECS_TYPE>(id);
+        this.inMemoryTrackedEntities = new TrackedEntities<ECS_TYPE>(id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ public abstract class OnScheduledTick<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        entities.track(ref, store, commandBuffer);
+        inMemoryTrackedEntities.track(ref, store, commandBuffer);
     }
 
     /**
@@ -104,7 +104,7 @@ public abstract class OnScheduledTick<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        entities.untrack(ref, store, reason);
+        inMemoryTrackedEntities.untrack(ref, store, reason);
     }
 
     /**
@@ -119,7 +119,7 @@ public abstract class OnScheduledTick<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        for (final @Nonnull var ticker : entities.ticking) {
+        for (final @Nonnull var ticker : inMemoryTrackedEntities.ticking) {
             final var res = this.tickTheTicker(ticker, dt, archetypeChunk, store, commandBuffer);
 
             // Transition to the state returned by the block

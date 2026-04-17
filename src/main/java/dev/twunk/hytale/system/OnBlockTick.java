@@ -6,12 +6,10 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.interfaces.IEventDriver;
-import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnBlockTick;
 import dev.twunk.interfaces.methods.IQuery;
 

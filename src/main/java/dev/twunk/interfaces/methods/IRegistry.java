@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
-import dev.twunk.interfaces.IEventDriver;
 import javax.annotation.Nullable;
 
 /**
@@ -38,5 +37,5 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     public void registerSystem(HytalePlugin plugin, ISystem<ECS_TYPE> system);
 
-    public void bindEventListeners(HytalePlugin plugin, Object unknown) {}
+    public void bindEventListeners(HytalePlugin plugin, Object unknown);
 }
