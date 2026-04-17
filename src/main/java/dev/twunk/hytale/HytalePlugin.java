@@ -19,8 +19,6 @@ import dev.twunk.interfaces.methods.IOnBlockTick;
 import dev.twunk.interfaces.methods.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.lib.AutoBuilderCodec;
-import dev.twunk.lib.system.AutoBlockLifetimeSystem;
-import dev.twunk.lib.system.AutoBlockTickSystem;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -62,25 +60,28 @@ public abstract class HytalePlugin extends JavaPlugin {
      * Register event listeners to the provided instance
      *
      * Requires a query on which to setup the event drivers themselves
+     *
+     * objectThatImplementsEventListenerMethodsThatICanCallFromSubSystems
      */
-    public final void register(IQuery<?> objectThatImplementsEventListenerMethodsThatICanCallFromSubSystems) {}
+    public final void register(IQuery<?> instance) {}
 
     /**
      * Register event listeners for components of the given type. Note: this will
      * setup systems to call the methods defined ON your component of type T
+     *
+     * classOfYourComponentThatImplementsEventListenerMethodsThatICanCall
      */
-    public final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void register(
-        Class<T> classOfYourComponentThatImplementsEventListenerMethodsThatICanCall
-    ) {
-        // first: check if its a common component
+    public final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void register(Class<T> clazz) {
+        // first: check what places i should be registering this
         var isCommon = false;
         var isChunk = true;
         var isEntity = false;
+
         if (isCommon || isChunk) {
-            addChunkEventListeners(classOfYourComponentThatImplementsEventListenerMethodsThatICanCall);
+            addChunkEventListeners(clazz);
         }
         if (isCommon || isEntity) {
-            addEntityEventListeners(classOfYourComponentThatImplementsEventListenerMethodsThatICanCall);
+            addEntityEventListeners(clazz);
         }
     }
 
@@ -125,7 +126,6 @@ public abstract class HytalePlugin extends JavaPlugin {
      * If you want that to be auto-registered, call `registerTickingComponent`
      * instead
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
         final BuilderCodec<T> codec
     ) {
@@ -150,7 +150,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         if (clazz.isAnnotationPresent(dev.twunk.annotations.Serializable.class)) {
             if (Component.class.isAssignableFrom(clazz)) {
                 if (IOnBlockTick.class.isAssignableFrom(clazz)) {
-                    new AutoBlockTickSystem(component).registerTo(this);
+                    // new AutoBlockTickSystem(component).registerTo(this);
                 }
             }
         }
@@ -167,7 +167,6 @@ public abstract class HytalePlugin extends JavaPlugin {
         return registerChunkComponent(codec);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     private final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void initCommonSystemsFor(
         Class<T> clazz,
         ComponentType<ECS_TYPE, T> componentType
@@ -180,12 +179,12 @@ public abstract class HytalePlugin extends JavaPlugin {
         if (Component.class.isAssignableFrom(clazz)) {
             if (IOnTick.class.isAssignableFrom(clazz)) {
                 // var config = getSystemConfig(clazz, ITickComponent.class);
-                new AutoBlockTickSystem(componentType).registerTo(this);
+                // new AutoBlockTickSystem(componentType).registerTo(this);
             }
 
             if (IOnAddRemove.class.isAssignableFrom(clazz)) {
                 // var config = getSystemConfig(clazz, ILifetimeComponent.class);
-                new AutoBlockLifetimeSystem(componentType).registerTo(this);
+                // new AutoBlockLifetimeSystem(componentType).registerTo(this);
             }
         }
     }
