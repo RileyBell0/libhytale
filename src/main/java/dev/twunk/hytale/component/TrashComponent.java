@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
 @Serializable
-public class TrashComponent<ECS_STORE extends WorldProvider> implements IContainerComponent<ECS_STORE> {
+public class TrashComponent<ECS_TYPE extends WorldProvider> implements IContainerComponent<ECS_TYPE> {
 
     //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
     //==> Codec
@@ -78,8 +78,8 @@ public class TrashComponent<ECS_STORE extends WorldProvider> implements IContain
     }
 
     @Override
-    public TrashComponent<ECS_STORE> clone() {
-        var trash = new TrashComponent<ECS_STORE>();
+    public TrashComponent<ECS_TYPE> clone() {
+        var trash = new TrashComponent<ECS_TYPE>();
         trash.capacity = this.capacity;
         trash.canOpen = this.canOpen;
         trash.canView = this.canView;

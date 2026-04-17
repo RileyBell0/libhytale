@@ -2,6 +2,7 @@ package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.query.Query;
@@ -10,10 +11,9 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.annotations.EventRunners;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.IOnAddRemoveSystem;
+import dev.twunk.hytale.system.OnAddRemoveSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.interfaces.component.IOnAddRemoveComponent;
 import dev.twunk.interfaces.methods.IOnAddRemove;
 
 /**
@@ -30,13 +30,13 @@ import dev.twunk.interfaces.methods.IOnAddRemove;
  *
  * My code
  * @see IOnAddRemove       - Methods for listening to entity add/remove events
- * @see IOnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ * @see OnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  *
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-@EventRunners.Chunk(IOnAddRemoveSystem.class)
-public class AutoBlockLifetimeSystem<T extends IOnAddRemoveComponent<ChunkStore>>
+@EventRunners.Chunk(OnAddRemoveSystem.class)
+public class AutoBlockLifetimeSystem<T extends Component<ChunkStore>>
     extends SubSystemOwner<ChunkStore>
     implements IOnAddRemove<ChunkStore>
 {
@@ -52,11 +52,9 @@ public class AutoBlockLifetimeSystem<T extends IOnAddRemoveComponent<ChunkStore>
     public AutoBlockLifetimeSystem(ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
-
-        // TODO remove this when the subsystem attachement / events system is working
-        // this.appendSubSystem(LifetimeSubSystem.constructNewSystemClass(this, super.getQuery(), LibHytale.CHUNK_REGISTRY));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onEntityAdded(
         final AnyRef<ChunkStore> ref,
@@ -71,9 +69,10 @@ public class AutoBlockLifetimeSystem<T extends IOnAddRemoveComponent<ChunkStore>
             return;
         }
 
-        component.onEntityAdded(ref, reason, commandBuffer);
+        ((IOnAddRemove<ChunkStore>) component).onEntityAdded(ref, reason, commandBuffer);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onEntityRemove(
         final AnyRef<ChunkStore> ref,
@@ -88,6 +87,6 @@ public class AutoBlockLifetimeSystem<T extends IOnAddRemoveComponent<ChunkStore>
             return;
         }
 
-        component.onEntityRemove(ref, reason, commandBuffer);
+        ((IOnAddRemove<ChunkStore>) component).onEntityRemove(ref, reason, commandBuffer);
     }
 }

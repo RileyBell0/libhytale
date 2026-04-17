@@ -13,7 +13,7 @@ public abstract class GameTime {
      * their endpoint seems to be nullable,
      */
     @Nullable
-    public static <ECS_STORE extends WorldProvider> Instant get(final CommandBuffer<ECS_STORE> commandBuffer) {
+    public static <ECS_TYPE extends WorldProvider> Instant get(final CommandBuffer<ECS_TYPE> commandBuffer) {
         return commandBuffer
             .getExternalData()
             .getWorld()

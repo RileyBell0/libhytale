@@ -25,7 +25,7 @@ import net.bytebuddy.utility.RandomString;
  *
  * No touchy.
  */
-public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS_STORE>, IRegistryProvider<ECS_STORE> {
+public interface ISubSystem<ECS_TYPE extends WorldProvider> extends ISystem<ECS_TYPE>, IRegistryProvider<ECS_TYPE> {
     public static final @Nullable HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     public default void registerTo(final HytalePlugin plugin) {
@@ -37,7 +37,7 @@ public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS
      * two underscores for a good reason - making you question yourself before deciding to use this...
      */
     @SuppressWarnings("null")
-    public static <ECS_STORE extends WorldProvider, T> Class<? extends T> __duplicateClass(
+    public static <ECS_TYPE extends WorldProvider, T> Class<? extends T> __duplicateClass(
         Class<T> subSystemClass,
         Class<?>... constructorArgTypes
     ) {
@@ -88,7 +88,7 @@ public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS
      * two underscores for a good reason - making you question yourself before deciding to use this...
      */
     @SuppressWarnings("null")
-    public static <ECS_STORE extends WorldProvider, T> Constructor<? extends T> __dupeClassAndGetConstructor(
+    public static <ECS_TYPE extends WorldProvider, T> Constructor<? extends T> __dupeClassAndGetConstructor(
         Class<T> subSystemClass,
         Class<?>... constructorArgTypes
     ) {
@@ -135,7 +135,7 @@ public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS
         }
     }
 
-    public static <ECS_STORE extends WorldProvider, T> Constructor<T> __getConstructor(
+    public static <ECS_TYPE extends WorldProvider, T> Constructor<T> __getConstructor(
         Class<T> clazz,
         Class<?>... args
     ) {
@@ -157,7 +157,7 @@ public interface ISubSystem<ECS_STORE extends WorldProvider> extends ISystem<ECS
         }
     }
 
-    public static <ECS_STORE extends WorldProvider, T> T __construct(Constructor<T> constructor, Object... args) {
+    public static <ECS_TYPE extends WorldProvider, T> T __construct(Constructor<T> constructor, Object... args) {
         // get the classes for the objects
         ArrayList<Class<?>> classes = new ArrayList<>();
         for (var arg : args) {

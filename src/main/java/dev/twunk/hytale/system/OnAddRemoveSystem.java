@@ -40,14 +40,14 @@ import dev.twunk.interfaces.methods.IRegistry;
  *                               Runs ONCE per tick (global, not per matching entity, just runs a single
  *                               time per tick) and has an inbuilt query
  */
-public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
-    extends RefSystem<ECS_STORE>
-    implements ISubSystem<ECS_STORE>
+public class OnAddRemoveSystem<ECS_TYPE extends WorldProvider>
+    extends RefSystem<ECS_TYPE>
+    implements ISubSystem<ECS_TYPE>
 {
 
-    private final IOnAddRemove<ECS_STORE> listener;
-    private final Query<ECS_STORE> query;
-    private final IRegistry<ECS_STORE> registry;
+    private final IOnAddRemove<ECS_TYPE> listener;
+    private final Query<ECS_TYPE> query;
+    private final IRegistry<ECS_TYPE> registry;
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -57,12 +57,12 @@ public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <ECS_STORE extends WorldProvider, T extends IOnAddRemoveSystem<ECS_STORE>> IOnAddRemoveSystem<
-        ECS_STORE
-    > constructNewSystemClass(IOnAddRemove<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    public static <ECS_TYPE extends WorldProvider, T extends OnAddRemoveSystem<ECS_TYPE>> OnAddRemoveSystem<
+        ECS_TYPE
+    > constructNewSystemClass(IOnAddRemove<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
-                IOnAddRemoveSystem.class,
+                OnAddRemoveSystem.class,
                 IOnAddRemove.class,
                 Query.class,
                 IRegistry.class
@@ -73,11 +73,7 @@ public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
         );
     }
 
-    protected IOnAddRemoveSystem(
-        IOnAddRemove<ECS_STORE> listener,
-        Query<ECS_STORE> query,
-        IRegistry<ECS_STORE> registry
-    ) {
+    protected OnAddRemoveSystem(IOnAddRemove<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.listener = listener;
         this.query = query;
         this.registry = registry;
@@ -85,31 +81,31 @@ public class IOnAddRemoveSystem<ECS_STORE extends WorldProvider>
 
     @Override
     public void onEntityAdded(
-        Ref<ECS_STORE> ref,
+        Ref<ECS_TYPE> ref,
         AddReason reason,
-        Store<ECS_STORE> store,
-        CommandBuffer<ECS_STORE> commandBuffer
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         listener.onEntityAdded(new AnyRef<>(ref), reason, commandBuffer);
     }
 
     @Override
     public void onEntityRemove(
-        Ref<ECS_STORE> ref,
+        Ref<ECS_TYPE> ref,
         RemoveReason reason,
-        Store<ECS_STORE> store,
-        CommandBuffer<ECS_STORE> commandBuffer
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         listener.onEntityRemove(new AnyRef<>(ref), reason, commandBuffer);
     }
 
     @Override
-    public Query<ECS_STORE> getQuery() {
+    public Query<ECS_TYPE> getQuery() {
         return this.query;
     }
 
     @Override
-    public IRegistry<ECS_STORE> getRegistry() {
+    public IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
 }

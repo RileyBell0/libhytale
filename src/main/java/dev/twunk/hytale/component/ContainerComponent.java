@@ -27,8 +27,8 @@ import javax.annotation.Nullable;
  */
 @Serializable
 public class ContainerComponent<
-    ECS_STORE extends WorldProvider
-> implements IContainerComponent<ECS_STORE>, IPersistentContainer {
+    ECS_TYPE extends WorldProvider
+> implements IContainerComponent<ECS_TYPE>, IPersistentContainer {
 
     //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
     //==> Codec
@@ -114,8 +114,8 @@ public class ContainerComponent<
         return this.worldChunk;
     }
 
-    public ContainerComponent<ECS_STORE> clone() {
-        var component = new ContainerComponent<ECS_STORE>();
+    public ContainerComponent<ECS_TYPE> clone() {
+        var component = new ContainerComponent<ECS_TYPE>();
         component.container = this.container.clone();
         component.canView = this.canView;
         component.canOpen = this.canOpen;

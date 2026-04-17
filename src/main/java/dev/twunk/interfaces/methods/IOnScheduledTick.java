@@ -22,14 +22,14 @@ import javax.annotation.Nullable;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IOnScheduledTick<ECS_STORE extends WorldProvider> {
+public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> {
     @Nullable
     public abstract TickPlan onEntityTick(
         final World world,
-        final Ref<ECS_STORE> ref,
+        final Ref<ECS_TYPE> ref,
         final float dt,
-        final Store<ECS_STORE> store,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final Store<ECS_TYPE> store,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     );
 
     /**

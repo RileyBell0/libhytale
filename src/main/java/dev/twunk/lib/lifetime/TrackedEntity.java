@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
  * }
  * </pre>
  */
-public class TrackedEntity<ECS_STORE> {
+public class TrackedEntity<ECS_TYPE> {
 
     private static long nextLifetimeId = 0;
 
@@ -64,11 +64,11 @@ public class TrackedEntity<ECS_STORE> {
     /**
      * The ref for your entity
      */
-    public final Ref<ECS_STORE> ref;
+    public final Ref<ECS_TYPE> ref;
 
-    private ArrayList<TrackedEntity<ECS_STORE>> currentAreaRef;
+    private ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef;
 
-    public TrackedEntity(World world, Ref<ECS_STORE> ref, ArrayList<TrackedEntity<ECS_STORE>> currentAreaRef) {
+    public TrackedEntity(World world, Ref<ECS_TYPE> ref, ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef) {
         this.lifetimeId = ++nextLifetimeId;
         this.world = world;
         this.ref = ref;

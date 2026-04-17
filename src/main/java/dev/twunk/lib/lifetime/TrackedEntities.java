@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 //
 // OH and responsible for finding the block info when they're loaded (coords,
 // the world and chunk its in, etc)
-public class TrackedEntities<ECS_STORE extends WorldProvider> {
+public class TrackedEntities<ECS_TYPE extends WorldProvider> {
 
     // A unique and STABLE identifier for the system. you cannot change this.
     // once you decide on an ID your players REQUIRE it to be stable (or everything
@@ -34,11 +34,11 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
     // what state they held
     private final String id;
 
-    private final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> tickStateComponent;
+    private final ComponentType<ECS_TYPE, INTERNAL_TickSchedulerComponent<ECS_TYPE>> tickStateComponent;
 
     public TrackedEntities(
         final String id,
-        final ComponentType<ECS_STORE, INTERNAL_TickSchedulerComponent<ECS_STORE>> component
+        final ComponentType<ECS_TYPE, INTERNAL_TickSchedulerComponent<ECS_TYPE>> component
     ) {
         this.id = id;
         this.tickStateComponent = component;
@@ -48,20 +48,20 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
     // Non-static implementation begins
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-    public final ArrayList<TrackedEntity<ECS_STORE>> ticking = new ArrayList<>();
+    public final ArrayList<TrackedEntity<ECS_TYPE>> ticking = new ArrayList<>();
 
-    private final ArrayList<TrackedEntity<ECS_STORE>> sleeping = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_TYPE>> sleeping = new ArrayList<>();
 
-    private final ArrayList<TrackedEntity<ECS_STORE>> comatose = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_TYPE>> comatose = new ArrayList<>();
 
-    private final ArrayList<TrackedEntity<ECS_STORE>> stopped = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_TYPE>> stopped = new ArrayList<>();
 
-    private final ArrayList<TrackedEntity<ECS_STORE>> broken = new ArrayList<>();
+    private final ArrayList<TrackedEntity<ECS_TYPE>> broken = new ArrayList<>();
 
     public void track(
-        final Ref<ECS_STORE> ref,
-        final Store<ECS_STORE> store,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final Ref<ECS_TYPE> ref,
+        final Store<ECS_TYPE> store,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         // figure out the current/initial ticking state our entity has
         final var tickingInfo = this.loadEntityTickingState(ref, commandBuffer);
@@ -87,7 +87,7 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
         tickingInfo._setMemoryLocation(this.id, onTickCache);
     }
 
-    public void untrack(final Ref<ECS_STORE> ref, final Store<ECS_STORE> store, final RemoveReason reason) {
+    public void untrack(final Ref<ECS_TYPE> ref, final Store<ECS_TYPE> store, final RemoveReason reason) {
         store.getComponent(ref, this.tickStateComponent).drop(this.id, reason);
     }
 
@@ -95,10 +95,10 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
      * Get a cached version of the info required to tick an entity
      */
     @Nullable
-    private TrackedEntity<ECS_STORE> getTickVars(
-        final Ref<ECS_STORE> ref,
-        final Store<ECS_STORE> store,
-        final ArrayList<TrackedEntity<ECS_STORE>> area
+    private TrackedEntity<ECS_TYPE> getTickVars(
+        final Ref<ECS_TYPE> ref,
+        final Store<ECS_TYPE> store,
+        final ArrayList<TrackedEntity<ECS_TYPE>> area
     ) {
         // We're going to spend a bunch of extra time in onEntityAdd to cache
         // all the information we'll need when this thing is ticking
@@ -112,9 +112,9 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
         return cache;
     }
 
-    private INTERNAL_TickSchedulerComponent<ECS_STORE> loadEntityTickingState(
-        final Ref<ECS_STORE> ref,
-        final CommandBuffer<ECS_STORE> commandBuffer
+    private INTERNAL_TickSchedulerComponent<ECS_TYPE> loadEntityTickingState(
+        final Ref<ECS_TYPE> ref,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         // Setup a tickingInfo component to track the state of our entitiy
         // so it can resume ticking/sleeping/etc when the server reboots. really
@@ -135,7 +135,7 @@ public class TrackedEntities<ECS_STORE extends WorldProvider> {
      * current ticking state (active, sleeping, stopped etc)
      * @return
      */
-    private ArrayList<TrackedEntity<ECS_STORE>> getOwner(@Nullable TickPlan currentState) {
+    private ArrayList<TrackedEntity<ECS_TYPE>> getOwner(@Nullable TickPlan currentState) {
         // and finally, we'll store it in the right place
         if (currentState instanceof TickPlan.Active) {
             return ticking;

@@ -14,6 +14,6 @@ import dev.twunk.hytale.system.OnTickSystem;
  * @see EntityTickingSystem - Baseline hytale system for ticking entities.
  *                            It's the underlying driver of IEntityTickSubSystem
  */
-public interface IOnTick<ECS_STORE extends WorldProvider> {
-    public void onEntityTick(final float dt, final AnyRef<ECS_STORE> ref, final CommandBuffer<ECS_STORE> commandBuffer);
+public interface IOnTick<ECS_TYPE extends WorldProvider> {
+    public void onEntityTick(final float dt, final AnyRef<ECS_TYPE> ref, final CommandBuffer<ECS_TYPE> commandBuffer);
 }

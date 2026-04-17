@@ -251,9 +251,9 @@ public abstract class ComponentUtils {
         });
     }
 
-    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> boolean has(
-        final Ref<ECS_STORE> ref,
-        final Supplier<ComponentType<ECS_STORE, T>> getComponentType
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> boolean has(
+        final Ref<ECS_TYPE> ref,
+        final Supplier<ComponentType<ECS_TYPE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -263,9 +263,9 @@ public abstract class ComponentUtils {
         return ComponentUtils.has(ref, componentType);
     }
 
-    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> boolean has(
-        final Ref<ECS_STORE> ref,
-        final ComponentType<ECS_STORE, T> componentType
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> boolean has(
+        final Ref<ECS_TYPE> ref,
+        final ComponentType<ECS_TYPE, T> componentType
     ) {
         return (T) ref.getStore().getComponent(ref, componentType) != null;
     }
@@ -275,9 +275,9 @@ public abstract class ComponentUtils {
     // ====================================================================
 
     @Nullable
-    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> T get(
-        final Ref<ECS_STORE> anyRef,
-        final Supplier<ComponentType<ECS_STORE, T>> getComponentType
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> T get(
+        final Ref<ECS_TYPE> anyRef,
+        final Supplier<ComponentType<ECS_TYPE, T>> getComponentType
     ) {
         final var componentType = getComponentType.get();
         if (componentType == null) {
@@ -288,9 +288,9 @@ public abstract class ComponentUtils {
     }
 
     @Nullable
-    public static final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> T get(
-        final Ref<ECS_STORE> anyRef,
-        final ComponentType<ECS_STORE, T> componentType
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> T get(
+        final Ref<ECS_TYPE> anyRef,
+        final ComponentType<ECS_TYPE, T> componentType
     ) {
         return anyRef.getStore().getComponent(anyRef, componentType);
     }

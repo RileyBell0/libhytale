@@ -21,16 +21,16 @@ import java.util.ArrayList;
  * Forces the parent to provide a `query` that its subsystems will use. That's
  * the most handy part honestly
  */
-public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements IQuery<ECS_STORE> {
+public abstract class SubSystemOwner<ECS_TYPE extends WorldProvider> implements IQuery<ECS_TYPE> {
 
-    private final ArrayList<ISubSystem<ECS_STORE>> subSystems = new ArrayList<>();
-    private final Query<ECS_STORE> query;
+    private final ArrayList<ISubSystem<ECS_TYPE>> subSystems = new ArrayList<>();
+    private final Query<ECS_TYPE> query;
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
 
-    public SubSystemOwner(final Query<ECS_STORE> query) {
+    public SubSystemOwner(final Query<ECS_TYPE> query) {
         this.query = query;
 
         this.init();
@@ -49,7 +49,7 @@ public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements
         }
     }
 
-    protected void appendSubSystem(final ISubSystem<ECS_STORE> system) {
+    protected void appendSubSystem(final ISubSystem<ECS_TYPE> system) {
         this.subSystems.add(system);
     }
 
@@ -60,7 +60,7 @@ public abstract class SubSystemOwner<ECS_STORE extends WorldProvider> implements
     }
 
     @Override
-    public Query<ECS_STORE> getQuery() {
+    public Query<ECS_TYPE> getQuery() {
         return this.query;
     }
 }

@@ -6,18 +6,18 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.IOnAddRemoveSystem;
+import dev.twunk.hytale.system.OnAddRemoveSystem;
 
 /**
  * Methods for my subsytem version of `RefSystem<ECS_Store>`
  *
  * My code
- * @see IOnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ * @see OnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
  *
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-public interface IOnAddRemove<ECS_STORE extends WorldProvider> {
+public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
     /**
      * Event for when an entity is added/loaded into the world
      *
@@ -30,9 +30,9 @@ public interface IOnAddRemove<ECS_STORE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityAdded(
-        final AnyRef<ECS_STORE> ref,
+        final AnyRef<ECS_TYPE> ref,
         final AddReason reason,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {}
 
     /**
@@ -47,8 +47,8 @@ public interface IOnAddRemove<ECS_STORE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityRemove(
-        final AnyRef<ECS_STORE> ref,
+        final AnyRef<ECS_TYPE> ref,
         final RemoveReason reason,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {}
 }

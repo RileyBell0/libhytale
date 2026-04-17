@@ -12,13 +12,17 @@ import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.annotations.EventRunners;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.interfaces.methods.IOnAddRemove;
 import dev.twunk.interfaces.methods.IOnBlockTick;
 import dev.twunk.interfaces.methods.IOnTick;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.lib.AutoBuilderCodec;
 import dev.twunk.lib.system.AutoBlockLifetimeSystem;
 import dev.twunk.lib.system.AutoBlockTickSystem;
+import java.util.Arrays;
+import java.util.HashSet;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
@@ -32,7 +36,6 @@ public abstract class HytalePlugin extends JavaPlugin {
         LibHytale.init(this);
     }
 
-    // Just forcing
     @Override
     protected final void setup0() {
         console.log("Setting up plugin " + this.getName());
@@ -53,6 +56,65 @@ public abstract class HytalePlugin extends JavaPlugin {
      */
     public final void registerSystem(final ISystem<ChunkStore> system) {
         this.getChunkStoreRegistry().registerSystem(system);
+    }
+
+    /**
+     * Register event listeners to the provided instance
+     *
+     * Requires a query on which to setup the event drivers themselves
+     */
+    public final void register(IQuery<?> objectThatImplementsEventListenerMethodsThatICanCallFromSubSystems) {}
+
+    /**
+     * Register event listeners for components of the given type. Note: this will
+     * setup systems to call the methods defined ON your component of type T
+     */
+    public final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void register(
+        Class<T> classOfYourComponentThatImplementsEventListenerMethodsThatICanCall
+    ) {
+        // first: check if its a common component
+        var isCommon = false;
+        var isChunk = true;
+        var isEntity = false;
+        if (isCommon || isChunk) {
+            addChunkEventListeners(classOfYourComponentThatImplementsEventListenerMethodsThatICanCall);
+        }
+        if (isCommon || isEntity) {
+            addEntityEventListeners(classOfYourComponentThatImplementsEventListenerMethodsThatICanCall);
+        }
+    }
+
+    private final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void addChunkEventListeners(
+        Class<T> clazz
+    ) {
+        // final ComponentType<ECS_TYPE, T> component = this.getChunkStoreRegistry().registerComponent(
+        //     clazz,
+        //     defaultId,
+        //     codec
+        // );
+
+        // look for event annotations on it
+        EventRunners.Chunk chunkEvents = clazz.getAnnotation(EventRunners.Chunk.class);
+        if (chunkEvents == null) {
+            return;
+        }
+
+        var listeners = new HashSet<>(Arrays.asList(chunkEvents.value()));
+        for (@SuppressWarnings("unused")
+        var eventListenerType : listeners) {}
+    }
+
+    private final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void addEntityEventListeners(
+        Class<T> clazz
+    ) {
+        EventRunners.Entity entityEvents = clazz.getAnnotation(EventRunners.Entity.class);
+        if (entityEvents == null) {
+            return;
+        }
+
+        var listeners = new HashSet<>(Arrays.asList(entityEvents.value()));
+        for (@SuppressWarnings("unused")
+        var eventListenerType : listeners) {}
     }
 
     /**
@@ -106,9 +168,9 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private final <ECS_STORE extends WorldProvider, T extends Component<ECS_STORE>> void initCommonSystemsFor(
+    private final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void initCommonSystemsFor(
         Class<T> clazz,
-        ComponentType<ECS_STORE, T> componentType
+        ComponentType<ECS_TYPE, T> componentType
     ) {
         if (!clazz.isAnnotationPresent(Serializable.class)) {
             return;

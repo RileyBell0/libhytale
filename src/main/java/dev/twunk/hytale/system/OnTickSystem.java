@@ -33,14 +33,14 @@ import dev.twunk.interfaces.methods.IRegistry;
  *                               Runs ONCE per tick (global, not per matching entity, just runs a single
  *                               time per tick) and has an inbuilt query
  */
-public class OnTickSystem<ECS_STORE extends WorldProvider>
-    extends EntityTickingSystem<ECS_STORE>
-    implements ISubSystem<ECS_STORE>
+public class OnTickSystem<ECS_TYPE extends WorldProvider>
+    extends EntityTickingSystem<ECS_TYPE>
+    implements ISubSystem<ECS_TYPE>
 {
 
-    private final IOnTick<ECS_STORE> listener;
-    private final Query<ECS_STORE> query;
-    private final IRegistry<ECS_STORE> registry;
+    private final IOnTick<ECS_TYPE> listener;
+    private final Query<ECS_TYPE> query;
+    private final IRegistry<ECS_TYPE> registry;
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -50,9 +50,9 @@ public class OnTickSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static final <ECS_STORE extends WorldProvider, T extends OnTickSystem<ECS_STORE>> OnTickSystem<
-        ECS_STORE
-    > constructNewSystemClass(IOnTick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    public static final <ECS_TYPE extends WorldProvider, T extends OnTickSystem<ECS_TYPE>> OnTickSystem<
+        ECS_TYPE
+    > constructNewSystemClass(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(OnTickSystem.class, IOnTick.class, Query.class, IRegistry.class),
             listener,
@@ -61,7 +61,7 @@ public class OnTickSystem<ECS_STORE extends WorldProvider>
         );
     }
 
-    protected OnTickSystem(IOnTick<ECS_STORE> listener, Query<ECS_STORE> query, IRegistry<ECS_STORE> registry) {
+    protected OnTickSystem(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.listener = listener;
         this.query = query;
         this.registry = registry;
@@ -70,20 +70,20 @@ public class OnTickSystem<ECS_STORE extends WorldProvider>
     public void tick(
         float dt,
         int index,
-        ArchetypeChunk<ECS_STORE> archetypeChunk,
-        Store<ECS_STORE> store,
-        CommandBuffer<ECS_STORE> commandBuffer
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         listener.onEntityTick(dt, new AnyRef<>(archetypeChunk.getReferenceTo(index)), commandBuffer);
     }
 
     @Override
-    public Query<ECS_STORE> getQuery() {
+    public Query<ECS_TYPE> getQuery() {
         return this.query;
     }
 
     @Override
-    public IRegistry<ECS_STORE> getRegistry() {
+    public IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
 }

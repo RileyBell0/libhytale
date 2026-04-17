@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * but to be fair, stupid stuff is fun stuff
  */
 @Serializable
-public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> implements Component<ECS_STORE> {
+public class INTERNAL_TickSchedulerComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
 
     /**
      * The idea is to only have 1x of this component per entity, thus, since my
@@ -48,7 +48,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      * Map from SystemID to locations where the item is stored (memory only,
      * not stored to disk)
      */
-    private final HashMap<String, TrackedEntity<ECS_STORE>> memoryLocation = new HashMap<>();
+    private final HashMap<String, TrackedEntity<ECS_TYPE>> memoryLocation = new HashMap<>();
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -84,7 +84,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedEntity<ECS_STORE> _setMemoryLocation(String systemId, TrackedEntity<ECS_STORE> state) {
+    public TrackedEntity<ECS_TYPE> _setMemoryLocation(String systemId, TrackedEntity<ECS_TYPE> state) {
         return memoryLocation.put(systemId, state);
     }
 
@@ -96,7 +96,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedEntity<ECS_STORE> _getMemoryLocation(String systemId) {
+    public TrackedEntity<ECS_TYPE> _getMemoryLocation(String systemId) {
         return memoryLocation.get(systemId);
     }
 
@@ -108,7 +108,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedEntity<ECS_STORE> _dumpMemoryLocation(String systemId, RemoveReason reason) {
+    public TrackedEntity<ECS_TYPE> _dumpMemoryLocation(String systemId, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
@@ -123,7 +123,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_STORE extends WorldProvider> im
         cache.drop();
     }
 
-    public INTERNAL_TickSchedulerComponent<ECS_STORE> clone() {
+    public INTERNAL_TickSchedulerComponent<ECS_TYPE> clone() {
         return new INTERNAL_TickSchedulerComponent<>();
     }
 }

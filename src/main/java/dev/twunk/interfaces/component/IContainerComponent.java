@@ -18,4 +18,4 @@ import dev.twunk.interfaces.methods.IContainer;
  * Hytale's code
  * @see OpenContainerInteraction - Their interaction that opens containers
  */
-public interface IContainerComponent<ECS_STORE extends WorldProvider> extends IContainer, Component<ECS_STORE> {}
+public interface IContainerComponent<ECS_TYPE extends WorldProvider> extends IContainer, Component<ECS_TYPE> {}

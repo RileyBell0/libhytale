@@ -25,11 +25,11 @@ import dev.twunk.hytale.system.OnUniverseTickSystem;
  * @see ArchetypeTickingSystem - I use this to run GlobalTickSubSystem(s). Only way i currently know
  *                               of for getting a commandBuffer in a global tick
  */
-public interface IOnUniverseTick<ECS_STORE extends WorldProvider> {
+public interface IOnUniverseTick<ECS_TYPE extends WorldProvider> {
     public void onSystemTick(
         final float dt,
-        final ArchetypeChunk<ECS_STORE> archetypeChunk,
-        final Store<ECS_STORE> store,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        final Store<ECS_TYPE> store,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     );
 }

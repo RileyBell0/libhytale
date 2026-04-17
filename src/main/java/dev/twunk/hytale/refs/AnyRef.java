@@ -9,7 +9,7 @@ import dev.twunk.hytale.utils.ComponentUtils;
 import javax.annotation.Nullable;
 
 /**
- * Implements the SAME methods as Ref<ECS_STORE> BUT also will include a bunch
+ * Implements the SAME methods as Ref<ECS_TYPE> BUT also will include a bunch
  * more methods from Utils so that you can just take a ref and access the stuff
  * you want without having to go through a billion processes
  */

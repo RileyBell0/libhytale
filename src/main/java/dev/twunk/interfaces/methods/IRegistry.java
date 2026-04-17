@@ -22,18 +22,18 @@ import javax.annotation.Nullable;
  * it'll return the `EntityStore` versions of a plugin's register methods, in a chunk store
  * case it'll do the same but for chunks etc)
  */
-public interface IRegistry<ECS_STORE extends WorldProvider> {
+public interface IRegistry<ECS_TYPE extends WorldProvider> {
     @Nullable
-    public <T extends Component<ECS_STORE>> ComponentType<ECS_STORE, T> getComponentType(final Class<T> componentClass);
+    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(final Class<T> componentClass);
 
     @Nullable
-    public ComponentType<ECS_STORE, ? extends Component<ECS_STORE>> getComponentType(final String componentClass);
+    public ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>> getComponentType(final String componentClass);
 
-    public <T extends Component<ECS_STORE>> void registerComponentType(
-        final ComponentType<ECS_STORE, T> componentType,
+    public <T extends Component<ECS_TYPE>> void registerComponentType(
+        final ComponentType<ECS_TYPE, T> componentType,
         final Class<T> myClass,
         final String id
     );
 
-    public void registerSystem(final HytalePlugin plugin, final ISubSystem<ECS_STORE> system);
+    public void registerSystem(final HytalePlugin plugin, final ISubSystem<ECS_TYPE> system);
 }

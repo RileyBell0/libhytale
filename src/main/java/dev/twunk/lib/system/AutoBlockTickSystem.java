@@ -1,6 +1,7 @@
 package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -12,7 +13,7 @@ import dev.twunk.hytale.system.OnTickSystem;
 import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.interfaces.component.IOnBlockTickComponent;
+import dev.twunk.interfaces.methods.IOnBlockTick;
 import dev.twunk.interfaces.methods.IOnTick;
 import dev.twunk.interfaces.methods.IRegistry;
 
@@ -30,7 +31,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  * - create a new instance `new TickableBlockComponent<YourComponent>(YourComponentType)`
  * - register the instance to your plugin
  */
-public final class AutoBlockTickSystem<T extends IOnBlockTickComponent>
+public final class AutoBlockTickSystem<T extends Component<ChunkStore>>
     extends SubSystemOwner<ChunkStore>
     implements IOnTick<ChunkStore>
 {
@@ -43,7 +44,7 @@ public final class AutoBlockTickSystem<T extends IOnBlockTickComponent>
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
 
-    public AutoBlockTickSystem(final ComponentType<ChunkStore, T> componentType) {
+    public AutoBlockTickSystem(ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
 
@@ -80,7 +81,7 @@ public final class AutoBlockTickSystem<T extends IOnBlockTickComponent>
         }
 
         // and call the tick method you defined on your component
-        component.onBlockTick(new BlockRef(ref), commandBuffer);
+        ((IOnBlockTick) component).onBlockTick(new BlockRef(ref), commandBuffer);
     }
 
     public IRegistry<ChunkStore> getRegistry() {

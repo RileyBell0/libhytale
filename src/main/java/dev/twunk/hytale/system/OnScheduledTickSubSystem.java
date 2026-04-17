@@ -36,14 +36,14 @@ import dev.twunk.lib.lifetime.TrackedEntities;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
-    extends SubSystemOwner<ECS_STORE>
-    implements IOnAddRemove<ECS_STORE>, IOnUniverseTick<ECS_STORE>, ISubSystem<ECS_STORE>
+public class OnScheduledTickSubSystem<ECS_TYPE extends WorldProvider>
+    extends SubSystemOwner<ECS_TYPE>
+    implements IOnAddRemove<ECS_TYPE>, IOnUniverseTick<ECS_TYPE>, ISubSystem<ECS_TYPE>
 {
 
-    private final TrackedEntities<ECS_STORE> entities;
-    private final IOnScheduledTick<ECS_STORE> listener;
-    private final IRegistry<ECS_STORE> registry;
+    private final TrackedEntities<ECS_TYPE> entities;
+    private final IOnScheduledTick<ECS_TYPE> listener;
+    private final IRegistry<ECS_TYPE> registry;
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -53,10 +53,10 @@ public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public OnScheduledTickSubSystem<ECS_STORE> constructNewSystemClass(
-        IOnScheduledTick<ECS_STORE> listener,
-        Query<ECS_STORE> query,
-        IRegistry<ECS_STORE> registry
+    public OnScheduledTickSubSystem<ECS_TYPE> constructNewSystemClass(
+        IOnScheduledTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
     ) {
         return ISubSystem.__construct(
             ISubSystem.__dupeClassAndGetConstructor(
@@ -72,9 +72,9 @@ public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
     }
 
     protected OnScheduledTickSubSystem(
-        IOnScheduledTick<ECS_STORE> listener,
-        Query<ECS_STORE> query,
-        IRegistry<ECS_STORE> registry
+        IOnScheduledTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
     ) {
         super(query);
         this.listener = listener;
@@ -82,17 +82,17 @@ public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
 
         @SuppressWarnings("unchecked")
         final var componentType = registry.getComponentType(
-            (Class<INTERNAL_TickSchedulerComponent<ECS_STORE>>) (Class<?>) INTERNAL_TickSchedulerComponent.class
+            (Class<INTERNAL_TickSchedulerComponent<ECS_TYPE>>) (Class<?>) INTERNAL_TickSchedulerComponent.class
         );
         if (componentType == null) {
             throw new RuntimeException("Failed to get component type for " + INTERNAL_TickSchedulerComponent.class);
         }
         // Init our module for tracking and persisting how our entities are
         // ticking/sleeping/etc
-        this.entities = new TrackedEntities<ECS_STORE>(listener.getId(), componentType);
+        this.entities = new TrackedEntities<ECS_TYPE>(listener.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(IOnAddRemoveSystem.constructNewSystemClass(this, query, this.registry));
+        this.appendSubSystem(OnAddRemoveSystem.constructNewSystemClass(this, query, this.registry));
         this.appendSubSystem(OnUniverseTickSystem.constructNewSystemClass(this, query, this.registry));
     }
 
@@ -104,10 +104,10 @@ public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * that'll set it up to be easily tickable for us later.
      */
     public void onEntityAdded(
-        final Ref<ECS_STORE> ref,
+        final Ref<ECS_TYPE> ref,
         final AddReason reason,
-        final Store<ECS_STORE> store,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final Store<ECS_TYPE> store,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         entities.track(ref, store, commandBuffer);
     }
@@ -120,10 +120,10 @@ public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      * Removes the entity from our TrackedEntities tracker.
      */
     public void onEntityRemove(
-        final Ref<ECS_STORE> ref,
+        final Ref<ECS_TYPE> ref,
         final RemoveReason reason,
-        final Store<ECS_STORE> store,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final Store<ECS_TYPE> store,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         // drop the entity from our tracker
         entities.untrack(ref, store, reason);
@@ -138,9 +138,9 @@ public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
      */
     public void onSystemTick(
         final float dt,
-        final ArchetypeChunk<ECS_STORE> archetypeChunk,
-        final Store<ECS_STORE> store,
-        final CommandBuffer<ECS_STORE> commandBuffer
+        final ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        final Store<ECS_TYPE> store,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         for (// Java doesn't believe us when we assert that items inside an arraylist are nonnull.
         // Don't worry, they are, that's the only reason we suppress null here
@@ -161,7 +161,7 @@ public class OnScheduledTickSubSystem<ECS_STORE extends WorldProvider>
     }
 
     @Override
-    public IRegistry<ECS_STORE> getRegistry() {
+    public IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
 }

@@ -26,7 +26,7 @@ public interface IContainer {
 
     public short getCapacity();
 
-    public default <ECS_STORE extends WorldProvider> void onOpen(final AnyRef<ECS_STORE> ref) {}
+    public default <ECS_TYPE extends WorldProvider> void onOpen(final AnyRef<ECS_TYPE> ref) {}
 
     // Hytale src code (deprecated) called this `isAllowViewing`
     public default boolean canView() {
