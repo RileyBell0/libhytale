@@ -10,9 +10,8 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.interfaces.IRegistryProvider;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IOnTick;
+import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
 
@@ -39,7 +38,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  */
 public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
     extends EntityTickingSystem<ECS_TYPE> // EntityTickingSystem is hytale's underlying code that powers this
-    implements IRegistryProvider<ECS_TYPE>
+    implements ISubSystem<ECS_TYPE>
 {
 
     private final Query<ECS_TYPE> query;

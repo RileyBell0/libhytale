@@ -14,8 +14,8 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IOnAddRemove;
-import dev.twunk.interfaces.methods.IOnTick;
+import dev.twunk.interfaces.events.IOnAddRemove;
+import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
 

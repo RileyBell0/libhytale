@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IOnWorldTick;
+import dev.twunk.interfaces.events.IOnWorldTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
 import javax.annotation.Nullable;
