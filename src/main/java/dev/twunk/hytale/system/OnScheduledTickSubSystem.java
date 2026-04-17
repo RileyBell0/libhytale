@@ -92,7 +92,7 @@ public class OnScheduledTickSubSystem<ECS_TYPE extends WorldProvider>
         this.entities = new TrackedEntities<ECS_TYPE>(listener.getId(), componentType);
 
         // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(OnAddRemoveSystem.constructNewSystemClass(this, query, this.registry));
+        this.appendSubSystem(OnAddRemoveEventDriver.ForListener.constructNewSystemClass(this, query, this.registry));
         this.appendSubSystem(OnUniverseTickSystem.constructNewSystemClass(this, query, this.registry));
     }
 

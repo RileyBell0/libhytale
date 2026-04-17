@@ -54,7 +54,7 @@ It's a pain.
 So, instead of all that junk now you can define (for simple cases such as this example)
 ```java
 @Serializable
-public class Example extends ILifetimeComponent, IBlockTickComponent {
+public class Example extends IOnAddRemoveComponent, IBlockTickComponent {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     public void onEntityAdded(AnyRef<ChunkStore> ref, AddReason reason, CommandBuffer<ChunkStore> commandBuffer) {

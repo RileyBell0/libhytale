@@ -6,13 +6,13 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.OnAddRemoveSystem;
+import dev.twunk.hytale.system.OnAddRemoveEventDriver;
 
 /**
  * Methods for my subsytem version of `RefSystem<ECS_Store>`
  *
  * My code
- * @see OnAddRemoveSystem      - The base subsystem that "runs" something with "IEntityLifetime"
+ * @see OnAddRemoveEventDriver      - The base subsystem that "runs" something with "IEntityLifetime"
  *
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events

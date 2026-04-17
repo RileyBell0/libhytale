@@ -183,7 +183,7 @@ public abstract class HytalePlugin extends JavaPlugin {
             }
 
             if (IOnAddRemove.class.isAssignableFrom(clazz)) {
-                // var config = getSystemConfig(clazz, ILifetimeComponent.class);
+                // var config = getSystemConfig(clazz, IOnAddRemoveComponent.class);
                 // new AutoBlockLifetimeSystem(componentType).registerTo(this);
             }
         }
