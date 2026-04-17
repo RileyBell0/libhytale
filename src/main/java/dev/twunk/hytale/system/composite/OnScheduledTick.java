@@ -16,6 +16,7 @@ import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnScheduledTick;
 import dev.twunk.interfaces.events.IOnWorldTick;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.lifetime.TrackedEntities;
@@ -137,72 +138,101 @@ public abstract class OnScheduledTick<
         }
     }
 
-    public final class ForListener extends OnScheduledTick<ECS_TYPE> {
-
-        private final IOnScheduledTick<ECS_TYPE> listener;
-
-        protected ForListener(
-            String id,
-            IOnScheduledTick<ECS_TYPE> listener,
-            Query<ECS_TYPE> query,
-            IRegistry<ECS_TYPE> registry
-        ) {
-            super(id, query, registry);
-            this.listener = listener;
-        }
-
-        ///////////////////////////////////////////////////////////////////////////
-        // \/======================\/-  Methods  -\/==========================\/ //
-        ///////////////////////////////////////////////////////////////////////////
-
-        @Override
-        @Nullable
-        public final TickPlan tickTheTicker(
-            TrackedEntity<ECS_TYPE> ticker,
-            float dt,
-            ArchetypeChunk<ECS_TYPE> archetypeChunk,
-            Store<ECS_TYPE> store,
-            CommandBuffer<ECS_TYPE> commandBuffer
-        ) {
-            return listener.onScheduledTick(ticker.world, ticker.ref, dt, store, commandBuffer);
-        }
+    public static final <
+        ECS_TYPE extends WorldProvider,
+        T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
+    > OnScheduledTick<ECS_TYPE> newUninitialised(String id, T listener, IRegistry<ECS_TYPE> registry) {
+        return new OnScheduledTick__Listener<ECS_TYPE>(id, listener, listener.getQuery(), registry);
     }
 
-    public final class ForComponent<T extends Component<ECS_TYPE>> extends OnScheduledTick<ECS_TYPE> {
+    public static final <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newUninitialised(
+        String id,
+        IOnScheduledTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
+    ) {
+        return new OnScheduledTick__Listener<ECS_TYPE>(id, listener, query, registry);
+    }
 
-        private final ComponentType<ECS_TYPE, T> componentType;
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
+        ECS_TYPE
+    > newUninitialised(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+        return new OnScheduledTick__Component<ECS_TYPE, T>(id, componentType, registry);
+    }
+}
 
-        protected ForComponent(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-            super(id, Query.and(componentType), registry);
-            this.componentType = componentType;
+final class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends OnScheduledTick<ECS_TYPE> {
+
+    private final IOnScheduledTick<ECS_TYPE> listener;
+
+    protected OnScheduledTick__Listener(
+        String id,
+        IOnScheduledTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
+    ) {
+        super(id, query, registry);
+        this.listener = listener;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    @Nullable
+    public final TickPlan tickTheTicker(
+        TrackedEntity<ECS_TYPE> ticker,
+        float dt,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        return listener.onScheduledTick(ticker.world, ticker.ref, dt, store, commandBuffer);
+    }
+}
+
+final class OnScheduledTick__Component<
+    ECS_TYPE extends WorldProvider,
+    T extends Component<ECS_TYPE>
+> extends OnScheduledTick<ECS_TYPE> {
+
+    private final ComponentType<ECS_TYPE, T> componentType;
+
+    protected OnScheduledTick__Component(
+        String id,
+        ComponentType<ECS_TYPE, T> componentType,
+        IRegistry<ECS_TYPE> registry
+    ) {
+        super(id, Query.and(componentType), registry);
+        this.componentType = componentType;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Nullable
+    public final TickPlan tickTheTicker(
+        TrackedEntity<ECS_TYPE> ticker,
+        float dt,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        final var component = ComponentUtils.get(ticker.ref, componentType);
+        if (component == null) {
+            return null;
         }
 
-        ///////////////////////////////////////////////////////////////////////////
-        // \/======================\/-  Methods  -\/==========================\/ //
-        ///////////////////////////////////////////////////////////////////////////
-
-        @SuppressWarnings("unchecked")
-        @Override
-        @Nullable
-        public final TickPlan tickTheTicker(
-            TrackedEntity<ECS_TYPE> ticker,
-            float dt,
-            ArchetypeChunk<ECS_TYPE> archetypeChunk,
-            Store<ECS_TYPE> store,
-            CommandBuffer<ECS_TYPE> commandBuffer
-        ) {
-            final var component = ComponentUtils.get(ticker.ref, componentType);
-            if (component == null) {
-                return null;
-            }
-
-            return ((IOnScheduledTick<ECS_TYPE>) component).onScheduledTick(
-                ticker.world,
-                ticker.ref,
-                dt,
-                store,
-                commandBuffer
-            );
-        }
+        return ((IOnScheduledTick<ECS_TYPE>) component).onScheduledTick(
+            ticker.world,
+            ticker.ref,
+            dt,
+            store,
+            commandBuffer
+        );
     }
 }

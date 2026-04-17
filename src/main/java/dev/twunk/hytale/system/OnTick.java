@@ -78,104 +78,104 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
         return this.registry;
     }
 
-    public class ForListener extends OnTick<ECS_TYPE> {
+    ///////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Implementations  -\/======================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
-        private final IOnTick<ECS_TYPE> listener;
-
-        protected ForListener(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
-            super(query, registry);
-            this.listener = listener;
-        }
-
-        /**
-         * Shim around other method for reducing boilerplate if i define a query on my class
-         */
-        public static final <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>> OnTick<
-            ECS_TYPE
-        > newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
-            return newUninitialised(listener, listener.getQuery(), registry);
-        }
-
-        public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newUninitialised(
-            IOnTick<ECS_TYPE> listener,
-            Query<ECS_TYPE> query,
-            IRegistry<ECS_TYPE> registry
-        ) {
-            return IEventDriver.__construct(
-                IEventDriver.__dupeClassAndGetConstructor(
-                    OnTick.ForListener.class,
-                    IOnTick.class,
-                    Query.class,
-                    IRegistry.class
-                ),
-                listener,
-                query,
-                registry
-            );
-        }
-
-        ///////////////////////////////////////////////////////////////////////////
-        // \/======================\/-  Methods  -\/==========================\/ //
-        ///////////////////////////////////////////////////////////////////////////
-
-        public final void tick(
-            float dt,
-            int index,
-            ArchetypeChunk<ECS_TYPE> archetypeChunk,
-            Store<ECS_TYPE> store,
-            CommandBuffer<ECS_TYPE> commandBuffer
-        ) {
-            listener.onTick(dt, new AnyRef<>(archetypeChunk.getReferenceTo(index)), commandBuffer);
-        }
+    /**
+     * Shim around other method for reducing boilerplate if i define a query on my class
+     */
+    public static final <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>> OnTick<
+        ECS_TYPE
+    > newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
+        return newUninitialised(listener, listener.getQuery(), registry);
     }
 
-    public final class ForComponent<T extends Component<ECS_TYPE>> extends OnTick<ECS_TYPE> {
+    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newUninitialised(
+        IOnTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnTick__Listener.class,
+                IOnTick.class,
+                Query.class,
+                IRegistry.class
+            ),
+            listener,
+            query,
+            registry
+        );
+    }
 
-        private final ComponentType<ECS_TYPE, T> componentType;
+    /**
+     * Bound for T fully defined here
+     */
+    public static <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & Component<ECS_TYPE>> OnTick<
+        ECS_TYPE
+    > init(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(OnTick__Component.class, ComponentType.class, IRegistry.class),
+            componentType,
+            registry
+        );
+    }
+}
 
-        /**
-         * Bound for T fully defined here
-         */
-        public static <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & Component<ECS_TYPE>> OnTick<
-            ECS_TYPE
-        > init(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-            return IEventDriver.__construct(
-                IEventDriver.__dupeClassAndGetConstructor(
-                    OnTick.ForComponent.class,
-                    ComponentType.class,
-                    IRegistry.class
-                ),
-                componentType,
-                registry
-            );
+final class OnTick__Listener<ECS_TYPE extends WorldProvider> extends OnTick<ECS_TYPE> {
+
+    private final IOnTick<ECS_TYPE> listener;
+
+    protected OnTick__Listener(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+        super(query, registry);
+        this.listener = listener;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
+    public final void tick(
+        float dt,
+        int index,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        listener.onTick(dt, new AnyRef<>(archetypeChunk.getReferenceTo(index)), commandBuffer);
+    }
+}
+
+final class OnTick__Component<ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> extends OnTick<ECS_TYPE> {
+
+    private final ComponentType<ECS_TYPE, T> componentType;
+
+    protected OnTick__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+        super(Query.and(componentType), registry);
+        this.componentType = componentType;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public final void tick(
+        float dt,
+        int index,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        var ref = new AnyRef<>(archetypeChunk.getReferenceTo(index));
+
+        @SuppressWarnings("unchecked")
+        var component = (IOnTick<ECS_TYPE>) ref.getComponent(componentType);
+        if (component == null) {
+            return;
         }
 
-        protected ForComponent(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-            super(Query.and(componentType), registry);
-            this.componentType = componentType;
-        }
-
-        ///////////////////////////////////////////////////////////////////////////
-        // \/======================\/-  Methods  -\/==========================\/ //
-        ///////////////////////////////////////////////////////////////////////////
-
-        @Override
-        public final void tick(
-            float dt,
-            int index,
-            ArchetypeChunk<ECS_TYPE> archetypeChunk,
-            Store<ECS_TYPE> store,
-            CommandBuffer<ECS_TYPE> commandBuffer
-        ) {
-            var ref = new AnyRef<>(archetypeChunk.getReferenceTo(index));
-
-            @SuppressWarnings("unchecked")
-            var component = (IOnTick<ECS_TYPE>) ref.getComponent(componentType);
-            if (component == null) {
-                return;
-            }
-
-            component.onTick(dt, ref, commandBuffer);
-        }
+        component.onTick(dt, ref, commandBuffer);
     }
 }

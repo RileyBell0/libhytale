@@ -8,6 +8,7 @@ import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.system.OnAddRemove;
 import dev.twunk.hytale.system.OnBlockTick;
 import dev.twunk.hytale.system.OnTick;
+import dev.twunk.hytale.system.OnWorldTick;
 import dev.twunk.hytale.system.composite.OnScheduledTick;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnBlockTick;
@@ -76,21 +77,43 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     }
 
     public <T extends IQuery<ChunkStore>> void bindEventListeners(HytalePlugin plugin, T unknown) {
-        // find the interfaces it supports
         var clazz = unknown.getClass();
+
+        // find the interfaces it supports
+
         if (IOnAddRemove.class.isAssignableFrom(clazz)) {
-            OnAddRemove.ForListener.newUninitialised((T & IOnAddRemove<ChunkStore>) unknown, this);
+            @SuppressWarnings("unchecked")
+            var driver = OnAddRemove.newUninitialised((T & IOnAddRemove<ChunkStore>) unknown, this);
+            driver.onRegister(plugin);
         }
+
         if (IOnBlockTick.class.isAssignableFrom(clazz)) {
-            OnBlockTick.ForListener.newUninitialised((T & IOnBlockTick) unknown);
+            var driver = OnBlockTick.newUninitialised((T & IOnBlockTick) unknown);
+            driver.onRegister(plugin);
         }
+
         if (IOnTick.class.isAssignableFrom(clazz)) {
-            OnTick.ForListener.newUninitialised((T & IOnTick<ChunkStore>) unknown, this);
+            @SuppressWarnings("unchecked")
+            var driver = OnTick.newUninitialised((T & IOnTick<ChunkStore>) unknown, this);
+            driver.onRegister(plugin);
         }
+
         if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
-            OnScheduledTick.newUninitialised((T & IOnScheduledTick<ChunkStore>) unknown, this);
+            @SuppressWarnings("unchecked")
+            var driver = OnScheduledTick.newUninitialised("", (T & IOnScheduledTick<ChunkStore>) unknown, this);
+            driver.onRegister(plugin);
         }
+
         if (IOnWorldTick.class.isAssignableFrom(clazz)) {
+            @SuppressWarnings("unchecked")
+            var driver = OnWorldTick.newUninitialised((T & IOnWorldTick<ChunkStore>) unknown, this);
+            driver.onRegister(plugin);
         }
+    }
+
+    @Override
+    public void bindEventListeners(HytalePlugin plugin, Object unknown) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'bindEventListeners'");
     }
 }
