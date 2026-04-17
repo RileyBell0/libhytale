@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system;
+package dev.twunk.hytale.system.composite;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -8,10 +8,11 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.interfaces.ISubSystem;
 import dev.twunk.interfaces.methods.IOnAddRemove;
 import dev.twunk.interfaces.methods.IOnScheduledTick;
-import dev.twunk.interfaces.methods.IOnUniverseTick;
+import dev.twunk.interfaces.methods.IOnWorldTick;
 import dev.twunk.interfaces.methods.IRegistry;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
@@ -38,7 +39,9 @@ import dev.twunk.lib.lifetime.TrackedEntities;
  */
 public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
     extends SubSystemOwner<ECS_TYPE>
-    implements IOnAddRemove<ECS_TYPE>, IOnUniverseTick<ECS_TYPE>, ISubSystem<ECS_TYPE>
+    // TODO need to get these subsystems registered somehow
+    // this is a COMPOSITE system (not base)
+    implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, ISubSystem<ECS_TYPE>
 {
 
     private final TrackedEntities<ECS_TYPE> entities;
@@ -90,10 +93,6 @@ public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
         // Init our module for tracking and persisting how our entities are
         // ticking/sleeping/etc
         this.entities = new TrackedEntities<ECS_TYPE>(listener.getId(), componentType);
-
-        // IMPORTANTLY the order in which these subsystems are created
-        this.appendSubSystem(OnAddRemoveEventDriver.ForListener.newUninitialised(this, query, this.registry));
-        this.appendSubSystem(OnUniverseTickEventDriver.newUninitialised(this, query, this.registry));
     }
 
     /**
@@ -136,7 +135,7 @@ public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
      * all ticking entities calling the parent's `onEntityTick` method for
      * their scheduled tick
      */
-    public void onSystemTick(
+    public void onWorldTick(
         final float dt,
         final ArchetypeChunk<ECS_TYPE> archetypeChunk,
         final Store<ECS_TYPE> store,
