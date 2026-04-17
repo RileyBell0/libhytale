@@ -3,16 +3,15 @@ package dev.twunk.hytale.system.composite;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.system.SubSystemOwner;
 import dev.twunk.interfaces.ISubSystem;
-import dev.twunk.interfaces.methods.IOnAddRemove;
-import dev.twunk.interfaces.methods.IOnScheduledTick;
-import dev.twunk.interfaces.methods.IOnWorldTick;
+import dev.twunk.interfaces.events.IOnAddRemove;
+import dev.twunk.interfaces.events.IOnScheduledTick;
+import dev.twunk.interfaces.events.IOnWorldTick;
 import dev.twunk.interfaces.methods.IRegistry;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
@@ -37,70 +36,44 @@ import dev.twunk.lib.lifetime.TrackedEntities;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
-    extends SubSystemOwner<ECS_TYPE>
-    // TODO need to get these subsystems registered somehow
-    // this is a COMPOSITE system (not base)
-    implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, ISubSystem<ECS_TYPE>
-{
+public class OnScheduledTickEventDriver<
+    ECS_TYPE extends WorldProvider
+> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, ISubSystem<ECS_TYPE> {
 
     private final TrackedEntities<ECS_TYPE> entities;
     private final IOnScheduledTick<ECS_TYPE> listener;
     private final IRegistry<ECS_TYPE> registry;
 
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
-     * of subsystems, each one must secretly create a new class each and every time you call it
-     */
     public OnScheduledTickEventDriver<ECS_TYPE> newUninitialised(
         IOnScheduledTick<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
     ) {
-        return ISubSystem.__construct(
-            ISubSystem.__dupeClassAndGetConstructor(
-                OnScheduledTickEventDriver.class,
-                IOnScheduledTick.class,
-                Query.class,
-                IRegistry.class
-            ),
-            listener,
-            query,
-            registry
-        );
+        return new OnScheduledTickEventDriver<>(listener, registry);
     }
 
-    protected OnScheduledTickEventDriver(
-        IOnScheduledTick<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
-    ) {
-        super(query);
+    protected OnScheduledTickEventDriver(IOnScheduledTick<ECS_TYPE> listener, IRegistry<ECS_TYPE> registry) {
         this.listener = listener;
         this.registry = registry;
 
         @SuppressWarnings("unchecked")
-        final var componentType = registry.getComponentType(
-            (Class<INTERNAL_TickSchedulerComponent<ECS_TYPE>>) (Class<?>) INTERNAL_TickSchedulerComponent.class
-        );
-        if (componentType == null) {
+        final ComponentType<ECS_TYPE, INTERNAL_TickSchedulerComponent<ECS_TYPE>> scheduledTickInfo =
+            registry.getComponentType(INTERNAL_TickSchedulerComponent.class);
+        if (scheduledTickInfo == null) {
             throw new RuntimeException("Failed to get component type for " + INTERNAL_TickSchedulerComponent.class);
         }
+
         // Init our module for tracking and persisting how our entities are
         // ticking/sleeping/etc
-        this.entities = new TrackedEntities<ECS_TYPE>(listener.getId(), componentType);
+        this.entities = new TrackedEntities<ECS_TYPE>(listener.getId(), scheduledTickInfo);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Events  -\/===========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+
     /**
-     * Whenever an entity is added we need to manually track it, such that we can
-     * later manually run the tick method ourselves on each of our entities.
-     *
-     * Thus, we kick this responsibility over to our `TrackedEntities` class
-     * that'll set it up to be easily tickable for us later.
+     * Track entity (add to the scheduler, or add BACK into the scheduler) when it's
+     * created or re-loaded into the world
      */
     public void onEntityAdded(
         final Ref<ECS_TYPE> ref,
@@ -112,11 +85,7 @@ public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
     }
 
     /**
-     * As above, we're maintaining the list of existing entities that match our
-     * query MANUALLY, so, equally, we have to remove them manually too (else we'll
-     * have invalid refs around the place)
-     *
-     * Removes the entity from our TrackedEntities tracker.
+     * Untrack entity (remove from scheduler) when the entity is removed/unloaded
      */
     public void onEntityRemove(
         final Ref<ECS_TYPE> ref,
@@ -124,16 +93,12 @@ public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
         final Store<ECS_TYPE> store,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        // drop the entity from our tracker
         entities.untrack(ref, store, reason);
     }
 
     /**
-     * Runs once globally AFTER the lifetime subsystem has finished
-     *
-     * This bit is the `IScheduledTickSystem` runner. Pretty much just runs through
-     * all ticking entities calling the parent's `onEntityTick` method for
-     * their scheduled tick
+     * Tick any entities that are scheduled to run this tick. Those entities can
+     * return a plan for when they should tick next, or null to just keep ticking
      */
     public void onWorldTick(
         final float dt,
@@ -141,23 +106,27 @@ public class OnScheduledTickEventDriver<ECS_TYPE extends WorldProvider>
         final Store<ECS_TYPE> store,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        for (// Java doesn't believe us when we assert that items inside an arraylist are nonnull.
-        // Don't worry, they are, that's the only reason we suppress null here
-        final var ticker : entities.ticking) {
-            final var res = listener.onEntityTick(ticker.world, ticker.ref, dt, store, commandBuffer);
+        for (final var ticker : entities.ticking) {
+            final var res = listener.onScheduledTick(ticker.world, ticker.ref, dt, store, commandBuffer);
 
             // Transition to the state returned by the block
-            if (res != null) {
-                switch (res.getType()) {
-                    case TickPlan.TYPE_BROKEN:
-                    case TickPlan.TYPE_SLEEP:
-                    case TickPlan.TYPE_STOP:
-                    default:
-                        break;
-                }
+            if (res == null) {
+                continue;
+            }
+
+            switch (res.getType()) {
+                case TickPlan.TYPE_BROKEN:
+                case TickPlan.TYPE_SLEEP:
+                case TickPlan.TYPE_STOP:
+                default:
+                    break;
             }
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public IRegistry<ECS_TYPE> getRegistry() {
