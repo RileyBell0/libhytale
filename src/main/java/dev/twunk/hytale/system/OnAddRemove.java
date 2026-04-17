@@ -33,7 +33,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  *
  * My code
  * @see IOnAddRemove       - Methods for listening to entity add/remove events
- * @see OnTickEventDriver  - Underlying SubSystem that powers the IEntityTick methods
+ * @see OnTick  - Underlying SubSystem that powers the IEntityTick methods
  *                             for IEntityTickSystems that register an EntityTickSubSystem
  * @see IOnTick           - Underlying method for ticking an entity
  *
@@ -44,7 +44,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  *                               Runs ONCE per tick (global, not per matching entity, just runs a single
  *                               time per tick) and has an inbuilt query
  */
-public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
+public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     extends RefSystem<ECS_TYPE>
     implements IEventDriver<ECS_TYPE>
 {
@@ -52,7 +52,7 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
     private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
 
-    protected OnAddRemoveEventDriver(Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnAddRemove(Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.query = query;
         this.registry = registry;
     }
@@ -111,7 +111,7 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
      * of defining game functionality in your class from finagling the hytale codebase
      * to cooperate
      */
-    public final class ForListener extends OnAddRemoveEventDriver<ECS_TYPE> {
+    public final class ForListener extends OnAddRemove<ECS_TYPE> {
 
         /**
          * YOUR class (well, instance of it). I store a reference to it here so i can keep calling
@@ -125,7 +125,7 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
         public static final <
             ECS_TYPE extends WorldProvider,
             T extends IOnAddRemove<ECS_TYPE> & IQuery<ECS_TYPE>
-        > OnAddRemoveEventDriver<ECS_TYPE> newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
+        > OnAddRemove<ECS_TYPE> newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
             return newUninitialised(listener, listener.getQuery(), registry);
         }
 
@@ -133,14 +133,14 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
          * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
          * of subsystems, each one must secretly create a new class each and every time you call it
          */
-        public static <ECS_TYPE extends WorldProvider> OnAddRemoveEventDriver<ECS_TYPE> newUninitialised(
+        public static <ECS_TYPE extends WorldProvider> OnAddRemove<ECS_TYPE> newUninitialised(
             IOnAddRemove<ECS_TYPE> listener,
             Query<ECS_TYPE> query,
             IRegistry<ECS_TYPE> registry
         ) {
             return IEventDriver.__construct(
                 IEventDriver.__dupeClassAndGetConstructor(
-                    OnAddRemoveEventDriver.ForListener.class,
+                    OnAddRemove.ForListener.class,
                     IOnAddRemove.class,
                     Query.class,
                     IRegistry.class
@@ -186,7 +186,7 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
      *
      * it's the exact same as a system that fetches your component then calls the method on it
      */
-    public final class ForComponent<T extends Component<ECS_TYPE>> extends OnAddRemoveEventDriver<ECS_TYPE> {
+    public final class ForComponent<T extends Component<ECS_TYPE>> extends OnAddRemove<ECS_TYPE> {
 
         private final ComponentType<ECS_TYPE, T> componentType;
 
@@ -199,13 +199,10 @@ public abstract class OnAddRemoveEventDriver<ECS_TYPE extends WorldProvider>
         public static <
             ECS_TYPE extends WorldProvider,
             T extends IOnAddRemove<ECS_TYPE> & Component<ECS_TYPE>
-        > OnAddRemoveEventDriver<ECS_TYPE> construct(
-            ComponentType<ECS_TYPE, T> componentType,
-            IRegistry<ECS_TYPE> registry
-        ) {
+        > OnAddRemove<ECS_TYPE> construct(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
             return IEventDriver.__construct(
                 IEventDriver.__dupeClassAndGetConstructor(
-                    OnAddRemoveEventDriver.ForComponent.class,
+                    OnAddRemove.ForComponent.class,
                     ComponentType.class,
                     IRegistry.class
                 ),

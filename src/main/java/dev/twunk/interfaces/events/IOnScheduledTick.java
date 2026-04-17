@@ -25,11 +25,11 @@ import javax.annotation.Nullable;
 public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> {
     @Nullable
     public abstract TickPlan onScheduledTick(
-        final World world,
-        final Ref<ECS_TYPE> ref,
-        final float dt,
-        final Store<ECS_TYPE> store,
-        final CommandBuffer<ECS_TYPE> commandBuffer
+        World world,
+        Ref<ECS_TYPE> ref,
+        float dt,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
     );
 
     /**

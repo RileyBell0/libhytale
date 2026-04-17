@@ -178,7 +178,4 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
     }
 
     public abstract void onRegister(HytalePlugin plugin);
-    // {
-    //     this.getRegistry().bindEventListeners(plugin, this);
-    // }
 }

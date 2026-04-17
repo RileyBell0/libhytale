@@ -64,4 +64,6 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
     public final void registerSystem(final HytalePlugin plugin, final ISystem<EntityStore> system) {
         plugin.getEntityStoreRegistry().registerSystem(system);
     }
+
+    public void bindEventListeners(HytalePlugin plugin, Object unknown) {}
 }

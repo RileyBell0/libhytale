@@ -6,10 +6,12 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.interfaces.IEventDriver;
+import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnBlockTick;
 import dev.twunk.interfaces.methods.IQuery;
 
@@ -24,14 +26,14 @@ import dev.twunk.interfaces.methods.IQuery;
  * PRODUCES:
  * - IQueryTickingSystem runner
  *
- * @see OnTickEventDriver - BlockTickSubSystem is simply an extension of EntityTickSubSystem
+ * @see OnTick - BlockTickSubSystem is simply an extension of EntityTickSubSystem
  *                            that grabs some more block-related data out of a ref before calling
  *                            the onBlockTick method your `IEntityTickSystem` provides
  * @see IOnBlockTick      - method i'll be calling on your class
  */
-public abstract class OnBlockTickEventDriver extends OnTickEventDriver<ChunkStore> {
+public abstract class OnBlockTick extends OnTick<ChunkStore> {
 
-    protected OnBlockTickEventDriver(Query<ChunkStore> query) {
+    protected OnBlockTick(Query<ChunkStore> query) {
         super(query, LibHytale.CHUNK_REGISTRY);
     }
 
@@ -48,7 +50,7 @@ public abstract class OnBlockTickEventDriver extends OnTickEventDriver<ChunkStor
         CommandBuffer<ChunkStore> commandBuffer
     );
 
-    public final class ForListener extends OnBlockTickEventDriver {
+    public final class ForListener extends OnBlockTick {
 
         private final IOnBlockTick listener;
 
@@ -60,16 +62,14 @@ public abstract class OnBlockTickEventDriver extends OnTickEventDriver<ChunkStor
         /**
          * Shim around other method for reducing boilerplate if i define a query on my class
          */
-        public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTickEventDriver newUninitialised(
-            T listener
-        ) {
+        public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTick newUninitialised(T listener) {
             return newUninitialised(listener, listener.getQuery());
         }
 
-        public static final OnBlockTickEventDriver newUninitialised(IOnBlockTick listener, Query<ChunkStore> query) {
+        public static final OnBlockTick newUninitialised(IOnBlockTick listener, Query<ChunkStore> query) {
             return IEventDriver.__construct(
                 IEventDriver.__dupeClassAndGetConstructor(
-                    OnBlockTickEventDriver.ForListener.class,
+                    OnBlockTick.ForListener.class,
                     IOnBlockTick.class,
                     Query.class
                 ),
@@ -93,21 +93,18 @@ public abstract class OnBlockTickEventDriver extends OnTickEventDriver<ChunkStor
         }
     }
 
-    public final class ForComponent<T extends Component<ChunkStore>> extends OnBlockTickEventDriver {
+    public final class ForComponent<T extends Component<ChunkStore>> extends OnBlockTick {
 
         private final ComponentType<ChunkStore, T> componentType;
 
         /**
          * Bound for T fully defined here
          */
-        public static <T extends IOnBlockTick & Component<ChunkStore>> OnBlockTickEventDriver init(
+        public static <T extends IOnBlockTick & Component<ChunkStore>> OnBlockTick init(
             ComponentType<ChunkStore, T> componentType
         ) {
             return IEventDriver.__construct(
-                IEventDriver.__dupeClassAndGetConstructor(
-                    OnBlockTickEventDriver.ForComponent.class,
-                    ComponentType.class
-                ),
+                IEventDriver.__dupeClassAndGetConstructor(OnBlockTick.ForComponent.class, ComponentType.class),
                 componentType
             );
         }

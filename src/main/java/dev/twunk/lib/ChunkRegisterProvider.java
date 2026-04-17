@@ -5,6 +5,16 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.hytale.system.OnAddRemove;
+import dev.twunk.hytale.system.OnBlockTick;
+import dev.twunk.hytale.system.OnTick;
+import dev.twunk.hytale.system.composite.OnScheduledTick;
+import dev.twunk.interfaces.events.IOnAddRemove;
+import dev.twunk.interfaces.events.IOnBlockTick;
+import dev.twunk.interfaces.events.IOnScheduledTick;
+import dev.twunk.interfaces.events.IOnTick;
+import dev.twunk.interfaces.events.IOnWorldTick;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
 import java.util.HashMap;
 import javax.annotation.Nullable;
@@ -63,5 +73,24 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
 
     public final void registerSystem(final HytalePlugin plugin, final ISystem<ChunkStore> system) {
         plugin.getChunkStoreRegistry().registerSystem(system);
+    }
+
+    public <T extends IQuery<ChunkStore>> void bindEventListeners(HytalePlugin plugin, T unknown) {
+        // find the interfaces it supports
+        var clazz = unknown.getClass();
+        if (IOnAddRemove.class.isAssignableFrom(clazz)) {
+            OnAddRemove.ForListener.newUninitialised((T & IOnAddRemove<ChunkStore>) unknown, this);
+        }
+        if (IOnBlockTick.class.isAssignableFrom(clazz)) {
+            OnBlockTick.ForListener.newUninitialised((T & IOnBlockTick) unknown);
+        }
+        if (IOnTick.class.isAssignableFrom(clazz)) {
+            OnTick.ForListener.newUninitialised((T & IOnTick<ChunkStore>) unknown, this);
+        }
+        if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
+            OnScheduledTick.newUninitialised((T & IOnScheduledTick<ChunkStore>) unknown, this);
+        }
+        if (IOnWorldTick.class.isAssignableFrom(clazz)) {
+        }
     }
 }

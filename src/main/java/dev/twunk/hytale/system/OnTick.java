@@ -37,7 +37,7 @@ import dev.twunk.interfaces.methods.IRegistry;
  *                               Runs ONCE per tick (global, not per matching entity, just runs a single
  *                               time per tick) and has an inbuilt query
  */
-public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
+public abstract class OnTick<ECS_TYPE extends WorldProvider>
     extends EntityTickingSystem<ECS_TYPE> // EntityTickingSystem is hytale's underlying code that powers this
     implements IEventDriver<ECS_TYPE>
 {
@@ -45,7 +45,7 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
     private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
 
-    protected OnTickEventDriver(Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnTick(Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.query = query;
         this.registry = registry;
     }
@@ -78,7 +78,7 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
         return this.registry;
     }
 
-    public class ForListener extends OnTickEventDriver<ECS_TYPE> {
+    public class ForListener extends OnTick<ECS_TYPE> {
 
         private final IOnTick<ECS_TYPE> listener;
 
@@ -90,21 +90,20 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
         /**
          * Shim around other method for reducing boilerplate if i define a query on my class
          */
-        public static final <
-            ECS_TYPE extends WorldProvider,
-            T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>
-        > OnTickEventDriver<ECS_TYPE> newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
+        public static final <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>> OnTick<
+            ECS_TYPE
+        > newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
             return newUninitialised(listener, listener.getQuery(), registry);
         }
 
-        public static final <ECS_TYPE extends WorldProvider> OnTickEventDriver<ECS_TYPE> newUninitialised(
+        public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newUninitialised(
             IOnTick<ECS_TYPE> listener,
             Query<ECS_TYPE> query,
             IRegistry<ECS_TYPE> registry
         ) {
             return IEventDriver.__construct(
                 IEventDriver.__dupeClassAndGetConstructor(
-                    OnTickEventDriver.ForListener.class,
+                    OnTick.ForListener.class,
                     IOnTick.class,
                     Query.class,
                     IRegistry.class
@@ -130,20 +129,19 @@ public abstract class OnTickEventDriver<ECS_TYPE extends WorldProvider>
         }
     }
 
-    public final class ForComponent<T extends Component<ECS_TYPE>> extends OnTickEventDriver<ECS_TYPE> {
+    public final class ForComponent<T extends Component<ECS_TYPE>> extends OnTick<ECS_TYPE> {
 
         private final ComponentType<ECS_TYPE, T> componentType;
 
         /**
          * Bound for T fully defined here
          */
-        public static <
-            ECS_TYPE extends WorldProvider,
-            T extends IOnTick<ECS_TYPE> & Component<ECS_TYPE>
-        > OnTickEventDriver<ECS_TYPE> init(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+        public static <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & Component<ECS_TYPE>> OnTick<
+            ECS_TYPE
+        > init(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
             return IEventDriver.__construct(
                 IEventDriver.__dupeClassAndGetConstructor(
-                    OnTickEventDriver.ForComponent.class,
+                    OnTick.ForComponent.class,
                     ComponentType.class,
                     IRegistry.class
                 ),

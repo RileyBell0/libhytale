@@ -6,6 +6,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.LibHytale;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import java.util.ArrayList;
@@ -34,14 +35,8 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
     // what state they held
     private final String id;
 
-    private final ComponentType<ECS_TYPE, INTERNAL_TickSchedulerComponent<ECS_TYPE>> tickStateComponent;
-
-    public TrackedEntities(
-        final String id,
-        final ComponentType<ECS_TYPE, INTERNAL_TickSchedulerComponent<ECS_TYPE>> component
-    ) {
+    public TrackedEntities(String id) {
         this.id = id;
-        this.tickStateComponent = component;
     }
 
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
@@ -88,7 +83,7 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
     }
 
     public void untrack(final Ref<ECS_TYPE> ref, final Store<ECS_TYPE> store, final RemoveReason reason) {
-        store.getComponent(ref, this.tickStateComponent).drop(this.id, reason);
+        store.getComponent(ref, TrackedEntities.getComponentType()).drop(this.id, reason);
     }
 
     /**
@@ -120,7 +115,7 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
         // so it can resume ticking/sleeping/etc when the server reboots. really
         // we just want to store shit so the lifetime extends past (NOW), and
         // so we can QUICKLY remove the entity again later
-        final var tickingInfo = commandBuffer.ensureAndGetComponent(ref, this.tickStateComponent);
+        final var tickingInfo = commandBuffer.ensureAndGetComponent(ref, TrackedEntities.getComponentType());
         var systemState = tickingInfo.getTickingInfo(this.id);
         if (systemState == null) {
             systemState = new TickPlan.Active();
@@ -150,5 +145,12 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
         } else {
             return broken;
         }
+    }
+
+    public static final <ECS_TYPE extends WorldProvider> ComponentType<
+        ECS_TYPE,
+        INTERNAL_TickSchedulerComponent<ECS_TYPE>
+    > getComponentType() {
+        return LibHytale.getChunkComponentType(INTERNAL_TickSchedulerComponent.class);
     }
 }

@@ -38,5 +38,5 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     public void registerSystem(HytalePlugin plugin, ISystem<ECS_TYPE> system);
 
-    public default void bindEventListeners(HytalePlugin plugin, IEventDriver<ECS_TYPE> mything) {}
+    public void bindEventListeners(HytalePlugin plugin, Object unknown) {}
 }

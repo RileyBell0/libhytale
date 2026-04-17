@@ -22,6 +22,7 @@ public class AnyRef<ECS_TYPE extends WorldProvider> extends Ref<ECS_TYPE> {
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
+
     public AnyRef(Ref<ECS_TYPE> ref) {
         super(ref.getStore(), ref.getIndex());
     }
