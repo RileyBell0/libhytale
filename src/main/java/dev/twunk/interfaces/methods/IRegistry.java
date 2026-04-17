@@ -37,5 +37,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     public void registerSystem(HytalePlugin plugin, ISystem<ECS_TYPE> system);
 
-    public void bindEventListeners(HytalePlugin plugin, Object unknown);
+    public <T extends Component<T>> void bindEventListeners(HytalePlugin plugin, Class<T> unknown);
+
+    public <T extends IQuery<ECS_TYPE>> void bindEventListeners(HytalePlugin plugin, T unknown);
 }

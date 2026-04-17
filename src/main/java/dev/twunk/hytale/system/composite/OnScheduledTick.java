@@ -45,12 +45,14 @@ import javax.annotation.Nullable;
  */
 public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
-> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IEventDriver<ECS_TYPE> {
+> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IEventDriver<ECS_TYPE>, IQuery<ECS_TYPE> {
 
     private final TrackedEntities<ECS_TYPE> inMemoryTrackedEntities;
     private final IRegistry<ECS_TYPE> registry;
+    private final Query<ECS_TYPE> query;
 
     protected OnScheduledTick(String id, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+        this.query = query;
         this.registry = registry;
 
         this.inMemoryTrackedEntities = new TrackedEntities<ECS_TYPE>(id);
@@ -59,6 +61,11 @@ public abstract class OnScheduledTick<
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public Query<ECS_TYPE> getQuery() {
+        return this.query;
+    }
 
     @Override
     public final void onRegister(HytalePlugin plugin) {

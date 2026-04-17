@@ -99,6 +99,8 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
+            // its a composite one so interestingly enough this one is recursive
+            // as in onRegister it calls bindEventListeners :)
             @SuppressWarnings("unchecked")
             var driver = OnScheduledTick.newUninitialised("", (T & IOnScheduledTick<ChunkStore>) unknown, this);
             driver.onRegister(plugin);
@@ -112,8 +114,8 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     }
 
     @Override
-    public void bindEventListeners(HytalePlugin plugin, Object unknown) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'bindEventListeners'");
+    public <T extends Component<T>> void bindEventListeners(HytalePlugin plugin, Class<T> unknown) {
+        // this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
+        // without the query as thats just gonna be Query.and(componentType);
     }
 }

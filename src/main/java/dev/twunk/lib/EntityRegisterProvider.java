@@ -5,6 +5,7 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
 import java.util.HashMap;
 import javax.annotation.Nullable;
@@ -65,5 +66,9 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
         plugin.getEntityStoreRegistry().registerSystem(system);
     }
 
-    public void bindEventListeners(HytalePlugin plugin, Object unknown) {}
+    @Override
+    public <T extends Component<T>> void bindEventListeners(HytalePlugin plugin, Class<T> unknown) {}
+
+    @Override
+    public <T extends IQuery<EntityStore>> void bindEventListeners(HytalePlugin plugin, T unknown) {}
 }
