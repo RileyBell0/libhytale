@@ -251,7 +251,11 @@ public abstract class HytalePlugin extends JavaPlugin {
     public final <ECS_TYPE extends WorldProvider, T extends Component<?>> void registerComponent(Class<T> clazz) {
         var inferred = inferECSTypeForComponent(clazz);
         if (inferred == null) {
-            console.atSevere().log(" ->| FAILED TO INFER ECS type of " + inferred + " | for class | " + clazz);
+            console
+                .atSevere()
+                .log(
+                    " ->| FAILED TO INFER ECS type of " + inferred + " for " + clazz.getSimpleName() + "(" + clazz + ")"
+                );
             console.atSevere().log("  >| COMPONENT WAS NOT ADDED TO ANY REGISTRY");
             return;
         }
