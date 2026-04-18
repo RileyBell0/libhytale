@@ -13,7 +13,8 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
-import dev.twunk.hytale.refs.AnyRef;
+import dev.twunk.hytale.system.ignoreme.OnAddRemove__Component;
+import dev.twunk.hytale.system.ignoreme.OnAddRemove__Listener;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnTick;
@@ -102,11 +103,10 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
-    public static final <
-        ECS_TYPE extends WorldProvider,
-        T extends IOnAddRemove<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnAddRemove<ECS_TYPE> newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
-        return newUninitialised(listener, listener.getQuery(), registry);
+    public static final <ECS_TYPE extends WorldProvider, T extends IQuery<ECS_TYPE>> OnAddRemove<
+        ECS_TYPE
+    > newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
+        return newUninitialised((IOnAddRemove<ECS_TYPE>) listener, listener.getQuery(), registry);
     }
 
     /**
@@ -137,7 +137,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
      *
      * Bound for T fully defined here
      */
-    public static <ECS_TYPE extends WorldProvider, T extends IOnAddRemove<ECS_TYPE> & Component<ECS_TYPE>> OnAddRemove<
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnAddRemove<
         ECS_TYPE
     > newUninitialised(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         return IEventDriver.__construct(
@@ -149,123 +149,5 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
             componentType,
             registry
         );
-    }
-}
-
-/**
- * This is the normal version, an almost 1 to 1 of what hytale does. It's a "system"
- * that has its `onEntityAdded` and `onEntityRemove` methods called
- *
- * Only difference between this and base hytale is that YOUR code isn't actually
- * run in this system, you pass in a listener and i'll call your methods on that
- * listener
- *
- * its a bit if indirection that really helps to seperate out the boilerplate
- * of defining game functionality in your class from finagling the hytale codebase
- * to cooperate
- */
-final class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAddRemove<ECS_TYPE> {
-
-    /**
-     * YOUR class (well, instance of it). I store a reference to it here so i can keep calling
-     * the event listener methods on it when event happen
-     */
-    private final IOnAddRemove<ECS_TYPE> listener;
-
-    protected OnAddRemove__Listener(
-        IOnAddRemove<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
-    ) {
-        super(query, registry);
-        this.listener = listener;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onEntityAdded(
-        Ref<ECS_TYPE> ref,
-        AddReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        listener.onEntityAdded(new AnyRef<>(ref), reason, commandBuffer);
-    }
-
-    @Override
-    public void onEntityRemove(
-        Ref<ECS_TYPE> ref,
-        RemoveReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        listener.onEntityRemove(new AnyRef<>(ref), reason, commandBuffer);
-    }
-}
-
-/**
- * This version will call the add and remove events defined in a specific component instance
- *
- * it's the exact same as a system that fetches your component then calls the method on it
- */
-final class OnAddRemove__Component<
-    ECS_TYPE extends WorldProvider,
-    T extends Component<ECS_TYPE>
-> extends OnAddRemove<ECS_TYPE> {
-
-    private final ComponentType<ECS_TYPE, T> componentType;
-
-    protected OnAddRemove__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-        super(Query.and(componentType), registry);
-        this.componentType = componentType;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onEntityAdded(
-        Ref<ECS_TYPE> ref,
-        AddReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        var anyRef = new AnyRef<>(ref);
-
-        // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `init` define
-        // this bound for me (because i can if its on a static method???) and then i'll just cast it here which IS SAFE given i've got that
-        // bound guarnateed earlier
-        @SuppressWarnings("unchecked")
-        var component = (IOnAddRemove<ECS_TYPE>) anyRef.getComponent(componentType);
-        if (component == null) {
-            return;
-        }
-
-        component.onEntityAdded(anyRef, reason, commandBuffer);
-    }
-
-    @Override
-    public void onEntityRemove(
-        Ref<ECS_TYPE> ref,
-        RemoveReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        var anyRef = new AnyRef<>(ref);
-
-        // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `init` define
-        // this bound for me (because i can if its on a static method???) and then i'll just cast it here which IS SAFE given i've got that
-        // bound guarnateed earlier
-        @SuppressWarnings("unchecked")
-        var component = (IOnAddRemove<ECS_TYPE>) anyRef.getComponent(componentType);
-        if (component == null) {
-            return;
-        }
-
-        component.onEntityRemove(anyRef, reason, commandBuffer);
     }
 }

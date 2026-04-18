@@ -8,7 +8,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.hytale.refs.BlockRef;
+import dev.twunk.hytale.system.ignoreme.OnBlockTick__Component;
+import dev.twunk.hytale.system.ignoreme.OnBlockTick__Listener;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnBlockTick;
 import dev.twunk.interfaces.methods.IQuery;
@@ -70,68 +71,12 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
     /**
      * Bound for T fully defined here
      */
-    public static <T extends IOnBlockTick & Component<ChunkStore>> OnBlockTick init(
+    public static final <T extends Component<ChunkStore>> OnBlockTick newUninitialised(
         ComponentType<ChunkStore, T> componentType
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Component.class, ComponentType.class),
             componentType
         );
-    }
-}
-
-final class OnBlockTick__Listener extends OnBlockTick {
-
-    private final IOnBlockTick listener;
-
-    protected OnBlockTick__Listener(IOnBlockTick listener, Query<ChunkStore> query) {
-        super(query);
-        this.listener = listener;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    public final void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ChunkStore> archetypeChunk,
-        Store<ChunkStore> store,
-        CommandBuffer<ChunkStore> commandBuffer
-    ) {
-        listener.onBlockTick(new BlockRef(archetypeChunk.getReferenceTo(index)), commandBuffer);
-    }
-}
-
-final class OnBlockTick__Component<T extends Component<ChunkStore>> extends OnBlockTick {
-
-    private final ComponentType<ChunkStore, T> componentType;
-
-    protected OnBlockTick__Component(ComponentType<ChunkStore, T> componentType) {
-        super(Query.and(componentType));
-        this.componentType = componentType;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public final void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ChunkStore> archetypeChunk,
-        Store<ChunkStore> store,
-        CommandBuffer<ChunkStore> commandBuffer
-    ) {
-        var ref = new BlockRef(archetypeChunk.getReferenceTo(index));
-
-        var component = (IOnBlockTick) ref.getComponent(componentType);
-        if (component == null) {
-            return;
-        }
-
-        component.onBlockTick(ref, commandBuffer);
     }
 }

@@ -1,10 +1,12 @@
 package dev.twunk.interfaces.events;
 
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.lib.TickPlan;
 import javax.annotation.Nullable;
 
@@ -55,4 +57,12 @@ public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> {
      * want this.
      */
     public String getId();
+
+    public interface IOnScheduledTick__Component<
+        ECS_TYPE extends WorldProvider
+    > extends IOnScheduledTick<ECS_TYPE>, Component<ECS_TYPE> {}
+
+    public interface IOnScheduledTick__IQuery<
+        ECS_TYPE extends WorldProvider
+    > extends IOnScheduledTick<ECS_TYPE>, IQuery<ECS_TYPE> {}
 }

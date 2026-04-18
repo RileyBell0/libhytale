@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.hytale.system.ignoreme.OnWorldTick__Listener;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnWorldTick;
 import dev.twunk.interfaces.methods.IQuery;
@@ -102,33 +103,5 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
             query,
             registry
         );
-    }
-}
-
-final class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> extends OnWorldTick<ECS_TYPE> {
-
-    private final IOnWorldTick<ECS_TYPE> listener;
-
-    protected OnWorldTick__Listener(
-        IOnWorldTick<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
-    ) {
-        super(query, registry);
-        this.listener = listener;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public final void tick(
-        final float dt,
-        final ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        final Store<ECS_TYPE> store,
-        final CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        this.listener.onWorldTick(dt, archetypeChunk, store, commandBuffer);
     }
 }

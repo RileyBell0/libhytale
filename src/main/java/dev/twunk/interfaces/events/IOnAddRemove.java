@@ -2,11 +2,13 @@ package dev.twunk.interfaces.events;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.OnAddRemove;
+import dev.twunk.interfaces.methods.IQuery;
 
 /**
  * Methods for my subsytem version of `RefSystem<ECS_Store>`
@@ -51,4 +53,12 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
         final RemoveReason reason,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {}
+
+    public interface IOnAddRemove__Component<
+        ECS_TYPE extends WorldProvider
+    > extends IOnAddRemove<ECS_TYPE>, Component<ECS_TYPE> {}
+
+    public interface IOnAddRemove__IQuery<
+        ECS_TYPE extends WorldProvider
+    > extends IOnAddRemove<ECS_TYPE>, IQuery<ECS_TYPE> {}
 }

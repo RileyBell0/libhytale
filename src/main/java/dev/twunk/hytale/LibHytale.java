@@ -9,8 +9,6 @@ import dev.twunk.hytale.component.TrashComponent;
 import dev.twunk.hytale.interaction.LogInteraction;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.hytale.interaction.SpawnItemInteraction;
-import dev.twunk.lib.ChunkRegisterProvider;
-import dev.twunk.lib.EntityRegisterProvider;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import dev.twunk.lib.test.TwunkDevTestComponent;
 import javax.annotation.Nullable;
@@ -78,6 +76,7 @@ public abstract class LibHytale {
      *          Types are stored on registration, thus, they're not there before
      *          registration...
      */
+    @Nullable
     public static <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getChunkComponentType(
         final Class<T> componentClass
     ) {

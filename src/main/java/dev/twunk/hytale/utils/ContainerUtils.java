@@ -95,6 +95,7 @@ public abstract class ContainerUtils {
 
         final UUID uuid = uuidComponent.getUuid();
         final WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(pos.x, pos.z));
+        @SuppressWarnings("removal")
         final ContainerBlockWindow window = new ContainerBlockWindow(
             pos.x,
             pos.y,
@@ -138,6 +139,7 @@ public abstract class ContainerUtils {
                 return;
             }
 
+            @SuppressWarnings("removal")
             final int rotationIndexx = chunk.getRotationIndex(pos.x, pos.y, pos.z);
             final Vector3d soundPosx = new Vector3d();
             blockType.getBlockCenter(rotationIndexx, soundPosx);
@@ -159,6 +161,7 @@ public abstract class ContainerUtils {
             return;
         }
 
+        @SuppressWarnings("removal")
         final int rotationIndex = chunk.getRotationIndex(pos.x, pos.y, pos.z);
         final Vector3d soundPos = new Vector3d();
         blockType.getBlockCenter(rotationIndex, soundPos);

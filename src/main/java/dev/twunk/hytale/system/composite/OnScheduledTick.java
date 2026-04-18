@@ -168,7 +168,7 @@ public abstract class OnScheduledTick<
     }
 }
 
-final class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends OnScheduledTick<ECS_TYPE> {
+class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends OnScheduledTick<ECS_TYPE> {
 
     private final IOnScheduledTick<ECS_TYPE> listener;
 
@@ -199,7 +199,7 @@ final class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends On
     }
 }
 
-final class OnScheduledTick__Component<
+class OnScheduledTick__Component<
     ECS_TYPE extends WorldProvider,
     T extends Component<ECS_TYPE>
 > extends OnScheduledTick<ECS_TYPE> {

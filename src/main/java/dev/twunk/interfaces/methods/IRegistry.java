@@ -1,5 +1,6 @@
 package dev.twunk.interfaces.methods;
 
+import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
@@ -35,11 +36,21 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         String id
     );
 
+    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
+        HytalePlugin plugin,
+        BuilderCodec<T> codec
+    );
+
+    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
+        HytalePlugin plugin,
+        Class<T> clazz
+    );
+
     public void registerSystem(HytalePlugin plugin, ISystem<ECS_TYPE> system);
 
-    public <T extends IQuery<ECS_TYPE>> void bindEventListeners(HytalePlugin plugin, T unknown);
+    public <T extends IQuery<ECS_TYPE>> void bindEventListeners(HytalePlugin plugin, T listener);
 
     // this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
     // without the query as thats just gonna be Query.and(componentType);
-    public <T extends Component<T>> void bindEventListeners(HytalePlugin plugin, Class<T> unknown);
+    public <T extends Component<ECS_TYPE>> void bindEventListeners(HytalePlugin plugin, Class<T> componentClass);
 }

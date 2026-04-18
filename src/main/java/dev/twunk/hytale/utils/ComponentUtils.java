@@ -35,6 +35,7 @@ public abstract class ComponentUtils {
     public static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT_TYPE =
         BlockStateInfo.getComponentType();
 
+    @SuppressWarnings("null")
     public static final ComponentType<ChunkStore, TwunkDevTestComponent> TWUNK_DEV_TEST_COMPONENT_TYPE =
         LibHytale.getChunkComponentType(TwunkDevTestComponent.class);
 

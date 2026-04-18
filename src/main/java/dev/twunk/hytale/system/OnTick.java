@@ -10,7 +10,8 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.HytalePlugin;
-import dev.twunk.hytale.refs.AnyRef;
+import dev.twunk.hytale.system.ignoreme.OnTick__Component;
+import dev.twunk.hytale.system.ignoreme.OnTick__Listener;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
@@ -112,70 +113,13 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     /**
      * Bound for T fully defined here
      */
-    public static <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & Component<ECS_TYPE>> OnTick<
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnTick<
         ECS_TYPE
-    > init(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    > newUninitialised(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(OnTick__Component.class, ComponentType.class, IRegistry.class),
             componentType,
             registry
         );
-    }
-}
-
-final class OnTick__Listener<ECS_TYPE extends WorldProvider> extends OnTick<ECS_TYPE> {
-
-    private final IOnTick<ECS_TYPE> listener;
-
-    protected OnTick__Listener(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
-        super(query, registry);
-        this.listener = listener;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    public final void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        listener.onTick(dt, new AnyRef<>(archetypeChunk.getReferenceTo(index)), commandBuffer);
-    }
-}
-
-final class OnTick__Component<ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> extends OnTick<ECS_TYPE> {
-
-    private final ComponentType<ECS_TYPE, T> componentType;
-
-    protected OnTick__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-        super(Query.and(componentType), registry);
-        this.componentType = componentType;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public final void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        var ref = new AnyRef<>(archetypeChunk.getReferenceTo(index));
-
-        @SuppressWarnings("unchecked")
-        var component = (IOnTick<ECS_TYPE>) ref.getComponent(componentType);
-        if (component == null) {
-            return;
-        }
-
-        component.onTick(dt, ref, commandBuffer);
     }
 }
