@@ -17,22 +17,34 @@ import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.lib.AutoBuilderCodec;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import javax.annotation.Nullable;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
 
+    private enum InferredECSType {
+        Unknown,
+        Chunk,
+        Entity,
+        SomeOtherTypeIDontKnow
+    }
+
     @SuppressWarnings("null")
-    private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+    private static final HytaleLogger console = HytaleLogger.forEnclosingClass();
 
     public HytalePlugin(final JavaPluginInit init) {
         super(init);
-        console.log("Initializing plugin " + this.getName());
+        console.atInfo().log("Initializing plugin " + this.getName());
         LibHytale.init(this);
     }
 
     @Override
     protected final void setup0() {
-        console.log("Setting up plugin " + this.getName());
+        console.atInfo().log("Setting up plugin " + this.getName());
         super.setup0();
     }
 
@@ -61,24 +73,239 @@ public abstract class HytalePlugin extends JavaPlugin {
      */
     public final void register(IQuery<?> instance) {}
 
+    @Nullable
+    public static final Class<?> getClassFromType(Type t) {
+        if (t instanceof Class) {
+            return (Class<?>) t;
+        } else if (t instanceof ParameterizedType) {
+            return (Class<?>) ((ParameterizedType) t).getRawType();
+        } else {
+            throw new RuntimeException("Pretty sure this state is impossible");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public static final Class<? extends Component<?>> getClassFromTypeIfExtendsComponent(Type t) {
+        Class<?> innerClass = getClassFromType(t);
+
+        if (!Component.class.isAssignableFrom(innerClass)) {
+            return null;
+        }
+
+        return (Class<? extends Component<?>>) innerClass;
+    }
+
+    @Nullable
+    private static final Type getFirstTypeArgThatExtendsComponent(Class<? extends Component<?>> clazz) {
+        for (var innerType : clazz.getGenericInterfaces()) {
+            if (innerType == null) {
+                throw new RuntimeException("Surprise null val in getGenericInterfaces");
+            }
+
+            Class<?> innerClass = getClassFromTypeIfExtendsComponent(innerType);
+            if (innerClass != null) {
+                return innerType;
+            }
+        }
+        throw new RuntimeException("Shouldn't happen if i got my logic right.askdfmawe");
+    }
+
+    private static final ArrayList<Type> buildHeirarchy(Class<? extends Component> componentClass) {
+        ArrayList<Type> heirarchy = new ArrayList<>();
+        var innerComponentClass = componentClass;
+
+        // until we get to the lowest level of Component.class we're going to keep going
+        while (innerComponentClass != Component.class && innerComponentClass != null) {
+            // Get the next type arg that gets us closer to Component
+            var innerType = getFirstTypeArgThatExtendsComponent((Class) innerComponentClass);
+            if (innerType == null) {
+                throw new RuntimeException("Failed to follow up the tree where <Component> comes from");
+            }
+
+            // SAVE that type arg
+            heirarchy.add(innerType);
+
+            // move onto that type arg and we'll loop to keep going up the tree
+            innerComponentClass = getClassFromTypeIfExtendsComponent(innerType);
+            if (innerComponentClass == null) {
+                throw new RuntimeException(
+                    "Failed to get class of type " + innerType + " | rileys debug code: iasdfoawef"
+                );
+            }
+        }
+
+        return heirarchy;
+    }
+
+    private static final ArrayList<ParameterizedType> reverseAndTrimTypeHeirarchy(ArrayList<Type> heirarchy) {
+        var reversed = new ArrayList<ParameterizedType>();
+        for (var i = heirarchy.size() - 1; i >= 0; i--) {
+            if (!(heirarchy.get(i) instanceof ParameterizedType)) {
+                break;
+            }
+            reversed.add((ParameterizedType) heirarchy.get(i));
+        }
+        return reversed;
+    }
+
+    @Nullable
+    private static final InferredECSType inferECSTypeForComponent(Class<?> clazz) {
+        var interfaceTypes = clazz.getGenericInterfaces();
+        for (var currType : interfaceTypes) {
+            if (currType == null) {
+                throw new RuntimeException("not sure why but curr type is null");
+            }
+
+            var interfaceClass = (Class) getClassFromTypeIfExtendsComponent(currType);
+            if (interfaceClass == null) {
+                continue;
+            }
+
+            // Get the heirarchy ABOVE this place
+            ArrayList<Type> heirarchy = new ArrayList<>();
+            heirarchy.add(currType);
+            if (interfaceClass == Component.class) {
+                heirarchy.addAll(buildHeirarchy(interfaceClass));
+            }
+
+            // before we process it, we'll check if the base class is a raw type
+            var componentType = heirarchy.get(heirarchy.size() - 1);
+            if (componentType instanceof Class && componentType == Component.class) {
+                return InferredECSType.Unknown;
+            }
+
+            // flip it and trim the bloated extra subclasses that give us no information
+            var reversed = reverseAndTrimTypeHeirarchy(heirarchy);
+            if (reversed.size() == 0) {
+                throw new RuntimeException("not sure why but reversed size was 0");
+            }
+
+            // No matter what there SHOULD be a type in the first spot.
+            var componentArgs = reversed.removeFirst().getActualTypeArguments();
+            if (componentArgs.length == 0) {
+                throw new RuntimeException(
+                    "This shouldn't be possible, we must have a Component<> in the first slot by now due to prior guards"
+                );
+            }
+            var typeVarInComponent = componentArgs[0];
+            var typeVarReceivedByComponent = typeVarInComponent;
+            if (!(typeVarInComponent instanceof TypeVariable)) {
+                // incredibly, raw types of Component fallback to using ChunkStore somehow, idk how but i'll take it
+                typeVarReceivedByComponent = typeVarInComponent;
+            } else {
+                // in the case that we weren't lucky enough to have the type hard-coded as a given ECSStore for us
+                // we'll look backwards until we can either determine what one to use, or give up
+                for (var nextInHeirarchy : reversed) {
+                    // Join 1x way up the tree towards component
+                    var typeParamsForBaseClass = ((Class<?>) nextInHeirarchy.getRawType()).getTypeParameters();
+                    var typeArgsReceivedByOurImplementationOfBaseClass = nextInHeirarchy.getActualTypeArguments();
+                    for (var j = 0; j < typeParamsForBaseClass.length; j++) {
+                        var nameSeenByChild = typeParamsForBaseClass[j];
+
+                        if (nameSeenByChild == typeVarReceivedByComponent) {
+                            typeVarReceivedByComponent = typeArgsReceivedByOurImplementationOfBaseClass[j];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (typeVarReceivedByComponent == null || typeVarReceivedByComponent instanceof TypeVariable) {
+                return InferredECSType.Unknown;
+            } else {
+                Class<?> a = getClassFromType(typeVarReceivedByComponent);
+                if (a == null) {
+                    throw new RuntimeException("THIS SHOULD NOT HAPPEN");
+                } else if (a == ChunkStore.class) {
+                    return InferredECSType.Chunk;
+                } else if (a == EntityStore.class) {
+                    return InferredECSType.Entity;
+                } else {
+                    return InferredECSType.SomeOtherTypeIDontKnow;
+                }
+            }
+        }
+        return InferredECSType.Unknown;
+    }
+
     /**
      * Register event listeners for components of the given type. Note: this will
      * setup systems to call the methods defined ON your component of type T
      *
      * classOfYourComponentThatImplementsEventListenerMethodsThatICanCall
      */
-    @SuppressWarnings("unchecked")
-    public final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void register(Class<T> clazz) {
-        // first: check what places i should be registering this
-        var isCommon = false;
-        var isChunk = true;
-        var isEntity = false;
+    public final <ECS_TYPE extends WorldProvider, T> void register(Class<T> clazz) {
+        if (Interaction.class.isAssignableFrom(clazz)) {
+            @SuppressWarnings("unchecked")
+            var asInteraction = (Class<? extends Interaction>) clazz;
 
-        if (isCommon || isChunk) {
-            LibHytale.CHUNK_REGISTRY.bindEventListeners(this, (Class<Component<ChunkStore>>) clazz);
+            this.registerInteraction(asInteraction);
         }
-        if (isCommon || isEntity) {
-            LibHytale.ENTITY_REGISTRY.bindEventListeners(this, (Class<Component<EntityStore>>) clazz);
+
+        if (Component.class.isAssignableFrom(clazz)) {
+            registerComponent((Class) clazz);
+        }
+    }
+
+    public final <ECS_TYPE extends WorldProvider, T extends Component<?>> void registerComponent(Class<T> clazz) {
+        var inferred = inferECSTypeForComponent(clazz);
+        if (inferred == null) {
+            console.atSevere().log(" ->| FAILED TO INFER ECS type of " + inferred + " | for class | " + clazz);
+            console.atSevere().log("  >| COMPONENT WAS NOT ADDED TO ANY REGISTRY");
+            return;
+        }
+
+        switch (inferred) {
+            case InferredECSType.Entity:
+                console
+                    .atInfo()
+                    .log(
+                        " ->| INFERRED ECS type  " +
+                            String.format("%-8s", "<" + inferred + ">") +
+                            "  for " +
+                            clazz.getSimpleName() +
+                            " (" +
+                            clazz +
+                            ")"
+                    );
+                LibHytale.ENTITY_REGISTRY.bindEventListeners(this, (Class) clazz);
+                break;
+            case InferredECSType.Chunk:
+                console
+                    .atInfo()
+                    .log(
+                        " ->| INFERRED ECS type  " +
+                            String.format("%-8s", "<" + inferred + ">") +
+                            "  for " +
+                            clazz.getSimpleName() +
+                            " (" +
+                            clazz +
+                            ")"
+                    );
+                LibHytale.CHUNK_REGISTRY.bindEventListeners(this, (Class) clazz);
+                break;
+            case InferredECSType.Unknown:
+                console
+                    .atWarning()
+                    .log(" ->| INFERRED ECS type  <Common> for " + clazz.getSimpleName() + " (" + clazz + ")");
+                LibHytale.ENTITY_REGISTRY.bindEventListeners(this, (Class) clazz);
+                LibHytale.CHUNK_REGISTRY.bindEventListeners(this, (Class) clazz);
+                break;
+            default:
+                console
+                    .atSevere()
+                    .log(
+                        " ->| FAILED TO INFER ECS type of " +
+                            inferred +
+                            " for " +
+                            clazz.getSimpleName() +
+                            "(" +
+                            clazz +
+                            ")"
+                    );
+                console.atSevere().log("  >| COMPONENT WAS NOT ADDED TO ANY REGISTRY");
+                break;
         }
     }
 
@@ -140,7 +367,9 @@ public abstract class HytalePlugin extends JavaPlugin {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
 
-        console.log("Adding component " + defaultId + " -- from class " + clazz);
+        console
+            .atInfo()
+            .log("Adding component for class " + clazz.getSimpleName() + " (" + clazz + ", " + defaultId + ")");
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }
@@ -190,7 +419,9 @@ public abstract class HytalePlugin extends JavaPlugin {
     ) {
         final Class<T> myClass = codec.getInnerClass();
 
-        console.log("Adding Interaction " + id + " -- from class " + myClass);
+        console
+            .atInfo()
+            .log("Adding Interaction for class " + myClass.getSimpleName() + " (" + myClass + ", " + id + ")");
 
         return this.getCodecRegistry(Interaction.CODEC).register(id, myClass, codec);
     }
