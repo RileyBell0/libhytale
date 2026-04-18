@@ -37,7 +37,9 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     public void registerSystem(HytalePlugin plugin, ISystem<ECS_TYPE> system);
 
-    public <T extends Component<T>> void bindEventListeners(HytalePlugin plugin, Class<T> unknown);
-
     public <T extends IQuery<ECS_TYPE>> void bindEventListeners(HytalePlugin plugin, T unknown);
+
+    // this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
+    // without the query as thats just gonna be Query.and(componentType);
+    public <T extends Component<T>> void bindEventListeners(HytalePlugin plugin, Class<T> unknown);
 }

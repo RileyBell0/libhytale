@@ -12,15 +12,12 @@ import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.annotations.EventRunners;
 import dev.twunk.annotations.Serializable;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnBlockTick;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.lib.AutoBuilderCodec;
-import java.util.Arrays;
-import java.util.HashSet;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
@@ -93,29 +90,26 @@ public abstract class HytalePlugin extends JavaPlugin {
         //     defaultId,
         //     codec
         // );
-
         // look for event annotations on it
-        EventRunners.Chunk chunkEvents = clazz.getAnnotation(EventRunners.Chunk.class);
-        if (chunkEvents == null) {
-            return;
-        }
-
-        var listeners = new HashSet<>(Arrays.asList(chunkEvents.value()));
-        for (@SuppressWarnings("unused")
-        var eventListenerType : listeners) {}
+        // EventRunners.Chunk chunkEvents = clazz.getAnnotation(EventRunners.Chunk.class);
+        // if (chunkEvents == null) {
+        //     return;
+        // }
+        // var listeners = new HashSet<>(Arrays.asList(chunkEvents.value()));
+        // for (@SuppressWarnings("unused")
+        // var eventListenerType : listeners) {}
     }
 
     private final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void addEntityEventListeners(
         Class<T> clazz
     ) {
-        EventRunners.Entity entityEvents = clazz.getAnnotation(EventRunners.Entity.class);
-        if (entityEvents == null) {
-            return;
-        }
-
-        var listeners = new HashSet<>(Arrays.asList(entityEvents.value()));
-        for (@SuppressWarnings("unused")
-        var eventListenerType : listeners) {}
+        // EventRunners.Entity entityEvents = clazz.getAnnotation(EventRunners.Entity.class);
+        // if (entityEvents == null) {
+        //     return;
+        // }
+        // var listeners = new HashSet<>(Arrays.asList(entityEvents.value()));
+        // for (@SuppressWarnings("unused")
+        // var eventListenerType : listeners) {}
     }
 
     /**
