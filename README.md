@@ -2,26 +2,30 @@
 
 A library for modding [Hytale](https://hytale.com/) server-side code.
 
-No AI was harmed in the making of this project.
+## TODO
+<details>
+  <summary><u><i><b>↓ What i'm working on ↓</b></i></u></summary>
 
-## The "Why"
-
-Hytale's server side code (as of 31/03/2026) has no comments, making learning their systems a lengthy process for programmers entering into their ecosystem.
-
-This library serves to provide **documented** and **tested** utilities to make your journey coding within Hytale far easier.
-
-> [!NOTE]
-> ## TODO
-> 
+> [!NOTE] TODO
 > ### Docs
 > - Add some side-by-side examples here
-> - Add an example for the same poison system example they've got in the hytale docs
+>   - Add an example for the same poison system example they've got in the hytale docs
+>   - THEN add a side by side of what from the old system goes where, the boilerplate my stuff removes and the ease of use and understanding it can provide when ive got it documented properly
+> - learn JavaDoc and get my shit fixed up
 >
-> ### Features / Fixes
-> - Fix up the LogInteraction and such's codecs - need to support nested ish codecs you see, or rather probably just need to fix up logInteraction to actually use multiple classes
-> - Add onBlockBreak, onBlockAdd (etc) event handlers as subsystems. The overall goal is to figure out an "onBlockUpdate" subsystem
+> ### Fixes
 > - Fix ScheduledTickSystem
 > - The team just added an `ItemContainerBlock` component, probably need to update my container utils to suit. might be able to extend that directly for containers
+> 
+> ### Features 
+> - Alter my inferECSType method to also
+>   - check the super type of a class that i receive for if IT implements component/interaction where i don't. Equally need to propgate this up all the way to Object
+>   - go through ALL interfaces defined on the class, not just the first one that extends component, as there's a chance someone might implement "Component" twice, once as a raw type or ECS_TYPE kinda thing, and another as an actual definition, meaning i can go until i find the first well defined component, or fallback to the first not-well-defined Component (e.g. raw type)
+> - Test my Component.class inference system (inferECSType or whatever i called it) with instances of an object. the idea is: if you pass an instance of the object i'll register events TO it, if you pass the class i'll register events that will find the relevant component and call it on that
+> - thus, i also need to make sure that i record which classes i've done this for already such that if you pass me several copies of an instance of a given system/object/whatever then i won't try and register the class again (e.g. imagine it extends component but its also a useful system? seems unlikely, but, its an edge case nonetheless so i must fix it eventually)
+>
+> ### Stretch goals
+> - Add onBlockBreak, onBlockAdd (etc) event handlers as subsystems. The overall goal is to figure out an "onBlockUpdate" subsystem. this is a stretch goal because i so cbf rn
 > ```java
 > /**
 >  * TODO add a "timeout" for trash inventories, so when you CLOSE the inventory i go "ok yeah i get you, you
@@ -32,8 +36,20 @@ This library serves to provide **documented** and **tested** utilities to make y
 >  * and resume the countdown when you close the trash
 >  */
 > ```
-> ### Stretch goals
-> - Fix up my definitions so they only NEED anything of type Object, because, well, theoretically i want my functions to just work and figure stuff out based on the props and interfaces something has, something that REALLY doesn't need annotations to work, so, may as well just make it work. Importantly, this means if you EXTEND component -> we're good, i'll register you as a component, if you DON'T extend component, i'll just not register you. Really i should ONLY throw exceptions or rather blocks of warnings for "you tried to register objects but nothing happened"
+</details>
+
+## The "Why"
+
+Hytale's server side code (as of 31/03/2026) has no comments, making learning their systems a lengthy process for programmers entering into their ecosystem.
+
+This library serves to provide **documented** and **tested** utilities to make your journey coding within Hytale far easier.
+
+> [!NOTE] i take it back, this is alot more than that
+> really its become a library about two things
+> - codecs, making codecs easy
+> - events. redefining systems as instead "observable" things you can listen to, kind of. you still need to define systems and such since its query based BUT doing so is a whole lot easier with you being able to define HOW and WHAT you want to listen to within your class definition itself by simply implementing the interface for the given event listener. WAY easier than before, all works through the same handler too, just gotta actually you know, finish this project and get it out there. ok. finish is a strong word, but, you know, get a 1.0.0 out that i can then fix bugs and docs and such later
+>
+> TODO: my release of it should include a few example mods, some staples we haven't had made yet to show how easy it is, and some dumb stuff, should be easy as long as i can come up with some ideas to throw at the systems
 
 Hytale is designed around Entity Component Systems (ECS), meaning you've got Entities (anything in a world) that has Components (data). To then run code and respond to events on these you have Systems.
 
@@ -51,29 +67,35 @@ then you'd have to register all three into the right stores, etc, etc.
 
 It's a pain.
 
-So, instead of all that junk now you can define (for simple cases such as this example)
+So, instead of all that junk now you can define
 ```java
-@Serializable
-public class Example extends IOnAddRemoveComponent, IBlockTickComponent {
-    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+// TODO allow lack of @Serializable tag BUT throw a Warning in the cases i mention in the next comment. Cause, yeah i can just make a default empty codec that's fine, just, please throw a warning so people add it, have it throw that warning by default and make a note that you CAN turn it off once you know what you're doing, but get in the habit of using it now and remove it for useless cases later
+// importantly you can skip the @Serializable tag if you have a default constructor and no fields that aren't static. but if you DON'T have a default constructor OR you have fields that aren't static i'll at least throw a warning
+// @Serializable
+public class Example extends IOnAddRemove<ChunkStore>, IOnBlockTick {
 
     public void onEntityAdded(AnyRef<ChunkStore> ref, AddReason reason, CommandBuffer<ChunkStore> commandBuffer) {
-        LOGGER.atInfo.log("Added new example entity");
+        // your code here
     }
 
     public void onBlockTick(BlockRef blockRef, CommandBuffer<ChunkStore> commandBuffer) {
-        ItemUtils.spawn(blockRef, commandBuffer, blockRef.getGlobalCoords(), new ItemStack("Soil_Grass", 1));
+        // e.g. spawning an item every tick
+        // ItemUtils.spawn(blockRef, commandBuffer, blockRef.getGlobalCoords(), new ItemStack("Soil_Grass", 1));
     }
 
     public void onEntityRemove(AnyRef<ChunkStore> ref, RemoveReason reason, CommandBuffer<ChunkStore> commandBuffer) {
-        LOGGER.atInfo.log("Removed example entity");
+        // your other code here
     }
+
+    // TODO have my component also be allowed to extend ISystem so that it can provide the getQuery, getGroup etc etc. meaning, yeah... idk... code required ahead and a slight rework of all the event drivers so that they can take an ISystem in for config reasons, or rather, suppliers of that stuff? fuck idk, yeah, maybe just methods on them for "setGroup" and shit before you build, so maybe i make a builder for them? yeah a builder for each one would be neat, then i can within my OWN code be quite strict about it but then again, fuck it, its my own code? who cares? its literally gonna be used like twice in my codebase and if someone runs into it i just have to have some decent comments. i'll just, yeah fuck it. i'll hardcode it in maybe idk.
 }
 ```
+and BOOM, it works! yeah this is pretty neat.
+
 
 Then in your plugin you run
-```
-this.registerChunkComponent(Example.class);
+```java
+this.register(Example.class);
 ```
 
 In my opinion that seems, alot easier
@@ -105,6 +127,11 @@ There's
 - Working with tick procedures (i believe they're deprecated? not sure...)
 
 Mainly there's subsystems. Subsystems are really the "killer app" of this library, that and the registration process i've got alongside the auto-codec-generation system
+
+> [!NOTE] wow, that ^^ reads like ai, i think its just the quotes haha, ive got to get more sleep. future riley: remember to rewrite all ohyeah
+> // TODO
+>
+> future riley come back here and fix up the readme, it all talks about subsystems too but i've moved it to events which, highkey, is STILL subsystems, just with a different (and optional) interface. plus, this in no way stops us doing anythign else or anyting extra alongside our current code, it literally just makes it possible to also OPT IN to this system and this library's way of doing things where that makes sense
 
 Basically, my goal was, if i've got system-like code - i want it all in the same file. It's WAY easier to debug/code stuff if you can see it all at the same time
 
