@@ -251,64 +251,28 @@ public abstract class HytalePlugin extends JavaPlugin {
     public final <ECS_TYPE extends WorldProvider, T extends Component<?>> void registerComponent(Class<T> clazz) {
         var inferred = inferECSTypeForComponent(clazz);
         if (inferred == null) {
-            console
-                .atSevere()
-                .log(
-                    " ->| FAILED TO INFER ECS type of " + inferred + " for " + clazz.getSimpleName() + "(" + clazz + ")"
-                );
-            console.atSevere().log("  >| COMPONENT WAS NOT ADDED TO ANY REGISTRY");
+            console.atSevere().log(" >FAILED TO INFER ECS type. Got null.");
+            console.atSevere().log(" >COMPONENT WAS NOT ADDED TO ANY REGISTRY");
             return;
         }
 
         switch (inferred) {
             case InferredECSType.Entity:
-                console
-                    .atInfo()
-                    .log(
-                        " ->| INFERRED ECS type  " +
-                            String.format("%-8s", "<" + inferred + ">") +
-                            "  for " +
-                            clazz.getSimpleName() +
-                            " (" +
-                            clazz +
-                            ")"
-                    );
+                console.atInfo().log(" > [INFERRED] ECS type  <" + inferred + ">");
                 LibHytale.ENTITY_REGISTRY.bindEventListeners(this, (Class) clazz);
                 break;
             case InferredECSType.Chunk:
-                console
-                    .atInfo()
-                    .log(
-                        " ->| INFERRED ECS type  " +
-                            String.format("%-8s", "<" + inferred + ">") +
-                            "  for " +
-                            clazz.getSimpleName() +
-                            " (" +
-                            clazz +
-                            ")"
-                    );
+                console.atInfo().log(" > [INFERRED] ECS type  <" + inferred + ">");
                 LibHytale.CHUNK_REGISTRY.bindEventListeners(this, (Class) clazz);
                 break;
             case InferredECSType.Unknown:
-                console
-                    .atWarning()
-                    .log(" ->| INFERRED ECS type  <Common> for " + clazz.getSimpleName() + " (" + clazz + ")");
+                console.atWarning().log(" > [INFERRED] ECS type  <Common>");
                 LibHytale.ENTITY_REGISTRY.bindEventListeners(this, (Class) clazz);
                 LibHytale.CHUNK_REGISTRY.bindEventListeners(this, (Class) clazz);
                 break;
             default:
-                console
-                    .atSevere()
-                    .log(
-                        " ->| FAILED TO INFER ECS type of " +
-                            inferred +
-                            " for " +
-                            clazz.getSimpleName() +
-                            "(" +
-                            clazz +
-                            ")"
-                    );
-                console.atSevere().log("  >| COMPONENT WAS NOT ADDED TO ANY REGISTRY");
+                console.atSevere().log(" > FAILED TO INFER ECS type of " + inferred);
+                console.atSevere().log(" > COMPONENT WAS NOT ADDED TO ANY REGISTRY");
                 break;
         }
     }
@@ -371,9 +335,8 @@ public abstract class HytalePlugin extends JavaPlugin {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
 
-        console
-            .atInfo()
-            .log("Adding component for class " + clazz.getSimpleName() + " (" + clazz + ", " + defaultId + ")");
+        console.atInfo().log("COMPONENT  " + clazz.getSimpleName());
+        console.atInfo().log(" --ID:     " + defaultId);
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }
@@ -423,9 +386,9 @@ public abstract class HytalePlugin extends JavaPlugin {
     ) {
         final Class<T> myClass = codec.getInnerClass();
 
-        console
-            .atInfo()
-            .log("Adding Interaction for class " + myClass.getSimpleName() + " (" + myClass + ", " + id + ")");
+        console.atInfo().log("INTERACTION \"" + myClass.getName() + "\"");
+        console.atInfo().log(" -- Class: \"" + myClass.getSimpleName() + "\"");
+        console.atInfo().log(" -- ID:    \"" + id + "\"");
 
         return this.getCodecRegistry(Interaction.CODEC).register(id, myClass, codec);
     }

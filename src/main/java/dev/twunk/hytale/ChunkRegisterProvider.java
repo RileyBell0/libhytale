@@ -102,7 +102,8 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         final Class<T> clazz = codec.getInnerClass();
         final var defaultId = clazz.getName();
 
-        console.log("Adding component for class " + clazz.getSimpleName() + " (" + clazz + ", " + defaultId + ")");
+        console.log("COMPONENT  " + clazz.getSimpleName());
+        console.log(" --ID:     " + defaultId);
         if (defaultId == null) {
             throw new RuntimeException("Failed to get classname while registering component with codec " + codec);
         }
