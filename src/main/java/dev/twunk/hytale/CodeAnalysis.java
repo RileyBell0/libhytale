@@ -1,6 +1,5 @@
 package dev.twunk.hytale;
 
-import java.lang.reflect.GenericSignatureFormatError;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -46,27 +45,30 @@ public class CodeAnalysis {
         return (Class<? extends T>) innerClass;
     }
 
-    @Nullable
-    private static final <T> Type getFirstTypeArgThatExtendsProvidedClass(Class<T> clazz, Class<? extends T> subclass) {
-        for (var innerType : subclass.getGenericInterfaces()) {
-            if (innerType == null) {
-                // yeah so if this happens you're in trouble for giving me a shitty class, not sure what causes this to happen, as i've never run into it
-                throw new GenericSignatureFormatError(
-                    "Null val in getGenericInterfaces whilst processing class (" +
-                        clazz +
-                        ") for subclass (" +
-                        subclass +
-                        ")"
-                );
+    private static final <T> ArrayList<ParameterizedType> getAllTypeArgsThatExtendsProvidedClass(
+        Type[] types,
+        Class<T> subclass
+    ) {
+        var res = new ArrayList<ParameterizedType>();
+        for (var val : types) {
+            if (val == null) {
+                // warning - not sure when this can happen or even if it can happen
+                continue;
             }
 
-            Class<?> innerClass = getClassFromTypeIfSubtypeOfProvidedClass(clazz, innerType);
-            if (innerClass != null) {
-                return innerType;
+            Class<?> classOfType = getClassFromType(val);
+            if (classOfType == null) {
+                continue;
             }
+
+            if (!subclass.isAssignableFrom(classOfType)) {
+                continue;
+            }
+
+            res.add((ParameterizedType) val);
         }
 
-        return null;
+        return res;
     }
 
     /**
@@ -87,7 +89,7 @@ public class CodeAnalysis {
         // the parent `clazz`
         while (innerSubClass != clazz && innerSubClass != null) {
             // Get the next type arg that gets us closer to clazz
-            var innerType = getFirstTypeArgThatExtendsProvidedClass(clazz, innerSubClass);
+            var innerType = getAllTypeArgsThatExtendsProvidedClass(innerSubClass.getGenericInterfaces(), clazz).get(0);
             if (innerType == null) {
                 throw new RuntimeException("Failed to follow up the tree where <" + clazz + "> comes from");
             }
