@@ -1,4 +1,4 @@
-package dev.twunk;
+package dev.twunk.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

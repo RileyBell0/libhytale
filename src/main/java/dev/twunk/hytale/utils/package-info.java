@@ -1,2 +1,2 @@
-@dev.twunk.EverythingIsNonnullByDefault
+@dev.twunk.annotations.EverythingIsNonnullByDefault
 package dev.twunk.hytale.utils;
