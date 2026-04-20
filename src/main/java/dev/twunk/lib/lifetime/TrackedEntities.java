@@ -148,7 +148,7 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
     }
 
     // TODO think i might have to do different ones for each registry
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" })
     public static final <ECS_TYPE extends WorldProvider> ComponentType<
         ECS_TYPE,
         INTERNAL_TickSchedulerComponent<ECS_TYPE>
