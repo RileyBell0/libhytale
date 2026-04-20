@@ -160,6 +160,20 @@ public class CodeAnalysis {
         return reversed;
     }
 
+    public static final <T> boolean hasInterfaceThatExtendsClass(Class<T> clazz, Class<? extends T> subClass) {
+        var interfaceClasses = subClass.getInterfaces();
+        for (var currClass : interfaceClasses) {
+            if (currClass == null) {
+                throw new RuntimeException("not sure why but curr type is null");
+            }
+
+            if (clazz.isAssignableFrom(currClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Returned value is not constrained by T directly, its constrained by the generic
      * args T can accept, e.g. if T is
