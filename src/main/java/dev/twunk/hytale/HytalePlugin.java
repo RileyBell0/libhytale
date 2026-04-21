@@ -81,6 +81,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     public final <ECS_TYPE extends WorldProvider, T extends Component<?>> void registerComponent(Class<T> clazz) {
+        // seriously i know ive got so many commits on this now but omg oh my GOD this works, fuck YES
         var inferred = CodeAnalysis.inferTypeReceivedByGenericInClassT(Component.class, clazz);
 
         if (inferred == null) {
