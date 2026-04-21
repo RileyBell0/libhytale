@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * I've got this filled with runtime exceptions atm since its just used in server startup
@@ -68,14 +67,14 @@ public class CodeAnalysis {
         if (clazz.getName() != "dev.twunk.plugin.tests.TestBlockRefComponent") {
             return new AnalysisReturn();
         }
-        var finalRes = new AnalysisReturn();
+        var searchRes = new AnalysisReturn();
         logit("Analysing " + clazz + " to (" + componentClass + ")");
 
         var superClass = componentClass.getGenericSuperclass();
 
         if (superClass != null) {
             logit("- " + clazz + " has superclass " + superClass);
-            finalRes.append(analyzeType(componentClass, index, superClass));
+            searchRes.append(analyzeType(componentClass, index, superClass));
         } else {
             logit("- No superclass");
         }
@@ -87,12 +86,15 @@ public class CodeAnalysis {
 
             var interfaceRes = analyzeType(componentClass, index, val);
             logit("- Returned: " + interfaceRes);
-            finalRes.append(interfaceRes);
+            searchRes.append(interfaceRes);
         }
 
-        // finally, need to analyse results
-        logit(finalRes.toString());
-        return finalRes;
+        logit(searchRes.toString());
+
+        // finally, need to analyse results. Gotta join everything in current onto self then return results, the parent will filter so that i can just figure it out later
+        // NOTE: ive tried joining it back onto the parent but there's no need since getActualTypeArguments will return any type arguments passed through to here anyway. so. yeah. we're already good to go.
+
+        return searchRes;
     }
 
     private static final AnalysisReturn analyzeType(Class<?> componentClass, int index, Type type) {
@@ -110,6 +112,7 @@ public class CodeAnalysis {
             var res = new AnalysisReturn();
             var val = (ParameterizedType) type;
             res.current.add(val.getActualTypeArguments()[index]);
+            res.allSeen.add(val.getActualTypeArguments()[index]);
             logit("FOUND CLASS!!!  " + clazz);
 
             logindent -= 2;
@@ -139,6 +142,7 @@ public class CodeAnalysis {
         // we'll keep track of all the promising generics we've lost along the way
         var res = new AnalysisReturn();
         res.lost.addAll(subSearchRes.lost);
+        res.allSeen.addAll(subSearchRes.allSeen);
         if (!(type instanceof ParameterizedType)) {
             res.lost.addAll(subSearchRes.current);
             logindent -= 2;
@@ -234,6 +238,7 @@ public class CodeAnalysis {
                 System.out.println("DID NOT FIND GENERIC AAAH " + subClassGeneric);
             } else {
                 res.current.add(foundGeneric);
+                res.allSeen.add(foundGeneric);
             }
         }
 
@@ -266,6 +271,9 @@ public class CodeAnalysis {
         allRes.addAll(prediction.current);
         allRes.addAll(prediction.finalised);
         allRes.addAll(prediction.lost);
+        allRes.addAll(prediction.allSeen);
+
+        // First, i need to join current onto the
         // if (!(type instanceof ParameterizedType)) {
         //     var t = subSearchRes.current.toArray(Type[]::new)[0];
         //     if (t instanceof TypeVariable) {
@@ -297,11 +305,13 @@ class AnalysisReturn {
     public Set<Type> finalised = new HashSet<>();
     public Set<Type> current = new HashSet<>();
     public Set<Type> lost = new HashSet<>();
+    public Set<Type> allSeen = new HashSet<>();
 
     public AnalysisReturn append(AnalysisReturn other) {
         this.current.addAll(other.current);
         this.lost.addAll(other.lost);
         this.finalised.addAll(other.finalised);
+        this.allSeen.addAll(other.allSeen);
         return this;
     }
 
@@ -320,6 +330,11 @@ class AnalysisReturn {
         res += "], ";
         res += "lost: [ ";
         for (var val : this.lost) {
+            res += val + ", ";
+        }
+        res += "], ";
+        res += "allSeen: [ ";
+        for (var val : this.allSeen) {
             res += val + ", ";
         }
         res += "]";
