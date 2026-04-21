@@ -1,11 +1,10 @@
 package dev.twunk.hytale;
 
 import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -21,20 +20,6 @@ import javax.annotation.Nullable;
  * a more thorough passover at the end of this project
  */
 public class CodeAnalysis {
-
-    public static int logindent = 0;
-
-    public static String prefix() {
-        var res = "";
-        for (var i = 0; i < logindent / 2; i++) {
-            res += "   | ";
-        }
-        return res;
-    }
-
-    public static void logit(String msg) {
-        System.out.println(prefix() + msg);
-    }
 
     @Nullable
     public static final Class<?> getClassFromType(Type t) {
@@ -64,32 +49,18 @@ public class CodeAnalysis {
     }
 
     private static final AnalysisReturn analyzeClass(Class<?> componentClass, int index, Class<?> clazz) {
-        if (clazz.getName() != "dev.twunk.plugin.tests.TestBlockRefComponent") {
-            return new AnalysisReturn();
-        }
         var searchRes = new AnalysisReturn();
-        logit("Analysing " + clazz + " to (" + componentClass + ")");
-
-        var superClass = componentClass.getGenericSuperclass();
-
+        var superClass = clazz.getGenericSuperclass();
         if (superClass != null) {
-            logit("- " + clazz + " has superclass " + superClass);
             searchRes.append(analyzeType(componentClass, index, superClass));
-        } else {
-            logit("- No superclass");
         }
         for (var val : clazz.getGenericInterfaces()) {
             if (val == null) {
                 continue;
             }
-            logit("- Type param: " + val);
 
-            var interfaceRes = analyzeType(componentClass, index, val);
-            logit("- Returned: " + interfaceRes);
-            searchRes.append(interfaceRes);
+            searchRes.append(analyzeType(componentClass, index, val));
         }
-
-        logit(searchRes.toString());
 
         // finally, need to analyse results. Gotta join everything in current onto self then return results, the parent will filter so that i can just figure it out later
         // NOTE: ive tried joining it back onto the parent but there's no need since getActualTypeArguments will return any type arguments passed through to here anyway. so. yeah. we're already good to go.
@@ -98,12 +69,9 @@ public class CodeAnalysis {
     }
 
     private static final AnalysisReturn analyzeType(Class<?> componentClass, int index, Type type) {
-        logindent += 2;
-        logit("TYPE: " + type);
         // figure out the underlying class of the type
         Class<?> clazz = getClassFromType(type);
         if (clazz == null) {
-            logindent -= 2;
             return new AnalysisReturn();
         }
 
@@ -113,24 +81,18 @@ public class CodeAnalysis {
             var val = (ParameterizedType) type;
             res.current.add(val.getActualTypeArguments()[index]);
             res.allSeen.add(val.getActualTypeArguments()[index]);
-            logit("FOUND CLASS!!!  " + clazz);
 
-            logindent -= 2;
             return res;
         }
 
         // recursively search through each interface defined on our class
         var subSearchRes = new AnalysisReturn();
-        logit("Analysing interfaces on " + clazz);
         for (var val : clazz.getGenericInterfaces()) {
             if (val == null) {
                 continue;
             }
 
-            logit("  Analysing " + val);
-            var asdf = analyzeType(componentClass, index, val);
-            logit("  RETURNED " + asdf);
-            subSearchRes.append(asdf);
+            subSearchRes.append(analyzeType(componentClass, index, val));
         }
 
         // also recursively search up to the next superclass (and its interfaces etc etc)
@@ -145,7 +107,6 @@ public class CodeAnalysis {
         res.allSeen.addAll(subSearchRes.allSeen);
         if (!(type instanceof ParameterizedType)) {
             res.lost.addAll(subSearchRes.current);
-            logindent -= 2;
             return res;
         }
 
@@ -234,15 +195,12 @@ public class CodeAnalysis {
 
             if (foundGeneric == null) {
                 res.lost.add(subClassGeneric);
-
-                System.out.println("DID NOT FIND GENERIC AAAH " + subClassGeneric);
             } else {
                 res.current.add(foundGeneric);
                 res.allSeen.add(foundGeneric);
             }
         }
 
-        logindent -= 2;
         return res;
     }
 
@@ -267,36 +225,65 @@ public class CodeAnalysis {
     public static final <T> Class<?> inferTypeReceivedByGenericInClassT(Class<T> clazz, Class<? extends T> subClass) {
         var prediction = analyzeClass(Component.class, 0, subClass);
 
-        var allRes = new ArrayList<>();
-        allRes.addAll(prediction.current);
-        allRes.addAll(prediction.finalised);
-        allRes.addAll(prediction.lost);
-        allRes.addAll(prediction.allSeen);
+        // 1) search all the types i've seen for classes
+        var classes = new HashSet<Class<?>>();
+        var allBounds = new HashSet<Type>();
+        for (var type : prediction.allSeen) {
+            if (type instanceof Class) {
+                classes.add((Class<?>) type);
+            }
+            if (type instanceof TypeVariable) {
+                allBounds.addAll(Arrays.asList(((TypeVariable<?>) type).getBounds()));
+            }
+        }
+        // and in case those results sucked we'll scan the bounds
+        for (var bound : allBounds) {
+            if (bound instanceof Class) {
+                classes.add((Class<?>) bound);
+            }
+        }
 
-        // First, i need to join current onto the
-        // if (!(type instanceof ParameterizedType)) {
-        //     var t = subSearchRes.current.toArray(Type[]::new)[0];
-        //     if (t instanceof TypeVariable) {
-        //         for (var bound : ((TypeVariable<?>) t).getBounds()) {
-        //             res.lost.add(bound);
-        //         }
-        //     }
-        //     res.lost.addAll(subSearchRes.current);
-        //     logindent -= 2;
-        //     return res;
-        // }
-        // if (prediction == null || prediction instanceof TypeVariable) {
-        //     return null;
-        // } else {
-        //     Class<?> a = getClassFromType(prediction);
-        //     if (a == null) {
-        //         throw new RuntimeException("THIS SHOULD NOT HAPPEN");
-        //     } else {
-        //         return a;
-        //     }
-        // }
+        // find the most extended/specific class (highest priority)
+        Class<?> mostSpecificClass = null;
+        var sortedClasses = classes.toArray(Class<?>[]::new);
+        Arrays.sort(classes.toArray(Class<?>[]::new), (a, b) -> {
+            if (a == b) {
+                return 0;
+            }
+            if (a.isAssignableFrom(b)) {
+                return 1;
+            }
+            return -1;
+        });
+        System.out.println(prediction);
+        System.out.println("Sorted classes:");
+        for (var a : sortedClasses) {
+            System.out.println(" - " + a);
+        }
+        for (var currentClass : classes) {
+            if (mostSpecificClass == null) {
+                mostSpecificClass = currentClass;
+            }
+            if (mostSpecificClass == currentClass) {
+                continue;
+            }
 
-        return ChunkStore.class;
+            if (
+                !currentClass.isAssignableFrom(mostSpecificClass) && !mostSpecificClass.isAssignableFrom(currentClass)
+            ) {
+                throw new RuntimeException(
+                    "WHAT!!!! so " + currentClass + " is not assignable from " + mostSpecificClass + " or visa versa??"
+                );
+            }
+
+            if (mostSpecificClass.isAssignableFrom(currentClass)) {
+                mostSpecificClass = currentClass;
+            }
+        }
+        System.out.println("Most specific class:");
+        System.out.println(" - " + mostSpecificClass);
+
+        return mostSpecificClass;
     }
 }
 
