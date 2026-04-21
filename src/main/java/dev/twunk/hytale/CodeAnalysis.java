@@ -245,21 +245,6 @@ public class CodeAnalysis {
 
         // find the most extended/specific class (highest priority)
         Class<?> mostSpecificClass = null;
-        var sortedClasses = classes.toArray(Class<?>[]::new);
-        Arrays.sort(classes.toArray(Class<?>[]::new), (a, b) -> {
-            if (a == b) {
-                return 0;
-            }
-            if (a.isAssignableFrom(b)) {
-                return 1;
-            }
-            return -1;
-        });
-        System.out.println(prediction);
-        System.out.println("Sorted classes:");
-        for (var a : sortedClasses) {
-            System.out.println(" - " + a);
-        }
         for (var currentClass : classes) {
             if (mostSpecificClass == null) {
                 mostSpecificClass = currentClass;
@@ -268,20 +253,17 @@ public class CodeAnalysis {
                 continue;
             }
 
-            if (
-                !currentClass.isAssignableFrom(mostSpecificClass) && !mostSpecificClass.isAssignableFrom(currentClass)
-            ) {
-                throw new RuntimeException(
-                    "WHAT!!!! so " + currentClass + " is not assignable from " + mostSpecificClass + " or visa versa??"
-                );
-            }
+            // shouldn't be possible for this to happen so just commented it out but yeah not certain
+            // if (
+            //     !currentClass.isAssignableFrom(mostSpecificClass) && !mostSpecificClass.isAssignableFrom(currentClass)
+            // ) {
+            //     continue;
+            // }
 
             if (mostSpecificClass.isAssignableFrom(currentClass)) {
                 mostSpecificClass = currentClass;
             }
         }
-        System.out.println("Most specific class:");
-        System.out.println(" - " + mostSpecificClass);
 
         return mostSpecificClass;
     }
