@@ -67,7 +67,7 @@ public abstract class HytalePlugin extends JavaPlugin {
      *
      * classOfYourComponentThatImplementsEventListenerMethodsThatICanCall
      */
-    public final <ECS_TYPE extends WorldProvider, T> void register(Class<T> clazz) {
+    public final <T> void register(Class<T> clazz) {
         if (Interaction.class.isAssignableFrom(clazz)) {
             @SuppressWarnings("unchecked")
             var asInteraction = (Class<? extends Interaction>) clazz;
@@ -76,7 +76,10 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
 
         if (Component.class.isAssignableFrom(clazz)) {
-            registerComponent((Class) clazz);
+            @SuppressWarnings("unchecked")
+            var asComponent = (Class<? extends Component<?>>) clazz;
+
+            registerComponent(asComponent);
         }
     }
 
@@ -86,14 +89,26 @@ public abstract class HytalePlugin extends JavaPlugin {
 
         if (inferred == null) {
             console.atWarning().log(" > [INFERRED] ECS type  <Common>");
-            LibHytale.ENTITY_REGISTRY.bindEventListeners(this, (Class) clazz);
-            LibHytale.CHUNK_REGISTRY.bindEventListeners(this, (Class) clazz);
+
+            @SuppressWarnings("unchecked")
+            var inferredAsEntity = (Class<? extends Component<EntityStore>>) clazz;
+            LibHytale.ENTITY_REGISTRY.bindEventListeners(this, inferredAsEntity);
+
+            @SuppressWarnings("unchecked")
+            var inferredAsChunk = (Class<? extends Component<ChunkStore>>) clazz;
+            LibHytale.CHUNK_REGISTRY.bindEventListeners(this, inferredAsChunk);
         } else if (ChunkStore.class.isAssignableFrom(inferred)) {
             console.atInfo().log(" > [INFERRED] ECS type  <" + inferred + ">");
-            LibHytale.CHUNK_REGISTRY.bindEventListeners(this, (Class) clazz);
+
+            @SuppressWarnings("unchecked")
+            var inferredClazz = (Class<? extends Component<ChunkStore>>) clazz;
+            LibHytale.CHUNK_REGISTRY.bindEventListeners(this, inferredClazz);
         } else if (EntityStore.class.isAssignableFrom(inferred)) {
             console.atInfo().log(" > [INFERRED] ECS type  <" + inferred + ">");
-            LibHytale.ENTITY_REGISTRY.bindEventListeners(this, (Class) clazz);
+
+            @SuppressWarnings("unchecked")
+            var inferredClazz = (Class<? extends Component<EntityStore>>) clazz;
+            LibHytale.ENTITY_REGISTRY.bindEventListeners(this, inferredClazz);
         } else {
             console.atSevere().log(" > FAILED TO INFER ECS type of " + inferred);
             console.atSevere().log(" > COMPONENT WAS NOT ADDED TO ANY REGISTRY");
