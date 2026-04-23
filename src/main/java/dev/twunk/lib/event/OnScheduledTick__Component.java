@@ -38,7 +38,7 @@ public class OnScheduledTick__Component<
     @SuppressWarnings("unchecked")
     @Override
     @Nullable
-    public final TickPlan tickTheTicker(
+    public final TickPlan runScheduledTick(
         TrackedEntity<ECS_TYPE> ticker,
         float dt,
         ArchetypeChunk<ECS_TYPE> archetypeChunk,

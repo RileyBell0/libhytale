@@ -72,7 +72,7 @@ public abstract class OnScheduledTick<
     ///////////////////////////////////////////////////////////////////////////
 
     @Nullable
-    protected abstract TickPlan tickTheTicker(
+    protected abstract TickPlan runScheduledTick(
         TrackedEntity<ECS_TYPE> ticker,
         float dt,
         ArchetypeChunk<ECS_TYPE> archetypeChunk,
@@ -122,7 +122,7 @@ public abstract class OnScheduledTick<
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         for (final @Nonnull var ticker : entities.ticking) {
-            final var res = this.tickTheTicker(ticker, dt, archetypeChunk, store, commandBuffer);
+            final var res = this.runScheduledTick(ticker, dt, archetypeChunk, store, commandBuffer);
 
             // Transition to the state returned by the block
             if (res == null) {

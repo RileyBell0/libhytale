@@ -32,7 +32,7 @@ public class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends O
 
     @Override
     @Nullable
-    public final TickPlan tickTheTicker(
+    public final TickPlan runScheduledTick(
         TrackedEntity<ECS_TYPE> ticker,
         float dt,
         ArchetypeChunk<ECS_TYPE> archetypeChunk,
