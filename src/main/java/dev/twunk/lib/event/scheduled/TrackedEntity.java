@@ -1,5 +1,6 @@
 package dev.twunk.lib.event.scheduled;
 
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.ref.AnyRef;
 import java.util.ArrayList;
@@ -44,22 +45,17 @@ import javax.annotation.Nullable;
  * }
  * </pre>
  */
-public class TrackedEntity<ECS_TYPE extends WorldProvider> {
+public class TrackedEntity<ECS_TYPE extends WorldProvider> extends AnyRef<ECS_TYPE> {
 
-    /**
-     * The ref for your entity
-     */
-    public final AnyRef<ECS_TYPE> ref;
+    private ArrayList<TrackedEntity<ECS_TYPE>> holder;
 
-    private ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef;
-
-    public TrackedEntity(AnyRef<ECS_TYPE> ref, ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef) {
-        this.ref = ref;
-        this.currentAreaRef = currentAreaRef;
+    public TrackedEntity(Ref<ECS_TYPE> ref, ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef) {
+        super(ref);
+        this.holder = currentAreaRef;
     }
 
     public void drop() {
-        this.currentAreaRef.remove(this);
+        this.holder.remove(this);
     }
 
     /**
@@ -68,7 +64,7 @@ public class TrackedEntity<ECS_TYPE extends WorldProvider> {
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof TrackedEntity) {
-            return ((TrackedEntity<?>) obj).ref == this.ref;
+            return ((TrackedEntity<?>) obj) == this;
         }
         return false;
     }
