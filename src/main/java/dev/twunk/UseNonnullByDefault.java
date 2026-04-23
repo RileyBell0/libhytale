@@ -15,4 +15,4 @@ import javax.annotation.meta.TypeQualifierDefault;
 @Documented
 @TypeQualifierDefault({ ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EverythingIsNonnullByDefault {}
+public @interface UseNonnullByDefault {}
