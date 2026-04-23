@@ -2,6 +2,7 @@ package dev.twunk.hytale;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.component.ContainerComponent;
@@ -49,26 +50,27 @@ public abstract class LibHytale {
     private static boolean hasRegisteredLibComponents = false;
 
     // Called automatically when you load a mod plugin
-    public static void init(final HytalePlugin plugin) {
+    public static void init(final JavaPlugin plugin) {
         if (hasRegisteredLibComponents) {
             return;
         }
         hasRegisteredLibComponents = true;
 
-        plugin.registerChunkComponent(TwunkDevTestComponent.class);
+        HytalePlugin.registerChunkComponent(plugin, TwunkDevTestComponent.class);
 
         // some components i've got i want accessible in both entity and chunk stores
         // since, well, i've got no real reason to restrict them to just one store rn
         // - NOTE i am aware they don't WORK in both stores rn but they should theoretically
         //   EXIST in both. I'll fix the bugs to get them working later TODO
-        plugin.registerCommonComponent(INTERNAL_TickSchedulerComponent.class);
-        plugin.registerCommonComponent(ContainerComponent.class);
-        plugin.registerCommonComponent(TrashComponent.class);
+        HytalePlugin.registerChunkComponent(plugin, TwunkDevTestComponent.class);
+        HytalePlugin.registerCommonComponent(plugin, INTERNAL_TickSchedulerComponent.class);
+        HytalePlugin.registerCommonComponent(plugin, ContainerComponent.class);
+        HytalePlugin.registerCommonComponent(plugin, TrashComponent.class);
 
         // Register interactions
-        plugin.registerInteraction(LogInteraction.class, "Log");
-        plugin.registerInteraction(SpawnItemInteraction.class, "SpawnItem");
-        plugin.registerInteraction(OpenContainerComponentInteraction.class, "OpenMahContainerPls");
+        HytalePlugin.registerInteraction(plugin, LogInteraction.class, "Log");
+        HytalePlugin.registerInteraction(plugin, SpawnItemInteraction.class, "SpawnItem");
+        HytalePlugin.registerInteraction(plugin, OpenContainerComponentInteraction.class, "OpenMahContainerPls");
     }
 
     /**

@@ -4,8 +4,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.HytalePlugin;
 import javax.annotation.Nullable;
 
 /**
@@ -37,20 +37,20 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     );
 
     public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         BuilderCodec<T> codec
     );
 
     public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         Class<T> clazz
     );
 
-    public void registerSystem(HytalePlugin plugin, ISystem<ECS_TYPE> system);
+    public void registerSystem(JavaPlugin plugin, ISystem<ECS_TYPE> system);
 
-    public <T extends IQuery<ECS_TYPE>> void bindEventListeners(HytalePlugin plugin, T listener);
+    public <T extends IQuery<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, T listener);
 
     // this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
     // without the query as thats just gonna be Query.and(componentType);
-    public <T extends Component<ECS_TYPE>> void bindEventListeners(HytalePlugin plugin, Class<T> componentClass);
+    public <T extends Component<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, Class<T> componentClass);
 }

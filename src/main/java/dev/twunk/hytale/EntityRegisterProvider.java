@@ -5,6 +5,7 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
@@ -67,19 +68,19 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
         registeredEntityComponentsById.put(id, componentType);
     }
 
-    public final void registerSystem(final HytalePlugin plugin, final ISystem<EntityStore> system) {
+    public final void registerSystem(final JavaPlugin plugin, final ISystem<EntityStore> system) {
         plugin.getEntityStoreRegistry().registerSystem(system);
     }
 
     @Override
-    public <T extends Component<EntityStore>> void bindEventListeners(HytalePlugin plugin, Class<T> listener) {}
+    public <T extends Component<EntityStore>> void bindEventListeners(JavaPlugin plugin, Class<T> listener) {}
 
     @Override
-    public <T extends IQuery<EntityStore>> void bindEventListeners(HytalePlugin plugin, T listener) {}
+    public <T extends IQuery<EntityStore>> void bindEventListeners(JavaPlugin plugin, T listener) {}
 
     @Override
     public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         BuilderCodec<T> codec
     ) {
         final Class<T> clazz = codec.getInnerClass();
@@ -98,14 +99,14 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
         // Store our component in the global register
         LibHytale.registerEntityComponentType(component, clazz, defaultId);
 
-        plugin.initCommonSystemsFor(clazz, component);
+        HytalePlugin.initCommonSystemsFor(plugin, clazz, component);
 
         return component;
     }
 
     @Override
     public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         Class<T> clazz
     ) {
         final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);

@@ -8,8 +8,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.system.ignoreme.OnTick__Component;
 import dev.twunk.hytale.system.ignoreme.OnTick__Listener;
 import dev.twunk.interfaces.IEventDriver;
@@ -65,7 +65,7 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     );
 
     @Override
-    public final void onRegister(HytalePlugin plugin) {
+    public final void onRegister(JavaPlugin plugin) {
         this.getRegistry().registerSystem(plugin, this);
     }
 

@@ -11,8 +11,8 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.system.ignoreme.OnAddRemove__Component;
 import dev.twunk.hytale.system.ignoreme.OnAddRemove__Listener;
 import dev.twunk.interfaces.IEventDriver;
@@ -82,7 +82,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     );
 
     @Override
-    public final void onRegister(HytalePlugin plugin) {
+    public final void onRegister(JavaPlugin plugin) {
         this.getRegistry().registerSystem(plugin, this);
     }
 
@@ -106,7 +106,9 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     public static final <ECS_TYPE extends WorldProvider, T extends IQuery<ECS_TYPE>> OnAddRemove<
         ECS_TYPE
     > newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
-        return newUninitialised((IOnAddRemove<ECS_TYPE>) listener, listener.getQuery(), registry);
+        @SuppressWarnings("unchecked")
+        var asIOnAddRemove = (IOnAddRemove<ECS_TYPE>) listener;
+        return newUninitialised(asIOnAddRemove, listener.getQuery(), registry);
     }
 
     /**

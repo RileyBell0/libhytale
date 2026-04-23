@@ -9,8 +9,8 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnAddRemove;
@@ -68,7 +68,7 @@ public abstract class OnScheduledTick<
     }
 
     @Override
-    public final void onRegister(HytalePlugin plugin) {
+    public final void onRegister(JavaPlugin plugin) {
         this.registry.bindEventListeners(plugin, this);
     }
 

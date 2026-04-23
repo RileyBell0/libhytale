@@ -5,6 +5,7 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.system.OnAddRemove;
 import dev.twunk.hytale.system.OnBlockTick;
@@ -63,7 +64,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     }
 
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         BuilderCodec<T> codec
     ) {
         var clazz = codec.getInnerClass();
@@ -78,7 +79,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     }
 
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         Class<T> clazz
     ) {
         var componentType = this._registerComponent(plugin, clazz);
@@ -96,7 +97,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
      * instead
      */
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> _registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         BuilderCodec<T> codec
     ) {
         final Class<T> clazz = codec.getInnerClass();
@@ -114,7 +115,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
 
         // Store our component in the global register
         LibHytale.registerChunkComponentType(component, clazz, defaultId);
-        plugin.initCommonSystemsFor(clazz, component);
+        HytalePlugin.initCommonSystemsFor(plugin, clazz, component);
 
         if (clazz.isAnnotationPresent(dev.twunk.annotations.Serializable.class)) {
             if (Component.class.isAssignableFrom(clazz)) {
@@ -128,7 +129,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     }
 
     public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> _registerComponent(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         Class<T> clazz
     ) {
         final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
@@ -169,14 +170,14 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         registeredChunkComponentsById.put(id, componentType);
     }
 
-    public final void registerSystem(final HytalePlugin plugin, final ISystem<ChunkStore> system) {
+    public final void registerSystem(final JavaPlugin plugin, final ISystem<ChunkStore> system) {
         plugin.getChunkStoreRegistry().registerSystem(system);
     }
 
     // this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
     // without the query as thats just gonna be Query.and(componentType);
     @Override
-    public <T extends IQuery<ChunkStore>> void bindEventListeners(HytalePlugin plugin, T listener) {
+    public <T extends IQuery<ChunkStore>> void bindEventListeners(JavaPlugin plugin, T listener) {
         var clazz = listener.getClass();
 
         // find the interfaces it supports
@@ -218,7 +219,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     }
 
     @Override
-    public <T extends Component<ChunkStore>> void bindEventListeners(HytalePlugin plugin, Class<T> componentClass) {
+    public <T extends Component<ChunkStore>> void bindEventListeners(JavaPlugin plugin, Class<T> componentClass) {
         ComponentType<ChunkStore, T> componentType = this.getComponentType(componentClass);
         if (componentType == null) {
             componentType = this._registerComponent(plugin, componentClass);
@@ -228,7 +229,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
     }
 
     public <T extends Component<ChunkStore>> void bindEventListeners(
-        HytalePlugin plugin,
+        JavaPlugin plugin,
         Class<T> componentClass,
         ComponentType<ChunkStore, T> componentType
     ) {

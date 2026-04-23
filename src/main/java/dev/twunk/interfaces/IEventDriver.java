@@ -1,8 +1,8 @@
 package dev.twunk.interfaces;
 
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.HytalePlugin;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -177,5 +177,5 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
         }
     }
 
-    public abstract void onRegister(HytalePlugin plugin);
+    public abstract void onRegister(JavaPlugin plugin);
 }
