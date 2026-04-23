@@ -46,16 +46,6 @@ import javax.annotation.Nullable;
  */
 public class TrackedEntity<ECS_TYPE> {
 
-    private static long nextLifetimeId = 0;
-
-    /**
-     * this is a serial integer that is MEMORY ONLY -> it WILL NOT be the same
-     * next time the entity is loaded off disk. do not save it to disk. Simply useful
-     * for quick lookups on entities (adding/removing them). makes my caching WAAAY easier
-     * and faster
-     */
-    public final long lifetimeId;
-
     /**
      * The world that your entity is in
      */
@@ -69,7 +59,6 @@ public class TrackedEntity<ECS_TYPE> {
     private ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef;
 
     public TrackedEntity(World world, Ref<ECS_TYPE> ref, ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef) {
-        this.lifetimeId = ++nextLifetimeId;
         this.world = world;
         this.ref = ref;
         this.currentAreaRef = currentAreaRef;
