@@ -1,4 +1,4 @@
-package dev.twunk.annotations;
+package dev.twunk.hytale.codec.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

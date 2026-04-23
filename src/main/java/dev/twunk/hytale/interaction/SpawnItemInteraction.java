@@ -7,8 +7,8 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
-import dev.twunk.annotations.Serializable;
-import dev.twunk.annotations.Serialize;
+import dev.twunk.hytale.codec.annotations.Serializable;
+import dev.twunk.hytale.codec.annotations.Serialize;
 import dev.twunk.hytale.utils.ItemUtils;
 import javax.annotation.Nullable;
 

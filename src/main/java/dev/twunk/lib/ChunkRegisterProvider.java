@@ -9,6 +9,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.codec.annotations.Serializable;
 import dev.twunk.hytale.system.OnAddRemove;
 import dev.twunk.hytale.system.OnBlockTick;
 import dev.twunk.hytale.system.OnTick;
@@ -118,7 +119,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         LibHytale.registerChunkComponentType(component, clazz, defaultId);
         HytalePlugin.initCommonSystemsFor(plugin, clazz, component);
 
-        if (clazz.isAnnotationPresent(dev.twunk.annotations.Serializable.class)) {
+        if (clazz.isAnnotationPresent(Serializable.class)) {
             if (Component.class.isAssignableFrom(clazz)) {
                 if (IOnBlockTick.class.isAssignableFrom(clazz)) {
                     // new AutoBlockTickSystem(component).registerTo(this);
