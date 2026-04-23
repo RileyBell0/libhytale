@@ -11,15 +11,16 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.interfaces.IEventDriver;
+import dev.twunk.hytale.interfaces.IQueryableEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.utils.ComponentUtils;
+import dev.twunk.lib.event.OnScheduledTick__Component;
+import dev.twunk.lib.event.OnScheduledTick__Listener;
+import dev.twunk.lib.event.scheduled.LoadedEntities;
 import dev.twunk.lib.event.scheduled.TickPlan;
-import dev.twunk.lib.event.scheduled.TrackedEntities;
 import dev.twunk.lib.event.scheduled.TrackedEntity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,9 +46,9 @@ import javax.annotation.Nullable;
  */
 public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
-> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IEventDriver<ECS_TYPE>, IQuery<ECS_TYPE> {
+> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
 
-    private final TrackedEntities<ECS_TYPE> entities;
+    private final LoadedEntities<ECS_TYPE> entities;
     private final IRegistry<ECS_TYPE> registry;
     private final Query<ECS_TYPE> query;
 
@@ -55,7 +56,7 @@ public abstract class OnScheduledTick<
         this.query = query;
         this.registry = registry;
 
-        this.entities = new TrackedEntities<ECS_TYPE>(id);
+        this.entities = new LoadedEntities<ECS_TYPE>(id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -165,75 +166,5 @@ public abstract class OnScheduledTick<
         ECS_TYPE
     > newUninitialised(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         return new OnScheduledTick__Component<ECS_TYPE, T>(id, componentType, registry);
-    }
-}
-
-class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends OnScheduledTick<ECS_TYPE> {
-
-    private final IOnScheduledTick<ECS_TYPE> listener;
-
-    protected OnScheduledTick__Listener(
-        String id,
-        IOnScheduledTick<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
-    ) {
-        super(id, query, registry);
-        this.listener = listener;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    @Nullable
-    public final TickPlan tickTheTicker(
-        TrackedEntity<ECS_TYPE> ticker,
-        float dt,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        return listener.onScheduledTick(ticker.ref, dt, store, commandBuffer);
-    }
-}
-
-class OnScheduledTick__Component<
-    ECS_TYPE extends WorldProvider,
-    T extends Component<ECS_TYPE>
-> extends OnScheduledTick<ECS_TYPE> {
-
-    private final ComponentType<ECS_TYPE, T> componentType;
-
-    protected OnScheduledTick__Component(
-        String id,
-        ComponentType<ECS_TYPE, T> componentType,
-        IRegistry<ECS_TYPE> registry
-    ) {
-        super(id, Query.and(componentType), registry);
-        this.componentType = componentType;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @SuppressWarnings("unchecked")
-    @Override
-    @Nullable
-    public final TickPlan tickTheTicker(
-        TrackedEntity<ECS_TYPE> ticker,
-        float dt,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        final var component = ComponentUtils.get(ticker.ref, componentType);
-        if (component == null) {
-            return null;
-        }
-
-        return ((IOnScheduledTick<ECS_TYPE>) component).onScheduledTick(ticker.ref, dt, store, commandBuffer);
     }
 }

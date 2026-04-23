@@ -2,7 +2,6 @@ package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.ref.AnyRef;
@@ -25,12 +24,7 @@ import javax.annotation.Nullable;
  */
 public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> {
     @Nullable
-    public abstract TickPlan onScheduledTick(
-        AnyRef<ECS_TYPE> ref,
-        float dt,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    );
+    public abstract TickPlan onScheduledTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer);
 
     /**
      * Must provide a STABLE id. this is what your ticking state is stored against
