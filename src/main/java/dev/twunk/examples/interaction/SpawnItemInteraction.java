@@ -1,4 +1,4 @@
-package dev.twunk.hytale.interaction;
+package dev.twunk.examples.interaction;
 
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;

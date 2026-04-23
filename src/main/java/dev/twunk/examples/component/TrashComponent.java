@@ -1,4 +1,4 @@
-package dev.twunk.hytale.component;
+package dev.twunk.examples.component;
 
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.ser
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.codec.annotations.Serializable;
 import dev.twunk.hytale.codec.annotations.Serialize;
+import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;

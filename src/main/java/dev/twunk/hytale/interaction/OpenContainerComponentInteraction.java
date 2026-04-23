@@ -12,11 +12,11 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.ser
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.examples.component.TrashComponent;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.codec.annotations.Serializable;
 import dev.twunk.hytale.codec.annotations.Serialize;
 import dev.twunk.hytale.component.ContainerComponent;
-import dev.twunk.hytale.component.TrashComponent;
 import dev.twunk.hytale.utils.ContainerUtils;
 import dev.twunk.interfaces.component.IContainerComponent;
 import dev.twunk.interfaces.methods.IContainer;
