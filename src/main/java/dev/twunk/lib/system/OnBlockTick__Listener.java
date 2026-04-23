@@ -1,9 +1,7 @@
-package dev.twunk.lib.ignoreme;
+package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
@@ -11,21 +9,19 @@ import dev.twunk.hytale.refs.BlockRef;
 import dev.twunk.hytale.system.OnBlockTick;
 import dev.twunk.interfaces.events.IOnBlockTick;
 
-// <ECS_TYPE extends WorldProvider>
-public abstract class OnBlockTick__Component<T extends Component<ChunkStore>> extends OnBlockTick {
+public abstract class OnBlockTick__Listener extends OnBlockTick {
 
-    private final ComponentType<ChunkStore, T> componentType;
+    private final IOnBlockTick listener;
 
-    public OnBlockTick__Component(ComponentType<ChunkStore, T> componentType) {
-        super(Query.and(componentType));
-        this.componentType = componentType;
+    public OnBlockTick__Listener(IOnBlockTick listener, Query<ChunkStore> query) {
+        super(query);
+        this.listener = listener;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
 
-    @Override
     public final void tick(
         float dt,
         int index,
@@ -33,13 +29,6 @@ public abstract class OnBlockTick__Component<T extends Component<ChunkStore>> ex
         Store<ChunkStore> store,
         CommandBuffer<ChunkStore> commandBuffer
     ) {
-        var ref = new BlockRef(archetypeChunk.getReferenceTo(index));
-
-        var component = (IOnBlockTick) ref.getComponent(componentType);
-        if (component == null) {
-            return;
-        }
-
-        component.onBlockTick(ref, commandBuffer);
+        listener.onBlockTick(new BlockRef(archetypeChunk.getReferenceTo(index)), commandBuffer);
     }
 }

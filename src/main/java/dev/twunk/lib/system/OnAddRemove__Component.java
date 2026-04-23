@@ -1,4 +1,4 @@
-package dev.twunk.lib.ignoreme;
+package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;

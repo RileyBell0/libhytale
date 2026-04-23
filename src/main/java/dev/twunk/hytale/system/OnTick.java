@@ -14,8 +14,8 @@ import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.lib.ignoreme.OnTick__Component;
-import dev.twunk.lib.ignoreme.OnTick__Listener;
+import dev.twunk.lib.system.OnTick__Component;
+import dev.twunk.lib.system.OnTick__Listener;
 
 /**
  * Subsystem for calling `onEntityTick` on the parent system every tick

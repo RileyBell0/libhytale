@@ -11,7 +11,7 @@ import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnWorldTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.lib.ignoreme.OnWorldTick__Listener;
+import dev.twunk.lib.system.OnWorldTick__Listener;
 import javax.annotation.Nullable;
 
 /**

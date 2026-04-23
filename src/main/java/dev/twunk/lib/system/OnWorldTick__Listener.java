@@ -1,20 +1,19 @@
-package dev.twunk.lib.ignoreme;
+package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.OnTick;
-import dev.twunk.interfaces.events.IOnTick;
+import dev.twunk.hytale.system.OnWorldTick;
+import dev.twunk.interfaces.events.IOnWorldTick;
 import dev.twunk.interfaces.methods.IRegistry;
 
-public abstract class OnTick__Listener<ECS_TYPE extends WorldProvider> extends OnTick<ECS_TYPE> {
+public abstract class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> extends OnWorldTick<ECS_TYPE> {
 
-    private final IOnTick<ECS_TYPE> listener;
+    private final IOnWorldTick<ECS_TYPE> listener;
 
-    public OnTick__Listener(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    public OnWorldTick__Listener(IOnWorldTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         super(query, registry);
         this.listener = listener;
     }
@@ -23,13 +22,13 @@ public abstract class OnTick__Listener<ECS_TYPE extends WorldProvider> extends O
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
 
+    @Override
     public final void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
+        final float dt,
+        final ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        final Store<ECS_TYPE> store,
+        final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onTick(dt, new AnyRef<>(archetypeChunk.getReferenceTo(index)), commandBuffer);
+        this.listener.onWorldTick(dt, archetypeChunk, store, commandBuffer);
     }
 }

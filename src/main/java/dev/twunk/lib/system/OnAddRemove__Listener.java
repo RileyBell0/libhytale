@@ -1,4 +1,4 @@
-package dev.twunk.lib.ignoreme;
+package dev.twunk.lib.system;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -11,7 +11,7 @@ import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.OnAddRemove;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.lib.ignoreme.OnAddRemove__Listener;
+import dev.twunk.lib.system.OnAddRemove__Listener;
 
 /**
  * This is the normal version, an almost 1 to 1 of what hytale does. It's a "system"
