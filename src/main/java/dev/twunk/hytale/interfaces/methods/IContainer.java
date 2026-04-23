@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.ser
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
-import dev.twunk.hytale.refs.AnyRef;
+import dev.twunk.hytale.ref.AnyRef;
 import java.util.Map;
 import java.util.UUID;
 

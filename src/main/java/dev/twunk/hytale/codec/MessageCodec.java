@@ -1,8 +1,8 @@
 package dev.twunk.hytale.codec;
 
 import com.hypixel.hytale.server.core.Message;
-import dev.twunk.hytale.annotations.Serializable;
-import dev.twunk.hytale.annotations.Serialize;
+import dev.twunk.hytale.codec.auto.Serializable;
+import dev.twunk.hytale.codec.auto.Serialize;
 import javax.annotation.Nullable;
 
 /**

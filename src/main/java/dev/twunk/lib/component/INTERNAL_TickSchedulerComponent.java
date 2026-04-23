@@ -3,7 +3,7 @@ package dev.twunk.lib.component;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.annotations.Serializable;
+import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.lifetime.TrackedEntity;
 import java.util.HashMap;

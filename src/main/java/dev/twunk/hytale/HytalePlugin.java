@@ -12,9 +12,9 @@ import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.hytale.annotations.Serializable;
-import dev.twunk.hytale.interfaces.events.IOnAddRemove;
-import dev.twunk.hytale.interfaces.events.IOnTick;
+import dev.twunk.hytale.codec.auto.Serializable;
+import dev.twunk.hytale.interfaces.event.IOnAddRemove;
+import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.lib.CodeAnalysis;
 import dev.twunk.lib.codec.AutoSerializeParser;
 

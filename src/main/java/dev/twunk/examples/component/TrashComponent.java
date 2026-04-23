@@ -4,8 +4,8 @@ import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBl
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.annotations.Serializable;
-import dev.twunk.hytale.annotations.Serialize;
+import dev.twunk.hytale.codec.auto.Serializable;
+import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;

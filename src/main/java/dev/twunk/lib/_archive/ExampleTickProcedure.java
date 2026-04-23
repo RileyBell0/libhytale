@@ -4,7 +4,7 @@ import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import dev.twunk.hytale.annotations.Serializable;
+import dev.twunk.hytale.codec.auto.Serializable;
 import javax.annotation.Nullable;
 
 @Serializable(inherits = TickProcedure.class, codecField = "BASE_CODEC")

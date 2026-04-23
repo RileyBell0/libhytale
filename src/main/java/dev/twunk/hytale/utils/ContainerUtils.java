@@ -21,7 +21,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import dev.twunk.hytale.interfaces.methods.IContainer;
 import dev.twunk.hytale.interfaces.methods.IPersistentContainer;
-import dev.twunk.hytale.refs.AnyRef;
+import dev.twunk.hytale.ref.AnyRef;
 import java.util.Map;
 import java.util.UUID;
 
