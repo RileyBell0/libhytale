@@ -13,8 +13,8 @@ import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.lib.test.TestComponent;
 import dev.twunk.lib.test.TestUtil;
-import dev.twunk.lib.test.TwunkDevTestComponent;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
@@ -36,8 +36,8 @@ public abstract class ComponentUtils {
         BlockStateInfo.getComponentType();
 
     @SuppressWarnings("null")
-    public static final ComponentType<ChunkStore, TwunkDevTestComponent> TWUNK_DEV_TEST_COMPONENT_TYPE =
-        LibHytale.getChunkComponentType(TwunkDevTestComponent.class);
+    public static final ComponentType<ChunkStore, TestComponent> TWUNK_DEV_TEST_COMPONENT_TYPE =
+        LibHytale.getChunkComponentType(TestComponent.class);
 
     /**
      * Tests all methods i've defined for getWorldChunk
@@ -58,8 +58,8 @@ public abstract class ComponentUtils {
 
         final var chunkRef = test.chunkRef;
 
-        final var blockRefComponent = new TwunkDevTestComponent().setValue(1);
-        final var chunkRefComponent = new TwunkDevTestComponent().setValue(2);
+        final var blockRefComponent = new TestComponent().setValue(1);
+        final var chunkRefComponent = new TestComponent().setValue(2);
 
         // ensure BlockStateInfo is on the BlockRef
         Component<ChunkStore> component;
@@ -87,13 +87,13 @@ public abstract class ComponentUtils {
         // validate the components AREN'T on there yet (BlockRef)
         component = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
         if (ComponentUtils.has(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || component != null) {
-            throw new RuntimeException("!! ERROR: BlockRef contained TwunkDevTestComponent before we added it");
+            throw new RuntimeException("!! ERROR: BlockRef contained TestComponent before we added it");
         }
 
         // validate the components AREN'T on there yet (ChunkRef)
         component = ComponentUtils.get(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
         if (ComponentUtils.has(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || component != null) {
-            throw new RuntimeException("!! ERROR: ChunkRef contained TwunkDevTestComponent before we added it");
+            throw new RuntimeException("!! ERROR: ChunkRef contained TestComponent before we added it");
         }
 
         // Add components

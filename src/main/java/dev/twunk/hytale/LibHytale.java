@@ -13,7 +13,7 @@ import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.lib.ChunkRegisterProvider;
 import dev.twunk.lib.EntityRegisterProvider;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
-import dev.twunk.lib.test.TwunkDevTestComponent;
+import dev.twunk.lib.test.TestComponent;
 import javax.annotation.Nullable;
 
 /**
@@ -58,13 +58,13 @@ public abstract class LibHytale {
         }
         hasRegisteredLibComponents = true;
 
-        HytalePlugin.registerChunkComponent(plugin, TwunkDevTestComponent.class);
+        HytalePlugin.registerChunkComponent(plugin, TestComponent.class);
 
         // some components i've got i want accessible in both entity and chunk stores
         // since, well, i've got no real reason to restrict them to just one store rn
         // - NOTE i am aware they don't WORK in both stores rn but they should theoretically
         //   EXIST in both. I'll fix the bugs to get them working later TODO
-        HytalePlugin.registerChunkComponent(plugin, TwunkDevTestComponent.class);
+        HytalePlugin.registerChunkComponent(plugin, TestComponent.class);
         HytalePlugin.registerCommonComponent(plugin, INTERNAL_TickSchedulerComponent.class);
         HytalePlugin.registerCommonComponent(plugin, ContainerComponent.class);
         HytalePlugin.registerCommonComponent(plugin, TrashComponent.class);

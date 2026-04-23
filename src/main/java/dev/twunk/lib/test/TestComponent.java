@@ -6,12 +6,12 @@ import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
 
 @Serializable
-public class TwunkDevTestComponent implements Component<ChunkStore> {
+public class TestComponent implements Component<ChunkStore> {
 
     @Serialize
     private int value;
 
-    public final TwunkDevTestComponent setValue(final int val) {
+    public final TestComponent setValue(final int val) {
         this.value = val;
         return this;
     }
@@ -20,7 +20,7 @@ public class TwunkDevTestComponent implements Component<ChunkStore> {
         return this.value;
     }
 
-    public TwunkDevTestComponent clone() {
-        return new TwunkDevTestComponent();
+    public TestComponent clone() {
+        return new TestComponent();
     }
 }
