@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.methods;
+package dev.twunk.hytale.interfaces.methods;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;

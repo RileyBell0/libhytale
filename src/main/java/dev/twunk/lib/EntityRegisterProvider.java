@@ -9,8 +9,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.interfaces.methods.IQuery;
-import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.hytale.interfaces.methods.IQuery;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.lib.codec.AutoSerializeParser;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 
@@ -110,7 +111,7 @@ public final class EntityRegisterProvider implements IRegistry<EntityStore> {
         JavaPlugin plugin,
         Class<T> clazz
     ) {
-        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }

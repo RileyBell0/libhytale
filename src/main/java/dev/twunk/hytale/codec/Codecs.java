@@ -1,7 +1,7 @@
 package dev.twunk.hytale.codec;
 
 import com.hypixel.hytale.codec.Codec;
-import dev.twunk.lib.TransformCodec;
+import dev.twunk.lib.FromStringCodec;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
  */
 public class Codecs {
 
-    public static final Codec<Level> LEVEL_CODEC = new TransformCodec<Level>(
+    public static final Codec<Level> LEVEL_CODEC = new FromStringCodec<Level>(
         val -> val.toString(),
         str -> Level.parse(str)
     );

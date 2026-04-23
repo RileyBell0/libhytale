@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.methods;
+package dev.twunk.hytale.interfaces.methods;
 
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;

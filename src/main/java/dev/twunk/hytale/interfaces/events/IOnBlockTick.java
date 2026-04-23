@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.events;
+package dev.twunk.hytale.interfaces.events;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -7,8 +7,8 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.events.OnTick;
+import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.refs.BlockRef;
-import dev.twunk.interfaces.methods.IQuery;
 
 /**
  * Methods for my subsytem version of `ChunkBlockTickSystem.Ticking`

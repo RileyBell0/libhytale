@@ -10,10 +10,10 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.interfaces.IEventDriver;
-import dev.twunk.interfaces.events.IOnTick;
-import dev.twunk.interfaces.methods.IQuery;
-import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.hytale.interfaces.IEventDriver;
+import dev.twunk.hytale.interfaces.events.IOnTick;
+import dev.twunk.hytale.interfaces.methods.IQuery;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.events.OnTick__Component;
 import dev.twunk.lib.events.OnTick__Listener;
 

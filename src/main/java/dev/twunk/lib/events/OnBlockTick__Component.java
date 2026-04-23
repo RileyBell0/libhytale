@@ -8,8 +8,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.events.OnBlockTick;
+import dev.twunk.hytale.interfaces.events.IOnBlockTick;
 import dev.twunk.hytale.refs.BlockRef;
-import dev.twunk.interfaces.events.IOnBlockTick;
 
 // <ECS_TYPE extends WorldProvider>
 public abstract class OnBlockTick__Component<T extends Component<ChunkStore>> extends OnBlockTick {

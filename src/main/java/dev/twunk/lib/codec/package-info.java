@@ -1,2 +1,2 @@
 @dev.twunk.EverythingIsNonnullByDefault
-package dev.twunk.interfaces.component;
+package dev.twunk.lib.codec;

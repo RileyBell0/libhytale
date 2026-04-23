@@ -17,9 +17,9 @@ import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.codec.annotations.Serializable;
 import dev.twunk.hytale.codec.annotations.Serialize;
 import dev.twunk.hytale.component.ContainerComponent;
+import dev.twunk.hytale.interfaces.component.IContainerComponent;
+import dev.twunk.hytale.interfaces.methods.IContainer;
 import dev.twunk.hytale.utils.ContainerUtils;
-import dev.twunk.interfaces.component.IContainerComponent;
-import dev.twunk.interfaces.methods.IContainer;
 import javax.annotation.Nullable;
 
 /**

@@ -15,13 +15,14 @@ import dev.twunk.hytale.events.OnBlockTick;
 import dev.twunk.hytale.events.OnTick;
 import dev.twunk.hytale.events.OnWorldTick;
 import dev.twunk.hytale.events.composite.OnScheduledTick;
-import dev.twunk.interfaces.events.IOnAddRemove;
-import dev.twunk.interfaces.events.IOnBlockTick;
-import dev.twunk.interfaces.events.IOnScheduledTick;
-import dev.twunk.interfaces.events.IOnTick;
-import dev.twunk.interfaces.events.IOnWorldTick;
-import dev.twunk.interfaces.methods.IQuery;
-import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.hytale.interfaces.events.IOnAddRemove;
+import dev.twunk.hytale.interfaces.events.IOnBlockTick;
+import dev.twunk.hytale.interfaces.events.IOnScheduledTick;
+import dev.twunk.hytale.interfaces.events.IOnTick;
+import dev.twunk.hytale.interfaces.events.IOnWorldTick;
+import dev.twunk.hytale.interfaces.methods.IQuery;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.lib.codec.AutoSerializeParser;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 
@@ -134,7 +135,7 @@ public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
         JavaPlugin plugin,
         Class<T> clazz
     ) {
-        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }

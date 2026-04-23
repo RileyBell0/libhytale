@@ -18,10 +18,10 @@ import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.hytale.interfaces.component.IContainerComponent;
+import dev.twunk.hytale.interfaces.methods.IContainer;
+import dev.twunk.hytale.interfaces.methods.IPersistentContainer;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.interfaces.component.IContainerComponent;
-import dev.twunk.interfaces.methods.IContainer;
-import dev.twunk.interfaces.methods.IPersistentContainer;
 import java.util.Map;
 import java.util.UUID;
 

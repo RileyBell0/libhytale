@@ -1,4 +1,4 @@
-package dev.twunk.interfaces;
+package dev.twunk.hytale.interfaces;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;

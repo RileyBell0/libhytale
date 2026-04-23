@@ -13,10 +13,10 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.codec.annotations.Serializable;
-import dev.twunk.interfaces.events.IOnAddRemove;
-import dev.twunk.interfaces.events.IOnTick;
-import dev.twunk.lib.AutoBuilderCodec;
+import dev.twunk.hytale.interfaces.events.IOnAddRemove;
+import dev.twunk.hytale.interfaces.events.IOnTick;
 import dev.twunk.lib.CodeAnalysis;
+import dev.twunk.lib.codec.AutoSerializeParser;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
@@ -261,7 +261,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static final <T extends Component> void registerCommonComponent(JavaPlugin plugin, Class<T> clazz) {
         final var defaultId = clazz.getName();
-        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }
@@ -318,7 +318,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         Class<T> clazz,
         String id
     ) {
-        final BuilderCodec<T> codec = AutoBuilderCodec.tryGetCodec(clazz);
+        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new RuntimeException("Failed to get codec for class " + clazz);
         }

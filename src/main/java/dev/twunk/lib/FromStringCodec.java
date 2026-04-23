@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import org.bson.BsonString;
 import org.bson.BsonValue;
 
-public class TransformCodec<T> implements Codec<T> {
+public class FromStringCodec<T> implements Codec<T> {
 
     private final Function<T, String> encoder;
     private final Function<String, T> decoder;
@@ -20,7 +20,7 @@ public class TransformCodec<T> implements Codec<T> {
     // \/======================\/-  Methods  -\/==========================\/ //
     ///////////////////////////////////////////////////////////////////////////
 
-    public TransformCodec(Function<T, String> encoder, Function<String, T> decoder) {
+    public FromStringCodec(Function<T, String> encoder, Function<String, T> decoder) {
         this.encoder = encoder;
         this.decoder = decoder;
     }

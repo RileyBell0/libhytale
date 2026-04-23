@@ -1,2 +1,2 @@
 @dev.twunk.EverythingIsNonnullByDefault
-package dev.twunk.interfaces.methods;
+package dev.twunk.hytale.interfaces;

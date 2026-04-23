@@ -1,11 +1,11 @@
-package dev.twunk.interfaces.events;
+package dev.twunk.hytale.interfaces.events;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.interfaces.methods.IQuery;
+import dev.twunk.hytale.interfaces.methods.IQuery;
 
 /**
  * Gives your system the event handler function it needs to run some code every

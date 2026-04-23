@@ -10,9 +10,9 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.events.OnAddRemove;
+import dev.twunk.hytale.interfaces.events.IOnAddRemove;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.interfaces.events.IOnAddRemove;
-import dev.twunk.interfaces.methods.IRegistry;
 
 /**
  * This version will call the add and remove events defined in a specific component instance

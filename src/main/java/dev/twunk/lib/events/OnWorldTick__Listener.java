@@ -6,8 +6,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.events.OnWorldTick;
-import dev.twunk.interfaces.events.IOnWorldTick;
-import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.hytale.interfaces.events.IOnWorldTick;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
 
 public abstract class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> extends OnWorldTick<ECS_TYPE> {
 

@@ -1,9 +1,9 @@
-package dev.twunk.interfaces.component;
+package dev.twunk.hytale.interfaces.component;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.interfaces.methods.IContainer;
+import dev.twunk.hytale.interfaces.methods.IContainer;
 
 // import dev.twunk.hytale.components.IContainer;
 

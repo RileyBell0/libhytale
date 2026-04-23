@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.events;
+package dev.twunk.hytale.interfaces.events;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
@@ -6,7 +6,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.interfaces.methods.IQuery;
+import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.lib.TickPlan;
 import javax.annotation.Nullable;
 

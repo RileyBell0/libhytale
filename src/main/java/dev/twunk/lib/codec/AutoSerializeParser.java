@@ -1,7 +1,7 @@
 /**
  * TODO this file is pretty uuh, repetitive, and hard to verify. needs a redo eventually
  */
-package dev.twunk.lib;
+package dev.twunk.lib.codec;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -12,7 +12,7 @@ import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.codec.Codecs;
 import dev.twunk.hytale.codec.annotations.Serializable;
 import dev.twunk.hytale.codec.annotations.Serialize;
-import dev.twunk.interfaces.component.IContainerComponent;
+import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -33,7 +33,7 @@ import javax.lang.model.type.NullType;
  * I figure you've got a sense of what you're doing, so, yeah, welcome, enjoy your stay,
  * and feel free to leave a PR or advice etc on how to make this less spaghetti and more, neat.
  */
-public final class AutoBuilderCodec {
+public final class AutoSerializeParser {
 
     private static final String normaliseFieldName(Field field) {
         // first letter must be capitalised in codec key
@@ -549,6 +549,6 @@ public final class AutoBuilderCodec {
                 return null;
             }
         };
-        return AutoBuilderCodec.build(clazz, supplier);
+        return AutoSerializeParser.build(clazz, supplier);
     }
 }

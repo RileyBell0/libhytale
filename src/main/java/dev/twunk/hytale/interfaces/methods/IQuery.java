@@ -1,4 +1,4 @@
-package dev.twunk.interfaces.methods;
+package dev.twunk.hytale.interfaces.methods;
 
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;

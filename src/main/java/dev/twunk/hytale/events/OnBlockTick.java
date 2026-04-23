@@ -8,9 +8,9 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.interfaces.IEventDriver;
-import dev.twunk.interfaces.events.IOnBlockTick;
-import dev.twunk.interfaces.methods.IQuery;
+import dev.twunk.hytale.interfaces.IEventDriver;
+import dev.twunk.hytale.interfaces.events.IOnBlockTick;
+import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.lib.events.OnBlockTick__Component;
 import dev.twunk.lib.events.OnBlockTick__Listener;
 

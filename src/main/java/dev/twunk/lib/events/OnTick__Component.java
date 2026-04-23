@@ -8,9 +8,9 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.events.OnTick;
+import dev.twunk.hytale.interfaces.events.IOnTick;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.interfaces.events.IOnTick;
-import dev.twunk.interfaces.methods.IRegistry;
 
 public abstract class OnTick__Component<
     ECS_TYPE extends WorldProvider,
