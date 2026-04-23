@@ -48,7 +48,7 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
      * Pass in the ID of the container component that this interaction will search for
      * and open on the interacted entity
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" })
     @Serialize
     private ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
         LibHytale.getChunkComponentType(ContainerComponent.class);

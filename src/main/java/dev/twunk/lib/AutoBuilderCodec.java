@@ -83,7 +83,10 @@ public final class AutoBuilderCodec {
             );
         }
 
-        var inheritedCodec = tryGetInheritedCodec((Class<? super T>) inherits, clazz);
+        @SuppressWarnings("unchecked")
+        var asSuperT = (Class<? super T>) inherits;
+
+        var inheritedCodec = tryGetInheritedCodec(asSuperT, clazz);
 
         BuilderCodec.Builder<T> builder;
         if (inheritedCodec == null) {
@@ -187,7 +190,9 @@ public final class AutoBuilderCodec {
                 new KeyedCodec<U[]>(
                     name,
                     new ArrayCodec<U>((Codec<U>) codec, (int len) -> {
-                        return (U[]) new Object[len];
+                        @SuppressWarnings("unchecked")
+                        var asArr = (U[]) new Object[len];
+                        return asArr;
                     }),
                     required
                 ),
@@ -196,6 +201,7 @@ public final class AutoBuilderCodec {
                         return;
                     }
                     try {
+                        @SuppressWarnings("unchecked")
                         final List<U> actualField = (List<U>) field.get(self);
                         actualField.addAll(Arrays.asList(val));
                     } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -204,9 +210,9 @@ public final class AutoBuilderCodec {
                 },
                 self -> {
                     try {
-                        final List<U> actualField = (List<U>) field.get(self);
-
-                        return (U[]) actualField.toArray();
+                        @SuppressWarnings("unchecked")
+                        final var actualField = (U[]) ((List<U>) field.get(self)).toArray();
+                        return actualField;
                     } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
@@ -247,7 +253,9 @@ public final class AutoBuilderCodec {
                 return null;
             }
 
-            return (BuilderCodec<U>) codec;
+            @SuppressWarnings("unchecked")
+            var asBuilderCodec = (BuilderCodec<U>) codec;
+            return asBuilderCodec;
         } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
             e.printStackTrace();
             return null;
@@ -267,9 +275,12 @@ public final class AutoBuilderCodec {
         }
 
         field.setAccessible(true);
+
+        @SuppressWarnings("unchecked")
+        final var keyedCodec = (KeyedCodec<Object>) new KeyedCodec<>(name, codec, required);
         return builder
             .append(
-                (KeyedCodec<Object>) new KeyedCodec(name, codec, required),
+                keyedCodec,
                 (self, val) -> {
                     if (val == null) {
                         return;
@@ -307,9 +318,11 @@ public final class AutoBuilderCodec {
         }
 
         field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        final var keyedCodec = (KeyedCodec<Object>) new KeyedCodec<>(name, codec, required);
         return builder
             .append(
-                (KeyedCodec<Object>) new KeyedCodec(name, codec, required),
+                keyedCodec,
                 (self, val) -> {
                     if (val != null) {
                         try {
