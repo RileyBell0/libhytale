@@ -1,2 +1,2 @@
 @dev.twunk.EverythingIsNonnullByDefault
-package dev.twunk.lib.system;
+package dev.twunk.lib.events;

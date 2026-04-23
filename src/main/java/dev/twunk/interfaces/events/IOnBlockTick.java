@@ -6,8 +6,8 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.hytale.events.OnTick;
 import dev.twunk.hytale.refs.BlockRef;
-import dev.twunk.hytale.system.OnTick;
 import dev.twunk.interfaces.methods.IQuery;
 
 /**

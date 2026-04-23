@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system.composite;
+package dev.twunk.hytale.events.composite;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;

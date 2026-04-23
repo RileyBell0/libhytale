@@ -1,4 +1,4 @@
-package dev.twunk.lib.system;
+package dev.twunk.lib.events;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -7,11 +7,11 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.events.OnAddRemove;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.OnAddRemove;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.lib.system.OnAddRemove__Listener;
+import dev.twunk.lib.events.OnAddRemove__Listener;
 
 /**
  * This is the normal version, an almost 1 to 1 of what hytale does. It's a "system"

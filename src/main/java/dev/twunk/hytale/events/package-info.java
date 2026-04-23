@@ -1,2 +1,2 @@
 @dev.twunk.EverythingIsNonnullByDefault
-package dev.twunk.hytale.system;
+package dev.twunk.hytale.events;

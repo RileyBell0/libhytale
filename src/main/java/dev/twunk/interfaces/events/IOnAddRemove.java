@@ -6,8 +6,8 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.events.OnAddRemove;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.OnAddRemove;
 import dev.twunk.interfaces.methods.IQuery;
 
 /**

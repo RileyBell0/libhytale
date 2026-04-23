@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system;
+package dev.twunk.hytale.events;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -11,8 +11,8 @@ import dev.twunk.hytale.LibHytale;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnBlockTick;
 import dev.twunk.interfaces.methods.IQuery;
-import dev.twunk.lib.system.OnBlockTick__Component;
-import dev.twunk.lib.system.OnBlockTick__Listener;
+import dev.twunk.lib.events.OnBlockTick__Component;
+import dev.twunk.lib.events.OnBlockTick__Listener;
 
 /**
  * Composite subsystem to allow the parent to run code on its elements every

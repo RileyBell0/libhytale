@@ -1,4 +1,4 @@
-package dev.twunk.lib.system;
+package dev.twunk.lib.events;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -7,8 +7,8 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.events.OnTick;
 import dev.twunk.hytale.refs.AnyRef;
-import dev.twunk.hytale.system.OnTick;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IRegistry;
 
