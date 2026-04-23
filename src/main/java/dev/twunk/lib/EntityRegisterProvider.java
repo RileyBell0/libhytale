@@ -1,4 +1,4 @@
-package dev.twunk.hytale;
+package dev.twunk.lib;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
@@ -7,9 +7,10 @@ import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.hytale.HytalePlugin;
+import dev.twunk.hytale.LibHytale;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
-import dev.twunk.lib.AutoBuilderCodec;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 

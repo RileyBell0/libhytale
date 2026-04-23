@@ -1,4 +1,4 @@
-package dev.twunk.hytale;
+package dev.twunk.lib;
 
 import com.hypixel.hytale.component.Component;
 import java.lang.reflect.ParameterizedType;

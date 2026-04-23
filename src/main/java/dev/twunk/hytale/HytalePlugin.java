@@ -16,6 +16,7 @@ import dev.twunk.annotations.Serializable;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.lib.AutoBuilderCodec;
+import dev.twunk.lib.CodeAnalysis;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
@@ -159,7 +160,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         HytalePlugin.initCommonSystemsFor(this, clazz, componentType);
     }
 
-    protected static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void initCommonSystemsFor(
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> void initCommonSystemsFor(
         JavaPlugin plugin,
         Class<T> clazz,
         ComponentType<ECS_TYPE, T> componentType
