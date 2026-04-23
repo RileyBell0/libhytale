@@ -9,7 +9,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.HytalePlugin;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.hytale.codec.annotations.Serializable;
+import dev.twunk.hytale.annotations.Serializable;
 import dev.twunk.hytale.events.OnAddRemove;
 import dev.twunk.hytale.events.OnBlockTick;
 import dev.twunk.hytale.events.OnTick;
