@@ -8,11 +8,11 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.hytale.system.ignoreme.OnBlockTick__Component;
-import dev.twunk.hytale.system.ignoreme.OnBlockTick__Listener;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnBlockTick;
 import dev.twunk.interfaces.methods.IQuery;
+import dev.twunk.lib.ignoreme.OnBlockTick__Component;
+import dev.twunk.lib.ignoreme.OnBlockTick__Listener;
 
 /**
  * Composite subsystem to allow the parent to run code on its elements every

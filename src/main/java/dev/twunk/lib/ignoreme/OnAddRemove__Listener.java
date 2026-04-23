@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system.ignoreme;
+package dev.twunk.lib.ignoreme;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,9 +9,9 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.refs.AnyRef;
 import dev.twunk.hytale.system.OnAddRemove;
-import dev.twunk.hytale.system.ignoreme.OnAddRemove__Listener;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.lib.ignoreme.OnAddRemove__Listener;
 
 /**
  * This is the normal version, an almost 1 to 1 of what hytale does. It's a "system"
@@ -33,11 +33,7 @@ public abstract class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> exte
      */
     private final IOnAddRemove<ECS_TYPE> listener;
 
-    protected OnAddRemove__Listener(
-        IOnAddRemove<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
-    ) {
+    public OnAddRemove__Listener(IOnAddRemove<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         super(query, registry);
         this.listener = listener;
     }

@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system.ignoreme;
+package dev.twunk.lib.ignoreme;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -13,11 +13,7 @@ public abstract class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> exte
 
     private final IOnWorldTick<ECS_TYPE> listener;
 
-    protected OnWorldTick__Listener(
-        IOnWorldTick<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
-    ) {
+    public OnWorldTick__Listener(IOnWorldTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         super(query, registry);
         this.listener = listener;
     }

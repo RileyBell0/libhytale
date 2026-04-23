@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system.ignoreme;
+package dev.twunk.lib.ignoreme;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -26,7 +26,7 @@ public abstract class OnAddRemove__Component<
 
     private final ComponentType<ECS_TYPE, T> componentType;
 
-    protected OnAddRemove__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    public OnAddRemove__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         super(Query.and(componentType), registry);
         this.componentType = componentType;
     }

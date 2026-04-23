@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system.ignoreme;
+package dev.twunk.lib.ignoreme;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -16,7 +16,7 @@ public abstract class OnBlockTick__Component<T extends Component<ChunkStore>> ex
 
     private final ComponentType<ChunkStore, T> componentType;
 
-    protected OnBlockTick__Component(ComponentType<ChunkStore, T> componentType) {
+    public OnBlockTick__Component(ComponentType<ChunkStore, T> componentType) {
         super(Query.and(componentType));
         this.componentType = componentType;
     }

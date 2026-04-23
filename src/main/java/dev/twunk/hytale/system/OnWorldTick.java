@@ -7,11 +7,11 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.system.ignoreme.OnWorldTick__Listener;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnWorldTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.lib.ignoreme.OnWorldTick__Listener;
 import javax.annotation.Nullable;
 
 /**

@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system.ignoreme;
+package dev.twunk.lib.ignoreme;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -19,7 +19,7 @@ public abstract class OnTick__Component<
 
     private final ComponentType<ECS_TYPE, T> componentType;
 
-    protected OnTick__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    public OnTick__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         super(Query.and(componentType), registry);
         this.componentType = componentType;
     }

@@ -13,13 +13,13 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.system.ignoreme.OnAddRemove__Component;
-import dev.twunk.hytale.system.ignoreme.OnAddRemove__Listener;
 import dev.twunk.interfaces.IEventDriver;
 import dev.twunk.interfaces.events.IOnAddRemove;
 import dev.twunk.interfaces.events.IOnTick;
 import dev.twunk.interfaces.methods.IQuery;
 import dev.twunk.interfaces.methods.IRegistry;
+import dev.twunk.lib.ignoreme.OnAddRemove__Component;
+import dev.twunk.lib.ignoreme.OnAddRemove__Listener;
 
 /**
  * Tiny Subsystem to simply tell our parent system when we added/removed entities

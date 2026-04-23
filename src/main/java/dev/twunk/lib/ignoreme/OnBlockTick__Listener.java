@@ -1,4 +1,4 @@
-package dev.twunk.hytale.system.ignoreme;
+package dev.twunk.lib.ignoreme;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -13,7 +13,7 @@ public abstract class OnBlockTick__Listener extends OnBlockTick {
 
     private final IOnBlockTick listener;
 
-    protected OnBlockTick__Listener(IOnBlockTick listener, Query<ChunkStore> query) {
+    public OnBlockTick__Listener(IOnBlockTick listener, Query<ChunkStore> query) {
         super(query);
         this.listener = listener;
     }
