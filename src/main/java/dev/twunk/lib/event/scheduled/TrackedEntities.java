@@ -7,7 +7,8 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
+import dev.twunk.hytale.ref.AnyRef;
+import dev.twunk.lib.component.TickSchedule;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
 
@@ -94,19 +95,13 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
         final Store<ECS_TYPE> store,
         final ArrayList<TrackedEntity<ECS_TYPE>> area
     ) {
-        // We're going to spend a bunch of extra time in onEntityAdd to cache
-        // all the information we'll need when this thing is ticking
-        //
-        // Most of this starts from the "info"
-        final var world = store.getExternalData().getWorld();
-
         // lets get this all bundled up for easy re-use
-        final var cache = new TrackedEntity<>(world, ref, area);
+        final var cache = new TrackedEntity<>(new AnyRef<>(ref), area);
 
         return cache;
     }
 
-    private INTERNAL_TickSchedulerComponent<ECS_TYPE> loadEntityTickingState(
+    private TickSchedule<ECS_TYPE> loadEntityTickingState(
         final Ref<ECS_TYPE> ref,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {
@@ -150,8 +145,8 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
     @SuppressWarnings({ "unchecked", "null" })
     public static final <ECS_TYPE extends WorldProvider> ComponentType<
         ECS_TYPE,
-        INTERNAL_TickSchedulerComponent<ECS_TYPE>
+        TickSchedule<ECS_TYPE>
     > getComponentType() {
-        return LibHytale.getChunkComponentType(INTERNAL_TickSchedulerComponent.class);
+        return LibHytale.getChunkComponentType(TickSchedule.class);
     }
 }

@@ -47,7 +47,7 @@ public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
 > implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IEventDriver<ECS_TYPE>, IQuery<ECS_TYPE> {
 
-    private final TrackedEntities<ECS_TYPE> inMemoryTrackedEntities;
+    private final TrackedEntities<ECS_TYPE> entities;
     private final IRegistry<ECS_TYPE> registry;
     private final Query<ECS_TYPE> query;
 
@@ -55,7 +55,7 @@ public abstract class OnScheduledTick<
         this.query = query;
         this.registry = registry;
 
-        this.inMemoryTrackedEntities = new TrackedEntities<ECS_TYPE>(id);
+        this.entities = new TrackedEntities<ECS_TYPE>(id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ public abstract class OnScheduledTick<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        inMemoryTrackedEntities.track(ref, store, commandBuffer);
+        entities.track(ref, store, commandBuffer);
     }
 
     /**
@@ -112,7 +112,7 @@ public abstract class OnScheduledTick<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        inMemoryTrackedEntities.untrack(ref, store, reason);
+        entities.untrack(ref, store, reason);
     }
 
     /**
@@ -127,7 +127,7 @@ public abstract class OnScheduledTick<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        for (final @Nonnull var ticker : inMemoryTrackedEntities.ticking) {
+        for (final @Nonnull var ticker : entities.ticking) {
             final var res = this.tickTheTicker(ticker, dt, archetypeChunk, store, commandBuffer);
 
             // Transition to the state returned by the block
@@ -195,7 +195,7 @@ class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends OnSchedu
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        return listener.onScheduledTick(ticker.world, ticker.ref, dt, store, commandBuffer);
+        return listener.onScheduledTick(ticker.ref, dt, store, commandBuffer);
     }
 }
 
@@ -234,12 +234,6 @@ class OnScheduledTick__Component<
             return null;
         }
 
-        return ((IOnScheduledTick<ECS_TYPE>) component).onScheduledTick(
-            ticker.world,
-            ticker.ref,
-            dt,
-            store,
-            commandBuffer
-        );
+        return ((IOnScheduledTick<ECS_TYPE>) component).onScheduledTick(ticker.ref, dt, store, commandBuffer);
     }
 }

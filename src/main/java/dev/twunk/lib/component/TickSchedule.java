@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * but to be fair, stupid stuff is fun stuff
  */
 @Serializable
-public class INTERNAL_TickSchedulerComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
+public class TickSchedule<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
 
     /**
      * The idea is to only have 1x of this component per entity, thus, since my
@@ -123,7 +123,7 @@ public class INTERNAL_TickSchedulerComponent<ECS_TYPE extends WorldProvider> imp
         cache.drop();
     }
 
-    public INTERNAL_TickSchedulerComponent<ECS_TYPE> clone() {
-        return new INTERNAL_TickSchedulerComponent<>();
+    public TickSchedule<ECS_TYPE> clone() {
+        return new TickSchedule<>();
     }
 }

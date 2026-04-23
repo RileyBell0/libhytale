@@ -1,7 +1,7 @@
 package dev.twunk.lib.event.scheduled;
 
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.ref.AnyRef;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
 
@@ -44,22 +44,16 @@ import javax.annotation.Nullable;
  * }
  * </pre>
  */
-public class TrackedEntity<ECS_TYPE> {
-
-    /**
-     * The world that your entity is in
-     */
-    public final World world;
+public class TrackedEntity<ECS_TYPE extends WorldProvider> {
 
     /**
      * The ref for your entity
      */
-    public final Ref<ECS_TYPE> ref;
+    public final AnyRef<ECS_TYPE> ref;
 
     private ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef;
 
-    public TrackedEntity(World world, Ref<ECS_TYPE> ref, ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef) {
-        this.world = world;
+    public TrackedEntity(AnyRef<ECS_TYPE> ref, ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef) {
         this.ref = ref;
         this.currentAreaRef = currentAreaRef;
     }

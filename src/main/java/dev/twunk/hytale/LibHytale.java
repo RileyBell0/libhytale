@@ -10,7 +10,7 @@ import dev.twunk.examples.interaction.SpawnItemInteraction;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.LogInteraction;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
-import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
+import dev.twunk.lib.component.TickSchedule;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import dev.twunk.lib.registry.EntityRegisterProvider;
 import dev.twunk.lib.test.TestComponent;
@@ -65,7 +65,7 @@ public abstract class LibHytale {
         // - NOTE i am aware they don't WORK in both stores rn but they should theoretically
         //   EXIST in both. I'll fix the bugs to get them working later TODO
         HytalePlugin.registerChunkComponent(plugin, TestComponent.class);
-        HytalePlugin.registerCommonComponent(plugin, INTERNAL_TickSchedulerComponent.class);
+        HytalePlugin.registerCommonComponent(plugin, TickSchedule.class);
         HytalePlugin.registerCommonComponent(plugin, ContainerComponent.class);
         HytalePlugin.registerCommonComponent(plugin, TrashComponent.class);
 
