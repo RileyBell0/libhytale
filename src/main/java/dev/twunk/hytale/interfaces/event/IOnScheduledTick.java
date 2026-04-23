@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.methods.IQuery;
-import dev.twunk.lib.TickPlan;
+import dev.twunk.lib.event.scheduled.TickPlan;
 import javax.annotation.Nullable;
 
 /**

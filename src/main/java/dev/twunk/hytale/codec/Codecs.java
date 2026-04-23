@@ -1,7 +1,6 @@
 package dev.twunk.hytale.codec;
 
 import com.hypixel.hytale.codec.Codec;
-import dev.twunk.lib.FromStringCodec;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;

@@ -1,4 +1,4 @@
-package dev.twunk.lib;
+package dev.twunk.lib.registry;
 
 import com.hypixel.hytale.component.Component;
 import java.lang.reflect.ParameterizedType;
@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  * yeah i cbf going through rn updating all the names of the vars, that's a step for when i'm doing
  * a more thorough passover at the end of this project
  */
-public class CodeAnalysis {
+public class TypeInferrer {
 
     @Nullable
     public static final Class<?> getClassFromType(Type t) {

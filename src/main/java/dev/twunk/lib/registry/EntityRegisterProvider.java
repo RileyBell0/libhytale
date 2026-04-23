@@ -1,4 +1,4 @@
-package dev.twunk.lib;
+package dev.twunk.lib.registry;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;

@@ -4,8 +4,8 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.codec.auto.Serializable;
-import dev.twunk.lib.TickPlan;
-import dev.twunk.lib.lifetime.TrackedEntity;
+import dev.twunk.lib.event.scheduled.TickPlan;
+import dev.twunk.lib.event.scheduled.TrackedEntity;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 

@@ -1,4 +1,4 @@
-package dev.twunk.lib;
+package dev.twunk.hytale.codec;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.ExtraInfo;

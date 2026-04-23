@@ -1,4 +1,4 @@
-package dev.twunk.lib;
+package dev.twunk.lib.event.scheduled;
 
 import javax.annotation.Nullable;
 

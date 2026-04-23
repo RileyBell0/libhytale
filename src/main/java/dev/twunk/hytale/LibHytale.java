@@ -10,9 +10,9 @@ import dev.twunk.examples.interaction.SpawnItemInteraction;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.LogInteraction;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
-import dev.twunk.lib.ChunkRegisterProvider;
-import dev.twunk.lib.EntityRegisterProvider;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
+import dev.twunk.lib.registry.ChunkRegisterProvider;
+import dev.twunk.lib.registry.EntityRegisterProvider;
 import dev.twunk.lib.test.TestComponent;
 import javax.annotation.Nullable;
 

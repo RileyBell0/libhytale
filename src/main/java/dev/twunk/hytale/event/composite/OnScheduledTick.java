@@ -18,9 +18,9 @@ import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.lib.TickPlan;
-import dev.twunk.lib.lifetime.TrackedEntities;
-import dev.twunk.lib.lifetime.TrackedEntity;
+import dev.twunk.lib.event.scheduled.TickPlan;
+import dev.twunk.lib.event.scheduled.TrackedEntities;
+import dev.twunk.lib.event.scheduled.TrackedEntity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

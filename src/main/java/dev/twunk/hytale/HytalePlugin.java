@@ -15,8 +15,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnTick;
-import dev.twunk.lib.CodeAnalysis;
 import dev.twunk.lib.codec.AutoSerializeParser;
+import dev.twunk.lib.registry.TypeInferrer;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
@@ -111,7 +111,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         Class<T> clazz
     ) {
         // seriously i know ive got so many commits on this now but omg oh my GOD this works, fuck YES
-        var inferred = CodeAnalysis.inferTypeReceivedByGenericInClassT(Component.class, clazz);
+        var inferred = TypeInferrer.inferTypeReceivedByGenericInClassT(Component.class, clazz);
 
         if (inferred == null) {
             console.atWarning().log(" > [INFERRED] ECS type  <Common>");

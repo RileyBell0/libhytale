@@ -1,4 +1,4 @@
-package dev.twunk.lib.lifetime;
+package dev.twunk.lib.event.scheduled;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -7,7 +7,6 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.lib.TickPlan;
 import dev.twunk.lib.component.INTERNAL_TickSchedulerComponent;
 import java.util.ArrayList;
 import javax.annotation.Nullable;

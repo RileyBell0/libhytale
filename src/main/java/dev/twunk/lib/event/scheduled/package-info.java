@@ -1,2 +1,2 @@
 @dev.twunk.EverythingIsNonnullByDefault
-package dev.twunk.lib.lifetime;
+package dev.twunk.lib.event.scheduled;

@@ -1,7 +1,10 @@
-package dev.twunk.lib.lifetime;
+package dev.twunk.lib.event.scheduled;
 
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
 
@@ -44,7 +47,7 @@ import javax.annotation.Nullable;
  * }
  * </pre>
  */
-public class TrackedEntity<ECS_TYPE> {
+public class TrackedBlockEntity {
 
     private static long nextLifetimeId = 0;
 
@@ -57,21 +60,50 @@ public class TrackedEntity<ECS_TYPE> {
     public final long lifetimeId;
 
     /**
-     * The world that your entity is in
+     * The world that your block entity is in
      */
     public final World world;
 
     /**
+     * The chunk that your block entity is in (within the given world)
+     */
+    public final WorldChunk chunk;
+
+    /**
      * The ref for your entity
      */
-    public final Ref<ECS_TYPE> ref;
+    public final Ref<ChunkStore> ref;
 
-    private ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef;
+    private ArrayList<TrackedBlockEntity> currentAreaRef;
 
-    public TrackedEntity(World world, Ref<ECS_TYPE> ref, ArrayList<TrackedEntity<ECS_TYPE>> currentAreaRef) {
+    /**
+     * Block coords - global for the given world. Never stored in hytale code as
+     * vector really, they just use int for each one. look for
+     * - `blockX`
+     * - `blockY`
+     * - `blockZ`
+     */
+    public final Vector3i pos;
+
+    /**
+     * The chunk that your block entity is in (within the given world)
+     */
+    public final int blockId;
+
+    public TrackedBlockEntity(
+        final World world,
+        final WorldChunk chunk,
+        final Ref<ChunkStore> ref,
+        final Vector3i coords,
+        final int blockId,
+        final ArrayList<TrackedBlockEntity> currentAreaRef
+    ) {
         this.lifetimeId = ++nextLifetimeId;
+        this.pos = coords;
         this.world = world;
+        this.chunk = chunk;
         this.ref = ref;
+        this.blockId = blockId;
         this.currentAreaRef = currentAreaRef;
     }
 
@@ -84,8 +116,8 @@ public class TrackedEntity<ECS_TYPE> {
      */
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj instanceof TrackedEntity) {
-            return ((TrackedEntity<?>) obj).ref == this.ref;
+        if (obj instanceof TrackedBlockEntity) {
+            return ((TrackedBlockEntity) obj).ref == this.ref;
         }
         return false;
     }
