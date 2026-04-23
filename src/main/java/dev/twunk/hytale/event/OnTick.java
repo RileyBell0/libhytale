@@ -8,9 +8,9 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.IEventDriver;
+import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
@@ -40,7 +40,7 @@ import dev.twunk.lib.event.OnTick__Listener;
  */
 public abstract class OnTick<ECS_TYPE extends WorldProvider>
     extends EntityTickingSystem<ECS_TYPE> // EntityTickingSystem is hytale's underlying code that powers this
-    implements IEventDriver<ECS_TYPE>
+    implements ISystemEventDriver<ECS_TYPE>
 {
 
     private final Query<ECS_TYPE> query;
@@ -63,11 +63,6 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     );
-
-    @Override
-    public final void onRegister(JavaPlugin plugin) {
-        this.getRegistry().registerSystem(plugin, this);
-    }
 
     @Override
     public final Query<ECS_TYPE> getQuery() {

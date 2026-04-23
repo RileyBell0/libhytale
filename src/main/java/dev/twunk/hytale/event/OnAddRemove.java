@@ -11,9 +11,9 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.IEventDriver;
+import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
@@ -47,7 +47,7 @@ import dev.twunk.lib.event.OnAddRemove__Listener;
  */
 public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     extends RefSystem<ECS_TYPE>
-    implements IEventDriver<ECS_TYPE>
+    implements ISystemEventDriver<ECS_TYPE>
 {
 
     private final Query<ECS_TYPE> query;
@@ -80,11 +80,6 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     );
-
-    @Override
-    public final void onRegister(JavaPlugin plugin) {
-        this.getRegistry().registerSystem(plugin, this);
-    }
 
     @Override
     public Query<ECS_TYPE> getQuery() {

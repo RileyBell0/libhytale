@@ -5,9 +5,9 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.IEventDriver;
+import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
  */
 public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
     extends ArchetypeTickingSystem<ECS_TYPE> // hytale's underlying driver for my code
-    implements IEventDriver<ECS_TYPE>
+    implements ISystemEventDriver<ECS_TYPE>
 {
 
     private final @Nullable Query<ECS_TYPE> query;
@@ -60,11 +60,6 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
         final Store<ECS_TYPE> store,
         final CommandBuffer<ECS_TYPE> commandBuffer
     );
-
-    @Override
-    public final void onRegister(JavaPlugin plugin) {
-        this.getRegistry().registerSystem(plugin, this);
-    }
 
     @Override
     @Nullable
