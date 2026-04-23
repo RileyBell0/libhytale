@@ -109,6 +109,16 @@ public abstract class HytalePlugin extends JavaPlugin {
             @SuppressWarnings("unchecked")
             var inferredClazz = (Class<? extends Component<EntityStore>>) clazz;
             LibHytale.ENTITY_REGISTRY.bindEventListeners(this, inferredClazz);
+        } else if (WorldProvider.class.isAssignableFrom(inferred)) {
+            console.atWarning().log(" > [INFERRED] ECS type  <Common>");
+
+            @SuppressWarnings("unchecked")
+            var inferredAsEntity = (Class<? extends Component<EntityStore>>) clazz;
+            LibHytale.ENTITY_REGISTRY.bindEventListeners(this, inferredAsEntity);
+
+            @SuppressWarnings("unchecked")
+            var inferredAsChunk = (Class<? extends Component<ChunkStore>>) clazz;
+            LibHytale.CHUNK_REGISTRY.bindEventListeners(this, inferredAsChunk);
         } else {
             console.atSevere().log(" > FAILED TO INFER ECS type of " + inferred);
             console.atSevere().log(" > COMPONENT WAS NOT ADDED TO ANY REGISTRY");
