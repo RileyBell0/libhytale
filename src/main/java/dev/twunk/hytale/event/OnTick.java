@@ -1,10 +1,7 @@
 package dev.twunk.hytale.event;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
@@ -51,19 +48,6 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
         this.registry = registry;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public abstract void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    );
-
     @Override
     public final Query<ECS_TYPE> getQuery() {
         return this.query;
@@ -77,6 +61,7 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     ///////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
     ///////////////////////////////////////////////////////////////////////////
+    // #region hide
 
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
@@ -117,4 +102,5 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
             registry
         );
     }
+    // #endregion hide
 }

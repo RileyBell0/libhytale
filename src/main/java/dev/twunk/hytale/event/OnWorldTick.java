@@ -1,8 +1,5 @@
 package dev.twunk.hytale.event;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
@@ -44,23 +41,6 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
         this.registry = registry;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * tick method that gets called by the `store`
-     * this is pretty much just a shim to get into my code, as i don't want to touch
-     * theirs wherever possible
-     */
-    @Override
-    public abstract void tick(
-        final float dt,
-        final ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        final Store<ECS_TYPE> store,
-        final CommandBuffer<ECS_TYPE> commandBuffer
-    );
-
     @Override
     @Nullable
     public final Query<ECS_TYPE> getQuery() {
@@ -71,6 +51,11 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
     public final IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Implementations  -\/======================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+    // #region hide
 
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
@@ -99,4 +84,6 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
             registry
         );
     }
+
+    // #endregion hide
 }

@@ -1,10 +1,7 @@
 package dev.twunk.hytale.event;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
@@ -35,19 +32,6 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
     protected OnBlockTick(Query<ChunkStore> query) {
         super(query, LibHytale.CHUNK_REGISTRY);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public abstract void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ChunkStore> archetypeChunk,
-        Store<ChunkStore> store,
-        CommandBuffer<ChunkStore> commandBuffer
-    );
 
     ///////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //

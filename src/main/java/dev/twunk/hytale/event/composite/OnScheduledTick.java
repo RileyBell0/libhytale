@@ -9,7 +9,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.IQueryableEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
@@ -55,13 +54,8 @@ public abstract class OnScheduledTick<
     protected OnScheduledTick(String id, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.query = query;
         this.registry = registry;
-
         this.entities = new LoadedEntities<ECS_TYPE>(id);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     public Query<ECS_TYPE> getQuery() {
@@ -69,14 +63,13 @@ public abstract class OnScheduledTick<
     }
 
     @Override
-    public final void onRegister(JavaPlugin plugin) {
-        this.registry.bindEventListeners(plugin, this);
-    }
-
-    @Override
     public IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    ///////////////////////////////////////////////////////////////////////////
 
     @Nullable
     protected abstract TickPlan tickTheTicker(
@@ -88,7 +81,7 @@ public abstract class OnScheduledTick<
     );
 
     ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Events  -\/===========================\/ //
+    // \/===========\/-  Logic driving the tick scheduling  -\/===========\/ //
     ///////////////////////////////////////////////////////////////////////////
 
     /**
@@ -146,6 +139,11 @@ public abstract class OnScheduledTick<
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Implementations  -\/======================\/ //
+    ///////////////////////////////////////////////////////////////////////////
+    // #region hide
+
     public static final <
         ECS_TYPE extends WorldProvider,
         T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
@@ -167,4 +165,5 @@ public abstract class OnScheduledTick<
     > newUninitialised(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         return new OnScheduledTick__Component<ECS_TYPE, T>(id, componentType, registry);
     }
+    // #endregion hide
 }

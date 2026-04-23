@@ -1,12 +1,7 @@
 package dev.twunk.hytale.event;
 
-import com.hypixel.hytale.component.AddReason;
-import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.RemoveReason;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
@@ -58,29 +53,6 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         this.registry = registry;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * To be defined in the subclasses
-     */
-    @Override
-    public abstract void onEntityAdded(
-        Ref<ECS_TYPE> ref,
-        AddReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    );
-
-    @Override
-    public abstract void onEntityRemove(
-        Ref<ECS_TYPE> ref,
-        RemoveReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    );
-
     @Override
     public Query<ECS_TYPE> getQuery() {
         return this.query;
@@ -94,6 +66,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     ///////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
     ///////////////////////////////////////////////////////////////////////////
+    // #region hide
 
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
@@ -147,4 +120,5 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
             registry
         );
     }
+    // #endregion hide
 }
