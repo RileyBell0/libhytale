@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 //
 // OH and responsible for finding the block info when they're loaded (coords,
 // the world and chunk its in, etc)
-public class TrackedEntities<ECS_TYPE extends WorldProvider> {
+public class LoadedEntities<ECS_TYPE extends WorldProvider> {
 
     // A unique and STABLE identifier for the system. you cannot change this.
     // once you decide on an ID your players REQUIRE it to be stable (or everything
@@ -35,7 +35,7 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
     // what state they held
     private final String id;
 
-    public TrackedEntities(String id) {
+    public LoadedEntities(String id) {
         this.id = id;
     }
 
@@ -83,7 +83,7 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
     }
 
     public void untrack(final Ref<ECS_TYPE> ref, final Store<ECS_TYPE> store, final RemoveReason reason) {
-        store.getComponent(ref, TrackedEntities.getComponentType()).drop(this.id, reason);
+        store.getComponent(ref, LoadedEntities.getComponentType()).drop(this.id, reason);
     }
 
     /**
@@ -109,7 +109,7 @@ public class TrackedEntities<ECS_TYPE extends WorldProvider> {
         // so it can resume ticking/sleeping/etc when the server reboots. really
         // we just want to store shit so the lifetime extends past (NOW), and
         // so we can QUICKLY remove the entity again later
-        final var tickingInfo = commandBuffer.ensureAndGetComponent(ref, TrackedEntities.getComponentType());
+        final var tickingInfo = commandBuffer.ensureAndGetComponent(ref, LoadedEntities.getComponentType());
         var systemState = tickingInfo.getTickingInfo(this.id);
         if (systemState == null) {
             systemState = new TickPlan.Active();
