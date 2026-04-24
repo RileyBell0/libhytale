@@ -58,8 +58,6 @@ public abstract class LibHytale {
         }
         hasRegisteredLibComponents = true;
 
-        HytalePlugin.registerChunkComponent(plugin, TestComponent.class);
-
         // some components i've got i want accessible in both entity and chunk stores
         // since, well, i've got no real reason to restrict them to just one store rn
         // - NOTE i am aware they don't WORK in both stores rn but they should theoretically
