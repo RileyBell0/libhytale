@@ -3,11 +3,12 @@ package dev.twunk.lib.registry;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> {
+public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> implements IRegistry<ECS_TYPE> {
 
     public final Map<
         Class<? extends Component<ECS_TYPE>>,

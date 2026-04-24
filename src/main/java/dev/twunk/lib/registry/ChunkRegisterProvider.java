@@ -8,9 +8,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.event.OnBlockTick;
 import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
-import dev.twunk.hytale.interfaces.methods.IRegistry;
 
-public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkStore> implements IRegistry<ChunkStore> {
+public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkStore> {
 
     @Override
     public ComponentRegistryProxy<ChunkStore> getStoreRegistry(JavaPlugin plugin) {
