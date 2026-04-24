@@ -91,7 +91,7 @@ public abstract class LibHytale {
      *          registration...
      */
     @Nullable
-    public static ComponentType<ChunkStore, ? extends Component<ChunkStore>> getChunkComponentType(
+    public static <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getChunkComponentType(
         final String componentId
     ) {
         return CHUNK_REGISTRY.getComponentType(componentId);
@@ -114,7 +114,7 @@ public abstract class LibHytale {
      *          registration...
      */
     @Nullable
-    public static ComponentType<EntityStore, ? extends Component<EntityStore>> getEntityComponentType(
+    public static <T extends Component<EntityStore>> ComponentType<EntityStore, T> getEntityComponentType(
         final String componentId
     ) {
         return ENTITY_REGISTRY.getComponentType(componentId);

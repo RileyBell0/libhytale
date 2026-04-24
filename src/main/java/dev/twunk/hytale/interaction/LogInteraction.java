@@ -60,9 +60,9 @@ public class LogInteraction extends SimpleInstantInteraction {
     @Serialize
     private ArrayList<MessageCodec> messages = new ArrayList<>();
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     /**
      * Runs the interaction.
@@ -94,11 +94,11 @@ public class LogInteraction extends SimpleInstantInteraction {
         }
 
         Message msg;
-        final var messages = this.messages.stream().map(MessageCodec::toMessage).toArray(Message[]::new);
-        if (messages == null) {
+        final var subMessages = this.messages.stream().map(MessageCodec::toMessage).toArray(Message[]::new);
+        if (subMessages == null) {
             msg = Chat.parse(this.message);
         } else {
-            msg = Message.join(Chat.parse(message), Message.join(messages));
+            msg = Message.join(Chat.parse(message), Message.join(subMessages));
         }
 
         if (this.color != null) {

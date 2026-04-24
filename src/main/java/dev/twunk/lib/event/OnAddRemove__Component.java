@@ -26,14 +26,14 @@ public abstract class OnAddRemove__Component<
 
     private final ComponentType<ECS_TYPE, T> componentType;
 
-    public OnAddRemove__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    protected OnAddRemove__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         super(Query.and(componentType), registry);
         this.componentType = componentType;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onEntityAdded(

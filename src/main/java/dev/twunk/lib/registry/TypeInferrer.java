@@ -7,6 +7,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -116,19 +117,14 @@ public class TypeInferrer {
         // subClassType is CLOSER to component than we are, so we don't want to keep it unless it's already a resolved type
         for (var subClassGeneric : subSearchRes.current) {
             // and we'll sus the current ones and figure out what we plan to do with them
-            if (!(subClassGeneric instanceof TypeVariable)) {
+            // if our parent type isn't parameterized we can't keep following any of the current generic types up the tree, so we end here
+            if (!(subClassGeneric instanceof TypeVariable) || !(type instanceof ParameterizedType)) {
                 // if it's NOT a type variable, this means something concrete was received, meaning
                 // we can stop looking down this path and save this
                 //
                 // We keep looking in general since we might find something MORE specific, really we could propell this
                 // up the tree but i'm not really sure how this works so i'll go for a full approach first then cut back
                 // where i can after
-                res.finalised.add(subClassGeneric);
-                continue;
-            }
-
-            // if our parent type isn't parameterized we can't keep following any of the current generic types up the tree, so we end here
-            if (!(type instanceof ParameterizedType)) {
                 res.finalised.add(subClassGeneric);
                 continue;
             }
@@ -151,46 +147,44 @@ public class TypeInferrer {
             for (var i = 0; i < ourClassTypes.length; i++) {
                 var ourClassGeneric = ourClassTypes[i];
 
-                if (ourClassGeneric != subClassGeneric) {
-                    continue;
+                if (ourClassGeneric == subClassGeneric) {
+                    // if we found a mathcing generic from the subclass type variable
+                    // we can use that index to figure out which actual generic
+                    // would have been passed where
+                    //
+                    // e.g.
+                    // if class definitions are
+                    // - MyClass<A1, A2, A3> extends SubClass<A3, A2>
+                    // - SubClass<B1, B2> extends Component<B2>
+                    // - Component<T>
+                    // this goes
+                    //
+                    // Hey when we looked into subclass we found it still extends component
+                    // then when we looked at component we saw it had the type param B2
+                    // So then now we're back in SubClass we want to figure out which one of our type args was used to extend Component,
+                    // - e.g. we have at this stage the info SubClass<?, ?> extends Component<B2>
+                    // then we loop through to go hey was C the first type arg or the second?
+                    // SubClass<B1, ?> extends Component<B2>
+                    // ok it wasnt that one, our class generic (B!) was not equal to sub class generic (B2)
+                    // then we find out
+                    // SubClass<B1, B2> extends Component<B2>
+                    // and we go
+                    // ok is B2 == B2? woah ok sick so we KNOW that our SubClass must have passed its type param "B2" in index 1
+                    // to the Component
+                    //
+                    // then we can go ok what was ACTUALLY passed to our SubClass generics themselves
+                    // and we find that our class definition for the actual types are as follows
+                    // - MyClass<String, ChunkStore, EntityStore>
+                    // - SubClass<A3, A2>
+                    // - Component<B2>
+                    // thus we can simply go ok so since I component received b2, i'll see that i join on B2 in SubClass
+                    // and return whatever subclass got instead, so subclass got A2 for its B2 param (A2 received in index 1)
+                    // so we use that
+                    //
+                    // the failure case would be if component received D3 instead of B2, cause then we go up the tree saying "hey does anyone see D3?" and nope nobody has so our inference fails
+                    foundGeneric = ourResolvedTypeArguments[i];
+                    break;
                 }
-
-                // if we found a mathcing generic from the subclass type variable
-                // we can use that index to figure out which actual generic
-                // would have been passed where
-                //
-                // e.g.
-                // if class definitions are
-                // - MyClass<A1, A2, A3> extends SubClass<A3, A2>
-                // - SubClass<B1, B2> extends Component<B2>
-                // - Component<T>
-                // this goes
-                //
-                // Hey when we looked into subclass we found it still extends component
-                // then when we looked at component we saw it had the type param B2
-                // So then now we're back in SubClass we want to figure out which one of our type args was used to extend Component,
-                // - e.g. we have at this stage the info SubClass<?, ?> extends Component<B2>
-                // then we loop through to go hey was C the first type arg or the second?
-                // SubClass<B1, ?> extends Component<B2>
-                // ok it wasnt that one, our class generic (B!) was not equal to sub class generic (B2)
-                // then we find out
-                // SubClass<B1, B2> extends Component<B2>
-                // and we go
-                // ok is B2 == B2? woah ok sick so we KNOW that our SubClass must have passed its type param "B2" in index 1
-                // to the Component
-                //
-                // then we can go ok what was ACTUALLY passed to our SubClass generics themselves
-                // and we find that our class definition for the actual types are as follows
-                // - MyClass<String, ChunkStore, EntityStore>
-                // - SubClass<A3, A2>
-                // - Component<B2>
-                // thus we can simply go ok so since I component received b2, i'll see that i join on B2 in SubClass
-                // and return whatever subclass got instead, so subclass got A2 for its B2 param (A2 received in index 1)
-                // so we use that
-                //
-                // the failure case would be if component received D3 instead of B2, cause then we go up the tree saying "hey does anyone see D3?" and nope nobody has so our inference fails
-                foundGeneric = ourResolvedTypeArguments[i];
-                break;
             }
 
             if (foundGeneric == null) {
@@ -253,12 +247,14 @@ public class TypeInferrer {
                 continue;
             }
 
-            // shouldn't be possible for this to happen so just commented it out but yeah not certain
-            // if (
-            //     !currentClass.isAssignableFrom(mostSpecificClass) && !mostSpecificClass.isAssignableFrom(currentClass)
-            // ) {
-            //     continue;
-            // }
+            /**
+             * // shouldn't be possible for this to happen so just commented it out but yeah not certain
+             * if (
+             *     !currentClass.isAssignableFrom(mostSpecificClass) && !mostSpecificClass.isAssignableFrom(currentClass)
+             * ) {
+             *     continue;
+             * }
+             */
 
             if (mostSpecificClass.isAssignableFrom(currentClass)) {
                 mostSpecificClass = currentClass;
@@ -271,10 +267,10 @@ public class TypeInferrer {
 
 class AnalysisReturn {
 
-    public Set<Type> finalised = new HashSet<>();
-    public Set<Type> current = new HashSet<>();
-    public Set<Type> lost = new HashSet<>();
-    public Set<Type> allSeen = new HashSet<>();
+    public final Set<Type> finalised = new HashSet<>();
+    public final Set<Type> current = new HashSet<>();
+    public final Set<Type> lost = new HashSet<>();
+    public final Set<Type> allSeen = new HashSet<>();
 
     public AnalysisReturn append(AnalysisReturn other) {
         this.current.addAll(other.current);
@@ -286,28 +282,37 @@ class AnalysisReturn {
 
     @Override
     public String toString() {
-        var res = "AnalysisReturn" + this.hashCode() + " { ";
-        res += "current: [";
+        var sb = new StringBuilder("AnalysisReturn" + this.hashCode() + " { ");
+        sb.append("current: [");
         for (var val : this.current) {
-            res += val + ", ";
+            sb.append(val);
+            sb.append(", ");
         }
-        res += "], ";
-        res += "finalised: [";
+        sb.append("], ");
+        sb.append("finalised: [");
         for (var val : this.finalised) {
-            res += val + ", ";
+            sb.append(val);
+            sb.append(", ");
         }
-        res += "], ";
-        res += "lost: [ ";
+        sb.append("], ");
+        sb.append("lost: [ ");
         for (var val : this.lost) {
-            res += val + ", ";
+            sb.append(val);
+            sb.append(", ");
         }
-        res += "], ";
-        res += "allSeen: [ ";
+        sb.append("], ");
+        sb.append("allSeen: [ ");
         for (var val : this.allSeen) {
-            res += val + ", ";
+            sb.append(val);
+            sb.append(", ");
         }
-        res += "]";
-        res += "}";
-        return res;
+        sb.append("]");
+        sb.append("}");
+
+        @SuppressWarnings("null")
+        @Nonnull
+        var str = sb.toString();
+
+        return str;
     }
 }

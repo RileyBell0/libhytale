@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.ItemUtils {
 
     private static final float DEFAULT_VELOCITY = 1.5F;
+    private static final FastRandom rand = new FastRandom();
 
     @SuppressWarnings("null")
     private static final Vector3f ZERO_VEC = Vector3f.ZERO;
@@ -42,7 +43,6 @@ public abstract class ItemUtils extends com.hypixel.hytale.server.core.entity.It
 
         // Calc a small random dir to throw the item. Will all vaguely fall in
         // the same area, but at least with some variation now
-        final FastRandom rand = new FastRandom();
         final Vector3d throwDirection = new Vector3d(
             rand.nextFloat() * 2 - 1,
             // forces y to be positive, so random number is in range [0.3, 1.0]

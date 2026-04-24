@@ -2,7 +2,7 @@ package dev.twunk.hytale.ref;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 
 /**
@@ -12,16 +12,16 @@ import javax.annotation.Nullable;
  */
 public class TrackedRef<ECS_TYPE extends WorldProvider> extends AnyRef<ECS_TYPE> {
 
-    private ArrayList<TrackedRef<ECS_TYPE>> holder;
+    private List<TrackedRef<ECS_TYPE>> holder;
 
-    public TrackedRef(Ref<ECS_TYPE> ref, ArrayList<TrackedRef<ECS_TYPE>> holder) {
+    public TrackedRef(Ref<ECS_TYPE> ref, List<TrackedRef<ECS_TYPE>> holder) {
         super(ref);
         this.holder = holder;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     public void drop() {
         this.holder.remove(this);

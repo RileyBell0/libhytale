@@ -3,6 +3,7 @@ package dev.twunk.hytale.interfaces;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.LibHytaleException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -32,10 +33,7 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
      * two underscores for a good reason - making you question yourself before deciding to use this...
      */
     @SuppressWarnings("null")
-    public static <ECS_TYPE extends WorldProvider, T> Class<? extends T> __duplicateClass(
-        Class<T> subSystemClass,
-        Class<?>... constructorArgTypes
-    ) {
+    public static <T> Class<? extends T> __duplicateClass(Class<T> subSystemClass, Class<?>... constructorArgTypes) {
         int[] indexes = new int[constructorArgTypes.length];
         for (var i = 0; i < constructorArgTypes.length; i++) {
             indexes[i] = i;
@@ -64,7 +62,7 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
                 .load(subSystemClass.getClassLoader(), ClassLoadingStrategy.UsingLookup.of(MethodHandles.lookup()))
                 .getLoaded();
         } catch (Exception e) {
-            throw new RuntimeException(
+            throw new LibHytaleException(
                 "RILEY, you called a constructor that doesnt exist for:" +
                     "\n- CALLER class: " +
                     subSystemClass.getName() +
@@ -83,7 +81,7 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
      * two underscores for a good reason - making you question yourself before deciding to use this...
      */
     @SuppressWarnings("null")
-    public static <ECS_TYPE extends WorldProvider, T> Constructor<? extends T> __dupeClassAndGetConstructor(
+    public static <T> Constructor<? extends T> __dupeClassAndGetConstructor(
         Class<T> subSystemClass,
         Class<?>... constructorArgTypes
     ) {
@@ -116,7 +114,7 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
                 .getLoaded()
                 .getDeclaredConstructor(constructorArgTypes);
         } catch (Exception e) {
-            throw new RuntimeException(
+            throw new LibHytaleException(
                 "RILEY, you called a constructor that doesnt exist for:" +
                     "\n- CALLER class: " +
                     subSystemClass.getName() +
@@ -130,10 +128,7 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
         }
     }
 
-    public static <ECS_TYPE extends WorldProvider, T> Constructor<T> __getConstructor(
-        Class<T> clazz,
-        Class<?>... args
-    ) {
+    public static <T> Constructor<T> __getConstructor(Class<T> clazz, Class<?>... args) {
         // get the classes for the objects
         ArrayList<Class<?>> classes = new ArrayList<>();
         for (var arg : args) {
@@ -143,26 +138,20 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
         try {
             var constructor = clazz.getDeclaredConstructor(classes.toArray(Class<?>[]::new));
             if (constructor == null) {
-                throw new RuntimeException("ERROR: shouldn't have been null but was asfhao8wh23r");
+                throw new LibHytaleException("ERROR: shouldn't have been null but was asfhao8wh23r");
             }
             return constructor;
         } catch (IllegalArgumentException | NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new LibHytaleException(e);
         }
     }
 
-    public static <ECS_TYPE extends WorldProvider, T> T __construct(Constructor<T> constructor, Object... args) {
-        // get the classes for the objects
-        ArrayList<Class<?>> classes = new ArrayList<>();
-        for (var arg : args) {
-            classes.add(arg.getClass());
-        }
-
+    public static <T> T __construct(Constructor<T> constructor, Object... args) {
         try {
             var res = constructor.newInstance(args);
             if (res == null) {
-                throw new RuntimeException("ERROR: shouldn't have been null but was asfhao8wh23r");
+                throw new LibHytaleException("ERROR: shouldn't have been null but was asfhao8wh23r");
             }
             return res;
         } catch (
@@ -173,7 +162,7 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
             | SecurityException e
         ) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new LibHytaleException(e);
         }
     }
 

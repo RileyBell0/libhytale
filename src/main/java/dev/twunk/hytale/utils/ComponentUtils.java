@@ -13,6 +13,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.LibHytaleException;
 import dev.twunk.lib.test.TestComponent;
 import dev.twunk.lib.test.TestUtil;
 import java.util.function.Supplier;
@@ -44,7 +45,6 @@ public abstract class ComponentUtils {
      */
     public static final void test(
         final Ref<ChunkStore> blockRef,
-        final WorldChunk worldChunk,
         final CommandBuffer<ChunkStore> commandBuffer,
         final Vector3i providedCoords,
         final @Nullable Boolean verbose
@@ -65,56 +65,57 @@ public abstract class ComponentUtils {
         Component<ChunkStore> component;
         component = ComponentUtils.get(blockRef, BLOCK_STATE_INFO_COMPONENT_TYPE);
         if (component == null) {
-            throw new RuntimeException("!! No BlockStateInfo component on BlockRef");
+            throw new LibHytaleException("!! No BlockStateInfo component on BlockRef");
         }
 
         // Chunk should contain WorldChunk component
         component = ComponentUtils.get(chunkRef, WORLD_CHUNK_COMPONENT);
         if (component == null) {
-            throw new RuntimeException("!! No WorldChunk component on ChunkRef");
+            throw new LibHytaleException("!! No WorldChunk component on ChunkRef");
         }
 
         // Chunk should contain BlockComponentChunk component
         component = ComponentUtils.get(chunkRef, BLOCK_COMPONENT_CHUNK);
         if (component == null) {
-            throw new RuntimeException("!! No BlockComponentChunk component on ChunkRef (base method)");
+            throw new LibHytaleException("!! No BlockComponentChunk component on ChunkRef (base method)");
         }
         component = ComponentUtils.getBlockComponentChunk(chunkRef);
         if (component == null) {
-            throw new RuntimeException("!! No BlockComponentChunk component on ChunkRef (higher level method)");
+            throw new LibHytaleException("!! No BlockComponentChunk component on ChunkRef (higher level method)");
         }
 
         // validate the components AREN'T on there yet (BlockRef)
         component = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
         if (ComponentUtils.has(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || component != null) {
-            throw new RuntimeException("!! ERROR: BlockRef contained TestComponent before we added it");
+            throw new LibHytaleException("!! ERROR: BlockRef contained TestComponent before we added it");
         }
 
         // validate the components AREN'T on there yet (ChunkRef)
         component = ComponentUtils.get(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
         if (ComponentUtils.has(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || component != null) {
-            throw new RuntimeException("!! ERROR: ChunkRef contained TestComponent before we added it");
+            throw new LibHytaleException("!! ERROR: ChunkRef contained TestComponent before we added it");
         }
 
         // Add components
         commandBuffer.run(componentAccessor -> {
             try {
-                try {
-                    componentAccessor.putComponent(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE, blockRefComponent);
-                } catch (Exception e) {
-                    throw new RuntimeException("!! !! ERROR: Failed to put component onto block");
-                }
+                componentAccessor.putComponent(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE, blockRefComponent);
+            } catch (Exception _) {
+                throw new LibHytaleException("!! !! ERROR: Failed to put component onto block");
+            }
 
+            TestComponent blockRefComponentREFETCHED;
+            try {
                 // and we'll check that it's there
-                var blockRefComponentREFETCHED = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
+                blockRefComponentREFETCHED = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
                 if (
                     !ComponentUtils.has(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || blockRefComponentREFETCHED == null
                 ) {
-                    throw new RuntimeException("!! !! ERROR: Failed to get component we just added from blockRef");
+                    throw new LibHytaleException("!! !! ERROR: Failed to get component we just added from blockRef");
                 }
 
                 if (blockRefComponent != blockRefComponentREFETCHED || blockRefComponentREFETCHED.getValue() != 1) {
-                    throw new RuntimeException(
+                    throw new LibHytaleException(
                         "new component on our block wasn't the same one we put on there " +
                             blockRefComponent +
                             " " +
@@ -125,25 +126,35 @@ public abstract class ComponentUtils {
                             blockRefComponentREFETCHED.getValue()
                     );
                 }
-
-                try {
-                    componentAccessor
-                        .getExternalData()
-                        .getStore()
-                        .putComponent(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE, chunkRefComponent);
-                } catch (Exception e) {
-                    throw new RuntimeException("!! !! ERROR: Failed to put component onto chunk");
+            } catch (Exception e) {
+                if (verbose != null) {
+                    Chat.log("ERROR IN TESTS" + e);
                 }
+                if (verbose == null) {
+                    Chat.log("- (13) FAILED:  TEST_Component_");
+                }
+                throw new LibHytaleException("failed to fetch test component");
+            }
 
+            try {
+                componentAccessor
+                    .getExternalData()
+                    .getStore()
+                    .putComponent(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE, chunkRefComponent);
+            } catch (Exception _) {
+                throw new LibHytaleException("!! !! ERROR: Failed to put component onto chunk");
+            }
+
+            try {
                 var chunkRefComponentREFETCHED = ComponentUtils.get(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
                 if (
                     !ComponentUtils.has(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || chunkRefComponentREFETCHED == null
                 ) {
-                    throw new RuntimeException("!! !! ERROR: Failed to get component we just added from chunkRef");
+                    throw new LibHytaleException("!! !! ERROR: Failed to get component we just added from chunkRef");
                 }
 
                 if (chunkRefComponent != chunkRefComponentREFETCHED || chunkRefComponentREFETCHED.getValue() != 2) {
-                    throw new RuntimeException(
+                    throw new LibHytaleException(
                         "new component on our chunk wasn't the same one we put on there " +
                             chunkRefComponent +
                             " " +
@@ -162,13 +173,13 @@ public abstract class ComponentUtils {
                     blockRefComponent.getValue() != blockRefComponentREFETCHED.getValue() ||
                     blockRefComponent.getValue() != 3
                 ) {
-                    throw new RuntimeException("new component on our block doesn't respond to updates");
+                    throw new LibHytaleException("new component on our block doesn't respond to updates");
                 }
                 if (
                     chunkRefComponent.getValue() != chunkRefComponentREFETCHED.getValue() ||
                     chunkRefComponent.getValue() != 4
                 ) {
-                    throw new RuntimeException("new component on our chunk doesn't respond to updates");
+                    throw new LibHytaleException("new component on our chunk doesn't respond to updates");
                 }
 
                 var component2 = ComponentUtils.get_blockCoords(
@@ -179,7 +190,7 @@ public abstract class ComponentUtils {
                     blockZ
                 );
                 if (component2 == null) {
-                    throw new RuntimeException("Failed to get component by block coords");
+                    throw new LibHytaleException("Failed to get component by block coords");
                 }
 
                 final var localCoords = BlockUtils.Coords.Local.get(blockCoords);
@@ -191,7 +202,7 @@ public abstract class ComponentUtils {
                     localCoords.z
                 );
                 if (component3 == null) {
-                    throw new RuntimeException("Failed to get component by local coords");
+                    throw new LibHytaleException("Failed to get component by local coords");
                 }
 
                 // then we'll remove it from one, check its still on the other and not on the one we removed it from
@@ -201,10 +212,10 @@ public abstract class ComponentUtils {
                 blockRefComponentREFETCHED = ComponentUtils.get(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
                 chunkRefComponentREFETCHED = ComponentUtils.get(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE);
                 if (ComponentUtils.has(blockRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || blockRefComponentREFETCHED != null) {
-                    throw new RuntimeException("failed to remove our new component from the block lmao");
+                    throw new LibHytaleException("failed to remove our new component from the block lmao");
                 }
                 if (ComponentUtils.has(chunkRef, TWUNK_DEV_TEST_COMPONENT_TYPE) || chunkRefComponentREFETCHED != null) {
-                    throw new RuntimeException("failed to remove our new component from the block lmao");
+                    throw new LibHytaleException("failed to remove our new component from the block lmao");
                 }
 
                 component2 = ComponentUtils.get_blockCoords(
@@ -215,7 +226,7 @@ public abstract class ComponentUtils {
                     blockZ
                 );
                 if (component2 != null) {
-                    throw new RuntimeException(
+                    throw new LibHytaleException(
                         "Should NOT have been able to get component after deleting it (from blockCoords)"
                     );
                 }
@@ -228,7 +239,7 @@ public abstract class ComponentUtils {
                     localCoords.z
                 );
                 if (component3 != null) {
-                    throw new RuntimeException(
+                    throw new LibHytaleException(
                         "Should NOT have been able to get component after deleting it (from localCoords)"
                     );
                 }
@@ -268,7 +279,7 @@ public abstract class ComponentUtils {
         final Ref<ECS_TYPE> ref,
         final ComponentType<ECS_TYPE, T> componentType
     ) {
-        return (T) ref.getStore().getComponent(ref, componentType) != null;
+        return ref.getStore().getComponent(ref, componentType) != null;
     }
 
     // ====================================================================
@@ -317,8 +328,6 @@ public abstract class ComponentUtils {
         }
 
         Chat.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
-        Chat.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
-        Chat.log("WARNING WARNING RILEY WARNING WE HAD A REF THAT WASN'T A BLOCK AND WASN'T A CHUNK");
         return null;
     }
 
@@ -328,7 +337,7 @@ public abstract class ComponentUtils {
             return anyRef.getStore().getComponent(anyRef, BLOCK_COMPONENT_CHUNK);
         } else if (BlockUtils.isBlockRef(anyRef)) {
             // get the chunkRef first
-            final var chunkRef = ChunkUtils.Ref_.get(anyRef);
+            final var chunkRef = ChunkUtils.Refs.get(anyRef);
             if (chunkRef == null) {
                 return null;
             }
@@ -385,7 +394,7 @@ public abstract class ComponentUtils {
         final int localY,
         final int localZ
     ) {
-        final var ref = BlockUtils.Ref_.getLocal(chunk, localX, localY, localZ);
+        final var ref = BlockUtils.Refs.getLocal(chunk, localX, localY, localZ);
         if (ref == null) {
             return null;
         }
@@ -405,7 +414,7 @@ public abstract class ComponentUtils {
         final int localY,
         final int localZ
     ) {
-        final var ref = BlockUtils.Ref_.getLocal(chunk, localX, localY, localZ);
+        final var ref = BlockUtils.Refs.getLocal(chunk, localX, localY, localZ);
         if (ref == null) {
             return null;
         }

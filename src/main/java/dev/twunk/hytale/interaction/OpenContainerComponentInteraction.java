@@ -55,9 +55,9 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
     //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     @Override
     protected void interactWithBlock(
@@ -79,5 +79,7 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
         final @Nullable ItemStack itemInHand,
         final World world,
         final Vector3i targetBlock
-    ) {}
+    ) {
+        /* simulate interact with block is what gets run when an NPC or smthn like that interacts with this. They don't need a GUI. They're not real */
+    }
 }

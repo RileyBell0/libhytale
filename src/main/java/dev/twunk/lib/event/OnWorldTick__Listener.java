@@ -13,14 +13,18 @@ public abstract class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> exte
 
     private final IOnWorldTick<ECS_TYPE> listener;
 
-    public OnWorldTick__Listener(IOnWorldTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnWorldTick__Listener(
+        IOnWorldTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
+    ) {
         super(query, registry);
         this.listener = listener;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     @Override
     public final void tick(

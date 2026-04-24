@@ -56,8 +56,7 @@ public class Toast extends NotificationUtil {
     }
 
     public Toast setPrimaryMessage(final @Nullable Object message) {
-        this.message = Chat.parse(message);
-        return this;
+        return setMessage(message);
     }
 
     public Toast setSecondaryMessage(final @Nullable Object secondaryMessage) {
@@ -89,11 +88,24 @@ public class Toast extends NotificationUtil {
     }
 
     public void send() {
-        Toast.sendNotificationToUniverse(this.message, this.secondaryMessage, this.icon, this.item, this.style);
+        NotificationUtil.sendNotificationToUniverse(
+            this.message,
+            this.secondaryMessage,
+            this.icon,
+            this.item,
+            this.style
+        );
     }
 
     public void send(PacketHandler handler) {
-        Toast.sendNotification(handler, this.message, this.secondaryMessage, this.icon, this.item, this.style);
+        NotificationUtil.sendNotification(
+            handler,
+            this.message,
+            this.secondaryMessage,
+            this.icon,
+            this.item,
+            this.style
+        );
     }
 
     public void send(Player player) {
@@ -122,6 +134,6 @@ public class Toast extends NotificationUtil {
 
         final var playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
 
-        Toast.sendNotification(playerRef.getPacketHandler(), message, secondaryMessage, icon, item, style);
+        NotificationUtil.sendNotification(playerRef.getPacketHandler(), message, secondaryMessage, icon, item, style);
     }
 }

@@ -33,14 +33,18 @@ public abstract class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> exte
      */
     private final IOnAddRemove<ECS_TYPE> listener;
 
-    public OnAddRemove__Listener(IOnAddRemove<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnAddRemove__Listener(
+        IOnAddRemove<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
+    ) {
         super(query, registry);
         this.listener = listener;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onEntityAdded(

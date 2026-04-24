@@ -5,8 +5,6 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.ser
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.methods.IContainer;
 
-// import dev.twunk.hytale.components.IContainer;
-
 /**
  * Basically just a component that satisfies the main basic methods needed for
  * running a container (getting the container, the capacity, etc)

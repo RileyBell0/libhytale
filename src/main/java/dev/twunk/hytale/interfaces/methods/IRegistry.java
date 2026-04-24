@@ -2,10 +2,15 @@ package dev.twunk.hytale.interfaces.methods;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.ComponentRegistryProxy;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.LibHytaleException;
+import dev.twunk.lib.codec.AutoSerializeParser;
+import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
@@ -24,33 +29,165 @@ import javax.annotation.Nullable;
  * case it'll do the same but for chunks etc)
  */
 public interface IRegistry<ECS_TYPE extends WorldProvider> {
-    @Nullable
-    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(Class<T> componentClass);
+    @SuppressWarnings("null")
+    static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+
+    public abstract Map<
+        Class<? extends Component<ECS_TYPE>>,
+        ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>
+    > getComponentMap();
 
     @Nullable
-    public ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>> getComponentType(String componentClass);
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(
+        Class<T> componentClass
+    ) {
+        var componentType = this.getComponentMap().get(componentClass);
+        if (componentType == null) {
+            return null;
+        }
 
-    public <T extends Component<ECS_TYPE>> void registerComponentType(
+        // casting is safe as long as i haven't stuffed something up
+        @SuppressWarnings("unchecked")
+        var res = (ComponentType<ECS_TYPE, T>) componentType;
+
+        return res;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(String componentId) {
+        return (ComponentType<ECS_TYPE, T>) this.getComponentByIdMap().get(componentId);
+    }
+
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
+        JavaPlugin plugin,
+        BuilderCodec<T> codec
+    ) {
+        var clazz = codec.getInnerClass();
+        if (clazz == null) {
+            throw new LibHytaleException("Failed to get component class from codec in asdiofhaowiehpg34");
+        }
+
+        var componentType = this._registerComponent(plugin, codec);
+        this.bindEventListeners(plugin, clazz, componentType);
+
+        return componentType;
+    }
+
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
+        JavaPlugin plugin,
+        Class<T> clazz
+    ) {
+        var componentType = this._registerComponent(plugin, clazz);
+        this.bindEventListeners(plugin, clazz, componentType);
+
+        return componentType;
+    }
+
+    /**
+     * Registers the component type with the static map that stores
+     * all that goodness for us. IRegisteredComponent gets to know
+     * about EVERYTHING above it WOOOO
+     */
+    public default <T extends Component<ECS_TYPE>> void registerComponentType(
+        ComponentType<ECS_TYPE, T> componentType,
+        Class<T> myClass
+    ) {
+        final var defaultId = myClass.getName();
+        if (defaultId == null) {
+            throw new LibHytaleException("Failed to make ID (failed to call .getName()) for class " + myClass);
+        }
+        this.registerComponentType(componentType, myClass, defaultId);
+    }
+
+    /**
+     * Registers the component type with the static map that stores
+     * all that goodness for us. IRegisteredComponent gets to know
+     * about EVERYTHING above it WOOOO
+     */
+    public default <T extends Component<ECS_TYPE>> void registerComponentType(
         ComponentType<ECS_TYPE, T> componentType,
         Class<T> myClass,
         String id
-    );
+    ) {
+        this.getComponentMap().put(myClass, componentType);
+        this.getComponentByIdMap().put(id, componentType);
+    }
 
-    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
-        JavaPlugin plugin,
-        BuilderCodec<T> codec
-    );
-
-    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
-        JavaPlugin plugin,
-        Class<T> clazz
-    );
-
-    public void registerSystem(JavaPlugin plugin, ISystem<ECS_TYPE> system);
+    public abstract Map<String, ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>> getComponentByIdMap();
 
     public <T extends IQuery<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, T listener);
 
-    // this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
-    // without the query as thats just gonna be Query.and(componentType);
-    public <T extends Component<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, Class<T> componentClass);
+    public abstract ComponentRegistryProxy<ECS_TYPE> getStoreRegistry(JavaPlugin plugin);
+
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> _registerComponent(
+        JavaPlugin plugin,
+        BuilderCodec<T> codec
+    ) {
+        final Class<T> clazz = codec.getInnerClass();
+        final var defaultId = clazz.getName();
+
+        console.log("COMPONENT  " + clazz.getSimpleName());
+        console.log(" --ID:     " + defaultId);
+        if (defaultId == null) {
+            throw new LibHytaleException("Failed to get classname while registering component with codec " + codec);
+        }
+
+        final ComponentType<ECS_TYPE, T> component = this.getStoreRegistry(plugin).registerComponent(
+            clazz,
+            defaultId,
+            codec
+        );
+
+        // Store our component in the global register
+        this.registerComponentType(component, clazz, defaultId);
+        this.bindEventListeners(plugin, clazz, component);
+
+        return component;
+    }
+
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> _registerComponent(
+        JavaPlugin plugin,
+        Class<T> clazz
+    ) {
+        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
+        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+            throw new LibHytaleException("Failed to get codec for class " + clazz);
+        }
+
+        return this.registerComponent(plugin, codec);
+    }
+
+    /**
+     * this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
+     * without the query as thats just gonna be `Query.and(componentType)`;
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public default <T extends Component> void bindEventListenersUnchecked(JavaPlugin plugin, Class<T> componentClass) {
+        var componentType = this.getComponentType(componentClass);
+        if (componentType == null) {
+            componentType = this._registerComponent(plugin, componentClass);
+        }
+
+        this.bindEventListeners(plugin, componentClass, componentType);
+    }
+
+    public default <T extends Component<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, Class<T> componentClass) {
+        ComponentType<ECS_TYPE, T> componentType = this.getComponentType(componentClass);
+        if (componentType == null) {
+            componentType = this._registerComponent(plugin, componentClass);
+        }
+
+        this.bindEventListeners(plugin, componentClass, componentType);
+    }
+
+    public default void registerSystem(final JavaPlugin plugin, final ISystem<ECS_TYPE> system) {
+        this.getStoreRegistry(plugin).registerSystem(system);
+    }
+
+    public <T extends Component<ECS_TYPE>> void bindEventListeners(
+        JavaPlugin plugin,
+        Class<T> componentClass,
+        ComponentType<ECS_TYPE, T> componentType
+    );
 }

@@ -72,8 +72,7 @@ public abstract class ContainerUtils {
         }
 
         final var world = commandBuffer.getExternalData().getWorld();
-
-        final var blockRef = BlockUtils.Ref_.get(world, block.x, block.y, block.z);
+        final var blockRef = BlockUtils.Refs.get(world, block.x, block.y, block.z);
         if (blockRef == null) {
             return;
         }

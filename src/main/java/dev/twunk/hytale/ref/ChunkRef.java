@@ -29,9 +29,9 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     @Nullable
     private WorldChunk worldChunk = null;
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     public ChunkRef(Ref<ChunkStore> ref) {
         super(ref);
@@ -50,13 +50,13 @@ public class ChunkRef extends AnyRef<ChunkStore> {
 
     @Nullable
     public ChunkCoordinates getChunkCoords() {
-        var chunkIndex = this.getChunkIndex();
-        if (chunkIndex == null) {
+        var loadedChunkIndex = this.getChunkIndex();
+        if (loadedChunkIndex == null) {
             return null;
         }
 
-        final int chunkX = (int) (chunkIndex >> 32);
-        final int chunkZ = (int) (long) (chunkIndex);
+        final int chunkX = (int) (loadedChunkIndex >> 32);
+        final int chunkZ = (int) (long) (loadedChunkIndex);
 
         return new ChunkCoordinates(chunkX, chunkZ);
     }
@@ -68,7 +68,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
             return this;
         }
 
-        var otherRef = ChunkUtils.Ref_.get(this, otherChunkIndex);
+        var otherRef = ChunkUtils.Refs.get(this, otherChunkIndex);
         if (otherRef == null) {
             return null;
         }
@@ -79,6 +79,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     // suppressing "unchecked" but, really, i've checked it. silly java.
     @SuppressWarnings("unchecked")
     @Nullable
+    @Override
     public <T extends Component<ChunkStore>> T getComponent(@Nullable ComponentType<ChunkStore, T> componentType) {
         if (componentType == null) {
             return null;
@@ -100,7 +101,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
             return this.worldChunk;
         }
 
-        this.worldChunk = ChunkUtils.WorldChunk_.get_chunkRef(this);
+        this.worldChunk = ChunkUtils.WorldChunks.get_chunkRef(this);
 
         return this.worldChunk;
     }

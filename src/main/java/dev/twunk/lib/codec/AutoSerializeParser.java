@@ -9,6 +9,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.component.ComponentType;
 import dev.twunk.hytale.LibHytale;
+import dev.twunk.hytale.LibHytaleException;
 import dev.twunk.hytale.codec.Codecs;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
@@ -56,7 +57,7 @@ public final class AutoSerializeParser {
                 | SecurityException e
             ) {
                 e.printStackTrace();
-                throw new RuntimeException(
+                throw new LibHytaleException(
                     "ERROR: you passed a class without a default constructor to AutoCodecGenerator::build. I need a default constructor. Thats the entire point of this shorthand. CLASS IN QUESTION: " +
                         clazz
                 );
@@ -68,6 +69,73 @@ public final class AutoSerializeParser {
         return builder(clazz, supplier).build();
     }
 
+    private static final <T> BuilderCodec.Builder<T> parseField(
+        Class<T> clazz,
+        BuilderCodec.Builder<T> builder,
+        Field field
+    ) {
+        if (!field.isAnnotationPresent(Serialize.class)) {
+            return builder;
+        }
+        var fieldClass = field.getType();
+
+        // First: check if i've specifically defined a codec for that class
+        try {
+            var codec = Codecs.tryGetCodec(clazz);
+            if (codec != null) {
+                return appendRawCodec(builder, field, codec);
+            }
+        } catch (Exception _) {}
+
+        // Next: in case the type is something like `SimpleItemContainer`, we'll check if there's an
+        //        existing codec on the class itself for the type of the var we're handling that we
+        //        can use
+        try {
+            var codecField = fieldClass.getField("CODEC");
+            var codec = codecField.get(fieldClass);
+
+            if (codec != null && BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+                field.setAccessible(true);
+                return appendCodec(builder, field, (BuilderCodec<?>) codec);
+            }
+        } catch (Exception _) {}
+
+        // Otherwise, we'll do some manual checking
+        if (fieldClass.equals(Boolean.TYPE) || fieldClass.equals(boolean.class)) {
+            return appendBoolean(builder, field);
+        } else if (fieldClass.equals(String.class)) {
+            return appendString(builder, field);
+        } else if (fieldClass.equals(Short.class) || fieldClass.equals(short.class)) {
+            return appendShort(builder, field);
+        } else if (fieldClass.equals(ComponentType.class)) {
+            return appendComponentType(builder, field);
+        } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
+            return appendInt(builder, field);
+        } else if (List.class.isAssignableFrom(fieldClass)) {
+            var genericType = field.getGenericType();
+            if (!(genericType instanceof ParameterizedType)) {
+                return builder;
+            }
+
+            ParameterizedType pType = (ParameterizedType) genericType;
+
+            Type[] fieldArgTypes = pType.getActualTypeArguments();
+            if (fieldArgTypes.length != 1) {
+                return builder;
+            }
+
+            var arrayValueType = fieldArgTypes[0];
+            if (!(arrayValueType instanceof Class)) {
+                return builder;
+            }
+            Class<?> innerClass = (Class<?>) arrayValueType;
+
+            return appendArray(builder, field, innerClass);
+        }
+
+        return builder;
+    }
+
     public static final <T> BuilderCodec.Builder<T> builder(Class<T> clazz, Supplier<T> supplier) {
         var fields = clazz.getDeclaredFields();
         var registeredComponent = clazz.getAnnotation(Serializable.class);
@@ -75,7 +143,7 @@ public final class AutoSerializeParser {
         var docString = registeredComponent.documentation();
 
         if (!inherits.equals(NullType.class) && !inherits.isAssignableFrom(clazz)) {
-            throw new RuntimeException(
+            throw new LibHytaleException(
                 "ERROR: class of which this inherits a codec from MUST BE a superclass of the class you're in, fuck idk how to write this | " +
                     inherits +
                     " | " +
@@ -100,66 +168,11 @@ public final class AutoSerializeParser {
         }
 
         for (var field : fields) {
-            if (!field.isAnnotationPresent(Serialize.class)) {
+            if (field == null) {
                 continue;
             }
-            var fieldClass = field.getType();
 
-            // First: check if i've specifically defined a codec for that class
-            try {
-                var codec = Codecs.tryGetCodec(clazz);
-                if (codec != null) {
-                    builder = appendRawCodec(builder, field, codec);
-                    continue;
-                }
-            } catch (Exception e) {}
-
-            // Next: in case the type is something like `SimpleItemContainer`, we'll check if there's an
-            //        existing codec on the class itself for the type of the var we're handling that we
-            //        can use
-            try {
-                var codecField = fieldClass.getField("CODEC");
-                var codec = codecField.get(fieldClass);
-
-                if (codec != null && BuilderCodec.class.isAssignableFrom(codec.getClass())) {
-                    field.setAccessible(true);
-                    builder = appendCodec(builder, field, (BuilderCodec<?>) codec);
-                    continue;
-                }
-            } catch (Exception e) {}
-
-            // Otherwise, we'll do some manual checking
-            if (fieldClass.equals(Boolean.TYPE) || fieldClass.equals(boolean.class)) {
-                builder = appendBoolean(builder, field);
-            } else if (fieldClass.equals(String.class)) {
-                builder = appendString(builder, field);
-            } else if (fieldClass.equals(Short.class) || fieldClass.equals(short.class)) {
-                builder = appendShort(builder, field);
-            } else if (fieldClass.equals(ComponentType.class)) {
-                builder = appendComponentType(builder, field);
-            } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
-                builder = appendInt(builder, field);
-            } else if (List.class.isAssignableFrom(fieldClass)) {
-                var genericType = field.getGenericType();
-                if (!(genericType instanceof ParameterizedType)) {
-                    continue;
-                }
-
-                ParameterizedType pType = (ParameterizedType) genericType;
-
-                Type[] fieldArgTypes = pType.getActualTypeArguments();
-                if (fieldArgTypes.length != 1) {
-                    continue;
-                }
-
-                var arrayValueType = fieldArgTypes[0];
-                if (!(arrayValueType instanceof Class)) {
-                    continue;
-                }
-                Class<?> innerClass = (Class<?>) arrayValueType;
-
-                builder = appendArray(builder, field, innerClass);
-            }
+            builder = parseField(clazz, builder, field);
         }
 
         return builder;
@@ -180,7 +193,7 @@ public final class AutoSerializeParser {
         if (codec == null) {
             codec = tryGetCodec(innerClass);
             if (codec == null) {
-                throw new RuntimeException("Failed to get codec for class " + innerClass);
+                throw new LibHytaleException("Failed to get codec for class " + innerClass);
             }
         }
 
@@ -189,7 +202,7 @@ public final class AutoSerializeParser {
             .append(
                 new KeyedCodec<U[]>(
                     name,
-                    new ArrayCodec<U>((Codec<U>) codec, (int len) -> {
+                    new ArrayCodec<>(codec, (int len) -> {
                         @SuppressWarnings("unchecked")
                         var asArr = (U[]) new Object[len];
                         return asArr;
@@ -285,6 +298,7 @@ public final class AutoSerializeParser {
                     if (val == null) {
                         return;
                     }
+
                     try {
                         field.set(self, val);
                         return;
@@ -294,11 +308,11 @@ public final class AutoSerializeParser {
                 },
                 self -> {
                     try {
-                        var val = field.get(self);
-                        return val;
+                        return field.get(self);
                     } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
+
                     return null;
                 }
             )
@@ -324,22 +338,23 @@ public final class AutoSerializeParser {
             .append(
                 keyedCodec,
                 (self, val) -> {
-                    if (val != null) {
-                        try {
-                            field.set(self, val);
-                            return;
-                        } catch (IllegalArgumentException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
+                    if (val == null) {
+                        return;
+                    }
+
+                    try {
+                        field.set(self, val);
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
                     }
                 },
                 self -> {
                     try {
-                        var val = field.get(self);
-                        return val;
+                        return field.get(self);
                     } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
+
                     return null;
                 }
             )

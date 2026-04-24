@@ -19,14 +19,14 @@ public abstract class OnTick__Component<
 
     private final ComponentType<ECS_TYPE, T> componentType;
 
-    public OnTick__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    protected OnTick__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         super(Query.and(componentType), registry);
         this.componentType = componentType;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     @Override
     public final void tick(

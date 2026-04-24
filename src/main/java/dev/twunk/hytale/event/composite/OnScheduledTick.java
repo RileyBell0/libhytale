@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
@@ -16,6 +15,7 @@ import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.ref.TrackedRef;
 import dev.twunk.lib.event.OnScheduledTick__Component;
 import dev.twunk.lib.event.OnScheduledTick__Listener;
@@ -54,7 +54,7 @@ public abstract class OnScheduledTick<
     protected OnScheduledTick(String id, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.query = query;
         this.registry = registry;
-        this.entities = new LoadedEntities<ECS_TYPE>(id);
+        this.entities = new LoadedEntities<>(id);
     }
 
     @Override
@@ -67,9 +67,9 @@ public abstract class OnScheduledTick<
         return this.registry;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     @Nullable
     protected abstract TickPlan runScheduledTick(
@@ -78,33 +78,25 @@ public abstract class OnScheduledTick<
         CommandBuffer<ECS_TYPE> commandBuffer
     );
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/===========\/-  Logic driving the tick scheduling  -\/===========\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     /**
      * Track entity (add to the scheduler, or add BACK into the scheduler) when it's
      * created or re-loaded into the world
      */
-    public final void onEntityAdded(
-        Ref<ECS_TYPE> ref,
-        AddReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        entities.track(ref, store, commandBuffer);
+    @Override
+    public final void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+        entities.track(ref, commandBuffer);
     }
 
     /**
      * Untrack entity (remove from scheduler) when the entity is removed/unloaded
      */
-    public final void onEntityRemove(
-        Ref<ECS_TYPE> ref,
-        RemoveReason reason,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        entities.untrack(ref, store, reason);
+    @Override
+    public final void onEntityRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+        entities.untrack(ref, reason);
     }
 
     /**
@@ -129,19 +121,11 @@ public abstract class OnScheduledTick<
                 continue;
             }
             switch (res.getType()) {
-                case TickPlan.ScheduleType.Active -> {
-                    // TODO haven't configured TYPE_BROKEN
-                    break;
-                }
-                case TickPlan.ScheduleType.Sleep -> {
-                    // TODO haven't configured TYPE_BROKEN
-                    break;
-                }
-                case TickPlan.ScheduleType.Stop -> {
-                    // TODO haven't configured TYPE_BROKEN
-                    break;
-                }
-                case TickPlan.ScheduleType.Unknown -> {
+                case
+                    TickPlan.ScheduleType.ACTIVE,
+                    TickPlan.ScheduleType.SLEEP,
+                    TickPlan.ScheduleType.STOP,
+                    TickPlan.ScheduleType.UNKNOWN -> {
                     // TODO haven't configured TYPE_BROKEN
                     break;
                 }
@@ -149,16 +133,16 @@ public abstract class OnScheduledTick<
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // #region hide
 
     public static final <
         ECS_TYPE extends WorldProvider,
         T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
     > OnScheduledTick<ECS_TYPE> newUninitialised(String id, T listener, IRegistry<ECS_TYPE> registry) {
-        return new OnScheduledTick__Listener<ECS_TYPE>(id, listener, listener.getQuery(), registry);
+        return new OnScheduledTick__Listener<>(id, listener, listener.getQuery(), registry);
     }
 
     public static final <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newUninitialised(
@@ -167,13 +151,13 @@ public abstract class OnScheduledTick<
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
     ) {
-        return new OnScheduledTick__Listener<ECS_TYPE>(id, listener, query, registry);
+        return new OnScheduledTick__Listener<>(id, listener, query, registry);
     }
 
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
         ECS_TYPE
     > newUninitialised(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-        return new OnScheduledTick__Component<ECS_TYPE, T>(id, componentType, registry);
+        return new OnScheduledTick__Component<>(id, componentType, registry);
     }
     // #endregion hide
 }

@@ -11,21 +11,18 @@ import javax.annotation.Nullable;
  */
 public class Codecs {
 
-    public static final Codec<Level> LEVEL_CODEC = new FromStringCodec<Level>(
-        val -> val.toString(),
-        str -> Level.parse(str)
-    );
+    public static final Codec<Level> LEVEL_CODEC = new FromStringCodec<>(Object::toString, Level::parse);
 
-    public static final HashMap<Class<?>, Codec<?>> allCodecs = new HashMap<>(Map.of(Level.class, LEVEL_CODEC));
+    protected static final Map<Class<?>, Codec<?>> ALL_CODECS = new HashMap<>(Map.of(Level.class, LEVEL_CODEC));
 
     public static final <T> void regiserCodec(Class<T> clazz, Codec<T> codec) {
-        allCodecs.put(clazz, codec);
+        ALL_CODECS.put(clazz, codec);
     }
 
     @Nullable
     public static final <T> Codec<T> tryGetCodec(Class<T> clazz) {
         @SuppressWarnings("unchecked")
-        var codec = (Codec<T>) allCodecs.get(clazz);
+        var codec = (Codec<T>) ALL_CODECS.get(clazz);
 
         return codec;
     }

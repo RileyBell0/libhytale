@@ -34,8 +34,7 @@ import dev.twunk.hytale.ref.BlockRef;
  * - systems that tick blocks
  * - etc
  *
- * TODO:
- * - overall goal here is to provide a consistent (and hopefully smaller) interface
+ * overall goal here is to provide a consistent (and hopefully smaller) interface
  *   for interacting with block components.
  * - Might consider making a `blockRef` class that extends `Ref<ChunkStore>` that i
  *   can instead store all these things in INDIRECTLY rather than computing them for

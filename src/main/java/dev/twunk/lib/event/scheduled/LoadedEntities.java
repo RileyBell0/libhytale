@@ -4,12 +4,12 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.ref.TrackedRef;
 import dev.twunk.lib.component.TickSchedule;
 import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 
 // TODO make a heap kinda thing with constant time access by assigning
@@ -43,17 +43,13 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
     // Non-static implementation begins
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-    public final ArrayList<TrackedRef<ECS_TYPE>> ticking = new ArrayList<>();
-    private final ArrayList<TrackedRef<ECS_TYPE>> sleeping = new ArrayList<>();
-    private final ArrayList<TrackedRef<ECS_TYPE>> comatose = new ArrayList<>();
-    private final ArrayList<TrackedRef<ECS_TYPE>> stopped = new ArrayList<>();
-    private final ArrayList<TrackedRef<ECS_TYPE>> broken = new ArrayList<>();
+    public final List<TrackedRef<ECS_TYPE>> ticking = new ArrayList<>();
+    private final List<TrackedRef<ECS_TYPE>> sleeping = new ArrayList<>();
+    private final List<TrackedRef<ECS_TYPE>> comatose = new ArrayList<>();
+    private final List<TrackedRef<ECS_TYPE>> stopped = new ArrayList<>();
+    private final List<TrackedRef<ECS_TYPE>> broken = new ArrayList<>();
 
-    public void track(
-        final Ref<ECS_TYPE> ref,
-        final Store<ECS_TYPE> store,
-        final CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
+    public void track(final Ref<ECS_TYPE> ref, final CommandBuffer<ECS_TYPE> commandBuffer) {
         // figure out the current/initial ticking state our entity has
         final var tickingInfo = this.loadEntityTickingState(ref, commandBuffer);
         final var initialState = tickingInfo.getTickingInfo(this.id);
@@ -73,8 +69,8 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
         tickingInfo._setMemoryLocation(this.id, trackedRef);
     }
 
-    public void untrack(final Ref<ECS_TYPE> ref, final Store<ECS_TYPE> store, final RemoveReason reason) {
-        store.getComponent(ref, LoadedEntities.getComponentType()).drop(this.id, reason);
+    public void untrack(final Ref<ECS_TYPE> ref, final RemoveReason reason) {
+        ref.getStore().getComponent(ref, LoadedEntities.getComponentType()).drop(this.id, reason);
     }
 
     private TickSchedule<ECS_TYPE> loadEntityTickingState(
@@ -100,12 +96,12 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
      * current ticking state (active, sleeping, stopped etc)
      * @return
      */
-    private ArrayList<TrackedRef<ECS_TYPE>> getOwner(@Nullable TickPlan currentState) {
+    private List<TrackedRef<ECS_TYPE>> getOwner(@Nullable TickPlan currentState) {
         // and finally, we'll store it in the right place
         if (currentState instanceof TickPlan.Active) {
             return ticking;
-        } else if (currentState instanceof TickPlan.Sleeping) {
-            if (((TickPlan.Sleeping) currentState).isIndefinite()) {
+        } else if (currentState instanceof TickPlan.Sleeping state) {
+            if (state.isIndefinite()) {
                 return comatose;
             } else {
                 return sleeping;

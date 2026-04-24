@@ -5,21 +5,21 @@ import javax.annotation.Nullable;
 public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, TickPlan.Stopped, TickPlan.Unknown {
     public ScheduleType getType();
 
-    public static final TickPlan CONTINUE = (TickPlan) new Active();
-    public static final TickPlan SLEEP = (TickPlan) new Sleeping();
-    public static final TickPlan STOP = (TickPlan) new Stopped();
-    public static final TickPlan BROKEN = (TickPlan) new Unknown();
+    public static final TickPlan CONTINUE = new Active();
+    public static final TickPlan SLEEP = new Sleeping();
+    public static final TickPlan STOP = new Stopped();
+    public static final TickPlan BROKEN = new Unknown();
 
     public enum ScheduleType {
-        Active,
-        Sleep,
-        Stop,
-        Unknown
+        ACTIVE,
+        SLEEP,
+        STOP,
+        UNKNOWN
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     /**
      * Keep ticking at the same frequency as before
@@ -28,7 +28,7 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
 
         @Override
         public ScheduleType getType() {
-            return ScheduleType.Active;
+            return ScheduleType.ACTIVE;
         }
     }
 
@@ -74,7 +74,7 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
 
         @Override
         public ScheduleType getType() {
-            return ScheduleType.Sleep;
+            return ScheduleType.SLEEP;
         }
     }
 
@@ -85,7 +85,7 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
 
         @Override
         public ScheduleType getType() {
-            return ScheduleType.Stop;
+            return ScheduleType.STOP;
         }
     }
 
@@ -102,7 +102,7 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
 
         @Override
         public ScheduleType getType() {
-            return ScheduleType.Unknown;
+            return ScheduleType.UNKNOWN;
         }
     }
 }

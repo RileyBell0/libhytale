@@ -13,14 +13,14 @@ public abstract class OnBlockTick__Listener extends OnBlockTick {
 
     private final IOnBlockTick listener;
 
-    public OnBlockTick__Listener(IOnBlockTick listener, Query<ChunkStore> query) {
+    protected OnBlockTick__Listener(IOnBlockTick listener, Query<ChunkStore> query) {
         super(query);
         this.listener = listener;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
-    ///////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
 
     public final void tick(
         float dt,

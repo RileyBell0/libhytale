@@ -8,7 +8,6 @@ import dev.twunk.hytale.codec.MessageCodec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -19,36 +18,35 @@ import javax.annotation.Nullable;
  */
 public abstract class Chat {
 
+    private static final String DEFAULT_COLOR = "#00d9ed";
+
     public static final String getColor(final @Nullable Level level) {
         if (level == null) {
-            return "#00d9ed";
+            return DEFAULT_COLOR;
         }
 
-        return switch ((Integer) level.intValue()) {
-            case Integer c when c <= Level.ALL.intValue() -> "#dadada";
-            case Integer c when c <= Level.FINEST.intValue() -> "#a600ed";
-            case Integer c when c <= Level.FINER.intValue() -> "#5b00ed";
-            case Integer c when c <= Level.FINE.intValue() -> "#002fed";
-            case Integer c when c <= Level.CONFIG.intValue() -> "#0096ed";
-            case Integer c when c <= Level.INFO.intValue() -> "#00d9ed";
-            case Integer c when c <= Level.WARNING.intValue() -> "#edba00";
-            case Integer c when c <= Level.SEVERE.intValue() -> "#c90d00";
-            default -> "#00d9ed";
+        return switch (level.intValue()) {
+            case int c when c <= Level.ALL.intValue() -> "#dadada";
+            case int c when c <= Level.FINEST.intValue() -> "#a600ed";
+            case int c when c <= Level.FINER.intValue() -> "#5b00ed";
+            case int c when c <= Level.FINE.intValue() -> "#002fed";
+            case int c when c <= Level.CONFIG.intValue() -> "#0096ed";
+            case int c when c <= Level.INFO.intValue() -> DEFAULT_COLOR;
+            case int c when c <= Level.WARNING.intValue() -> "#edba00";
+            case int c when c <= Level.SEVERE.intValue() -> "#c90d00";
+            default -> DEFAULT_COLOR;
         };
     }
 
+    @SuppressWarnings("null")
     public static final Message parse(final @Nullable Object toMessage) {
-        @SuppressWarnings("null")
-        @Nonnull
-        final var msg = switch (toMessage) {
+        return switch (toMessage) {
             case Message m -> m;
             case String m -> Message.raw(m);
             case MessageCodec codec -> codec.toMessage();
             case Object unknown -> Message.raw(unknown.toString());
             case null -> Message.empty();
         };
-
-        return msg;
     }
 
     public static final Message join(final @Nullable Object... messages) {
