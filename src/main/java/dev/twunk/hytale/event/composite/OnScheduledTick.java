@@ -16,11 +16,11 @@ import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.hytale.ref.TrackedRef;
 import dev.twunk.lib.event.OnScheduledTick__Component;
 import dev.twunk.lib.event.OnScheduledTick__Listener;
 import dev.twunk.lib.event.scheduled.LoadedEntities;
 import dev.twunk.lib.event.scheduled.TickPlan;
-import dev.twunk.lib.event.scheduled.TrackedEntity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -73,10 +73,8 @@ public abstract class OnScheduledTick<
 
     @Nullable
     protected abstract TickPlan runScheduledTick(
-        TrackedEntity<ECS_TYPE> ticker,
         float dt,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
+        TrackedRef<ECS_TYPE> ticker,
         CommandBuffer<ECS_TYPE> commandBuffer
     );
 
@@ -122,7 +120,7 @@ public abstract class OnScheduledTick<
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         for (final @Nonnull var ticker : entities.ticking) {
-            final var res = this.runScheduledTick(ticker, dt, archetypeChunk, store, commandBuffer);
+            final var res = this.runScheduledTick(dt, ticker, commandBuffer);
 
             // Transition to the state returned by the block
             if (res == null) {

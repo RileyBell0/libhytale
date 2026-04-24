@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.hytale.ref.AnyRef;
+import dev.twunk.hytale.ref.TrackedRef;
 import dev.twunk.lib.component.TickSchedule;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
@@ -43,15 +43,11 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
     // Non-static implementation begins
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-    public final ArrayList<TrackedEntity<ECS_TYPE>> ticking = new ArrayList<>();
-
-    private final ArrayList<TrackedEntity<ECS_TYPE>> sleeping = new ArrayList<>();
-
-    private final ArrayList<TrackedEntity<ECS_TYPE>> comatose = new ArrayList<>();
-
-    private final ArrayList<TrackedEntity<ECS_TYPE>> stopped = new ArrayList<>();
-
-    private final ArrayList<TrackedEntity<ECS_TYPE>> broken = new ArrayList<>();
+    public final ArrayList<TrackedRef<ECS_TYPE>> ticking = new ArrayList<>();
+    private final ArrayList<TrackedRef<ECS_TYPE>> sleeping = new ArrayList<>();
+    private final ArrayList<TrackedRef<ECS_TYPE>> comatose = new ArrayList<>();
+    private final ArrayList<TrackedRef<ECS_TYPE>> stopped = new ArrayList<>();
+    private final ArrayList<TrackedRef<ECS_TYPE>> broken = new ArrayList<>();
 
     public void track(
         final Ref<ECS_TYPE> ref,
@@ -66,39 +62,19 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
         // state
         final var area = this.getOwner(initialState);
 
-        // prepare the variables/references we need to run our tick method
-        // (whenever that tick happens)
-        final var onTickCache = this.getTickVars(ref, store, area);
-        if (onTickCache == null) {
-            return;
-        }
+        final var trackedRef = new TrackedRef<ECS_TYPE>(ref, area);
 
         // we'll put chuck our cache into the right ticking group (ready to go)
-        area.add(onTickCache);
+        area.add(trackedRef);
 
         // and finally, we'll write down the area that we put said cache
         // so our component (found by ref) can remove itself easily
         // when it gets removed
-        tickingInfo._setMemoryLocation(this.id, onTickCache);
+        tickingInfo._setMemoryLocation(this.id, trackedRef);
     }
 
     public void untrack(final Ref<ECS_TYPE> ref, final Store<ECS_TYPE> store, final RemoveReason reason) {
         store.getComponent(ref, LoadedEntities.getComponentType()).drop(this.id, reason);
-    }
-
-    /**
-     * Get a cached version of the info required to tick an entity
-     */
-    @Nullable
-    private TrackedEntity<ECS_TYPE> getTickVars(
-        final Ref<ECS_TYPE> ref,
-        final Store<ECS_TYPE> store,
-        final ArrayList<TrackedEntity<ECS_TYPE>> area
-    ) {
-        // lets get this all bundled up for easy re-use
-        final var cache = new TrackedEntity<>(new AnyRef<>(ref), area);
-
-        return cache;
     }
 
     private TickSchedule<ECS_TYPE> loadEntityTickingState(
@@ -124,7 +100,7 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
      * current ticking state (active, sleeping, stopped etc)
      * @return
      */
-    private ArrayList<TrackedEntity<ECS_TYPE>> getOwner(@Nullable TickPlan currentState) {
+    private ArrayList<TrackedRef<ECS_TYPE>> getOwner(@Nullable TickPlan currentState) {
         // and finally, we'll store it in the right place
         if (currentState instanceof TickPlan.Active) {
             return ticking;

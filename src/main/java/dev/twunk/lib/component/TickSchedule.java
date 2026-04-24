@@ -4,8 +4,8 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.codec.auto.Serializable;
+import dev.twunk.hytale.ref.TrackedRef;
 import dev.twunk.lib.event.scheduled.TickPlan;
-import dev.twunk.lib.event.scheduled.TrackedEntity;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 
@@ -48,7 +48,7 @@ public class TickSchedule<ECS_TYPE extends WorldProvider> implements Component<E
      * Map from SystemID to locations where the item is stored (memory only,
      * not stored to disk)
      */
-    private final HashMap<String, TrackedEntity<ECS_TYPE>> memoryLocation = new HashMap<>();
+    private final HashMap<String, TrackedRef<ECS_TYPE>> memoryLocation = new HashMap<>();
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -84,7 +84,7 @@ public class TickSchedule<ECS_TYPE extends WorldProvider> implements Component<E
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedEntity<ECS_TYPE> _setMemoryLocation(String systemId, TrackedEntity<ECS_TYPE> state) {
+    public TrackedRef<ECS_TYPE> _setMemoryLocation(String systemId, TrackedRef<ECS_TYPE> state) {
         return memoryLocation.put(systemId, state);
     }
 
@@ -96,7 +96,7 @@ public class TickSchedule<ECS_TYPE extends WorldProvider> implements Component<E
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedEntity<ECS_TYPE> _getMemoryLocation(String systemId) {
+    public TrackedRef<ECS_TYPE> _getMemoryLocation(String systemId) {
         return memoryLocation.get(systemId);
     }
 
@@ -108,7 +108,7 @@ public class TickSchedule<ECS_TYPE extends WorldProvider> implements Component<E
      * and *not* tick it anymore
      */
     @Nullable
-    public TrackedEntity<ECS_TYPE> _dumpMemoryLocation(String systemId, RemoveReason reason) {
+    public TrackedRef<ECS_TYPE> _dumpMemoryLocation(String systemId, RemoveReason reason) {
         if (reason == RemoveReason.REMOVE) {
             this.tickingState.remove(systemId);
         }
