@@ -9,6 +9,14 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.LibHytaleException;
+import dev.twunk.hytale.event.OnAddRemove;
+import dev.twunk.hytale.event.OnTick;
+import dev.twunk.hytale.event.OnWorldTick;
+import dev.twunk.hytale.event.composite.OnScheduledTick;
+import dev.twunk.hytale.interfaces.event.IOnAddRemove;
+import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
+import dev.twunk.hytale.interfaces.event.IOnTick;
+import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.lib.codec.AutoSerializeParser;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -116,8 +124,6 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     public abstract Map<String, ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>> getComponentByIdMap();
 
-    public <T extends IQuery<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, T listener);
-
     public abstract ComponentRegistryProxy<ECS_TYPE> getStoreRegistry(JavaPlugin plugin);
 
     public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> _registerComponent(
@@ -158,6 +164,10 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         return this.registerComponent(plugin, codec);
     }
 
+    public default void registerSystem(final JavaPlugin plugin, final ISystem<ECS_TYPE> system) {
+        this.getStoreRegistry(plugin).registerSystem(system);
+    }
+
     /**
      * this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
      * without the query as thats just gonna be `Query.and(componentType)`;
@@ -181,13 +191,88 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         this.bindEventListeners(plugin, componentClass, componentType);
     }
 
-    public default void registerSystem(final JavaPlugin plugin, final ISystem<ECS_TYPE> system) {
-        this.getStoreRegistry(plugin).registerSystem(system);
+    public default <T extends IQuery<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, T listener) {
+        var clazz = listener.getClass();
+
+        // find the interfaces it supports
+
+        if (IOnAddRemove.class.isAssignableFrom(clazz)) {
+            @SuppressWarnings("unchecked")
+            var driver = OnAddRemove.newUninitialised((IOnAddRemove.IOnAddRemove__IQuery<ECS_TYPE>) listener, this);
+            driver.onRegister(plugin);
+        }
+        if (IOnTick.class.isAssignableFrom(clazz)) {
+            @SuppressWarnings("unchecked")
+            var driver = OnTick.newUninitialised((IOnTick.IOnTick__IQuery<ECS_TYPE>) listener, this);
+            driver.onRegister(plugin);
+        }
+
+        if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
+            // its a composite one so interestingly enough this one is recursive
+            // as in onRegister it calls bindEventListeners :)
+            @SuppressWarnings("unchecked")
+            var driver = OnScheduledTick.newUninitialised(
+                "",
+                (IOnScheduledTick.IOnScheduledTick__IQuery<ECS_TYPE>) listener,
+                this
+            );
+            driver.onRegister(plugin);
+        }
+
+        if (IOnWorldTick.class.isAssignableFrom(clazz)) {
+            @SuppressWarnings("unchecked")
+            var driver = OnWorldTick.newUninitialised((IOnWorldTick.IOnWorldTick__IQuery<ECS_TYPE>) listener, this);
+            driver.onRegister(plugin);
+        }
+
+        this.bindRegistrySpecificEventListeners(plugin, listener);
     }
 
-    public <T extends Component<ECS_TYPE>> void bindEventListeners(
+    public default <T extends Component<ECS_TYPE>> void bindEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
         ComponentType<ECS_TYPE, T> componentType
-    );
+    ) {
+        if (IOnAddRemove.class.isAssignableFrom(componentClass)) {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            var driver = OnAddRemove.newUninitialised((ComponentType) componentType, this);
+            driver.onRegister(plugin);
+        }
+
+        if (IOnTick.class.isAssignableFrom(componentClass)) {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            var driver = OnTick.newUninitialised((ComponentType) componentType, this);
+            driver.onRegister(plugin);
+        }
+
+        if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
+            // its a composite one so interestingly enough this one is recursive
+            // as in onRegister it calls bindEventListeners :)
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            var driver = OnScheduledTick.newUninitialised("", (ComponentType) componentType, this);
+            driver.onRegister(plugin);
+        }
+
+        // TODO - allow only annotated static methods to be used here
+        // if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
+        //     @SuppressWarnings("unchecked") // var driver = OnWorldTick.newUninitialised(, this);
+        //     driver.onRegister(plugin);
+        // }
+
+        this.bindRegistrySpecificEventListeners(plugin, componentClass, componentType);
+    }
+
+    public default <T extends Component<ECS_TYPE>> void bindRegistrySpecificEventListeners(
+        JavaPlugin plugin,
+        Class<T> componentClass,
+        ComponentType<ECS_TYPE, T> componentType
+    ) {
+        // only need to override this if you've got specific events for the given registry you want to init
+        // e.g. onBlockTick
+    }
+
+    public default <T extends IQuery<ECS_TYPE>> void bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {
+        // only need to override this if you've got specific events for the given registry you want to init
+        // e.g. onBlockTick
+    }
 }
