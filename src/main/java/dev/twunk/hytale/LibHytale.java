@@ -1,7 +1,5 @@
 package dev.twunk.hytale;
 
-import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -14,7 +12,6 @@ import dev.twunk.lib.component.TickSchedule;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import dev.twunk.lib.registry.EntityRegisterProvider;
 import dev.twunk.lib.test.TestComponent;
-import javax.annotation.Nullable;
 
 /**
  * General need to knows for hytale's internals
@@ -71,71 +68,5 @@ public abstract class LibHytale {
         HytalePlugin.registerInteraction(plugin, LogInteraction.class, "Log");
         HytalePlugin.registerInteraction(plugin, SpawnItemInteraction.class, "SpawnItem");
         HytalePlugin.registerInteraction(plugin, OpenContainerComponentInteraction.class, "OpenMahContainerPls");
-    }
-
-    /**
-     * WARNING: Only ever call this AFTER your plugin's setup function. Component
-     *          Types are stored on registration, thus, they're not there before
-     *          registration...
-     */
-    @Nullable
-    public static <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getChunkComponentType(
-        final Class<T> componentClass
-    ) {
-        return CHUNK_REGISTRY.getComponentType(componentClass);
-    }
-
-    /**
-     * WARNING: Only ever call this AFTER your plugin's setup function. Component
-     *          Types are stored on registration, thus, they're not there before
-     *          registration...
-     */
-    @Nullable
-    public static <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> getChunkComponentType(
-        final String componentId
-    ) {
-        return CHUNK_REGISTRY.getComponentType(componentId);
-    }
-
-    /**
-     * WARNING: Only ever call this AFTER your plugin's setup function. Component
-     *          Types are stored on registration, thus, they're not there before
-     *          registration...
-     */
-    public static <T extends Component<EntityStore>> ComponentType<EntityStore, T> getEntityComponentType(
-        final Class<T> componentClass
-    ) {
-        return ENTITY_REGISTRY.getComponentType(componentClass);
-    }
-
-    /**
-     * WARNING: Only ever call this AFTER your plugin's setup function. Component
-     *          Types are stored on registration, thus, they're not there before
-     *          registration...
-     */
-    @Nullable
-    public static <T extends Component<EntityStore>> ComponentType<EntityStore, T> getEntityComponentType(
-        final String componentId
-    ) {
-        return ENTITY_REGISTRY.getComponentType(componentId);
-    }
-
-    /**
-     * Register component type to both its Class, and to its ID
-     */
-    public static <T extends Component<ChunkStore>> void registerChunkComponentType(
-        final ComponentType<ChunkStore, T> componentType,
-        final Class<T> myClass,
-        final String id
-    ) {
-        CHUNK_REGISTRY.registerComponentType(componentType, myClass, id);
-    }
-
-    public static <T extends Component<EntityStore>> void registerEntityComponentType(
-        final ComponentType<EntityStore, T> componentType,
-        final Class<T> myClass,
-        final String id
-    ) {
-        ENTITY_REGISTRY.registerComponentType(componentType, myClass, id);
     }
 }

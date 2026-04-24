@@ -211,10 +211,10 @@ public abstract class HytalePlugin extends JavaPlugin {
 
         // Store our component in the global register
         final var chunkComponent = plugin.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
-        LibHytale.registerChunkComponentType(chunkComponent, clazz, defaultId);
+        LibHytale.CHUNK_REGISTRY.registerComponentType(chunkComponent, clazz, defaultId);
 
         final var entityComponent = plugin.getEntityStoreRegistry().registerComponent(clazz, defaultId, codec);
-        LibHytale.registerEntityComponentType(entityComponent, clazz, defaultId);
+        LibHytale.ENTITY_REGISTRY.registerComponentType(entityComponent, clazz, defaultId);
 
         LibHytale.CHUNK_REGISTRY.bindEventListeners(plugin, clazz, chunkComponent);
         LibHytale.ENTITY_REGISTRY.bindEventListeners(plugin, clazz, entityComponent);

@@ -5,11 +5,12 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.ref.TrackedRef;
 import dev.twunk.lib.component.TickSchedule;
+import dev.twunk.lib.registry.RegistryProvider;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // TODO make a heap kinda thing with constant time access by assigning
@@ -35,8 +36,16 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
     // what state they held
     private final String id;
 
-    public LoadedEntities(String id) {
+    private final ComponentType<ECS_TYPE, TickSchedule<ECS_TYPE>> componentType;
+
+    public LoadedEntities(String id, RegistryProvider<ECS_TYPE> registry) {
         this.id = id;
+
+        @SuppressWarnings({ "null", "unchecked" })
+        @Nonnull
+        ComponentType<ECS_TYPE, TickSchedule<ECS_TYPE>> compType = registry.getComponentType(TickSchedule.class);
+
+        this.componentType = compType;
     }
 
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
@@ -70,7 +79,7 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
     }
 
     public void untrack(final Ref<ECS_TYPE> ref, final RemoveReason reason) {
-        ref.getStore().getComponent(ref, LoadedEntities.getComponentType()).drop(this.id, reason);
+        ref.getStore().getComponent(ref, this.componentType).drop(this.id, reason);
     }
 
     private TickSchedule<ECS_TYPE> loadEntityTickingState(
@@ -81,7 +90,7 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
         // so it can resume ticking/sleeping/etc when the server reboots. really
         // we just want to store shit so the lifetime extends past (NOW), and
         // so we can QUICKLY remove the entity again later
-        final var tickingInfo = commandBuffer.ensureAndGetComponent(ref, LoadedEntities.getComponentType());
+        final var tickingInfo = commandBuffer.ensureAndGetComponent(ref, this.componentType);
         var systemState = tickingInfo.getTickingInfo(this.id);
         if (systemState == null) {
             systemState = new TickPlan.Active();
@@ -111,14 +120,5 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
         } else {
             return broken;
         }
-    }
-
-    // TODO think i might have to do different ones for each registry
-    @SuppressWarnings({ "unchecked", "null" })
-    public static final <ECS_TYPE extends WorldProvider> ComponentType<
-        ECS_TYPE,
-        TickSchedule<ECS_TYPE>
-    > getComponentType() {
-        return LibHytale.getChunkComponentType(TickSchedule.class);
     }
 }

@@ -380,8 +380,8 @@ public final class AutoSerializeParser {
                         return;
                     }
                     final var potentialComponentType = inChunkStore
-                        ? LibHytale.getChunkComponentType(id)
-                        : LibHytale.getEntityComponentType(id);
+                        ? LibHytale.CHUNK_REGISTRY.getComponentType(id)
+                        : LibHytale.ENTITY_REGISTRY.getComponentType(id);
                     if (potentialComponentType == null) {
                         // I'm deciding to crash gracefully here
                         return;

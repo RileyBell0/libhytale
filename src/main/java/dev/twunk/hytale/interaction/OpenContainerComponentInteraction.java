@@ -51,7 +51,7 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
     @SuppressWarnings({ "unchecked", "null" })
     @Serialize
     private ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
-        LibHytale.getChunkComponentType(ContainerComponent.class);
+        LibHytale.CHUNK_REGISTRY.getComponentType(ContainerComponent.class);
 
     //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
 
