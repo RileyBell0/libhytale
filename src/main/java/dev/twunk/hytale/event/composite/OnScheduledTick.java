@@ -54,7 +54,7 @@ public abstract class OnScheduledTick<
     protected OnScheduledTick(String id, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.query = query;
         this.registry = registry;
-        this.entities = new LoadedEntities<>(id);
+        this.entities = new LoadedEntities<>(id, registry);
     }
 
     @Override

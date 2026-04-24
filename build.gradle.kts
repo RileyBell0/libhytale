@@ -22,14 +22,42 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
+tasks {
+    val ENABLE_PREVIEW = "--enable-preview"
 
-tasks.shadowJar {
-    archiveClassifier.set("") // replace normal jar
-}
+    // In our project we have the tasks compileJava and
+    // compileTestJava that need to have the
+    // --enable-preview compiler arguments.
+    withType<JavaCompile>() {
+        options.compilerArgs.add(ENABLE_PREVIEW)
+        // Optionally we can show which preview feature we use.
+        // options.compilerArgs.add("-Xlint:preview")
 
-tasks.build {
-    dependsOn(tasks.shadowJar)
+        // Explicitly setting compiler option --release
+        // is needed when we wouldn't set the
+        // sourceCompatiblity and targetCompatibility
+        // properties of the Java plugin extension.
+        options.release.set(26)
+    }
+    // Test tasks need to have the JVM argument --enable-preview.
+    withType<Test>() {
+        useJUnitPlatform()
+        jvmArgs.add(ENABLE_PREVIEW)
+    }
+    // JavaExec tasks need to have the JVM argument --enable-preview.
+    withType<JavaExec>() {
+        jvmArgs.add(ENABLE_PREVIEW)
+    }
+
+    // test {
+    //     useJUnitPlatform()
+    // }
+
+    shadowJar {
+        archiveClassifier.set("") // replace normal jar
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
 }

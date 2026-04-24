@@ -9,45 +9,14 @@ import dev.twunk.hytale.event.OnBlockTick;
 import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import java.util.HashMap;
-import java.util.Map;
 
-public final class ChunkRegisterProvider implements IRegistry<ChunkStore> {
-
-    protected static final Map<
-        Class<? extends Component<ChunkStore>>,
-        ComponentType<ChunkStore, ? extends Component<ChunkStore>>
-    > CHUNK_COMPONENTS = new HashMap<>();
-
-    protected static final Map<
-        String,
-        ComponentType<ChunkStore, ? extends Component<ChunkStore>>
-    > CHUNK_COMPONENTS_BY_ID = new HashMap<>();
-
-    public final Map<
-        Class<? extends Component<ChunkStore>>,
-        ComponentType<ChunkStore, ? extends Component<ChunkStore>>
-    > getComponentMap() {
-        return CHUNK_COMPONENTS;
-    }
-
-    public final Map<String, ComponentType<ChunkStore, ? extends Component<ChunkStore>>> getComponentByIdMap() {
-        return CHUNK_COMPONENTS_BY_ID;
-    }
-
-    // ////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    // ////////////////////////////////////////////////////////////////////////
+public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkStore> implements IRegistry<ChunkStore> {
 
     @Override
     public ComponentRegistryProxy<ChunkStore> getStoreRegistry(JavaPlugin plugin) {
         return plugin.getChunkStoreRegistry();
     }
 
-    /**
-     * this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
-     * without the query as thats just gonna be Query.and(componentType);
-     */
     @Override
     public <T extends IQuery<ChunkStore>> void bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {
         var clazz = listener.getClass();

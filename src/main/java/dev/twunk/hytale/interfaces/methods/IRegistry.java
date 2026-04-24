@@ -18,7 +18,6 @@ import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.lib.codec.AutoSerializeParser;
-import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
@@ -40,32 +39,11 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     @SuppressWarnings("null")
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
-    public abstract Map<
-        Class<? extends Component<ECS_TYPE>>,
-        ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>
-    > getComponentMap();
+    @Nullable
+    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(Class<T> componentClass);
 
     @Nullable
-    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(
-        Class<T> componentClass
-    ) {
-        var componentType = this.getComponentMap().get(componentClass);
-        if (componentType == null) {
-            return null;
-        }
-
-        // casting is safe as long as i haven't stuffed something up
-        @SuppressWarnings("unchecked")
-        var res = (ComponentType<ECS_TYPE, T>) componentType;
-
-        return res;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Nullable
-    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(String componentId) {
-        return (ComponentType<ECS_TYPE, T>) this.getComponentByIdMap().get(componentId);
-    }
+    public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(String componentId);
 
     public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
         JavaPlugin plugin,
@@ -113,16 +91,11 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
      * all that goodness for us. IRegisteredComponent gets to know
      * about EVERYTHING above it WOOOO
      */
-    public default <T extends Component<ECS_TYPE>> void registerComponentType(
+    public <T extends Component<ECS_TYPE>> void registerComponentType(
         ComponentType<ECS_TYPE, T> componentType,
         Class<T> myClass,
         String id
-    ) {
-        this.getComponentMap().put(myClass, componentType);
-        this.getComponentByIdMap().put(id, componentType);
-    }
-
-    public abstract Map<String, ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>> getComponentByIdMap();
+    );
 
     public abstract ComponentRegistryProxy<ECS_TYPE> getStoreRegistry(JavaPlugin plugin);
 

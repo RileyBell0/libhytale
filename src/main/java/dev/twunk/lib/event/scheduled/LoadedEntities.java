@@ -5,9 +5,9 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.TrackedRef;
 import dev.twunk.lib.component.TickSchedule;
-import dev.twunk.lib.registry.RegistryProvider;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -38,7 +38,7 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
 
     private final ComponentType<ECS_TYPE, TickSchedule<ECS_TYPE>> componentType;
 
-    public LoadedEntities(String id, RegistryProvider<ECS_TYPE> registry) {
+    public LoadedEntities(String id, IRegistry<ECS_TYPE> registry) {
         this.id = id;
 
         @SuppressWarnings({ "null", "unchecked" })
