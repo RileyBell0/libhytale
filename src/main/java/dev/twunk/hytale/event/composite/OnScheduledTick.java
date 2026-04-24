@@ -129,15 +129,22 @@ public abstract class OnScheduledTick<
                 continue;
             }
             switch (res.getType()) {
-                case TickPlan.TYPE_BROKEN:
+                case TickPlan.ScheduleType.Active -> {
                     // TODO haven't configured TYPE_BROKEN
                     break;
-                case TickPlan.TYPE_SLEEP:
+                }
+                case TickPlan.ScheduleType.Sleep -> {
                     // TODO haven't configured TYPE_BROKEN
                     break;
-                case TickPlan.TYPE_STOP:
+                }
+                case TickPlan.ScheduleType.Stop -> {
                     // TODO haven't configured TYPE_BROKEN
                     break;
+                }
+                case TickPlan.ScheduleType.Unknown -> {
+                    // TODO haven't configured TYPE_BROKEN
+                    break;
+                }
             }
         }
     }

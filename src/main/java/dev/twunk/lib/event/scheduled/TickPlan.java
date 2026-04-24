@@ -3,17 +3,19 @@ package dev.twunk.lib.event.scheduled;
 import javax.annotation.Nullable;
 
 public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, TickPlan.Stopped, TickPlan.Unknown {
-    public static final String TYPE_CONTINUE = "continue";
-    public static final String TYPE_SLEEP = "sleep";
-    public static final String TYPE_STOP = "stop";
-    public static final String TYPE_BROKEN = "broken";
-
-    public String getType();
+    public ScheduleType getType();
 
     public static final TickPlan CONTINUE = (TickPlan) new Active();
     public static final TickPlan SLEEP = (TickPlan) new Sleeping();
     public static final TickPlan STOP = (TickPlan) new Stopped();
     public static final TickPlan BROKEN = (TickPlan) new Unknown();
+
+    public enum ScheduleType {
+        Active,
+        Sleep,
+        Stop,
+        Unknown
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -25,8 +27,8 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
     public final class Active implements TickPlan {
 
         @Override
-        public String getType() {
-            return TickPlan.TYPE_CONTINUE;
+        public ScheduleType getType() {
+            return ScheduleType.Active;
         }
     }
 
@@ -71,8 +73,8 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
         }
 
         @Override
-        public String getType() {
-            return TickPlan.TYPE_SLEEP;
+        public ScheduleType getType() {
+            return ScheduleType.Sleep;
         }
     }
 
@@ -82,8 +84,8 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
     public final class Stopped implements TickPlan {
 
         @Override
-        public String getType() {
-            return TickPlan.TYPE_STOP;
+        public ScheduleType getType() {
+            return ScheduleType.Stop;
         }
     }
 
@@ -99,8 +101,8 @@ public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, Tic
     public final class Unknown implements TickPlan {
 
         @Override
-        public String getType() {
-            return TickPlan.TYPE_BROKEN;
+        public ScheduleType getType() {
+            return ScheduleType.Unknown;
         }
     }
 }

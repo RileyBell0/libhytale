@@ -8,6 +8,7 @@ import dev.twunk.hytale.codec.MessageCodec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -19,54 +20,35 @@ import javax.annotation.Nullable;
 public abstract class Chat {
 
     public static final String getColor(final @Nullable Level level) {
-        String color = null;
         if (level == null) {
             return "#00d9ed";
         }
 
-        final var levelCode = level.intValue();
-        if (levelCode <= Level.ALL.intValue()) {
-            color = "#dadada";
-        } else if (levelCode <= Level.FINEST.intValue()) {
-            color = "#a600ed";
-        } else if (levelCode <= Level.FINER.intValue()) {
-            color = "#5b00ed";
-        } else if (levelCode <= Level.FINE.intValue()) {
-            color = "#002fed";
-        } else if (levelCode <= Level.CONFIG.intValue()) {
-            color = "#0096ed";
-        } else if (levelCode <= Level.INFO.intValue()) {
-            color = "#00d9ed";
-        } else if (levelCode <= Level.WARNING.intValue()) {
-            color = "#edba00";
-        } else if (levelCode <= Level.SEVERE.intValue()) {
-            color = "#c90d00";
-        } else {
-            color = "#00d9ed";
-        }
-
-        return color;
+        return switch ((Integer) level.intValue()) {
+            case Integer c when c <= Level.ALL.intValue() -> "#dadada";
+            case Integer c when c <= Level.FINEST.intValue() -> "#a600ed";
+            case Integer c when c <= Level.FINER.intValue() -> "#5b00ed";
+            case Integer c when c <= Level.FINE.intValue() -> "#002fed";
+            case Integer c when c <= Level.CONFIG.intValue() -> "#0096ed";
+            case Integer c when c <= Level.INFO.intValue() -> "#00d9ed";
+            case Integer c when c <= Level.WARNING.intValue() -> "#edba00";
+            case Integer c when c <= Level.SEVERE.intValue() -> "#c90d00";
+            default -> "#00d9ed";
+        };
     }
 
-    public static final Message parse(final @Nullable Object message) {
-        if (message == null) {
-            return Message.empty();
-        }
+    public static final Message parse(final @Nullable Object toMessage) {
+        @SuppressWarnings("null")
+        @Nonnull
+        final var msg = switch (toMessage) {
+            case Message m -> m;
+            case String m -> Message.raw(m);
+            case MessageCodec codec -> codec.toMessage();
+            case Object unknown -> Message.raw(unknown.toString());
+            case null -> Message.empty();
+        };
 
-        if (message instanceof Message) {
-            return (Message) message;
-        } else if (message instanceof String) {
-            return Message.raw((String) message);
-        } else if (message instanceof MessageCodec) {
-            return ((MessageCodec) message).toMessage();
-        } else {
-            final var strVal = message.toString();
-            if (strVal == null) {
-                return Message.empty();
-            } else {
-                return Message.raw(strVal);
-            }
-        }
+        return msg;
     }
 
     public static final Message join(final @Nullable Object... messages) {
@@ -79,7 +61,7 @@ public abstract class Chat {
             parsed.add(Chat.parse(message));
         }
 
-        Message[] asArray = parsed.toArray(new Message[0]);
+        Message[] asArray = parsed.toArray(Message[]::new);
         if (asArray == null) {
             return Message.empty();
         }
@@ -87,11 +69,11 @@ public abstract class Chat {
         return Message.join(asArray);
     }
 
-    private static final Message constructLogMessage(final Message message) {
+    private static Message constructLogMessage(final Message message) {
         return constructLogMessage(Level.INFO, message);
     }
 
-    private static final Message constructLogMessage(@Nullable Level level, final Message message) {
+    private static Message constructLogMessage(@Nullable Level level, final Message message) {
         if (level == null) {
             level = Level.INFO;
         }
