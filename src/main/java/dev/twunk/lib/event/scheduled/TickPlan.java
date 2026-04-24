@@ -2,7 +2,7 @@ package dev.twunk.lib.event.scheduled;
 
 import javax.annotation.Nullable;
 
-public interface TickPlan {
+public sealed interface TickPlan permits TickPlan.Active, TickPlan.Sleeping, TickPlan.Stopped, TickPlan.Unknown {
     public static final String TYPE_CONTINUE = "continue";
     public static final String TYPE_SLEEP = "sleep";
     public static final String TYPE_STOP = "stop";
@@ -11,11 +11,8 @@ public interface TickPlan {
     public String getType();
 
     public static final TickPlan CONTINUE = (TickPlan) new Active();
-
     public static final TickPlan SLEEP = (TickPlan) new Sleeping();
-
     public static final TickPlan STOP = (TickPlan) new Stopped();
-
     public static final TickPlan BROKEN = (TickPlan) new Unknown();
 
     ///////////////////////////////////////////////////////////////////////////
@@ -25,7 +22,7 @@ public interface TickPlan {
     /**
      * Keep ticking at the same frequency as before
      */
-    public class Active implements TickPlan {
+    public final class Active implements TickPlan {
 
         @Override
         public String getType() {
@@ -38,7 +35,7 @@ public interface TickPlan {
      *
      * notably, you can set this to be sleeping forever
      */
-    public class Sleeping implements TickPlan {
+    public final class Sleeping implements TickPlan {
 
         @Nullable
         public final Integer sleepForTicks;
@@ -82,7 +79,7 @@ public interface TickPlan {
     /**
      * Goodbye ticking forever
      */
-    public class Stopped implements TickPlan {
+    public final class Stopped implements TickPlan {
 
         @Override
         public String getType() {
@@ -99,7 +96,7 @@ public interface TickPlan {
      * single tick (when you know its broken) BUT still lets you, the developer,
      * have the OPTION of re-trying every now and then if you so desire
      */
-    public class Unknown implements TickPlan {
+    public final class Unknown implements TickPlan {
 
         @Override
         public String getType() {

@@ -119,19 +119,24 @@ public abstract class OnScheduledTick<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
+        // For all entities scheduled to be ticked right now
         for (final @Nonnull var ticker : entities.ticking) {
+            // Tick
             final var res = this.runScheduledTick(dt, ticker, commandBuffer);
 
-            // Transition to the state returned by the block
+            // Configure schedule for future tick(s)
             if (res == null) {
                 continue;
             }
-
             switch (res.getType()) {
                 case TickPlan.TYPE_BROKEN:
+                    // TODO haven't configured TYPE_BROKEN
+                    break;
                 case TickPlan.TYPE_SLEEP:
+                    // TODO haven't configured TYPE_BROKEN
+                    break;
                 case TickPlan.TYPE_STOP:
-                default:
+                    // TODO haven't configured TYPE_BROKEN
                     break;
             }
         }
