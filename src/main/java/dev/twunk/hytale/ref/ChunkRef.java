@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
  * @see AnyRef
  * @see Ref (Ref<ChunkStore>)
  */
-public class ChunkRef extends AnyRef<ChunkStore> {
+public final class ChunkRef extends AnyRef<ChunkStore> {
 
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, WorldChunk> WORLD_CHUNK_COMPONENT_TYPE =
@@ -38,7 +38,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public Long getChunkIndex() {
+    public final Long getChunkIndex() {
         if (this.chunkIndex != null) {
             return this.chunkIndex;
         }
@@ -49,7 +49,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public ChunkCoordinates getChunkCoords() {
+    public final ChunkCoordinates getChunkCoords() {
         var loadedChunkIndex = this.getChunkIndex();
         if (loadedChunkIndex == null) {
             return null;
@@ -62,7 +62,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public ChunkRef getOtherChunkRef(long otherChunkIndex) {
+    public final ChunkRef getOtherChunkRef(long otherChunkIndex) {
         // skip looking up other chunks if its the same one
         if (otherChunkIndex == this.getChunkIndex()) {
             return this;
@@ -80,7 +80,9 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <T extends Component<ChunkStore>> T getComponent(@Nullable ComponentType<ChunkStore, T> componentType) {
+    public final <T extends Component<ChunkStore>> T getComponent(
+        @Nullable ComponentType<ChunkStore, T> componentType
+    ) {
         if (componentType == null) {
             return null;
         }
@@ -96,7 +98,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public WorldChunk getWorldChunk() {
+    public final WorldChunk getWorldChunk() {
         if (this.worldChunk != null) {
             return this.worldChunk;
         }
@@ -107,7 +109,7 @@ public class ChunkRef extends AnyRef<ChunkStore> {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "ChunkRef{" + super.toString() + "}";
     }
 }

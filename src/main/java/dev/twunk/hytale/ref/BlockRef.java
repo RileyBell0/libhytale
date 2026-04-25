@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  * @see AnyRef
  * @see Ref (Ref<ChunkStore>)
  */
-public class BlockRef extends AnyRef<ChunkStore> {
+public final class BlockRef extends AnyRef<ChunkStore> {
 
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT_TYPE =
@@ -60,7 +60,9 @@ public class BlockRef extends AnyRef<ChunkStore> {
     // suppressing "unchecked" but, really, i've checked it. silly java.
     @Nullable
     @Override
-    public <T extends Component<ChunkStore>> T getComponent(@Nullable ComponentType<ChunkStore, T> componentType) {
+    public final <T extends Component<ChunkStore>> T getComponent(
+        @Nullable ComponentType<ChunkStore, T> componentType
+    ) {
         if (componentType == null) {
             return null;
         }
@@ -79,7 +81,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public BlockStateInfo getInfo() {
+    public final BlockStateInfo getInfo() {
         if (this.info != null) {
             return this.info;
         }
@@ -90,17 +92,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public Integer getBlockIndex() {
-        if (this.blockIndex != null) {
-            return this.blockIndex;
-        }
-        this.blockIndex = BlockUtils.Coords.Index.get(this);
-
-        return this.blockIndex;
-    }
-
-    @Nullable
-    public ChunkRef getOtherChunkRef(long otherChunkIndex) {
+    public final ChunkRef getOtherChunkRef(long otherChunkIndex) {
         var loadedChunkRef = this.getChunkRef();
         if (loadedChunkRef == null) {
             return null;
@@ -110,7 +102,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public Integer getBlockId() {
+    public final Integer getBlockId() {
         // block ID can only be found via world chunk
         var loadedChunkRef = this.getChunkRef();
         if (loadedChunkRef == null) {
@@ -118,7 +110,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
         }
 
         var worldChunk = loadedChunkRef.getWorldChunk();
-        var loadedBlockCoords = this.getBlockCoords();
+        var loadedBlockCoords = this.getCoords();
         if (worldChunk == null || loadedBlockCoords == null) {
             return null;
         }
@@ -127,7 +119,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public Integer getOtherBlockId(Vector3i otherBlockCoords) {
+    public final Integer getOtherBlockId(Vector3i otherBlockCoords) {
         // block ID can only be found via world chunk
         var loadedChunkRef = this.getChunkRef();
         if (loadedChunkRef == null) {
@@ -143,7 +135,27 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public Vector3i getBlockCoords() {
+    public final Integer getLocalIndex() {
+        return this.getBlockIndex();
+    }
+
+    @Nullable
+    public final Integer getBlockIndex() {
+        if (this.blockIndex != null) {
+            return this.blockIndex;
+        }
+        this.blockIndex = BlockUtils.Coords.Index.get(this);
+
+        return this.blockIndex;
+    }
+
+    @Nullable
+    public final Vector3i getCoords() {
+        return this.getBlockCoords();
+    }
+
+    @Nullable
+    public final Vector3i getBlockCoords() {
         if (this.blockCoords != null) {
             return this.blockCoords;
         }
@@ -160,7 +172,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public Long getChunkIndex() {
+    public final Long getChunkIndex() {
         if (this.chunkIndex != null) {
             return this.chunkIndex;
         }
@@ -175,7 +187,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public ChunkRef getChunkRef() {
+    public final ChunkRef getChunkRef() {
         if (this.chunkRef != null) {
             return this.chunkRef;
         }
@@ -190,7 +202,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public ChunkCoordinates getChunkCoords() {
+    public final ChunkCoordinates getChunkCoords() {
         var loadedChunkIndex = this.getChunkIndex();
         if (loadedChunkIndex == null) {
             return null;
@@ -202,7 +214,7 @@ public class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "BlockRef{" + super.toString() + "}";
     }
 }

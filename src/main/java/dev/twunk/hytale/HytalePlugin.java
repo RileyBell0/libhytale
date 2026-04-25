@@ -96,7 +96,18 @@ public abstract class HytalePlugin extends JavaPlugin {
         BuilderCodec<T> codec,
         String id
     ) {
-        var inferredStore = TypeInferrer.inferTypeReceivedByGenericInClassT(Component.class, componentClass);
+        // TODO some day add some type inferrer logic that means we can search for Component.class's generic
+        // for a type that implements it, e.g. if i implement onTick<ChunkStore> and onWorldTick<EntityStore> theoretically
+        // that should be legal, no reason to block it, so i should lean into it and MAKE it super legal so you can
+        // define both on the same one and i'll just figure out if i should have both entity and chunk systems for it or just entity or just chunk etc
+        // and then if ive got that the code would do it for each one, e.g. whenever i find X is assignable from <your class> i can just
+        // follow X down until i find the actual class that defines IOnAddRemove or whatever and just check that path for one that satisfies both.
+        //
+        // might be as easy as replacing Component.class with (Class other) -> Component.class.isAssignableFrom(other) && IOnAddRemove.isAssignableFrom(other)
+        // except, notably, i need to have two "modes" i think, yeah one that finds IOnAdddRemove and THEN one that finds component
+        // so more like an array for me to go down, use the first until you actually find the exact defintion of it, then use the second etc. if i wrote it recursively
+        // that would be really easy, meaning i dont do a lambda, i do [IOnAddRemove.class, Component.class] and yeah you find IOnAddRemove then keep going down JUST into that type via reflection
+        final var inferredStore = TypeInferrer.inferTypeReceivedByGenericInClassT(Component.class, componentClass);
         if (ChunkStore.class.isAssignableFrom(inferredStore)) {
             console.atInfo().log(" > [INFERRED] ECS type  <Chunk>    " + componentClass);
         } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
@@ -106,10 +117,10 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
 
         @SuppressWarnings("rawtypes")
-        Class rawClass = componentClass;
+        final Class rawClass = componentClass;
 
         @SuppressWarnings("rawtypes")
-        BuilderCodec rawCodec = codec;
+        final BuilderCodec rawCodec = codec;
 
         if (ChunkStore.class.isAssignableFrom(inferredStore)) {
             LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);

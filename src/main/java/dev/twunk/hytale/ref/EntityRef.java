@@ -10,14 +10,14 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
  * @see AnyRef
  * @see Ref (Ref<ChunkStore>)
  */
-public class EntityRef extends AnyRef<EntityStore> {
+public final class EntityRef extends AnyRef<EntityStore> {
 
     public EntityRef(Ref<EntityStore> ref) {
         super(ref);
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "EntityRef{" + super.toString() + "}";
     }
 }
