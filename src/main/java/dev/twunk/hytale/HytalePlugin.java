@@ -3,7 +3,6 @@ package dev.twunk.hytale;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
@@ -12,7 +11,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry.Assets;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.lib.codec.AutoSerializeParser;
+import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.registry.TypeInferrer;
 
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
@@ -33,274 +32,94 @@ public abstract class HytalePlugin extends JavaPlugin {
         super.setup0();
     }
 
-    //
+    // ///////////////////////////////////////////
+    // register events to an instance of an object   (system)
+    // ///////////////////////////////////////////
 
-    /**
-     * Register the given system to the plugin
-     * @param system
-     */
     public final void register(ISystem<ChunkStore> system) {
         HytalePlugin.register(this, system);
     }
+
+    public static final void register(JavaPlugin plugin, ISystem<ChunkStore> system) {
+        plugin.getChunkStoreRegistry().registerSystem(system);
+    }
+
+    // /////////////////////////////////////////////
+    // register events to a component or interaction   (component/interaction)
+    // /////////////////////////////////////////////
 
     /**
      * Register event listeners for components of the given type. Note: this will
      * setup systems to call the methods defined ON your component of type T
      *
-     * classOfYourComponentThatImplementsEventListenerMethodsThatICanCall
+     *  T should extend Interaction or Component
      */
     public final <T> void register(Class<T> clazz) {
         HytalePlugin.register(this, clazz);
     }
 
     /**
-     * Register the given system to the plugin
-     * @param system
-     */
-    public static final void register(JavaPlugin plugin, ISystem<ChunkStore> system) {
-        plugin.getChunkStoreRegistry().registerSystem(system);
-    }
-
-    /**
      * Register event listeners for components of the given type. Note: this will
      * setup systems to call the methods defined ON your component of type T
      *
-     * classOfYourComponentThatImplementsEventListenerMethodsThatICanCall
+     *  T should extend Interaction or Component
      */
+    @SuppressWarnings("null")
     public static final <T> void register(JavaPlugin plugin, Class<T> clazz) {
-        if (Interaction.class.isAssignableFrom(clazz)) {
-            @SuppressWarnings("unchecked")
-            var asInteraction = (Class<? extends Interaction>) clazz;
+        register(plugin, clazz, clazz.getName());
+    }
 
-            HytalePlugin.registerInteraction(plugin, asInteraction);
+    public static final <T> void register(JavaPlugin plugin, Class<T> clazz, String id) {
+        register(plugin, clazz, IRegistry.getCodec(clazz), id);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static final void register(JavaPlugin plugin, Class clazz, BuilderCodec codec, String id) {
+        if (Interaction.class.isAssignableFrom(clazz)) {
+            HytalePlugin.registerInteraction(plugin, clazz, codec, id);
         }
 
         if (Component.class.isAssignableFrom(clazz)) {
-            @SuppressWarnings("unchecked")
-            var asComponent = (Class<? extends Component<?>>) clazz;
-
-            HytalePlugin.registerComponent(plugin, asComponent);
+            HytalePlugin.registerComponent(plugin, clazz, codec, id);
         }
-    }
-
-    //
-
-    /**
-     * Register the given system to the plugin
-     * @param system
-     */
-    public final void registerSystem(ISystem<ChunkStore> system) {
-        HytalePlugin.registerSystem(this, system);
-    }
-
-    public static final void registerSystem(JavaPlugin plugin, ISystem<ChunkStore> system) {
-        plugin.getChunkStoreRegistry().registerSystem(system);
-    }
-
-    //
-
-    public final <T extends Component<?>> void registerComponent(Class<T> clazz) {
-        HytalePlugin.registerComponent(this, clazz);
     }
 
     @SuppressWarnings("unchecked")
-    public static final <T extends Component<?>> void registerComponent(JavaPlugin plugin, Class<T> componentClass) {
-        // seriously i know ive got so many commits on this now but omg oh my GOD this works, fuck YES
-        var inferred = TypeInferrer.inferTypeReceivedByGenericInClassT(Component.class, componentClass);
-
-        if (ChunkStore.class.isAssignableFrom(inferred)) {
-            console.atInfo().log(" > [INFERRED] ECS type  <Chunk>");
-            var asChunkClass = (Class<? extends Component<ChunkStore>>) componentClass;
-            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, asChunkClass);
-        } else if (EntityStore.class.isAssignableFrom(inferred)) {
-            console.atInfo().log(" > [INFERRED] ECS type  <Entity>");
-            var asEntityClass = (Class<? extends Component<EntityStore>>) componentClass;
-            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, asEntityClass);
-        } else {
-            console.atWarning().log(" > [INFERRED] ECS type  <Common>");
-            var asChunkClass = (Class<? extends Component<ChunkStore>>) componentClass;
-            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, asChunkClass);
-            var asEntityClass = (Class<? extends Component<EntityStore>>) componentClass;
-            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, asEntityClass);
-        }
-    }
-
-    //
-
-    public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
-        BuilderCodec<T> codec
-    ) {
-        return HytalePlugin.registerChunkComponent(this, codec);
-    }
-
-    public <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(Class<T> clazz) {
-        return HytalePlugin.registerChunkComponent(this, clazz);
-    }
-
-    public static final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
+    public static final <T extends Component<?>> void registerComponent(
         JavaPlugin plugin,
-        Class<T> clazz
-    ) {
-        return LibHytale.CHUNK_REGISTRY.registerComponent(plugin, clazz);
-    }
-
-    public static final <T extends Component<ChunkStore>> ComponentType<ChunkStore, T> registerChunkComponent(
-        JavaPlugin plugin,
-        BuilderCodec<T> codec
-    ) {
-        return LibHytale.CHUNK_REGISTRY.registerComponent(plugin, codec);
-    }
-
-    //
-
-    public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
-        BuilderCodec<T> codec
-    ) {
-        return HytalePlugin.registerEntityComponent(this, codec);
-    }
-
-    public <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(Class<T> clazz) {
-        return HytalePlugin.registerEntityComponent(this, clazz);
-    }
-
-    public static final <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
-        JavaPlugin plugin,
-        BuilderCodec<T> codec
-    ) {
-        return LibHytale.ENTITY_REGISTRY.registerComponent(plugin, codec);
-    }
-
-    public static final <T extends Component<EntityStore>> ComponentType<EntityStore, T> registerEntityComponent(
-        JavaPlugin plugin,
-        Class<T> clazz
-    ) {
-        return LibHytale.ENTITY_REGISTRY.registerComponent(plugin, clazz);
-    }
-
-    //
-
-    /**
-     * Register the specified component via codec. Does NOT setup
-     * system/initialiser.
-     * Useful especially for non-ticking components
-     *
-     * If you want that to be auto-registered, call `registerTickingComponent`
-     * instead
-     */
-    @SuppressWarnings({ "rawtypes" })
-    public <T extends Component> void registerCommonComponent(Class<T> clazz) {
-        HytalePlugin.registerCommonComponent(this, clazz);
-    }
-
-    /**
-     * Register the specified component via codec. Does NOT setup
-     * system/initialiser.
-     * Useful especially for non-ticking components
-     *
-     * If you want that to be auto-registered, call `registerTickingComponent`
-     * instead
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static final <T extends Component> void registerCommonComponent(JavaPlugin plugin, Class<T> clazz) {
-        final var defaultId = clazz.getName();
-        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
-        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
-            throw new LibHytaleException("Failed to get codec for class " + clazz);
-        }
-
-        console.atInfo().log("COMPONENT  " + clazz.getSimpleName());
-        console.atInfo().log(" --ID:     " + defaultId);
-        if (defaultId == null) {
-            throw new LibHytaleException("Failed to get classname while registering component with codec " + codec);
-        }
-
-        // Store our component in the global register
-        final var chunkComponent = plugin.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
-        LibHytale.CHUNK_REGISTRY.cacheComponentType(chunkComponent, clazz, defaultId);
-
-        final var entityComponent = plugin.getEntityStoreRegistry().registerComponent(clazz, defaultId, codec);
-        LibHytale.ENTITY_REGISTRY.cacheComponentType(entityComponent, clazz, defaultId);
-
-        LibHytale.CHUNK_REGISTRY.registerEventListeners(plugin, clazz, codec::getDefaultValue, chunkComponent);
-        LibHytale.ENTITY_REGISTRY.registerEventListeners(plugin, clazz, codec::getDefaultValue, entityComponent);
-    }
-
-    //
-
-    public <T extends Interaction> Assets<Interaction, ? extends Codec<? extends Interaction>> registerInteraction(
-        Class<T> clazz
-    ) {
-        return HytalePlugin.registerInteraction(this, clazz);
-    }
-
-    public <T extends Interaction> Assets<Interaction, ? extends Codec<? extends Interaction>> registerInteraction(
-        Class<T> clazz,
-        String id
-    ) {
-        return HytalePlugin.registerInteraction(this, clazz, id);
-    }
-
-    public <T extends Interaction> Assets<Interaction, ? extends Codec<? extends Interaction>> registerInteraction(
-        BuilderCodec<T> codec
-    ) {
-        return HytalePlugin.registerInteraction(this, codec);
-    }
-
-    public <T extends Interaction> Assets<Interaction, ? extends Codec<? extends Interaction>> registerInteraction(
+        Class<T> componentClass,
         BuilderCodec<T> codec,
         String id
     ) {
-        return HytalePlugin.registerInteraction(this, codec, id);
-    }
-
-    public static final <T extends Interaction> Assets<
-        Interaction,
-        ? extends Codec<? extends Interaction>
-    > registerInteraction(JavaPlugin plugin, Class<T> clazz) {
-        final var defaultId = clazz.getName();
-        if (defaultId == null) {
-            throw new LibHytaleException("Failed to get classname while registering interaction with class " + clazz);
+        var inferredStore = TypeInferrer.inferTypeReceivedByGenericInClassT(Component.class, componentClass);
+        if (ChunkStore.class.isAssignableFrom(inferredStore)) {
+            console.atInfo().log(" > [INFERRED] ECS type  <Chunk>    " + componentClass);
+        } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
+            console.atInfo().log(" > [INFERRED] ECS type  <Entity>   " + componentClass);
+        } else {
+            console.atWarning().log(" > [INFERRED] ECS type  <Common>   " + componentClass);
         }
 
-        return registerInteraction(plugin, clazz, defaultId);
-    }
+        @SuppressWarnings("rawtypes")
+        Class rawClass = componentClass;
 
-    public static final <T extends Interaction> Assets<
-        Interaction,
-        ? extends Codec<? extends Interaction>
-    > registerInteraction(JavaPlugin plugin, Class<T> clazz, String id) {
-        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
-        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
-            throw new LibHytaleException("Failed to get codec for class " + clazz);
+        @SuppressWarnings("rawtypes")
+        BuilderCodec rawCodec = codec;
+
+        if (ChunkStore.class.isAssignableFrom(inferredStore)) {
+            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+        } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
+            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+        } else {
+            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
         }
-
-        return registerInteraction(plugin, codec, id);
     }
 
     public static final <T extends Interaction> Assets<
         Interaction,
         ? extends Codec<? extends Interaction>
-    > registerInteraction(JavaPlugin plugin, BuilderCodec<T> codec) {
-        final Class<T> myClass = codec.getInnerClass();
-        final var defaultId = myClass.getName();
-        if (defaultId == null) {
-            throw new LibHytaleException("Failed to get classname while registering interaction with codec " + codec);
-        }
-
-        return registerInteraction(plugin, codec, defaultId);
-    }
-
-    public static final <T extends Interaction> Assets<
-        Interaction,
-        ? extends Codec<? extends Interaction>
-    > registerInteraction(JavaPlugin plugin, BuilderCodec<T> codec, String id) {
-        final Class<T> myClass = codec.getInnerClass();
-
-        console.atInfo().log("INTERACTION \"" + myClass.getName() + "\"");
-        console.atInfo().log(" -- Class: \"" + myClass.getSimpleName() + "\"");
-        console.atInfo().log(" -- ID:    \"" + id + "\"");
-
-        var registry = plugin.getCodecRegistry(Interaction.CODEC);
-        return registry.register(id, myClass, codec);
+    > registerInteraction(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
+        return plugin.getCodecRegistry(Interaction.CODEC).register(id, clazz, codec);
     }
 }

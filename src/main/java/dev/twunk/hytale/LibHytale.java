@@ -46,27 +46,23 @@ public abstract class LibHytale {
 
     public static final ChunkRegisterProvider CHUNK_REGISTRY = new ChunkRegisterProvider();
 
-    private static boolean hasRegisteredLibComponents = false;
+    private static boolean initialized = false;
 
     // Called automatically when you load a mod plugin
     public static void init(final JavaPlugin plugin) {
-        if (hasRegisteredLibComponents) {
+        if (initialized) {
             return;
         }
-        hasRegisteredLibComponents = true;
+        initialized = true;
 
-        // some components i've got i want accessible in both entity and chunk stores
-        // since, well, i've got no real reason to restrict them to just one store rn
-        // - NOTE i am aware they don't WORK in both stores rn but they should theoretically
-        //   EXIST in both. I'll fix the bugs to get them working later TODO
-        HytalePlugin.registerChunkComponent(plugin, TestComponent.class);
-        HytalePlugin.registerCommonComponent(plugin, TickSchedule.class);
-        HytalePlugin.registerCommonComponent(plugin, ContainerComponent.class);
-        HytalePlugin.registerCommonComponent(plugin, TrashComponent.class);
+        HytalePlugin.register(plugin, TestComponent.class);
+        HytalePlugin.register(plugin, TickSchedule.class);
+        HytalePlugin.register(plugin, ContainerComponent.class);
+        HytalePlugin.register(plugin, TrashComponent.class);
 
         // Register interactions
-        HytalePlugin.registerInteraction(plugin, LogInteraction.class, "Log");
-        HytalePlugin.registerInteraction(plugin, SpawnItemInteraction.class, "SpawnItem");
-        HytalePlugin.registerInteraction(plugin, OpenContainerComponentInteraction.class, "OpenMahContainerPls");
+        HytalePlugin.register(plugin, LogInteraction.class, "Log");
+        HytalePlugin.register(plugin, SpawnItemInteraction.class, "SpawnItem");
+        HytalePlugin.register(plugin, OpenContainerComponentInteraction.class, "OpenMahContainerPls");
     }
 }
