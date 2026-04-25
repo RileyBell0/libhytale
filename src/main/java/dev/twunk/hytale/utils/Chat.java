@@ -25,15 +25,16 @@ public abstract class Chat {
             return DEFAULT_COLOR;
         }
 
-        return switch (level.intValue()) {
-            case int c when c <= Level.ALL.intValue() -> "#dadada";
-            case int c when c <= Level.FINEST.intValue() -> "#a600ed";
-            case int c when c <= Level.FINER.intValue() -> "#5b00ed";
-            case int c when c <= Level.FINE.intValue() -> "#002fed";
-            case int c when c <= Level.CONFIG.intValue() -> "#0096ed";
-            case int c when c <= Level.INFO.intValue() -> DEFAULT_COLOR;
-            case int c when c <= Level.WARNING.intValue() -> "#edba00";
-            case int c when c <= Level.SEVERE.intValue() -> "#c90d00";
+        Integer val = level.intValue();
+        return switch (val) {
+            case Integer c when c <= Level.ALL.intValue() -> "#dadada";
+            case Integer c when c <= Level.FINEST.intValue() -> "#a600ed";
+            case Integer c when c <= Level.FINER.intValue() -> "#5b00ed";
+            case Integer c when c <= Level.FINE.intValue() -> "#002fed";
+            case Integer c when c <= Level.CONFIG.intValue() -> "#0096ed";
+            case Integer c when c <= Level.INFO.intValue() -> DEFAULT_COLOR;
+            case Integer c when c <= Level.WARNING.intValue() -> "#edba00";
+            case Integer c when c <= Level.SEVERE.intValue() -> "#c90d00";
             default -> DEFAULT_COLOR;
         };
     }
