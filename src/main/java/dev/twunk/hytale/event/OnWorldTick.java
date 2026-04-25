@@ -63,11 +63,11 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
     public static final <
         ECS_TYPE extends WorldProvider,
         T extends IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnWorldTick<ECS_TYPE> newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
-        return newUninitialised(listener, listener.getQuery(), registry);
+    > OnWorldTick<ECS_TYPE> newDriverFor(T listener, IRegistry<ECS_TYPE> registry) {
+        return newDriverFor(listener, listener.getQuery(), registry);
     }
 
-    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newUninitialised(
+    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
         IOnWorldTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry

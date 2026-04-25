@@ -24,7 +24,7 @@ public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> im
      * all that goodness for us. IRegisteredComponent gets to know
      * about EVERYTHING above it WOOOO
      */
-    public final <T extends Component<ECS_TYPE>> void registerComponentType(
+    public final <T extends Component<ECS_TYPE>> void cacheComponentType(
         ComponentType<ECS_TYPE, T> componentType,
         Class<T> myClass,
         String id

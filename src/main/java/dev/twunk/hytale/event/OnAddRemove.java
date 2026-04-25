@@ -71,19 +71,18 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
-    public static final <ECS_TYPE extends WorldProvider, T extends IQuery<ECS_TYPE>> OnAddRemove<
-        ECS_TYPE
-    > newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
-        @SuppressWarnings("unchecked")
-        var asIOnAddRemove = (IOnAddRemove<ECS_TYPE>) listener;
-        return newUninitialised(asIOnAddRemove, listener.getQuery(), registry);
+    public static final <
+        ECS_TYPE extends WorldProvider,
+        T extends IOnAddRemove<ECS_TYPE> & IQuery<ECS_TYPE>
+    > OnAddRemove<ECS_TYPE> newDriverFor(T listener, IRegistry<ECS_TYPE> registry) {
+        return newDriverFor(listener, listener.getQuery(), registry);
     }
 
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static <ECS_TYPE extends WorldProvider> OnAddRemove<ECS_TYPE> newUninitialised(
+    public static <ECS_TYPE extends WorldProvider> OnAddRemove<ECS_TYPE> newDriverFor(
         IOnAddRemove<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
@@ -109,7 +108,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
      */
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnAddRemove<
         ECS_TYPE
-    > newUninitialised(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    > newDriverFor(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnAddRemove__Component.class,

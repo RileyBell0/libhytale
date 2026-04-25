@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentRegistryProxy;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -14,10 +15,15 @@ import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.event.OnWorldTick;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
+import dev.twunk.hytale.interfaces.event.IOnAddRemove.IOnAddRemove__IQuery;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
+import dev.twunk.hytale.interfaces.event.IOnScheduledTick.IOnScheduledTick__IQuery;
 import dev.twunk.hytale.interfaces.event.IOnTick;
+import dev.twunk.hytale.interfaces.event.IOnTick.IOnTick__IQuery;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
+import dev.twunk.hytale.interfaces.event.IOnWorldTick.IOnWorldTick__IQuery;
 import dev.twunk.lib.codec.AutoSerializeParser;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 /**
@@ -39,213 +45,205 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     @SuppressWarnings("null")
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
+    public static <T> BuilderCodec<T> getCodec(Class<T> clazz) {
+        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
+        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+            throw new LibHytaleException("Failed to get codec for class " + clazz);
+        }
+
+        return codec;
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // Methods that require an implementation
+    // ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Caches a component type for easy access via either its class or the ID associated with it
+     *
+     * See its definition in ComponentRegistryHelper for the reason behind its existence
+     */
+    public <T extends Component<ECS_TYPE>> void cacheComponentType(
+        ComponentType<ECS_TYPE, T> componentType,
+        Class<T> myClass,
+        String id
+    );
+
     @Nullable
     public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(Class<T> componentClass);
 
     @Nullable
     public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(String componentId);
 
-    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
-        JavaPlugin plugin,
-        BuilderCodec<T> codec
-    ) {
-        var clazz = codec.getInnerClass();
-        if (clazz == null) {
-            throw new LibHytaleException("Failed to get component class from codec in asdiofhaowiehpg34");
-        }
-
-        var componentType = this._registerComponent(plugin, codec);
-        this.bindEventListeners(plugin, clazz, componentType);
-
-        return componentType;
-    }
-
-    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
-        JavaPlugin plugin,
-        Class<T> clazz
-    ) {
-        var componentType = this._registerComponent(plugin, clazz);
-        this.bindEventListeners(plugin, clazz, componentType);
-
-        return componentType;
-    }
-
-    /**
-     * Registers the component type with the static map that stores
-     * all that goodness for us. IRegisteredComponent gets to know
-     * about EVERYTHING above it WOOOO
-     */
-    public default <T extends Component<ECS_TYPE>> void registerComponentType(
-        ComponentType<ECS_TYPE, T> componentType,
-        Class<T> myClass
-    ) {
-        final var defaultId = myClass.getName();
-        if (defaultId == null) {
-            throw new LibHytaleException("Failed to make ID (failed to call .getName()) for class " + myClass);
-        }
-        this.registerComponentType(componentType, myClass, defaultId);
-    }
-
-    /**
-     * Registers the component type with the static map that stores
-     * all that goodness for us. IRegisteredComponent gets to know
-     * about EVERYTHING above it WOOOO
-     */
-    public <T extends Component<ECS_TYPE>> void registerComponentType(
-        ComponentType<ECS_TYPE, T> componentType,
-        Class<T> myClass,
-        String id
-    );
-
     public abstract ComponentRegistryProxy<ECS_TYPE> getStoreRegistry(JavaPlugin plugin);
 
-    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> _registerComponent(
-        JavaPlugin plugin,
-        BuilderCodec<T> codec
-    ) {
-        final Class<T> clazz = codec.getInnerClass();
-        final var defaultId = clazz.getName();
+    // ////////////////////////////////////////////////////////////////////////
+    // All of the below should be left as is, an implementor not need change them.
+    // ////////////////////////////////////////////////////////////////////////
 
-        console.log("COMPONENT  " + clazz.getSimpleName());
-        console.log(" --ID:     " + defaultId);
-        if (defaultId == null) {
-            throw new LibHytaleException("Failed to get classname while registering component with codec " + codec);
-        }
+    // //////////////////////
+    // get/register component
+    // //////////////////////
 
-        final ComponentType<ECS_TYPE, T> component = this.getStoreRegistry(plugin).registerComponent(
-            clazz,
-            defaultId,
-            codec
-        );
-
-        // Store our component in the global register
-        this.registerComponentType(component, clazz, defaultId);
-        this.bindEventListeners(plugin, clazz, component);
-
-        return component;
-    }
-
-    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> _registerComponent(
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getOrRegisterComponent(
         JavaPlugin plugin,
         Class<T> clazz
     ) {
-        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
-        if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
-            throw new LibHytaleException("Failed to get codec for class " + clazz);
-        }
-
-        return this.registerComponent(plugin, codec);
+        return getOrRegisterComponent(plugin, clazz, getCodec(clazz));
     }
 
-    public default void registerSystem(final JavaPlugin plugin, final ISystem<ECS_TYPE> system) {
+    @SuppressWarnings("null") // suppressing null warning from clazz.getName()
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getOrRegisterComponent(
+        JavaPlugin plugin,
+        Class<T> clazz,
+        BuilderCodec<T> codec
+    ) {
+        final var componentType = this.getComponentType(clazz);
+        if (componentType != null) {
+            return componentType;
+        }
+
+        return this.registerComponent(plugin, clazz, codec, clazz.getName());
+    }
+
+    // //////////////////
+    // register component
+    // //////////////////
+
+    @SuppressWarnings("null") // suppressing null warning from clazz.getName()
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
+        JavaPlugin plugin,
+        Class<T> clazz
+    ) {
+        return this.registerComponent(plugin, clazz, getCodec(clazz), clazz.getName());
+    }
+
+    @SuppressWarnings("null") // suppressing null warning from clazz.getName()
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
+        JavaPlugin plugin,
+        BuilderCodec<T> codec
+    ) {
+        return this.registerComponent(plugin, codec.getInnerClass(), codec, codec.getInnerClass().getName());
+    }
+
+    /// BASE method that actually registers the component
+    public default <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> registerComponent(
+        JavaPlugin plugin,
+        Class<T> clazz,
+        BuilderCodec<T> codec,
+        String id
+    ) {
+        // register the component with hytale
+        final var componentType = this.getStoreRegistry(plugin).registerComponent(clazz, id, codec);
+
+        // store the component type for lookup via <class> or <id>
+        this.cacheComponentType(componentType, clazz, id);
+
+        // setup systems to run any event interfaces it implements
+        this.registerEventListeners(plugin, clazz, codec::getDefaultValue, componentType);
+
+        return componentType;
+    }
+
+    // ///////////////
+    // register system
+    // ///////////////
+
+    /**
+     * kinda low level as far as this library is concerned, as i've mostly tried to do away with the idea of systems
+     */
+    public default void registerSystem(JavaPlugin plugin, ISystem<ECS_TYPE> system) {
         this.getStoreRegistry(plugin).registerSystem(system);
     }
 
+    // ////////////////////
+    // bind event listeners
+    // ////////////////////
+
     /**
-     * this one is interesting, should be the same as the above method basically except calling the newUninitialised method instead
-     * without the query as thats just gonna be `Query.and(componentType)`;
+     * registers event listeners
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public default <T extends Component> void bindEventListenersUnchecked(JavaPlugin plugin, Class<T> componentClass) {
-        var componentType = this.getComponentType(componentClass);
-        if (componentType == null) {
-            componentType = this._registerComponent(plugin, componentClass);
-        }
-
-        this.bindEventListeners(plugin, componentClass, componentType);
+    public default <T extends Component> void unsafe_registerEventListeners(
+        JavaPlugin plugin,
+        Class<T> componentClass
+    ) {
+        this.registerEventListeners(
+            plugin,
+            componentClass,
+            getCodec(componentClass)::getDefaultValue,
+            getOrRegisterComponent(plugin, componentClass)
+        );
     }
 
-    public default <T extends Component<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, Class<T> componentClass) {
-        ComponentType<ECS_TYPE, T> componentType = this.getComponentType(componentClass);
-        if (componentType == null) {
-            componentType = this._registerComponent(plugin, componentClass);
-        }
-
-        this.bindEventListeners(plugin, componentClass, componentType);
-    }
-
-    public default <T extends IQuery<ECS_TYPE>> void bindEventListeners(JavaPlugin plugin, T listener) {
-        var clazz = listener.getClass();
-
-        // find the interfaces it supports
+    @SuppressWarnings("unchecked")
+    public default <T extends IQuery<ECS_TYPE>> void registerEventListeners(JavaPlugin plugin, T listener) {
+        final var clazz = listener.getClass();
 
         if (IOnAddRemove.class.isAssignableFrom(clazz)) {
-            @SuppressWarnings("unchecked")
-            var driver = OnAddRemove.newUninitialised((IOnAddRemove.IOnAddRemove__IQuery<ECS_TYPE>) listener, this);
-            driver.onRegister(plugin);
+            OnAddRemove.newDriverFor((IOnAddRemove__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
         }
+
         if (IOnTick.class.isAssignableFrom(clazz)) {
-            @SuppressWarnings("unchecked")
-            var driver = OnTick.newUninitialised((IOnTick.IOnTick__IQuery<ECS_TYPE>) listener, this);
-            driver.onRegister(plugin);
+            OnTick.newDriverFor((IOnTick__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
-            // its a composite one so interestingly enough this one is recursive
-            // as in onRegister it calls bindEventListeners :)
-            @SuppressWarnings("unchecked")
-            var driver = OnScheduledTick.newUninitialised(
-                "",
-                (IOnScheduledTick.IOnScheduledTick__IQuery<ECS_TYPE>) listener,
-                this
-            );
-            driver.onRegister(plugin);
+            OnScheduledTick.newDriverFor("", (IOnScheduledTick__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
         }
 
         if (IOnWorldTick.class.isAssignableFrom(clazz)) {
-            @SuppressWarnings("unchecked")
-            var driver = OnWorldTick.newUninitialised((IOnWorldTick.IOnWorldTick__IQuery<ECS_TYPE>) listener, this);
-            driver.onRegister(plugin);
+            OnWorldTick.newDriverFor((IOnWorldTick__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, listener);
     }
 
-    public default <T extends Component<ECS_TYPE>> void bindEventListeners(
+    public default <T extends Component<ECS_TYPE>> void registerEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
+        Supplier<T> instanceForStaticIshSystems, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
         ComponentType<ECS_TYPE, T> componentType
     ) {
         if (IOnAddRemove.class.isAssignableFrom(componentClass)) {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            var driver = OnAddRemove.newUninitialised((ComponentType) componentType, this);
-            driver.onRegister(plugin);
+            OnAddRemove.newDriverFor(componentType, this).onRegister(plugin);
         }
 
         if (IOnTick.class.isAssignableFrom(componentClass)) {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            var driver = OnTick.newUninitialised((ComponentType) componentType, this);
-            driver.onRegister(plugin);
+            OnTick.newDriverFor(componentType, this).onRegister(plugin);
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
-            // its a composite one so interestingly enough this one is recursive
-            // as in onRegister it calls bindEventListeners :)
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            var driver = OnScheduledTick.newUninitialised("", (ComponentType) componentType, this);
-            driver.onRegister(plugin);
+            OnScheduledTick.newDriverFor("", componentType, this).onRegister(plugin);
         }
 
-        // TODO - allow only annotated static methods to be used here
-        // if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
-        //     @SuppressWarnings("unchecked") // var driver = OnWorldTick.newUninitialised(, this);
-        //     driver.onRegister(plugin);
-        // }
+        if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
+            @SuppressWarnings({ "unchecked" })
+            var instanceThatListenes = (IOnWorldTick<ECS_TYPE>) instanceForStaticIshSystems.get();
+            if (instanceThatListenes == null) {
+                throw new LibHytaleException(
+                    "error: failed to consume supplier for " + componentClass + " while registering event listeners"
+                );
+            }
+
+            OnWorldTick.newDriverFor(instanceThatListenes, Query.and(componentType), this).onRegister(plugin);
+        }
 
         this.bindRegistrySpecificEventListeners(plugin, componentClass, componentType);
     }
 
+    // only need to override this if you've got specific events for the given registry you want to init
+    // e.g. onBlockTick
     public default <T extends Component<ECS_TYPE>> void bindRegistrySpecificEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
         ComponentType<ECS_TYPE, T> componentType
-    ) {
-        // only need to override this if you've got specific events for the given registry you want to init
-        // e.g. onBlockTick
-    }
+    ) {}
 
-    public default <T extends IQuery<ECS_TYPE>> void bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {
-        // only need to override this if you've got specific events for the given registry you want to init
-        // e.g. onBlockTick
-    }
+    // only need to override this if you've got specific events for the given registry you want to init
+    // e.g. onBlockTick
+    public default <T extends IQuery<ECS_TYPE>> void bindRegistrySpecificEventListeners(
+        JavaPlugin plugin,
+        T listener
+    ) {}
 }

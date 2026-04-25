@@ -21,7 +21,7 @@ public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkSt
         var clazz = listener.getClass();
 
         if (IOnBlockTick.class.isAssignableFrom(clazz)) {
-            var driver = OnBlockTick.newUninitialised((IOnBlockTick.IOnBlockTick__IQuery) listener);
+            var driver = OnBlockTick.newDriverFor((IOnBlockTick.IOnBlockTick__IQuery) listener);
             driver.onRegister(plugin);
         }
     }
@@ -34,7 +34,7 @@ public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkSt
     ) {
         if (IOnBlockTick.class.isAssignableFrom(componentClass)) {
             @SuppressWarnings({ "unchecked", "rawtypes" })
-            var driver = OnBlockTick.newUninitialised((ComponentType) componentType);
+            var driver = OnBlockTick.newDriverFor((ComponentType) componentType);
             driver.onRegister(plugin);
         }
     }

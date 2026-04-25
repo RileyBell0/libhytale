@@ -103,20 +103,25 @@ public abstract class HytalePlugin extends JavaPlugin {
         HytalePlugin.registerComponent(this, clazz);
     }
 
+    @SuppressWarnings("unchecked")
     public static final <T extends Component<?>> void registerComponent(JavaPlugin plugin, Class<T> componentClass) {
         // seriously i know ive got so many commits on this now but omg oh my GOD this works, fuck YES
         var inferred = TypeInferrer.inferTypeReceivedByGenericInClassT(Component.class, componentClass);
 
         if (ChunkStore.class.isAssignableFrom(inferred)) {
             console.atInfo().log(" > [INFERRED] ECS type  <Chunk>");
-            LibHytale.CHUNK_REGISTRY.bindEventListenersUnchecked(plugin, componentClass);
+            var asChunkClass = (Class<? extends Component<ChunkStore>>) componentClass;
+            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, asChunkClass);
         } else if (EntityStore.class.isAssignableFrom(inferred)) {
             console.atInfo().log(" > [INFERRED] ECS type  <Entity>");
-            LibHytale.ENTITY_REGISTRY.bindEventListenersUnchecked(plugin, componentClass);
+            var asEntityClass = (Class<? extends Component<EntityStore>>) componentClass;
+            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, asEntityClass);
         } else {
             console.atWarning().log(" > [INFERRED] ECS type  <Common>");
-            LibHytale.CHUNK_REGISTRY.bindEventListenersUnchecked(plugin, componentClass);
-            LibHytale.ENTITY_REGISTRY.bindEventListenersUnchecked(plugin, componentClass);
+            var asChunkClass = (Class<? extends Component<ChunkStore>>) componentClass;
+            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, asChunkClass);
+            var asEntityClass = (Class<? extends Component<EntityStore>>) componentClass;
+            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, asEntityClass);
         }
     }
 
@@ -211,13 +216,13 @@ public abstract class HytalePlugin extends JavaPlugin {
 
         // Store our component in the global register
         final var chunkComponent = plugin.getChunkStoreRegistry().registerComponent(clazz, defaultId, codec);
-        LibHytale.CHUNK_REGISTRY.registerComponentType(chunkComponent, clazz, defaultId);
+        LibHytale.CHUNK_REGISTRY.cacheComponentType(chunkComponent, clazz, defaultId);
 
         final var entityComponent = plugin.getEntityStoreRegistry().registerComponent(clazz, defaultId, codec);
-        LibHytale.ENTITY_REGISTRY.registerComponentType(entityComponent, clazz, defaultId);
+        LibHytale.ENTITY_REGISTRY.cacheComponentType(entityComponent, clazz, defaultId);
 
-        LibHytale.CHUNK_REGISTRY.bindEventListeners(plugin, clazz, chunkComponent);
-        LibHytale.ENTITY_REGISTRY.bindEventListeners(plugin, clazz, entityComponent);
+        LibHytale.CHUNK_REGISTRY.registerEventListeners(plugin, clazz, codec::getDefaultValue, chunkComponent);
+        LibHytale.ENTITY_REGISTRY.registerEventListeners(plugin, clazz, codec::getDefaultValue, entityComponent);
     }
 
     //

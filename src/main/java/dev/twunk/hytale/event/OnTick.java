@@ -68,11 +68,11 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
      */
     public static final <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>> OnTick<
         ECS_TYPE
-    > newUninitialised(T listener, IRegistry<ECS_TYPE> registry) {
-        return newUninitialised(listener, listener.getQuery(), registry);
+    > newDriverFor(T listener, IRegistry<ECS_TYPE> registry) {
+        return newDriverFor(listener, listener.getQuery(), registry);
     }
 
-    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newUninitialised(
+    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
         IOnTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry
@@ -93,9 +93,10 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     /**
      * Bound for T fully defined here
      */
-    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnTick<
-        ECS_TYPE
-    > newUninitialised(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnTick<ECS_TYPE> newDriverFor(
+        ComponentType<ECS_TYPE, T> componentType,
+        IRegistry<ECS_TYPE> registry
+    ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(OnTick__Component.class, ComponentType.class, IRegistry.class),
             componentType,

@@ -141,11 +141,11 @@ public abstract class OnScheduledTick<
     public static final <
         ECS_TYPE extends WorldProvider,
         T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnScheduledTick<ECS_TYPE> newUninitialised(String id, T listener, IRegistry<ECS_TYPE> registry) {
+    > OnScheduledTick<ECS_TYPE> newDriverFor(String id, T listener, IRegistry<ECS_TYPE> registry) {
         return new OnScheduledTick__Listener<>(id, listener, listener.getQuery(), registry);
     }
 
-    public static final <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newUninitialised(
+    public static final <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
         String id,
         IOnScheduledTick<ECS_TYPE> listener,
         Query<ECS_TYPE> query,
@@ -156,7 +156,7 @@ public abstract class OnScheduledTick<
 
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
         ECS_TYPE
-    > newUninitialised(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    > newDriverFor(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
         return new OnScheduledTick__Component<>(id, componentType, registry);
     }
     // #endregion hide

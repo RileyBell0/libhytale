@@ -40,11 +40,11 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
-    public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTick newUninitialised(T listener) {
-        return newUninitialised(listener, listener.getQuery());
+    public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTick newDriverFor(T listener) {
+        return newDriverFor(listener, listener.getQuery());
     }
 
-    public static final OnBlockTick newUninitialised(IOnBlockTick listener, Query<ChunkStore> query) {
+    public static final OnBlockTick newDriverFor(IOnBlockTick listener, Query<ChunkStore> query) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Listener.class, IOnBlockTick.class, Query.class),
             listener,
@@ -55,7 +55,7 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
     /**
      * Bound for T fully defined here
      */
-    public static final <T extends Component<ChunkStore>> OnBlockTick newUninitialised(
+    public static final <T extends Component<ChunkStore>> OnBlockTick newDriverFor(
         ComponentType<ChunkStore, T> componentType
     ) {
         return IEventDriver.__construct(

@@ -8,6 +8,6 @@ public interface IQueryableEventDriver<
     ECS_TYPE extends WorldProvider
 > extends IEventDriver<ECS_TYPE>, IQuery<ECS_TYPE> {
     public default void onRegister(JavaPlugin plugin) {
-        this.getRegistry().bindEventListeners(plugin, this);
+        this.getRegistry().registerEventListeners(plugin, this);
     }
 }
