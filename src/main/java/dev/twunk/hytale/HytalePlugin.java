@@ -54,38 +54,45 @@ public abstract class HytalePlugin extends JavaPlugin {
      *
      *  T should extend Interaction or Component
      */
+    @SuppressWarnings("null")
     public final <T> void register(Class<T> clazz) {
-        HytalePlugin.register(this, clazz);
+        HytalePlugin.register0(this, clazz, IRegistry.getCodec(clazz), clazz.getName());
     }
 
-    /**
-     * Register event listeners for components of the given type. Note: this will
-     * setup systems to call the methods defined ON your component of type T
-     *
-     *  T should extend Interaction or Component
-     */
+    public final <T> void register(Class<T> clazz, String id) {
+        HytalePlugin.register0(this, clazz, IRegistry.getCodec(clazz), id);
+    }
+
+    public final <T> void register(Class<T> clazz, BuilderCodec<T> codec, String id) {
+        HytalePlugin.register0(this, clazz, codec, id);
+    }
+
     @SuppressWarnings("null")
     public static final <T> void register(JavaPlugin plugin, Class<T> clazz) {
-        register(plugin, clazz, clazz.getName());
+        HytalePlugin.register0(plugin, clazz, IRegistry.getCodec(clazz), clazz.getName());
     }
 
     public static final <T> void register(JavaPlugin plugin, Class<T> clazz, String id) {
-        register(plugin, clazz, IRegistry.getCodec(clazz), id);
+        HytalePlugin.register0(plugin, clazz, IRegistry.getCodec(clazz), id);
+    }
+
+    public static final <T> void register(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
+        HytalePlugin.register0(plugin, clazz, codec, id);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static final void register(JavaPlugin plugin, Class clazz, BuilderCodec codec, String id) {
+    protected static final void register0(JavaPlugin plugin, Class clazz, BuilderCodec codec, String id) {
         if (Interaction.class.isAssignableFrom(clazz)) {
-            HytalePlugin.registerInteraction(plugin, clazz, codec, id);
+            HytalePlugin.registerInteraction0(plugin, clazz, codec, id);
         }
 
         if (Component.class.isAssignableFrom(clazz)) {
-            HytalePlugin.registerComponent(plugin, clazz, codec, id);
+            HytalePlugin.registerComponent0(plugin, clazz, codec, id);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static final <T extends Component<?>> void registerComponent(
+    protected static final <T extends Component<?>> void registerComponent0(
         JavaPlugin plugin,
         Class<T> componentClass,
         BuilderCodec<T> codec,
@@ -116,10 +123,10 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
     }
 
-    public static final <T extends Interaction> Assets<
+    protected static final <T extends Interaction> Assets<
         Interaction,
         ? extends Codec<? extends Interaction>
-    > registerInteraction(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
+    > registerInteraction0(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
         return plugin.getCodecRegistry(Interaction.CODEC).register(id, clazz, codec);
     }
 }
