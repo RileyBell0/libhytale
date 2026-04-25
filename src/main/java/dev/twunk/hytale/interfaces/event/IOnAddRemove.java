@@ -2,12 +2,10 @@ package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnAddRemove;
-import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.ref.AnyRef;
 
 /**
@@ -53,12 +51,4 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
         final RemoveReason reason,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {}
-
-    public interface IOnAddRemove__Component<
-        ECS_TYPE extends WorldProvider
-    > extends IOnAddRemove<ECS_TYPE>, Component<ECS_TYPE> {}
-
-    public interface IOnAddRemove__IQuery<
-        ECS_TYPE extends WorldProvider
-    > extends IOnAddRemove<ECS_TYPE>, IQuery<ECS_TYPE> {}
 }

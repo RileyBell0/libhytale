@@ -15,13 +15,9 @@ import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.event.OnWorldTick;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
-import dev.twunk.hytale.interfaces.event.IOnAddRemove.IOnAddRemove__IQuery;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
-import dev.twunk.hytale.interfaces.event.IOnScheduledTick.IOnScheduledTick__IQuery;
 import dev.twunk.hytale.interfaces.event.IOnTick;
-import dev.twunk.hytale.interfaces.event.IOnTick.IOnTick__IQuery;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
-import dev.twunk.hytale.interfaces.event.IOnWorldTick.IOnWorldTick__IQuery;
 import dev.twunk.lib.codec.AutoSerializeParser;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
@@ -176,34 +172,58 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         );
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("null")
     public default <T extends IQuery<ECS_TYPE>> void registerEventListeners(JavaPlugin plugin, T listener) {
+        this.registerEventListeners(plugin, listener, listener.getClass().getName());
+    }
+
+    @SuppressWarnings("unchecked")
+    public default <T extends IQuery<ECS_TYPE>> void registerEventListeners(JavaPlugin plugin, T listener, String id) {
         final var clazz = listener.getClass();
 
         if (IOnAddRemove.class.isAssignableFrom(clazz)) {
-            OnAddRemove.newDriverFor((IOnAddRemove__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
+            OnAddRemove.newDriverFor((IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener, this).onRegister(plugin);
         }
 
         if (IOnTick.class.isAssignableFrom(clazz)) {
-            OnTick.newDriverFor((IOnTick__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
+            OnTick.newDriverFor((IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
-            OnScheduledTick.newDriverFor("", (IOnScheduledTick__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
+            OnScheduledTick.newDriverFor(id, (IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(
+                plugin
+            );
         }
 
         if (IOnWorldTick.class.isAssignableFrom(clazz)) {
-            OnWorldTick.newDriverFor((IOnWorldTick__IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
+            OnWorldTick.newDriverFor((IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, listener);
+    }
+
+    @SuppressWarnings("null")
+    public default <T extends Component<ECS_TYPE>> void registerEventListeners(
+        JavaPlugin plugin,
+        Class<T> componentClass,
+        Supplier<T> instanceForStaticIshSystems, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
+        ComponentType<ECS_TYPE, T> componentType
+    ) {
+        this.registerEventListeners(
+            plugin,
+            componentClass,
+            instanceForStaticIshSystems,
+            componentType,
+            componentClass.getName()
+        );
     }
 
     public default <T extends Component<ECS_TYPE>> void registerEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
         Supplier<T> instanceForStaticIshSystems, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
-        ComponentType<ECS_TYPE, T> componentType
+        ComponentType<ECS_TYPE, T> componentType,
+        String id
     ) {
         if (IOnAddRemove.class.isAssignableFrom(componentClass)) {
             OnAddRemove.newDriverFor(componentType, this).onRegister(plugin);
@@ -214,7 +234,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
-            OnScheduledTick.newDriverFor("", componentType, this).onRegister(plugin);
+            OnScheduledTick.newDriverFor(id, componentType, this).onRegister(plugin);
         }
 
         if (IOnWorldTick.class.isAssignableFrom(componentClass)) {

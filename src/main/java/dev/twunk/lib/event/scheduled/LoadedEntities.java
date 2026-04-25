@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.TrackedRef;
-import dev.twunk.lib.component.TickSchedule;
+import dev.twunk.lib.component.ScheduledTickCache;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -36,14 +36,16 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
     // what state they held
     private final String id;
 
-    private final ComponentType<ECS_TYPE, TickSchedule<ECS_TYPE>> componentType;
+    private final ComponentType<ECS_TYPE, ScheduledTickCache<ECS_TYPE>> componentType;
 
     public LoadedEntities(String id, IRegistry<ECS_TYPE> registry) {
         this.id = id;
 
         @SuppressWarnings({ "null", "unchecked" })
         @Nonnull
-        ComponentType<ECS_TYPE, TickSchedule<ECS_TYPE>> compType = registry.getComponentType(TickSchedule.class);
+        ComponentType<ECS_TYPE, ScheduledTickCache<ECS_TYPE>> compType = registry.getComponentType(
+            ScheduledTickCache.class
+        );
 
         this.componentType = compType;
     }
@@ -82,7 +84,7 @@ public class LoadedEntities<ECS_TYPE extends WorldProvider> {
         ref.getStore().getComponent(ref, this.componentType).drop(this.id, reason);
     }
 
-    private TickSchedule<ECS_TYPE> loadEntityTickingState(
+    private ScheduledTickCache<ECS_TYPE> loadEntityTickingState(
         final Ref<ECS_TYPE> ref,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {

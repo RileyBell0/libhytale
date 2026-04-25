@@ -2,12 +2,10 @@ package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.builtin.blocktick.system.ChunkBlockTickSystem;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.event.OnTick;
-import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.ref.BlockRef;
 
 /**
@@ -44,8 +42,4 @@ import dev.twunk.hytale.ref.BlockRef;
 @FunctionalInterface
 public interface IOnBlockTick {
     public void onBlockTick(final BlockRef blockRef, final CommandBuffer<ChunkStore> commandBuffer);
-
-    public interface IOnBlockTick__Component extends IOnBlockTick, Component<ChunkStore> {}
-
-    public interface IOnBlockTick__IQuery extends IOnBlockTick, IQuery<ChunkStore> {}
 }

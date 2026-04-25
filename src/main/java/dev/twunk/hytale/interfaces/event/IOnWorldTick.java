@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.interfaces.methods.IQuery;
 
 /**
  * Gives your system the event handler function it needs to run some code every
@@ -33,8 +32,4 @@ public interface IOnWorldTick<ECS_TYPE extends WorldProvider> {
         final Store<ECS_TYPE> store,
         final CommandBuffer<ECS_TYPE> commandBuffer
     );
-
-    public interface IOnWorldTick__IQuery<
-        ECS_TYPE extends WorldProvider
-    > extends IOnWorldTick<ECS_TYPE>, IQuery<ECS_TYPE> {}
 }

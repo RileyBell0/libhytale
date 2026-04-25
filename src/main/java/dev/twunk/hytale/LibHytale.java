@@ -8,7 +8,7 @@ import dev.twunk.examples.interaction.SpawnItemInteraction;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.LogInteraction;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
-import dev.twunk.lib.component.TickSchedule;
+import dev.twunk.lib.component.ScheduledTickCache;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import dev.twunk.lib.registry.EntityRegisterProvider;
 import dev.twunk.lib.test.TestComponent;
@@ -56,7 +56,7 @@ public abstract class LibHytale {
         initialized = true;
 
         HytalePlugin.register(plugin, TestComponent.class);
-        HytalePlugin.register(plugin, TickSchedule.class);
+        HytalePlugin.register(plugin, ScheduledTickCache.class);
         HytalePlugin.register(plugin, ContainerComponent.class);
         HytalePlugin.register(plugin, TrashComponent.class);
 

@@ -21,7 +21,7 @@ public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkSt
         var clazz = listener.getClass();
 
         if (IOnBlockTick.class.isAssignableFrom(clazz)) {
-            var driver = OnBlockTick.newDriverFor((IOnBlockTick.IOnBlockTick__IQuery) listener);
+            var driver = OnBlockTick.newDriverFor((IOnBlockTick & IQuery<ChunkStore>) listener);
             driver.onRegister(plugin);
         }
     }
