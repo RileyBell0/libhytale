@@ -1,4 +1,4 @@
-package dev.twunk.lib._archive;
+package dev.twunk.examples._archive;
 
 import com.hypixel.hytale.server.core.asset.type.blocktick.BlockTickStrategy;
 import com.hypixel.hytale.server.core.asset.type.blocktick.config.TickProcedure;
