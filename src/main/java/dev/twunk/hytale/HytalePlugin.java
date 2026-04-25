@@ -33,7 +33,7 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     // ///////////////////////////////////////////
-    // register events to an instance of an object   (system)
+    //    (system)
     // ///////////////////////////////////////////
 
     public final void register(ISystem<ChunkStore> system) {
@@ -45,15 +45,13 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     // /////////////////////////////////////////////
-    // register events to a component or interaction   (component/interaction)
+    //    (component/interaction)
     // /////////////////////////////////////////////
+    // Register event listeners for components of the given type. Note: this will
+    // setup systems to call the methods defined ON your component of type T
+    //
+    //  T should extend Interaction or Component
 
-    /**
-     * Register event listeners for components of the given type. Note: this will
-     * setup systems to call the methods defined ON your component of type T
-     *
-     *  T should extend Interaction or Component
-     */
     @SuppressWarnings("null")
     public final <T> void register(Class<T> clazz) {
         HytalePlugin.register0(this, clazz, IRegistry.getCodec(clazz), clazz.getName());

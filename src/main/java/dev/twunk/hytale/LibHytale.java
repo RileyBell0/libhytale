@@ -48,7 +48,7 @@ public abstract class LibHytale {
 
     private static boolean initialized = false;
 
-    // Called automatically when you load a mod plugin
+    // Called automatically when a plugin that extends "HytalePlugin" is setup
     public static void init(final JavaPlugin plugin) {
         if (initialized) {
             return;
