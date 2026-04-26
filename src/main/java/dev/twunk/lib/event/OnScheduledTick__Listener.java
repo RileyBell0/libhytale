@@ -6,8 +6,8 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.TrackedRef;
-import dev.twunk.lib.event.scheduled.TickPlan;
+import dev.twunk.hytale.ref.AnyRef;
+import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
 
 public class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends OnScheduledTick<ECS_TYPE> {
@@ -24,17 +24,28 @@ public class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends O
         this.listener = listener;
     }
 
+    public OnScheduledTick__Listener(
+        String id,
+        IOnScheduledTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry,
+        TickSchedule defaultSchedule
+    ) {
+        super(id, query, registry, defaultSchedule);
+        this.listener = listener;
+    }
+
     // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     // ////////////////////////////////////////////////////////////////////////
 
     @Override
     @Nullable
-    public final TickPlan runScheduledTick(
+    protected final TickSchedule _onScheduledTick(
         float dt,
-        TrackedRef<ECS_TYPE> ticker,
+        AnyRef<ECS_TYPE> ref,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        return listener.onScheduledTick(dt, ticker, commandBuffer);
+        return listener.onScheduledTick(dt, ref, commandBuffer);
     }
 }

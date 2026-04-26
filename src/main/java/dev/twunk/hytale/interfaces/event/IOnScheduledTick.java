@@ -1,9 +1,9 @@
 package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.ref.AnyRef;
-import dev.twunk.lib.event.scheduled.TickPlan;
+import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
 
 /**
@@ -22,5 +22,5 @@ import javax.annotation.Nullable;
  */
 public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> {
     @Nullable
-    public abstract TickPlan onScheduledTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer);
+    public abstract TickSchedule onScheduledTick(float dt, Ref<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer);
 }

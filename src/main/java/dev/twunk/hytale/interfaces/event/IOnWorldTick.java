@@ -27,9 +27,9 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 @FunctionalInterface
 public interface IOnWorldTick<ECS_TYPE extends WorldProvider> {
     public void onWorldTick(
-        final float dt,
-        final ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        final Store<ECS_TYPE> store,
-        final CommandBuffer<ECS_TYPE> commandBuffer
+        float dt,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
     );
 }

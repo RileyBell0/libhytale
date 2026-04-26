@@ -8,6 +8,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -20,7 +21,10 @@ import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.utils.BlockUtils;
+import dev.twunk.hytale.utils.ChunkUtils;
+import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.lib.event.scheduled.TickSchedule;
+import dev.twunk.lib.registry.ChunkRegisterProvider;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -55,6 +59,11 @@ public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
 > implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTickQuery<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
 
+    @FunctionalInterface
+    private static interface SleepingEntityCreator<ECS_TYPE extends WorldProvider> {
+        SleepingEntity fromRef(Ref<ECS_TYPE> ref, UUID uuid, TickSchedule.Sleeping schedule);
+    }
+
     // A unique and STABLE identifier for the system. you cannot change this.
     // once you decide on an ID your players REQUIRE it to be stable (or everything
     // in their worlds will break)
@@ -73,14 +82,56 @@ public abstract class OnScheduledTick<
     private ComponentType<ECS_TYPE, TickScheduleComponent<ECS_TYPE>> tickScheduleComponentType;
     private final ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponentType;
 
+    public static final SleepingEntity sleepingEntityCreator__ChunkStore(
+        Ref<ChunkStore> ref,
+        UUID uuid,
+        TickSchedule.Sleeping schedule
+    ) {
+        // get the BlockStateInfo component -> this gives us access to the
+        // local index directly with info.getIndex(), and gives us a chunk
+        // ref that we can turn into a chunk index easily too
+        @SuppressWarnings("null")
+        @Nonnull
+        final var info = ComponentUtils.get(ref, BlockStateInfo.getComponentType());
+
+        final var blockIndex = info.getIndex();
+
+        @SuppressWarnings("null")
+        @Nonnull
+        final var chunkIndex = ChunkUtils.Coords.Index.get(info);
+
+        return new SleepingEntity__Block(uuid, schedule, chunkIndex, blockIndex);
+    }
+
+    private static final SleepingEntity sleepingEntityCreator__EntityStore(
+        Ref<EntityStore> ref,
+        UUID uuid,
+        TickSchedule.Sleeping schedule
+    ) {
+        return new SleepingEntity(uuid, schedule);
+    }
+
     private final Set<UUID> removedSleepers = new HashSet<>();
     private final PriorityQueue<SleepingEntity> nextToWake = new PriorityQueue<>();
+    private final SleepingEntityCreator<ECS_TYPE> sleepingEntityCreator;
 
     protected OnScheduledTick(String id, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
         this.id = id;
         this.query = query;
         this.registry = registry;
         this.defaultSchedule = TickSchedule.ACTIVE;
+
+        if (this.registry instanceof ChunkRegisterProvider) {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            SleepingEntityCreator<ECS_TYPE> creator =
+                (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__ChunkStore;
+            this.sleepingEntityCreator = creator;
+        } else {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            SleepingEntityCreator<ECS_TYPE> creator =
+                (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__EntityStore;
+            this.sleepingEntityCreator = creator;
+        }
 
         @SuppressWarnings({ "unchecked", "null" })
         @Nonnull
@@ -113,6 +164,18 @@ public abstract class OnScheduledTick<
         this.query = query;
         this.registry = registry;
         this.defaultSchedule = defaultSchedule;
+
+        if (this.registry instanceof ChunkRegisterProvider) {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            SleepingEntityCreator<ECS_TYPE> creator =
+                (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__ChunkStore;
+            this.sleepingEntityCreator = creator;
+        } else {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            SleepingEntityCreator<ECS_TYPE> creator =
+                (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__EntityStore;
+            this.sleepingEntityCreator = creator;
+        }
 
         @SuppressWarnings({ "unchecked", "null" })
         @Nonnull
@@ -157,12 +220,14 @@ public abstract class OnScheduledTick<
 
     /**
      * Load in tick schedule (or use default fallback)
+     *
+     * Guarantees that entities will have a UUID component after this point.
      */
     @Override
     public final void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
-        // Get its UUID, or force an ID onto the entity
-        final var uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
-        final var uuid = uuidComponent.getUuid();
+        // get the UUID component, or force one onto the entity otherwise
+        final UUIDComponent<ECS_TYPE> uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
+        final UUID uuid = uuidComponent.getUuid();
 
         // Get the schedule holder component, or force said component to store our schedule onto the entity
         final var tickScheduleComponent = commandBuffer.ensureAndGetComponent(ref, this.tickScheduleComponentType);
@@ -178,7 +243,9 @@ public abstract class OnScheduledTick<
             // it wants to be ticking so make sure its got that component that we query on for ticking entities and move along
             case TickSchedule.Active _ -> commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
             // it wants to be sleeping, so just need to record when it wants to be awake so i can wake it up (as long as its still loaded when that happens)
-            case TickSchedule.Sleeping sleeping -> this.nextToWake.add(new SleepingEntity(uuid, sleeping));
+            case TickSchedule.Sleeping sleeping -> this.nextToWake.add(
+                this.sleepingEntityCreator.fromRef(ref, uuid, sleeping)
+            );
             // ignore and discard other cases, they're not waiting for a tick or actively ticking
             // so i literally don't care about them
             default -> {
@@ -193,8 +260,15 @@ public abstract class OnScheduledTick<
      */
     @Override
     public final void onEntityRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
-        // get the UUID
-        final var uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
+        // get the UUID component
+        @Nullable
+        UUIDComponent<ECS_TYPE> uuidComponent = ComponentUtils.get(ref, this.uuidComponentType);
+
+        // if it DIDNT exist there's no point in making a new one so we'll just dip.
+        // sure, it SHOULD exist but hell i don't trust y'all enough to rely on that heavily
+        if (uuidComponent == null) {
+            return;
+        }
 
         // mark that the sleeper handler should discard element next time it sees it, as we're just, yeah, done with it
         removedSleepers.add(uuidComponent.getUuid());
@@ -234,7 +308,7 @@ public abstract class OnScheduledTick<
 
             // if we're in chunk mode we have to use the coords to get a ref
             final Ref<ECS_TYPE> ref = switch (nowAwake) {
-                case SleepingEntity.Chunk asChunk -> {
+                case SleepingEntity__Block asChunk -> {
                     // getRef based on its coords. We can't use UUID for this without modifying hytales ChunkStore to also record entites vs uuids and i so cbf doing that
                     @SuppressWarnings({ "unchecked", "rawtypes" })
                     final Ref<ECS_TYPE> blockRef = (Ref) BlockUtils.Refs.get(
@@ -305,7 +379,8 @@ public abstract class OnScheduledTick<
 
                 // write us into the sleep queue
                 final var uuidComponent = commandBuffer.getComponent(ref, this.uuidComponentType);
-                this.nextToWake.add(new SleepingEntity(uuidComponent.getUuid(), newSchedule));
+                final var uuid = uuidComponent.getUuid();
+                this.nextToWake.add(this.sleepingEntityCreator.fromRef(ref, uuid, newSchedule));
 
                 // persist our new schedule
                 tickScheduleComponent.setSchedule(this.id, newSchedule);

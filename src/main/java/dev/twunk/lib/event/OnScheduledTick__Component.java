@@ -8,19 +8,16 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.TrackedRef;
+import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.lib.event.scheduled.TickPlan;
+import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
 
-public class OnScheduledTick__Component<
-    ECS_TYPE extends WorldProvider,
-    T extends Component<ECS_TYPE>
-> extends OnScheduledTick<ECS_TYPE> {
+public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends OnScheduledTick<ECS_TYPE> {
 
-    private final ComponentType<ECS_TYPE, T> componentType;
+    private final ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>> componentType;
 
-    public OnScheduledTick__Component(
+    public <T extends Component<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>> OnScheduledTick__Component(
         String id,
         ComponentType<ECS_TYPE, T> componentType,
         IRegistry<ECS_TYPE> registry
@@ -29,23 +26,36 @@ public class OnScheduledTick__Component<
         this.componentType = componentType;
     }
 
+    public <T extends Component<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>> OnScheduledTick__Component(
+        String id,
+        ComponentType<ECS_TYPE, T> componentType,
+        IRegistry<ECS_TYPE> registry,
+        TickSchedule defaultSchedule
+    ) {
+        super(id, Query.and(componentType), registry, defaultSchedule);
+        this.componentType = componentType;
+    }
+
     // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     // ////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("unchecked")
     @Override
     @Nullable
-    public final TickPlan runScheduledTick(
+    protected final TickSchedule _onScheduledTick(
         float dt,
-        TrackedRef<ECS_TYPE> ticker,
+        AnyRef<ECS_TYPE> ref,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        final var component = ComponentUtils.get(ticker, componentType);
+        @SuppressWarnings("unchecked")
+        final IOnScheduledTick<ECS_TYPE> component = (
+            IOnScheduledTick<ECS_TYPE>
+            & Component<ECS_TYPE>
+        ) ComponentUtils.get(ref, this.componentType);
         if (component == null) {
             return null;
         }
 
-        return ((IOnScheduledTick<ECS_TYPE>) component).onScheduledTick(dt, ticker, commandBuffer);
+        return component.onScheduledTick(dt, ref, commandBuffer);
     }
 }

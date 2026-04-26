@@ -172,3 +172,134 @@ https://github.com/RileyBell0/hytale-plugin
 Got most of my resources from reading the src code directly and from <https://hytalemodding.dev/en/docs>
 
 I highly recommend checking out <https://hytalemodding.dev/en/docs> for an overview on Hytale's systems and some examples
+
+---
+
+## ignore this, im just dumping code
+```java
+public final int getIndexInArchetypeChunk(
+    ArchetypeChunk<ECS_TYPE> archetypeChunk,
+    com.hypixel.hytale.component.Ref<ECS_TYPE> ref
+) {
+    for (var i = 0; i < archetypeChunk.size(); i++) {
+        if (ref.equals(archetypeChunk.getReferenceTo(i))) {
+            return i;
+        }
+    }
+    for (var i = 0; i < archetypeChunk.size(); i++) {
+        System.out.println(i + ") " + archetypeChunk.getReferenceTo(i));
+    }
+    throw new RuntimeException("reiwriwjeroijwaorijawioj " + ref);
+}
+```
+
+---
+
+```java
+
+final var listener = commandBuffer.ensureAndGetComponent(
+    ref,
+    (ComponentType<ECS_TYPE, ?>) listenerComponentType
+);
+@SuppressWarnings("unchecked")
+final var trackedRef = (TrackedRef<ECS_TYPE, T>) new TrackedRef<>(
+    ref,
+    associatedCache,
+    (IOnScheduledTick) listener
+);
+area.add(trackedRef); // we'll put chuck our cache into the right ticking group (ready to go)
+```
+
+```java
+public static final <
+    ECS_TYPE extends WorldProvider,
+    T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
+> OnScheduledTick<ECS_TYPE> newDriverFor(String id, T listener, IRegistry<ECS_TYPE> registry) {
+    return new OnScheduledTick__Listener<>(id, listener, listener.getQuery(), registry);
+}
+
+public static final <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
+    String id,
+    IOnScheduledTick<ECS_TYPE> listener,
+    Query<ECS_TYPE> query,
+    IRegistry<ECS_TYPE> registry
+) {
+    return new OnScheduledTick__Listener<>(id, listener, query, registry);
+}
+
+public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
+    ECS_TYPE
+> newDriverFor(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    return new OnScheduledTick__Component<>(id, componentType, registry);
+}
+```
+
+
+
+
+and a method i was looking into for making unique identifiers (ish) for each block
+
+problem is that world IDs are the size of a UUID so i can't just, combine them into one uuid without losing accuracy but that's whatever
+```java
+final class Chunk extends UUIDComponent<ChunkStore> {
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static final BuilderCodec<Chunk> CODEC = BuilderCodec.builder(Chunk.class, Chunk::new)
+        .append(new KeyedCodec("UUID", Codec.UUID_BINARY, true), (o, i) -> o.uuid = i, o -> o.uuid)
+        .addValidator(Validators.nonNull())
+        .add()
+        .build();
+
+    public Chunk() {
+        super();
+    }
+
+    // combination of world, chunk, local index
+    public Chunk(UUID coords) {
+        super(coords);
+    }
+
+    // combination of world, chunk, local index
+    public Chunk(UUID worldId, long chunkCoords, int blockCoords) {
+        super(UUIDComponent.uuidFromBlockCoords(worldId, chunkCoords, blockCoords));
+    }
+}
+
+
+
+
+ // get the UUID component if it exists
+@Nullable
+UUIDComponent<ECS_TYPE> uuidComponent = ComponentUtils.get(ref, this.uuidComponentType);
+
+// if it DIDNT exist we'll make a new one and chuck that onto the entity
+// note: we have to do seperate logic for blocks vs entities. Entities seem to have one by default
+// but blocks don't.
+if (uuidComponent == null) {
+    return;
+    if (ChunkStore.class.isAssignableFrom(ref.getStore().getClass())) {
+        @SuppressWarnings("unchecked")
+        final var asChunkRef = (Ref<ChunkStore>) ref;
+
+        @SuppressWarnings("null")
+        @Nonnull
+        final var info = ComponentUtils.get(asChunkRef, BlockStateInfo.getComponentType());
+
+        final var blockIndex = info.getIndex();
+
+        @SuppressWarnings("null")
+        @Nonnull
+        final var chunkIndex = ChunkUtils.Coords.Index.get(info);
+
+        final var worldId = asChunkRef.getStore().getExternalData().getWorld().getWorldConfig().getUuid();
+        final UUID blockUuid = UUIDComponent.uuidFromBlockCoords(worldId, chunkIndex, blockIndex);
+
+        uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
+        uuidComponent.setUuid(blockUuid);
+    } else {
+        uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
+    }
+}
+```
+
+annoyingly since theres no way to get a block ref back from its component that i know of (except maybe persistent ref though havent had a chance to read up on it that much, seems to be entity locked iirc) ive got this whole weird stupid ass system. that checks at runtime if its a block or entity. hate it. but hey it works? probably? maybe i can instead just put a method onto the UUID component that will get you the ref? that way i CAN put whatever data i want on the uuid and sure it might be a bit weird at a standing data thing but as long as nobody tries to hardcode UUIDS and shit we'll be good, yeah i could do that, means its two different components technically but hey who says i NEED to define both fields? coud just, yeah im sure i can find some hacks
