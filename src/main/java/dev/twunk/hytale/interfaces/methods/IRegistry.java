@@ -13,7 +13,9 @@ import dev.twunk.hytale.LibHytaleException;
 import dev.twunk.hytale.event.OnAddRemove;
 import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.event.OnWorldTick;
+import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
+import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.lib.codec.AutoSerializeParser;
@@ -187,11 +189,11 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
             OnTick.newDriverFor((IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
         }
 
-        // if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
-        //     OnScheduledTick.newDriverFor(id, (IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(
-        //         plugin
-        //     );
-        // }
+        if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
+            OnScheduledTick.newDriverFor(id, (IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(
+                plugin
+            );
+        }
 
         if (IOnWorldTick.class.isAssignableFrom(clazz)) {
             OnWorldTick.newDriverFor((IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
@@ -231,9 +233,9 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
             OnTick.newDriverFor(componentType, this).onRegister(plugin);
         }
 
-        // if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
-        //     OnScheduledTick.newDriverFor(id, componentType, this).onRegister(plugin);
-        // }
+        if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
+            OnScheduledTick.newDriverFor(id, componentType, this).onRegister(plugin);
+        }
 
         if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
             @SuppressWarnings({ "unchecked" })

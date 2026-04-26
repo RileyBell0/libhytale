@@ -3,6 +3,7 @@ package dev.twunk.hytale.event.composite;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
@@ -14,15 +15,20 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.LibHytaleException;
 import dev.twunk.hytale.component.UUIDComponent;
+import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.IQueryableEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
+import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick.IOnTickQuery;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
+import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
+import dev.twunk.lib.event.OnScheduledTick__Component;
+import dev.twunk.lib.event.OnScheduledTick__Listener;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import java.util.HashSet;
@@ -402,4 +408,133 @@ public abstract class OnScheduledTick<
             }
         }
     }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Implementations  -\/======================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+    // #region hide
+
+    /**
+     * Shim around other method for reducing boilerplate if i define a query on my class
+     */
+    public static final <
+        ECS_TYPE extends WorldProvider,
+        T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
+    > OnScheduledTick<ECS_TYPE> newDriverFor(String id, T listener, IRegistry<ECS_TYPE> registry) {
+        return newDriverFor(id, listener, listener.getQuery(), registry, null);
+    }
+
+    /**
+     * Shim around other method for reducing boilerplate if i define a query on my class
+     */
+    public static final <
+        ECS_TYPE extends WorldProvider,
+        T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
+    > OnScheduledTick<ECS_TYPE> newDriverFor(
+        String id,
+        T listener,
+        IRegistry<ECS_TYPE> registry,
+        @Nullable TickSchedule defaultSchedule
+    ) {
+        return newDriverFor(id, listener, listener.getQuery(), registry, defaultSchedule);
+    }
+
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     */
+    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
+        String id,
+        IOnScheduledTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Listener.class,
+                String.class,
+                IOnScheduledTick.class,
+                Query.class,
+                IRegistry.class
+            ),
+            id,
+            listener,
+            query,
+            registry
+        );
+    }
+
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     */
+    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
+        String id,
+        IOnScheduledTick<ECS_TYPE> listener,
+        Query<ECS_TYPE> query,
+        IRegistry<ECS_TYPE> registry,
+        @Nullable TickSchedule defaultSchedule
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Listener.class,
+                String.class,
+                IOnScheduledTick.class,
+                Query.class,
+                IRegistry.class,
+                TickSchedule.class
+            ),
+            id,
+            listener,
+            query,
+            registry,
+            defaultSchedule
+        );
+    }
+
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     *
+     * Bound for T fully defined here
+     */
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
+        ECS_TYPE
+    > newDriverFor(
+        String id,
+        ComponentType<ECS_TYPE, T> componentType,
+        IRegistry<ECS_TYPE> registry,
+        TickSchedule defaultSchedule
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Component.class,
+                String.class,
+                ComponentType.class,
+                IRegistry.class,
+                TickSchedule.class
+            ),
+            id,
+            componentType,
+            registry,
+            defaultSchedule
+        );
+    }
+
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
+        ECS_TYPE
+    > newDriverFor(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Component.class,
+                String.class,
+                ComponentType.class,
+                IRegistry.class
+            ),
+            id,
+            componentType,
+            registry
+        );
+    }
+    // #endregion hide
 }

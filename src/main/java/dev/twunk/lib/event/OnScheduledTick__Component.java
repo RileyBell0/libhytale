@@ -17,7 +17,7 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
 
     private final ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>> componentType;
 
-    public <T extends Component<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>> OnScheduledTick__Component(
+    public <T extends Component<ECS_TYPE>> OnScheduledTick__Component(
         String id,
         ComponentType<ECS_TYPE, T> componentType,
         IRegistry<ECS_TYPE> registry
@@ -26,7 +26,7 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
         this.componentType = componentType;
     }
 
-    public <T extends Component<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>> OnScheduledTick__Component(
+    public <T extends Component<ECS_TYPE>> OnScheduledTick__Component(
         String id,
         ComponentType<ECS_TYPE, T> componentType,
         IRegistry<ECS_TYPE> registry,
@@ -48,10 +48,10 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         @SuppressWarnings("unchecked")
-        final IOnScheduledTick<ECS_TYPE> component = (
-            IOnScheduledTick<ECS_TYPE>
-            & Component<ECS_TYPE>
-        ) ComponentUtils.get(ref, this.componentType);
+        final IOnScheduledTick<ECS_TYPE> component = (IOnScheduledTick<ECS_TYPE>) ComponentUtils.get(
+            ref,
+            this.componentType
+        );
         if (component == null) {
             return null;
         }
