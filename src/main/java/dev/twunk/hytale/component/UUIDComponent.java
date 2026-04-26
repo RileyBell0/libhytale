@@ -37,25 +37,7 @@ final class Chunk extends UUIDComponent<ChunkStore> {
 
     // combination of world, chunk, local index
     public Chunk(UUID worldId, long chunkCoords, int blockCoords) {
-        super(combine(worldId, new UUID(chunkCoords, blockCoords)));
-    }
-
-    public static final UUID combine(UUID a, UUID b) {
-        // Source - https://stackoverflow.com/a/5683621
-        // Posted by pickypg, modified by community. See post 'Timeline' for change history
-        // Retrieved 2026-04-26, License - CC BY-SA 4.0
-
-        byte[] one = UuidHelper.encodeUuidToBinary(a, UuidRepresentation.STANDARD);
-        byte[] two = UuidHelper.encodeUuidToBinary(b, UuidRepresentation.STANDARD);
-        byte[] combined = new byte[one.length + two.length];
-
-        System.arraycopy(one, 0, combined, 0, one.length);
-        System.arraycopy(two, 0, combined, one.length, two.length);
-
-        @SuppressWarnings("null")
-        @Nonnull
-        var uuid = UUID.nameUUIDFromBytes(combined);
-        return uuid;
+        super(UUIDComponent.uuidFromBlockCoords(worldId, chunkCoords, blockCoords));
     }
 }
 
@@ -108,5 +90,28 @@ public abstract class UUIDComponent<ECS_TYPE extends WorldProvider> implements C
 
     public Component<ECS_TYPE> clone() {
         return this;
+    }
+
+    // combination of world, chunk, local index
+    public static final UUID uuidFromBlockCoords(UUID worldId, long chunkCoords, int blockCoords) {
+        return combine(worldId, new UUID(chunkCoords, blockCoords));
+    }
+
+    public static final UUID combine(UUID a, UUID b) {
+        // Source - https://stackoverflow.com/a/5683621
+        // Posted by pickypg, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-04-26, License - CC BY-SA 4.0
+
+        byte[] one = UuidHelper.encodeUuidToBinary(a, UuidRepresentation.STANDARD);
+        byte[] two = UuidHelper.encodeUuidToBinary(b, UuidRepresentation.STANDARD);
+        byte[] combined = new byte[one.length + two.length];
+
+        System.arraycopy(one, 0, combined, 0, one.length);
+        System.arraycopy(two, 0, combined, one.length, two.length);
+
+        @SuppressWarnings("null")
+        @Nonnull
+        var uuid = UUID.nameUUIDFromBytes(combined);
+        return uuid;
     }
 }
