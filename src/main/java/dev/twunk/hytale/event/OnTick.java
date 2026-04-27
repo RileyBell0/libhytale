@@ -95,11 +95,18 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
      */
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnTick<ECS_TYPE> newDriverFor(
         IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
         ComponentType<ECS_TYPE, T> componentType
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnTick__Component.class, IRegistry.class, ComponentType.class),
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnTick__Component.class,
+                IRegistry.class,
+                Query.class,
+                ComponentType.class
+            ),
             registry,
+            query,
             componentType
         );
     }

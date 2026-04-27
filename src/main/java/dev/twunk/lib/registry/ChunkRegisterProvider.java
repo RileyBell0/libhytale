@@ -3,11 +3,13 @@ package dev.twunk.lib.registry;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentRegistryProxy;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.event.OnBlockTick;
 import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
+import java.util.function.Function;
 
 public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkStore> {
 
@@ -21,7 +23,10 @@ public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkSt
         var clazz = listener.getClass();
 
         if (IOnBlockTick.class.isAssignableFrom(clazz)) {
-            var driver = OnBlockTick.newDriverFor((IOnBlockTick & IQuery<ChunkStore>) listener);
+            var driver = OnBlockTick.newDriverFor(
+                listener.getQuery(IOnBlockTick.class),
+                (IOnBlockTick & IQuery<ChunkStore>) listener
+            );
             driver.onRegister(plugin);
         }
     }
@@ -30,12 +35,11 @@ public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkSt
     public <T extends Component<ChunkStore>> void bindRegistrySpecificEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
+        Function<Class<?>, Query<ChunkStore>> querySupplier,
         ComponentType<ChunkStore, T> componentType
     ) {
         if (IOnBlockTick.class.isAssignableFrom(componentClass)) {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            var driver = OnBlockTick.newDriverFor((ComponentType) componentType);
-            driver.onRegister(plugin);
+            OnBlockTick.newDriverFor(querySupplier.apply(IOnBlockTick.class), componentType).onRegister(plugin);
         }
     }
 }

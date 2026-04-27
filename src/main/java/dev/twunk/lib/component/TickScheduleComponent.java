@@ -12,12 +12,20 @@ import javax.annotation.Nullable;
 @Serializable
 public final class TickScheduleComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
 
+    public TickScheduleComponent() {
+        this.allSchedules = new HashMap<>();
+    }
+
+    public TickScheduleComponent(Map<String, TickSchedule> allSchedules) {
+        this.allSchedules = allSchedules;
+    }
+
     // Stores ALL schedules for ALL scheduled tick systems that query this entity.
     // means i only need to generate 1x component for each scheduled tick system
     // and also means that this component could get huge if someone does something dumb,
     // but thats true regardless of my approach so that means we're good to go using this.
     @Serialize
-    private final Map<String, TickSchedule> allSchedules = new HashMap<>();
+    private final Map<String, TickSchedule> allSchedules;
 
     @Nullable
     public TickSchedule getSchedule(String systemId) {
@@ -29,6 +37,6 @@ public final class TickScheduleComponent<ECS_TYPE extends WorldProvider> impleme
     }
 
     public TickScheduleComponent<ECS_TYPE> clone() {
-        return new TickScheduleComponent<>();
+        return new TickScheduleComponent<>(allSchedules);
     }
 }

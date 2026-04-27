@@ -19,20 +19,22 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
 
     public <T extends Component<ECS_TYPE>> OnScheduledTick__Component(
         IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
         ComponentType<ECS_TYPE, T> componentType,
         String id
     ) {
-        super(registry, Query.and(componentType), id);
+        super(registry, query, id);
         this.componentType = componentType;
     }
 
     public <T extends Component<ECS_TYPE>> OnScheduledTick__Component(
         IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
         ComponentType<ECS_TYPE, T> componentType,
         String id,
         TickSchedule defaultSchedule
     ) {
-        super(registry, Query.and(componentType), id, defaultSchedule);
+        super(registry, query, id, defaultSchedule);
         this.componentType = componentType;
     }
 

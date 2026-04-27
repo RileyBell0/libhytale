@@ -19,6 +19,7 @@ import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.lib.codec.AutoSerializeParser;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
@@ -180,21 +181,36 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     @SuppressWarnings({ "unchecked" })
     public default <T extends IQuery<ECS_TYPE>> void registerEventListeners(JavaPlugin plugin, T listener, String id) {
         if (listener instanceof IOnAddRemove) {
-            OnAddRemove.newDriverFor(this, (IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener).onRegister(plugin);
+            OnAddRemove.newDriverFor(
+                this,
+                listener.getQuery(IOnAddRemove.class),
+                (IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener
+            ).onRegister(plugin);
         }
 
         if (listener instanceof IOnTick) {
-            OnTick.newDriverFor(this, (IQuery<ECS_TYPE> & IOnTick<ECS_TYPE>) listener).onRegister(plugin);
+            OnTick.newDriverFor(
+                this,
+                listener.getQuery(IOnTick.class),
+                (IQuery<ECS_TYPE> & IOnTick<ECS_TYPE>) listener
+            ).onRegister(plugin);
         }
 
         if (listener instanceof IOnScheduledTick) {
-            OnScheduledTick.newDriverFor(this, (IQuery<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>) listener, id).onRegister(
-                plugin
-            );
+            OnScheduledTick.newDriverFor(
+                this,
+                listener.getQuery(IOnScheduledTick.class),
+                (IQuery<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>) listener,
+                id
+            ).onRegister(plugin);
         }
 
         if (listener instanceof IOnWorldTick) {
-            OnWorldTick.newDriverFor(this, (IQuery<ECS_TYPE> & IOnWorldTick<ECS_TYPE>) listener).onRegister(plugin);
+            OnWorldTick.newDriverFor(
+                this,
+                listener.getQuery(IOnWorldTick.class),
+                (IQuery<ECS_TYPE> & IOnWorldTick<ECS_TYPE>) listener
+            ).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, listener);
@@ -204,52 +220,52 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     public default <T extends Component<ECS_TYPE>> void registerEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
-        Supplier<T> instanceForStaticIshSystems, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
+        Supplier<T> globalInstance, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
         ComponentType<ECS_TYPE, T> componentType
     ) {
-        this.registerEventListeners(
-            plugin,
-            componentClass,
-            instanceForStaticIshSystems,
-            componentType,
-            componentClass.getName()
-        );
+        this.registerEventListeners(plugin, componentClass, globalInstance, componentType, componentClass.getName());
     }
 
     public default <T extends Component<ECS_TYPE>> void registerEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
-        Supplier<T> instanceForStaticIshSystems, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
+        Supplier<T> supplier, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
         ComponentType<ECS_TYPE, T> componentType,
         String id
     ) {
+        var globalInstance = supplier.get();
+        Function<Class<?>, Query<ECS_TYPE>> querySupplier = clazz -> Query.and(componentType);
+        if (globalInstance instanceof IQuery) {
+            @SuppressWarnings("unchecked")
+            var asQueryable = ((IQuery<ECS_TYPE>) globalInstance);
+            querySupplier = asQueryable::getQuery;
+        }
+
         if (IOnAddRemove.class.isAssignableFrom(componentClass)) {
-            OnAddRemove.newDriverFor(this, componentType).onRegister(plugin);
+            OnAddRemove.newDriverFor(this, querySupplier.apply(IOnAddRemove.class), componentType).onRegister(plugin);
         }
 
         if (IOnTick.class.isAssignableFrom(componentClass)) {
-            OnTick.newDriverFor(this, componentType).onRegister(plugin);
+            OnTick.newDriverFor(this, querySupplier.apply(IOnTick.class), componentType).onRegister(plugin);
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
-            OnScheduledTick.newDriverFor(this, componentType, id).onRegister(plugin);
+            OnScheduledTick.newDriverFor(
+                this,
+                querySupplier.apply(IOnScheduledTick.class),
+                componentType,
+                id
+            ).onRegister(plugin);
         }
 
         if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
             @SuppressWarnings({ "unchecked" })
-            var instanceThatListenes = (IOnWorldTick<ECS_TYPE>) instanceForStaticIshSystems.get();
-            if (instanceThatListenes == null) {
-                throw new LibHytaleException(
-                    "error: failed to consume supplier for " + componentClass + " while registering event listeners"
-                );
-            }
+            var instance = (IOnWorldTick<ECS_TYPE>) globalInstance;
 
-            OnWorldTick.newDriverFor(this, Query.and(componentType), instanceThatListenes)
-                // .setDependencies(Set.of(new SystemDependency<>(Order.AFTER, addRemoveClass)))
-                .onRegister(plugin);
+            OnWorldTick.newDriverFor(this, querySupplier.apply(IOnWorldTick.class), instance).onRegister(plugin);
         }
 
-        this.bindRegistrySpecificEventListeners(plugin, componentClass, componentType);
+        this.bindRegistrySpecificEventListeners(plugin, componentClass, querySupplier, componentType);
     }
 
     // only need to override this if you've got specific events for the given registry you want to init
@@ -257,6 +273,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     public default <T extends Component<ECS_TYPE>> void bindRegistrySpecificEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
+        Function<Class<?>, Query<ECS_TYPE>> supplier, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
         ComponentType<ECS_TYPE, T> componentType
     ) {}
 

@@ -56,10 +56,12 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
      * Bound for T fully defined here
      */
     public static final <T extends Component<ChunkStore>> OnBlockTick newDriverFor(
+        Query<ChunkStore> query,
         ComponentType<ChunkStore, T> componentType
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Component.class, ComponentType.class),
+            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Component.class, Query.class, ComponentType.class),
+            query,
             componentType
         );
     }

@@ -16,8 +16,8 @@ public abstract class OnBlockTick__Component<T extends Component<ChunkStore>> ex
 
     private final ComponentType<ChunkStore, T> componentType;
 
-    protected OnBlockTick__Component(ComponentType<ChunkStore, T> componentType) {
-        super(Query.and(componentType));
+    protected OnBlockTick__Component(Query<ChunkStore> query, ComponentType<ChunkStore, T> componentType) {
+        super(query);
         this.componentType = componentType;
     }
 

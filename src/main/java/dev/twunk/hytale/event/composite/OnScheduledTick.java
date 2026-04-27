@@ -213,8 +213,12 @@ public abstract class OnScheduledTick<
         return this.query;
     }
 
-    public final Query<ECS_TYPE> getEventQuery(Class<?> clazz) {
-        return Query.and(this.query, this.activeFlagComponentType);
+    @Override
+    public final Query<ECS_TYPE> getQuery(Class<?> clazz) {
+        if (clazz.equals(IOnTick.class)) {
+            return Query.and(this.query, this.activeFlagComponentType);
+        }
+        return this.query;
     }
 
     @Override
@@ -302,7 +306,6 @@ public abstract class OnScheduledTick<
         final var currentTick = store.getExternalData().getWorld().getTick();
         // while the next sleeper exists and is waiting to be ticked (<= currentTick)
         while ((next = nextToWake.peek()) != null && next.nextTick <= currentTick) {
-            System.out.println("Waking up " + next);
             // skip over & remove entites that are no longer loaded from our
             // next tick queue
             final var uuid = next.uuid;
@@ -372,7 +375,6 @@ public abstract class OnScheduledTick<
         // run your tick method
         final var res = this._onScheduledTick(dt, ref, commandBuffer);
         if (res == null) {
-            System.out.println("null!!!!!");
             return;
         }
 
@@ -381,7 +383,6 @@ public abstract class OnScheduledTick<
         // Configure future schedule for this entity according to your returned tick schedule
         switch (res) {
             case TickSchedule.Sleeping newSchedule -> {
-                System.out.println("Sleeping!!!!!");
                 // if they're planning to run next tick, we'll just, ignore that new
                 // schedule request. silly dummie
                 final var currentTick = ref.getStore().getExternalData().getWorld().getTick();
@@ -399,10 +400,9 @@ public abstract class OnScheduledTick<
 
                 // finally: remove the flag that says we're ticking (so we don't anymore)
                 // (occurs AFTER our system finishes running all ticks)
-                commandBuffer.removeComponent(ref, this.activeFlagComponentType);
+                commandBuffer.run(s -> s.removeComponent(ref, this.activeFlagComponentType));
             }
             case TickSchedule.Stopped newSchedule -> {
-                System.out.println("Stopped!!!!!");
                 // persist our new schedule
                 tickScheduleComponent.setSchedule(this.id, newSchedule);
 
@@ -509,6 +509,7 @@ public abstract class OnScheduledTick<
         ECS_TYPE
     > newDriverFor(
         IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
         ComponentType<ECS_TYPE, T> componentType,
         String id,
         TickSchedule defaultSchedule
@@ -517,11 +518,13 @@ public abstract class OnScheduledTick<
             IEventDriver.__dupeClassAndGetConstructor(
                 OnScheduledTick__Component.class,
                 IRegistry.class,
+                Query.class,
                 ComponentType.class,
                 String.class,
                 TickSchedule.class
             ),
             registry,
+            query,
             componentType,
             id,
             defaultSchedule
@@ -530,15 +533,22 @@ public abstract class OnScheduledTick<
 
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
         ECS_TYPE
-    > newDriverFor(IRegistry<ECS_TYPE> registry, ComponentType<ECS_TYPE, T> componentType, String id) {
+    > newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
+        ComponentType<ECS_TYPE, T> componentType,
+        String id
+    ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnScheduledTick__Component.class,
                 IRegistry.class,
+                Query.class,
                 ComponentType.class,
                 String.class
             ),
             registry,
+            query,
             componentType,
             id
         );
