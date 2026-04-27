@@ -6,11 +6,14 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.examples.component.TrashComponent;
 import dev.twunk.examples.interaction.SpawnItemInteraction;
 import dev.twunk.hytale.component.ContainerComponent;
+import dev.twunk.hytale.component.UUIDComponent;
 import dev.twunk.hytale.interaction.LogInteraction;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
+import dev.twunk.lib.component.ActivelyTickingComponent;
+import dev.twunk.lib.component.TestComponent;
+import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import dev.twunk.lib.registry.EntityRegisterProvider;
-import dev.twunk.lib.test.TestComponent;
 
 /**
  * General need to knows for hytale's internals
@@ -55,8 +58,12 @@ public abstract class LibHytale {
         initialized = true;
 
         HytalePlugin.register(plugin, TestComponent.class);
+        HytalePlugin.register(plugin, TickScheduleComponent.class);
         HytalePlugin.register(plugin, ContainerComponent.class);
         HytalePlugin.register(plugin, TrashComponent.class);
+        // TODO don't register this, instead register a new component each time it loads
+        HytalePlugin.register(plugin, ActivelyTickingComponent.class);
+        HytalePlugin.register(plugin, UUIDComponent.class);
 
         // Register interactions
         HytalePlugin.register(plugin, LogInteraction.class, "Log");
