@@ -48,7 +48,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
 
-    protected OnAddRemove(Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnAddRemove(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query) {
         this.query = query;
         this.registry = registry;
     }
@@ -74,8 +74,8 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     public static final <
         ECS_TYPE extends WorldProvider,
         T extends IOnAddRemove<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnAddRemove<ECS_TYPE> newDriverFor(T listener, IRegistry<ECS_TYPE> registry) {
-        return newDriverFor(listener, listener.getQuery(), registry);
+    > OnAddRemove<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
+        return newDriverFor(registry, listener.getQuery(OnAddRemove.class), listener);
     }
 
     /**
@@ -83,20 +83,20 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnAddRemove<ECS_TYPE> newDriverFor(
-        IOnAddRemove<ECS_TYPE> listener,
+        IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
+        IOnAddRemove<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnAddRemove__Listener.class,
-                IOnAddRemove.class,
+                IRegistry.class,
                 Query.class,
-                IRegistry.class
+                IOnAddRemove.class
             ),
-            listener,
+            registry,
             query,
-            registry
+            listener
         );
     }
 
@@ -108,15 +108,15 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
      */
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnAddRemove<
         ECS_TYPE
-    > newDriverFor(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    > newDriverFor(IRegistry<ECS_TYPE> registry, ComponentType<ECS_TYPE, T> componentType) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnAddRemove__Component.class,
-                ComponentType.class,
-                IRegistry.class
+                IRegistry.class,
+                ComponentType.class
             ),
-            componentType,
-            registry
+            registry,
+            componentType
         );
     }
     // #endregion hide

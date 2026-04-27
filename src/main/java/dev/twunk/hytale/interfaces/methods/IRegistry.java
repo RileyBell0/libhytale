@@ -177,26 +177,24 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         this.registerEventListeners(plugin, listener, listener.getClass().getName());
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked" })
     public default <T extends IQuery<ECS_TYPE>> void registerEventListeners(JavaPlugin plugin, T listener, String id) {
-        final var clazz = listener.getClass();
-
-        if (IOnAddRemove.class.isAssignableFrom(clazz)) {
-            OnAddRemove.newDriverFor((IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener, this).onRegister(plugin);
+        if (listener instanceof IOnAddRemove) {
+            OnAddRemove.newDriverFor(this, (IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener).onRegister(plugin);
         }
 
-        if (IOnTick.class.isAssignableFrom(clazz)) {
-            OnTick.newDriverFor((IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
+        if (listener instanceof IOnTick) {
+            OnTick.newDriverFor(this, (IQuery<ECS_TYPE> & IOnTick<ECS_TYPE>) listener).onRegister(plugin);
         }
 
-        if (IOnScheduledTick.class.isAssignableFrom(clazz)) {
-            OnScheduledTick.newDriverFor(id, (IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(
+        if (listener instanceof IOnScheduledTick) {
+            OnScheduledTick.newDriverFor(this, (IQuery<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>) listener, id).onRegister(
                 plugin
             );
         }
 
-        if (IOnWorldTick.class.isAssignableFrom(clazz)) {
-            OnWorldTick.newDriverFor((IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>) listener, this).onRegister(plugin);
+        if (listener instanceof IOnWorldTick) {
+            OnWorldTick.newDriverFor(this, (IQuery<ECS_TYPE> & IOnWorldTick<ECS_TYPE>) listener).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, listener);
@@ -226,15 +224,15 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         String id
     ) {
         if (IOnAddRemove.class.isAssignableFrom(componentClass)) {
-            OnAddRemove.newDriverFor(componentType, this).onRegister(plugin);
+            OnAddRemove.newDriverFor(this, componentType).onRegister(plugin);
         }
 
         if (IOnTick.class.isAssignableFrom(componentClass)) {
-            OnTick.newDriverFor(componentType, this).onRegister(plugin);
+            OnTick.newDriverFor(this, componentType).onRegister(plugin);
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
-            OnScheduledTick.newDriverFor(id, componentType, this).onRegister(plugin);
+            OnScheduledTick.newDriverFor(this, componentType, id).onRegister(plugin);
         }
 
         if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
@@ -246,7 +244,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
                 );
             }
 
-            OnWorldTick.newDriverFor(instanceThatListenes, Query.and(componentType), this)
+            OnWorldTick.newDriverFor(this, Query.and(componentType), instanceThatListenes)
                 // .setDependencies(Set.of(new SystemDependency<>(Order.AFTER, addRemoveClass)))
                 .onRegister(plugin);
         }

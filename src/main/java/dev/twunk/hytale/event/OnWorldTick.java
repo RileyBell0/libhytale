@@ -36,7 +36,7 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
     private final @Nullable Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
 
-    protected OnWorldTick(Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnWorldTick(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query) {
         this.query = query;
         this.registry = registry;
     }
@@ -63,25 +63,25 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
     public static final <
         ECS_TYPE extends WorldProvider,
         T extends IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnWorldTick<ECS_TYPE> newDriverFor(T listener, IRegistry<ECS_TYPE> registry) {
-        return newDriverFor(listener, listener.getQuery(), registry);
+    > OnWorldTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
+        return newDriverFor(registry, listener.getQuery(OnWorldTick.class), listener);
     }
 
     public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
-        IOnWorldTick<ECS_TYPE> listener,
+        IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
+        IOnWorldTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnWorldTick__Listener.class,
-                IOnWorldTick.class,
+                IRegistry.class,
                 Query.class,
-                IRegistry.class
+                IOnWorldTick.class
             ),
-            listener,
+            registry,
             query,
-            registry
+            listener
         );
     }
 

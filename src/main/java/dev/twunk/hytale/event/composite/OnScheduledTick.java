@@ -19,7 +19,7 @@ import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.IQueryableEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
-import dev.twunk.hytale.interfaces.event.IOnTick.IOnTickQuery;
+import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
@@ -67,7 +67,7 @@ import javax.annotation.Nullable;
  */
 public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
-> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTickQuery<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
+> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
 
     @FunctionalInterface
     private static interface SleepingEntityCreator<ECS_TYPE extends WorldProvider> {
@@ -125,7 +125,7 @@ public abstract class OnScheduledTick<
     private final PriorityQueue<SleepingEntity> nextToWake = new PriorityQueue<>();
     private final SleepingEntityCreator<ECS_TYPE> sleepingEntityCreator;
 
-    protected OnScheduledTick(String id, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
+    protected OnScheduledTick(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query, String id) {
         this.id = id;
         this.query = query;
         this.registry = registry;
@@ -165,9 +165,9 @@ public abstract class OnScheduledTick<
     }
 
     protected OnScheduledTick(
-        String id,
-        Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
+        String id,
         TickSchedule defaultSchedule
     ) {
         this.id = id;
@@ -213,8 +213,7 @@ public abstract class OnScheduledTick<
         return this.query;
     }
 
-    @Override
-    public final Query<ECS_TYPE> getIOnTickQuery() {
+    public final Query<ECS_TYPE> getEventQuery(Class<?> clazz) {
         return Query.and(this.query, this.activeFlagComponentType);
     }
 
@@ -303,6 +302,7 @@ public abstract class OnScheduledTick<
         final var currentTick = store.getExternalData().getWorld().getTick();
         // while the next sleeper exists and is waiting to be ticked (<= currentTick)
         while ((next = nextToWake.peek()) != null && next.nextTick <= currentTick) {
+            System.out.println("Waking up " + next);
             // skip over & remove entites that are no longer loaded from our
             // next tick queue
             final var uuid = next.uuid;
@@ -372,6 +372,7 @@ public abstract class OnScheduledTick<
         // run your tick method
         final var res = this._onScheduledTick(dt, ref, commandBuffer);
         if (res == null) {
+            System.out.println("null!!!!!");
             return;
         }
 
@@ -380,6 +381,7 @@ public abstract class OnScheduledTick<
         // Configure future schedule for this entity according to your returned tick schedule
         switch (res) {
             case TickSchedule.Sleeping newSchedule -> {
+                System.out.println("Sleeping!!!!!");
                 // if they're planning to run next tick, we'll just, ignore that new
                 // schedule request. silly dummie
                 final var currentTick = ref.getStore().getExternalData().getWorld().getTick();
@@ -397,15 +399,16 @@ public abstract class OnScheduledTick<
 
                 // finally: remove the flag that says we're ticking (so we don't anymore)
                 // (occurs AFTER our system finishes running all ticks)
-                commandBuffer.tryRemoveComponent(ref, this.activeFlagComponentType);
+                commandBuffer.removeComponent(ref, this.activeFlagComponentType);
             }
             case TickSchedule.Stopped newSchedule -> {
+                System.out.println("Stopped!!!!!");
                 // persist our new schedule
                 tickScheduleComponent.setSchedule(this.id, newSchedule);
 
                 // finally: remove the flag that says we're ticking (so we don't anymore)
                 // (occurs AFTER our system finishes running all ticks)
-                commandBuffer.tryRemoveComponent(ref, this.activeFlagComponentType);
+                commandBuffer.removeComponent(ref, this.activeFlagComponentType);
             }
             default -> {
                 // default behaviour is to continue ticking, so can sip this
@@ -424,8 +427,8 @@ public abstract class OnScheduledTick<
     public static final <
         ECS_TYPE extends WorldProvider,
         T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnScheduledTick<ECS_TYPE> newDriverFor(String id, T listener, IRegistry<ECS_TYPE> registry) {
-        return newDriverFor(id, listener, listener.getQuery(), registry, null);
+    > OnScheduledTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener, String id) {
+        return newDriverFor(registry, listener.getQuery(OnScheduledTick.class), listener, id, null);
     }
 
     /**
@@ -435,12 +438,12 @@ public abstract class OnScheduledTick<
         ECS_TYPE extends WorldProvider,
         T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
     > OnScheduledTick<ECS_TYPE> newDriverFor(
-        String id,
-        T listener,
         IRegistry<ECS_TYPE> registry,
+        T listener,
+        String id,
         @Nullable TickSchedule defaultSchedule
     ) {
-        return newDriverFor(id, listener, listener.getQuery(), registry, defaultSchedule);
+        return newDriverFor(registry, listener.getQuery(OnScheduledTick.class), listener, id, defaultSchedule);
     }
 
     /**
@@ -448,23 +451,23 @@ public abstract class OnScheduledTick<
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        String id,
-        IOnScheduledTick<ECS_TYPE> listener,
+        IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
+        IOnScheduledTick<ECS_TYPE> listener,
+        String id
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnScheduledTick__Listener.class,
-                String.class,
-                IOnScheduledTick.class,
+                IRegistry.class,
                 Query.class,
-                IRegistry.class
+                IOnScheduledTick.class,
+                String.class
             ),
-            id,
-            listener,
+            registry,
             query,
-            registry
+            listener,
+            id
         );
     }
 
@@ -473,25 +476,25 @@ public abstract class OnScheduledTick<
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        String id,
-        IOnScheduledTick<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
+        IOnScheduledTick<ECS_TYPE> listener,
+        String id,
         @Nullable TickSchedule defaultSchedule
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnScheduledTick__Listener.class,
-                String.class,
-                IOnScheduledTick.class,
-                Query.class,
                 IRegistry.class,
+                Query.class,
+                IOnScheduledTick.class,
+                String.class,
                 TickSchedule.class
             ),
-            id,
-            listener,
-            query,
             registry,
+            query,
+            listener,
+            id,
             defaultSchedule
         );
     }
@@ -505,39 +508,39 @@ public abstract class OnScheduledTick<
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
         ECS_TYPE
     > newDriverFor(
-        String id,
-        ComponentType<ECS_TYPE, T> componentType,
         IRegistry<ECS_TYPE> registry,
+        ComponentType<ECS_TYPE, T> componentType,
+        String id,
         TickSchedule defaultSchedule
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnScheduledTick__Component.class,
-                String.class,
-                ComponentType.class,
                 IRegistry.class,
+                ComponentType.class,
+                String.class,
                 TickSchedule.class
             ),
-            id,
-            componentType,
             registry,
+            componentType,
+            id,
             defaultSchedule
         );
     }
 
     public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
         ECS_TYPE
-    > newDriverFor(String id, ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
+    > newDriverFor(IRegistry<ECS_TYPE> registry, ComponentType<ECS_TYPE, T> componentType, String id) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
                 OnScheduledTick__Component.class,
-                String.class,
+                IRegistry.class,
                 ComponentType.class,
-                IRegistry.class
+                String.class
             ),
-            id,
+            registry,
             componentType,
-            registry
+            id
         );
     }
     // #endregion hide

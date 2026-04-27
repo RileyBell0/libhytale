@@ -14,8 +14,8 @@ public abstract class OnTick__Listener<ECS_TYPE extends WorldProvider> extends O
 
     private final IOnTick<ECS_TYPE> listener;
 
-    protected OnTick__Listener(IOnTick<ECS_TYPE> listener, Query<ECS_TYPE> query, IRegistry<ECS_TYPE> registry) {
-        super(query, registry);
+    protected OnTick__Listener(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query, IOnTick<ECS_TYPE> listener) {
+        super(registry, query);
         this.listener = listener;
     }
 

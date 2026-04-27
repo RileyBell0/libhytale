@@ -30,7 +30,7 @@ import dev.twunk.lib.event.OnBlockTick__Listener;
 public abstract class OnBlockTick extends OnTick<ChunkStore> {
 
     protected OnBlockTick(Query<ChunkStore> query) {
-        super(query, LibHytale.CHUNK_REGISTRY);
+        super(LibHytale.CHUNK_REGISTRY, query);
     }
 
     // ////////////////////////////////////////////////////////////////////////
@@ -41,14 +41,14 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
     public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTick newDriverFor(T listener) {
-        return newDriverFor(listener, listener.getQuery());
+        return newDriverFor(listener.getQuery(OnBlockTick.class), listener);
     }
 
-    public static final OnBlockTick newDriverFor(IOnBlockTick listener, Query<ChunkStore> query) {
+    public static final OnBlockTick newDriverFor(Query<ChunkStore> query, IOnBlockTick listener) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Listener.class, IOnBlockTick.class, Query.class),
-            listener,
-            query
+            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Listener.class, Query.class, IOnBlockTick.class),
+            query,
+            listener
         );
     }
 

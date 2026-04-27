@@ -15,23 +15,23 @@ public class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends O
     private final IOnScheduledTick<ECS_TYPE> listener;
 
     public OnScheduledTick__Listener(
-        String id,
-        IOnScheduledTick<ECS_TYPE> listener,
+        IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
+        IOnScheduledTick<ECS_TYPE> listener,
+        String id
     ) {
-        super(id, query, registry);
+        super(registry, query, id);
         this.listener = listener;
     }
 
     public OnScheduledTick__Listener(
-        String id,
-        IOnScheduledTick<ECS_TYPE> listener,
-        Query<ECS_TYPE> query,
         IRegistry<ECS_TYPE> registry,
+        Query<ECS_TYPE> query,
+        IOnScheduledTick<ECS_TYPE> listener,
+        String id,
         TickSchedule defaultSchedule
     ) {
-        super(id, query, registry, defaultSchedule);
+        super(registry, query, id, defaultSchedule);
         this.listener = listener;
     }
 

@@ -26,8 +26,8 @@ public abstract class OnAddRemove__Component<
 
     private final ComponentType<ECS_TYPE, T> componentType;
 
-    protected OnAddRemove__Component(ComponentType<ECS_TYPE, T> componentType, IRegistry<ECS_TYPE> registry) {
-        super(Query.and(componentType), registry);
+    protected OnAddRemove__Component(IRegistry<ECS_TYPE> registry, ComponentType<ECS_TYPE, T> componentType) {
+        super(registry, Query.and(componentType));
         this.componentType = componentType;
     }
 

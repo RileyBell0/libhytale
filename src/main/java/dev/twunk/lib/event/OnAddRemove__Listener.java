@@ -34,11 +34,11 @@ public abstract class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> exte
     private final IOnAddRemove<ECS_TYPE> listener;
 
     protected OnAddRemove__Listener(
-        IOnAddRemove<ECS_TYPE> listener,
+        IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
-        IRegistry<ECS_TYPE> registry
+        IOnAddRemove<ECS_TYPE> listener
     ) {
-        super(query, registry);
+        super(registry, query);
         this.listener = listener;
     }
 

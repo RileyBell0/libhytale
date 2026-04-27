@@ -9,34 +9,44 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.bson.UuidRepresentation;
 import org.bson.internal.UuidHelper;
 
 public class UUIDComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static final BuilderCodec<UUIDComponent> CODEC = BuilderCodec.builder(
-        UUIDComponent.class,
+    public static final BuilderCodec<UUIDComponent<? extends WorldProvider>> CODEC = BuilderCodec.builder(
+        (Class<UUIDComponent<? extends WorldProvider>>) (Class) UUIDComponent.class,
         UUIDComponent::new
     )
         .append(
-            new KeyedCodec("UUID", Codec.UUID_BINARY),
-            (o, i) -> o.uuid = i == null ? UUIDUtil.generateVersion3UUID() : i,
+            new KeyedCodec<>("UUID", Codec.UUID_BINARY),
+            (o, i) -> {
+                System.out.println(o + " | '" + i + "'");
+                o.uuid = i == null ? UUIDUtil.generateVersion3UUID() : i;
+            },
             o -> o.uuid
         )
         .addValidator(Validators.nonNull())
         .add()
+        .afterDecode(v -> {
+            if (v.uuid == null) {
+                v.uuid = UUIDUtil.generateVersion3UUID();
+            }
+        })
         .build();
 
+    // Only null during codec construction, but after codec construction its already non nulls
+    @Nullable
     protected UUID uuid;
 
     protected UUIDComponent(UUID uuid) {
         this.uuid = uuid;
     }
 
-    @SuppressWarnings("null")
     protected UUIDComponent() {}
 
+    @SuppressWarnings("null")
     public UUID getUuid() {
         return this.uuid;
     }
