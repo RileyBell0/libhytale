@@ -19,7 +19,7 @@ import dev.twunk.hytale.interfaces.IQueryableEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
-import dev.twunk.hytale.interfaces.event.IOnWorldTick;
+import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
@@ -66,7 +66,7 @@ import javax.annotation.Nullable;
  */
 public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
-> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
+> implements IOnAddRemove<ECS_TYPE>, IOnUniverseTick<ECS_TYPE>, IOnTick<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
 
     @FunctionalInterface
     private static interface SleepingEntityCreator<ECS_TYPE extends WorldProvider> {
@@ -300,7 +300,7 @@ public abstract class OnScheduledTick<
     // #region awaken
 
     @Override
-    public void onWorldTick(float dt, int index, Store<ECS_TYPE> store) {
+    public void onUniverseTick(float dt, int index, Store<ECS_TYPE> store) {
         // first: wake up elements that are ready to wake
         SleepingEntity next;
         final var currentTick = store.getExternalData().getWorld().getTick();

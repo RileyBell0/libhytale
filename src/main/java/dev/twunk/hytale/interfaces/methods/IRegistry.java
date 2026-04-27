@@ -12,12 +12,12 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.LibHytaleException;
 import dev.twunk.hytale.event.OnAddRemove;
 import dev.twunk.hytale.event.OnTick;
-import dev.twunk.hytale.event.OnWorldTick;
+import dev.twunk.hytale.event.OnUniverseTick;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
-import dev.twunk.hytale.interfaces.event.IOnWorldTick;
+import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.lib.codec.AutoSerializeParser;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -207,8 +207,8 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
             }
         }
 
-        if (listener instanceof IOnWorldTick) {
-            OnWorldTick.newDriverFor(this, (IOnWorldTick<ECS_TYPE>) listener).onRegister(plugin);
+        if (listener instanceof IOnUniverseTick) {
+            OnUniverseTick.newDriverFor(this, (IOnUniverseTick<ECS_TYPE>) listener).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, listener);
@@ -256,11 +256,11 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
             ).onRegister(plugin);
         }
 
-        if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
+        if (IOnUniverseTick.class.isAssignableFrom(componentClass)) {
             @SuppressWarnings({ "unchecked" })
-            var instance = (IOnWorldTick<ECS_TYPE>) globalInstance;
+            var instance = (IOnUniverseTick<ECS_TYPE>) globalInstance;
 
-            OnWorldTick.newDriverFor(this, instance).onRegister(plugin);
+            OnUniverseTick.newDriverFor(this, instance).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, componentClass, querySupplier, componentType);

@@ -5,9 +5,9 @@ import com.hypixel.hytale.component.system.tick.TickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.ISystemEventDriver;
-import dev.twunk.hytale.interfaces.event.IOnWorldTick;
+import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.lib.event.OnWorldTick__Listener;
+import dev.twunk.lib.event.OnUniverseTick__Listener;
 
 /**
  * Subsystem for calling `onSystemTick` on the parent system every tick
@@ -20,20 +20,20 @@ import dev.twunk.lib.event.OnWorldTick__Listener;
  * - IGlobalTickSystem runner
  *
  * My code
- * @see IOnWorldTick - Something that this subsystem can call and run.
+ * @see IOnUniverseTick - Something that this subsystem can call and run.
  *
  * Hytale's code
  * @see ArchetypeTickingSystem - I use this to run the subsystem. Only way i currently know
  *                               of for getting a commandBuffer in a global tick
  */
-public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
+public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
     extends TickingSystem<ECS_TYPE> // hytale's underlying driver for my code
     implements ISystemEventDriver<ECS_TYPE>
 {
 
     private final IRegistry<ECS_TYPE> registry;
 
-    protected OnWorldTick(IRegistry<ECS_TYPE> registry) {
+    protected OnUniverseTick(IRegistry<ECS_TYPE> registry) {
         this.registry = registry;
     }
 
@@ -47,12 +47,16 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
     // ////////////////////////////////////////////////////////////////////////
     // #region hide
 
-    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
+    public static final <ECS_TYPE extends WorldProvider> OnUniverseTick<ECS_TYPE> newDriverFor(
         IRegistry<ECS_TYPE> registry,
-        IOnWorldTick<ECS_TYPE> listener
+        IOnUniverseTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnWorldTick__Listener.class, IRegistry.class, IOnWorldTick.class),
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnUniverseTick__Listener.class,
+                IRegistry.class,
+                IOnUniverseTick.class
+            ),
             registry,
             listener
         );

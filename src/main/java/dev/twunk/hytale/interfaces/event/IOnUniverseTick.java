@@ -23,6 +23,6 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
  *                               of for getting a commandBuffer in a global tick
  */
 @FunctionalInterface
-public interface IOnWorldTick<ECS_TYPE extends WorldProvider> {
-    public void onWorldTick(float dt, int index, Store<ECS_TYPE> store);
+public interface IOnUniverseTick<ECS_TYPE extends WorldProvider> {
+    public void onUniverseTick(float dt, int index, Store<ECS_TYPE> store);
 }

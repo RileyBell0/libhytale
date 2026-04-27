@@ -97,7 +97,7 @@ public abstract class HytalePlugin extends JavaPlugin {
         String id
     ) {
         // TODO some day add some type inferrer logic that means we can search for Component.class's generic
-        // for a type that implements it, e.g. if i implement onTick<ChunkStore> and onWorldTick<EntityStore> theoretically
+        // for a type that implements it, e.g. if i implement onTick<ChunkStore> and onUniverseTick<EntityStore> theoretically
         // that should be legal, no reason to block it, so i should lean into it and MAKE it super legal so you can
         // define both on the same one and i'll just figure out if i should have both entity and chunk systems for it or just entity or just chunk etc
         // and then if ive got that the code would do it for each one, e.g. whenever i find X is assignable from <your class> i can just
