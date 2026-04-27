@@ -26,6 +26,16 @@ public class FromStringCodec<T> implements Codec<T> {
     }
 
     @Nullable
+    public T fromString(String str) {
+        return this.decoder.apply(str);
+    }
+
+    @Nullable
+    public String stringify(T str) {
+        return this.encoder.apply(str);
+    }
+
+    @Nullable
     public T decode(@Nullable BsonValue bsonValue, @Nullable ExtraInfo extraInfo) {
         if (bsonValue == null) {
             return null;
