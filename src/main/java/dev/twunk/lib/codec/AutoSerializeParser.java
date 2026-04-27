@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.component.ComponentType;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.LibHytaleException;
@@ -19,7 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.lang.model.type.NullType;
@@ -94,9 +97,9 @@ public final class AutoSerializeParser {
             var codecField = fieldClass.getField("CODEC");
             var codec = codecField.get(fieldClass);
 
-            if (codec != null && BuilderCodec.class.isAssignableFrom(codec.getClass())) {
+            if (codec != null && Codec.class.isAssignableFrom(codec.getClass())) {
                 field.setAccessible(true);
-                return appendCodec(builder, field, (BuilderCodec<?>) codec);
+                return appendCodec(builder, field, (Codec<?>) codec);
             }
         } catch (Exception _) {}
 
@@ -131,6 +134,36 @@ public final class AutoSerializeParser {
             Class<?> innerClass = (Class<?>) arrayValueType;
 
             return appendArray(builder, field, innerClass);
+        } else if (Map.class.isAssignableFrom(fieldClass)) {
+            var genericType = field.getGenericType();
+            if (!(genericType instanceof ParameterizedType)) {
+                return builder;
+            }
+
+            ParameterizedType pType = (ParameterizedType) genericType;
+
+            Type[] fieldArgTypes = pType.getActualTypeArguments();
+            if (fieldArgTypes.length != 2) {
+                return builder;
+            }
+
+            var keyType = fieldArgTypes[0];
+            var valueType = fieldArgTypes[1];
+            if (!(keyType instanceof Class)) {
+                return builder;
+            }
+            if (!(valueType instanceof Class)) {
+                return builder;
+            }
+
+            Class<?> keyClass = (Class<?>) keyType;
+            Class<?> valueClass = (Class<?>) valueType;
+
+            if (keyClass == String.class) {
+                return appendMap(builder, field, valueClass);
+            } else {
+                return appendMap(builder, field, keyClass, valueClass);
+            }
         }
 
         return builder;
@@ -154,7 +187,11 @@ public final class AutoSerializeParser {
         @SuppressWarnings("unchecked")
         var asSuperT = (Class<? super T>) inherits;
 
-        var inheritedCodec = tryGetInheritedCodec(asSuperT, clazz);
+        var temp = tryGetInheritedCodec(asSuperT, clazz);
+        BuilderCodec<T> inheritedCodec = null;
+        if (temp instanceof BuilderCodec c) {
+            inheritedCodec = c;
+        }
 
         BuilderCodec.Builder<T> builder;
         if (inheritedCodec == null) {
@@ -191,7 +228,7 @@ public final class AutoSerializeParser {
         }
         var codec = Codecs.tryGetCodec(innerClass);
         if (codec == null) {
-            codec = tryGetCodec(innerClass);
+            codec = tryGetBuilderCodec(innerClass);
             if (codec == null) {
                 throw new LibHytaleException("Failed to get codec for class " + innerClass);
             }
@@ -235,8 +272,111 @@ public final class AutoSerializeParser {
             .add();
     }
 
+    private static final <T, V> BuilderCodec.Builder<T> appendMap(
+        BuilderCodec.Builder<T> builder,
+        Field field,
+        Class<V> valueClass
+    ) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+        var valueCodec = Codecs.tryGetCodec(valueClass);
+        if (valueCodec == null) {
+            valueCodec = tryGetCodec(valueClass);
+            if (valueCodec == null) {
+                throw new LibHytaleException("Failed to get codec for class " + valueClass);
+            }
+        }
+        field.setAccessible(true);
+
+        return builder
+            .append(
+                new KeyedCodec<>(name, new MapCodec<>(valueCodec, HashMap::new, false), required),
+                (self, val) -> {
+                    if (val == null) {
+                        return;
+                    }
+                    try {
+                        @SuppressWarnings("unchecked")
+                        final var actualField = (Map<String, V>) field.get(self);
+                        actualField.putAll(val);
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                },
+                self -> {
+                    try {
+                        @SuppressWarnings("unchecked")
+                        final var actualField = (Map<String, V>) field.get(self);
+                        return actualField;
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
+    }
+
+    private static final <T, K, V> BuilderCodec.Builder<T> appendMap(
+        BuilderCodec.Builder<T> builder,
+        Field field,
+        Class<K> keyClass,
+        Class<V> valueClass
+    ) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+        var keyCodec = Codecs.tryGetFromStrCodec(keyClass);
+        if (keyCodec == null) {
+            throw new LibHytaleException("Failed to get codec for class " + keyClass);
+        }
+        var valueCodec = Codecs.tryGetCodec(valueClass);
+        if (valueCodec == null) {
+            valueCodec = tryGetCodec(valueClass);
+            if (valueCodec == null) {
+                throw new LibHytaleException("Failed to get codec for class " + valueClass);
+            }
+        }
+        field.setAccessible(true);
+
+        return builder
+            .append(
+                new KeyedCodec<>(name, new StringableKeyMapCodec<>(keyCodec, valueCodec, HashMap::new), required),
+                (self, val) -> {
+                    if (val == null) {
+                        return;
+                    }
+                    try {
+                        @SuppressWarnings("unchecked")
+                        final var actualField = (Map<K, V>) field.get(self);
+                        actualField.putAll(val);
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                },
+                self -> {
+                    try {
+                        @SuppressWarnings("unchecked")
+                        final var actualField = (Map<K, V>) field.get(self);
+                        return actualField;
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
+    }
+
     @Nullable
-    public static final <T extends U, U> BuilderCodec<U> tryGetInheritedCodec(Class<U> clazz, Class<T> parent) {
+    public static final <T extends U, U> Codec<U> tryGetInheritedCodec(Class<U> clazz, Class<T> parent) {
         if (clazz.equals(NullType.class)) {
             return null;
         }
@@ -249,7 +389,7 @@ public final class AutoSerializeParser {
         // Priority 1: if the class we're inherting a codec from has been annotated
         // with RegisteredComponent, we'll recurse
         if (clazz.isAnnotationPresent(Serializable.class)) {
-            return tryGetCodec(clazz);
+            return tryGetBuilderCodec(clazz);
         }
 
         // Priority 2: Look in the field with the name the parent assumed CODEC might be in
@@ -278,7 +418,7 @@ public final class AutoSerializeParser {
     private static final <T, U> BuilderCodec.Builder<T> appendCodec(
         BuilderCodec.Builder<T> builder,
         Field field,
-        BuilderCodec<U> codec
+        Codec<U> codec
     ) {
         final var annotation = field.getAnnotation(Serialize.class);
         var name = annotation.key();
@@ -544,7 +684,19 @@ public final class AutoSerializeParser {
     }
 
     @Nullable
-    public static final <T> BuilderCodec<T> tryGetCodec(Class<T> clazz) {
+    public static final <T> Codec<T> tryGetCodec(Class<T> clazz) {
+        try {
+            var codecField = clazz.getField("CODEC");
+            var codec = codecField.get(clazz);
+
+            if (codec instanceof Codec<?> c) {
+                return (Codec<T>) c;
+            }
+        } catch (Exception _) {
+            // just trynna see if there is a codec for this class
+            // and happy to just dip if there's an exception cause its really a "best effort" kinda sitch
+        }
+
         if (!clazz.isAnnotationPresent(Serializable.class)) {
             return null;
         }
@@ -564,6 +716,44 @@ public final class AutoSerializeParser {
                 return null;
             }
         };
+        return AutoSerializeParser.build(clazz, supplier);
+    }
+
+    @Nullable
+    public static final <T> BuilderCodec<T> tryGetBuilderCodec(Class<T> clazz) {
+        try {
+            var codecField = clazz.getField("CODEC");
+            if (clazz == codecField.getDeclaringClass()) {
+                var codec = codecField.get(clazz);
+                if (codec instanceof BuilderCodec<?> c) {
+                    return (BuilderCodec<T>) c;
+                }
+            }
+        } catch (Exception _) {
+            // just trynna see if there is a codec for this class
+            // and happy to just dip if there's an exception cause its really a "best effort" kinda sitch
+        }
+
+        if (!clazz.isAnnotationPresent(Serializable.class)) {
+            return null;
+        }
+
+        final Supplier<T> supplier = () -> {
+            try {
+                return clazz.getConstructor().newInstance();
+            } catch (
+                InstantiationException
+                | IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException
+                | NoSuchMethodException
+                | SecurityException e
+            ) {
+                e.printStackTrace();
+                return null;
+            }
+        };
+
         return AutoSerializeParser.build(clazz, supplier);
     }
 }
