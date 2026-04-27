@@ -174,43 +174,41 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     }
 
     @SuppressWarnings("null")
-    public default <T extends IQuery<ECS_TYPE>> void registerEventListeners(JavaPlugin plugin, T listener) {
+    public default <T> void registerEventListeners(JavaPlugin plugin, T listener) {
         this.registerEventListeners(plugin, listener, listener.getClass().getName());
     }
 
     @SuppressWarnings({ "unchecked" })
-    public default <T extends IQuery<ECS_TYPE>> void registerEventListeners(JavaPlugin plugin, T listener, String id) {
-        if (listener instanceof IOnAddRemove) {
-            OnAddRemove.newDriverFor(
-                this,
-                listener.getQuery(IOnAddRemove.class),
-                (IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener
-            ).onRegister(plugin);
-        }
+    public default <T> void registerEventListeners(JavaPlugin plugin, T listener, String id) {
+        if (listener instanceof IQuery q) {
+            if (listener instanceof IOnAddRemove) {
+                OnAddRemove.newDriverFor(
+                    this,
+                    q.getQuery(IOnAddRemove.class),
+                    (IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener
+                ).onRegister(plugin);
+            }
 
-        if (listener instanceof IOnTick) {
-            OnTick.newDriverFor(
-                this,
-                listener.getQuery(IOnTick.class),
-                (IQuery<ECS_TYPE> & IOnTick<ECS_TYPE>) listener
-            ).onRegister(plugin);
-        }
+            if (listener instanceof IOnTick) {
+                OnTick.newDriverFor(
+                    this,
+                    q.getQuery(IOnTick.class),
+                    (IQuery<ECS_TYPE> & IOnTick<ECS_TYPE>) listener
+                ).onRegister(plugin);
+            }
 
-        if (listener instanceof IOnScheduledTick) {
-            OnScheduledTick.newDriverFor(
-                this,
-                listener.getQuery(IOnScheduledTick.class),
-                (IQuery<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>) listener,
-                id
-            ).onRegister(plugin);
+            if (listener instanceof IOnScheduledTick) {
+                OnScheduledTick.newDriverFor(
+                    this,
+                    q.getQuery(IOnScheduledTick.class),
+                    (IQuery<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>) listener,
+                    id
+                ).onRegister(plugin);
+            }
         }
 
         if (listener instanceof IOnWorldTick) {
-            OnWorldTick.newDriverFor(
-                this,
-                listener.getQuery(IOnWorldTick.class),
-                (IQuery<ECS_TYPE> & IOnWorldTick<ECS_TYPE>) listener
-            ).onRegister(plugin);
+            OnWorldTick.newDriverFor(this, (IOnWorldTick<ECS_TYPE>) listener).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, listener);
@@ -262,7 +260,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
             @SuppressWarnings({ "unchecked" })
             var instance = (IOnWorldTick<ECS_TYPE>) globalInstance;
 
-            OnWorldTick.newDriverFor(this, querySupplier.apply(IOnWorldTick.class), instance).onRegister(plugin);
+            OnWorldTick.newDriverFor(this, instance).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, componentClass, querySupplier, componentType);
@@ -279,8 +277,5 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     // only need to override this if you've got specific events for the given registry you want to init
     // e.g. onBlockTick
-    public default <T extends IQuery<ECS_TYPE>> void bindRegistrySpecificEventListeners(
-        JavaPlugin plugin,
-        T listener
-    ) {}
+    public default <T> void bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {}
 }

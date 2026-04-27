@@ -19,15 +19,17 @@ public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkSt
     }
 
     @Override
-    public <T extends IQuery<ChunkStore>> void bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {
+    public <T> void bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {
         var clazz = listener.getClass();
 
-        if (IOnBlockTick.class.isAssignableFrom(clazz)) {
-            var driver = OnBlockTick.newDriverFor(
-                listener.getQuery(IOnBlockTick.class),
-                (IOnBlockTick & IQuery<ChunkStore>) listener
-            );
-            driver.onRegister(plugin);
+        if (listener instanceof IQuery q) {
+            if (IOnBlockTick.class.isAssignableFrom(clazz)) {
+                var driver = OnBlockTick.newDriverFor(
+                    q.getQuery(IOnBlockTick.class),
+                    (IOnBlockTick & IQuery<ChunkStore>) listener
+                );
+                driver.onRegister(plugin);
+            }
         }
     }
 

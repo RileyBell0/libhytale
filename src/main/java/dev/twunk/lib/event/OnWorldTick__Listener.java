@@ -1,9 +1,6 @@
 package dev.twunk.lib.event;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnWorldTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
@@ -13,12 +10,8 @@ public class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> extends OnWor
 
     private final IOnWorldTick<ECS_TYPE> listener;
 
-    protected OnWorldTick__Listener(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        IOnWorldTick<ECS_TYPE> listener
-    ) {
-        super(registry, query);
+    protected OnWorldTick__Listener(IRegistry<ECS_TYPE> registry, IOnWorldTick<ECS_TYPE> listener) {
+        super(registry);
         this.listener = listener;
     }
 
@@ -27,12 +20,7 @@ public class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> extends OnWor
     // ////////////////////////////////////////////////////////////////////////
 
     @Override
-    public final void tick(
-        final float dt,
-        final ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        final Store<ECS_TYPE> store,
-        final CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        this.listener.onWorldTick(dt, archetypeChunk, store, commandBuffer);
+    public final void tick(float dt, int index, Store<ECS_TYPE> store) {
+        this.listener.onWorldTick(dt, index, store);
     }
 }
