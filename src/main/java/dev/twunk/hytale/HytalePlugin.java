@@ -54,11 +54,11 @@ public abstract class HytalePlugin extends JavaPlugin {
 
     @SuppressWarnings("null")
     public final <T> void register(Class<T> clazz) {
-        HytalePlugin.register0(this, clazz, IRegistry.getCodec(clazz), clazz.getName());
+        HytalePlugin.register0(this, clazz, IRegistry.getBuilderCodec(clazz), clazz.getName());
     }
 
     public final <T> void register(Class<T> clazz, String id) {
-        HytalePlugin.register0(this, clazz, IRegistry.getCodec(clazz), id);
+        HytalePlugin.register0(this, clazz, IRegistry.getBuilderCodec(clazz), id);
     }
 
     public final <T> void register(Class<T> clazz, BuilderCodec<T> codec, String id) {
@@ -67,11 +67,11 @@ public abstract class HytalePlugin extends JavaPlugin {
 
     @SuppressWarnings("null")
     public static final <T> void register(JavaPlugin plugin, Class<T> clazz) {
-        HytalePlugin.register0(plugin, clazz, IRegistry.getCodec(clazz), clazz.getName());
+        HytalePlugin.register0(plugin, clazz, IRegistry.getBuilderCodec(clazz), clazz.getName());
     }
 
     public static final <T> void register(JavaPlugin plugin, Class<T> clazz, String id) {
-        HytalePlugin.register0(plugin, clazz, IRegistry.getCodec(clazz), id);
+        HytalePlugin.register0(plugin, clazz, IRegistry.getBuilderCodec(clazz), id);
     }
 
     public static final <T> void register(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {

@@ -41,8 +41,8 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     @SuppressWarnings("null")
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
-    public static <T> BuilderCodec<T> getCodec(Class<T> clazz) {
-        final BuilderCodec<T> codec = AutoSerializeParser.tryGetCodec(clazz);
+    public static <T> BuilderCodec<T> getBuilderCodec(Class<T> clazz) {
+        final BuilderCodec<T> codec = AutoSerializeParser.tryGetBuilderCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new LibHytaleException("Failed to get codec for class " + clazz);
         }
@@ -85,7 +85,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         JavaPlugin plugin,
         Class<T> clazz
     ) {
-        return getOrRegisterComponent(plugin, clazz, getCodec(clazz));
+        return getOrRegisterComponent(plugin, clazz, getBuilderCodec(clazz));
     }
 
     @SuppressWarnings("null") // suppressing null warning from clazz.getName()
@@ -111,7 +111,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         JavaPlugin plugin,
         Class<T> clazz
     ) {
-        return this.registerComponent(plugin, clazz, getCodec(clazz), clazz.getName());
+        return this.registerComponent(plugin, clazz, getBuilderCodec(clazz), clazz.getName());
     }
 
     @SuppressWarnings("null") // suppressing null warning from clazz.getName()
@@ -167,7 +167,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         this.registerEventListeners(
             plugin,
             componentClass,
-            getCodec(componentClass)::getDefaultValue,
+            getBuilderCodec(componentClass)::getDefaultValue,
             getOrRegisterComponent(plugin, componentClass)
         );
     }

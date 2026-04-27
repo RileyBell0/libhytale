@@ -14,7 +14,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.LibHytaleException;
-import dev.twunk.lib.test.TestComponent;
+import dev.twunk.lib.component.TestComponent;
 import dev.twunk.lib.test.TestUtil;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
