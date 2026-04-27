@@ -64,7 +64,7 @@ public abstract class OnWorldTick<ECS_TYPE extends WorldProvider>
         ECS_TYPE extends WorldProvider,
         T extends IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>
     > OnWorldTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
-        return newDriverFor(registry, listener.getQuery(OnWorldTick.class), listener);
+        return newDriverFor(registry, listener.getQuery(IOnWorldTick.class), listener);
     }
 
     public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(

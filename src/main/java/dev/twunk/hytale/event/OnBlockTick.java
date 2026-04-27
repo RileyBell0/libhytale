@@ -41,7 +41,7 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
     public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTick newDriverFor(T listener) {
-        return newDriverFor(listener.getQuery(OnBlockTick.class), listener);
+        return newDriverFor(listener.getQuery(IOnBlockTick.class), listener);
     }
 
     public static final OnBlockTick newDriverFor(Query<ChunkStore> query, IOnBlockTick listener) {

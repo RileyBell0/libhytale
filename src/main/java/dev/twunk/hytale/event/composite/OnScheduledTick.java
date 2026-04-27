@@ -238,6 +238,7 @@ public abstract class OnScheduledTick<
      */
     @Override
     public final void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+        System.out.println("On entity added");
         // get the UUID component, or force one onto the entity otherwise
         final UUIDComponent<ECS_TYPE> uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
         final UUID uuid = uuidComponent.getUuid();
@@ -273,6 +274,7 @@ public abstract class OnScheduledTick<
      */
     @Override
     public final void onEntityRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+        System.out.println("On entity remove");
         // get the UUID component
         @Nullable
         UUIDComponent<ECS_TYPE> uuidComponent = ComponentUtils.get(ref, this.uuidComponentType);
@@ -400,7 +402,10 @@ public abstract class OnScheduledTick<
 
                 // finally: remove the flag that says we're ticking (so we don't anymore)
                 // (occurs AFTER our system finishes running all ticks)
-                commandBuffer.run(s -> s.removeComponent(ref, this.activeFlagComponentType));
+                commandBuffer.run(s -> {
+                    System.out.println("REMOVE COMPONENT ACTIVEFLAGTYPE");
+                    s.removeComponent(ref, this.activeFlagComponentType);
+                });
             }
             case TickSchedule.Stopped newSchedule -> {
                 // persist our new schedule
@@ -428,7 +433,7 @@ public abstract class OnScheduledTick<
         ECS_TYPE extends WorldProvider,
         T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
     > OnScheduledTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener, String id) {
-        return newDriverFor(registry, listener.getQuery(OnScheduledTick.class), listener, id, null);
+        return newDriverFor(registry, listener.getQuery(IOnScheduledTick.class), listener, id, null);
     }
 
     /**
@@ -443,7 +448,7 @@ public abstract class OnScheduledTick<
         String id,
         @Nullable TickSchedule defaultSchedule
     ) {
-        return newDriverFor(registry, listener.getQuery(OnScheduledTick.class), listener, id, defaultSchedule);
+        return newDriverFor(registry, listener.getQuery(IOnScheduledTick.class), listener, id, defaultSchedule);
     }
 
     /**

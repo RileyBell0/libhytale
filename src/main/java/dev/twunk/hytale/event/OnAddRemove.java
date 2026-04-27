@@ -75,7 +75,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         ECS_TYPE extends WorldProvider,
         T extends IOnAddRemove<ECS_TYPE> & IQuery<ECS_TYPE>
     > OnAddRemove<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
-        return newDriverFor(registry, listener.getQuery(OnAddRemove.class), listener);
+        return newDriverFor(registry, listener.getQuery(IOnAddRemove.class), listener);
     }
 
     /**

@@ -69,7 +69,7 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     public static final <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>> OnTick<
         ECS_TYPE
     > newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
-        return newDriverFor(registry, listener.getQuery(OnTick.class), listener);
+        return newDriverFor(registry, listener.getQuery(IOnTick.class), listener);
     }
 
     public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
