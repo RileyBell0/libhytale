@@ -2,14 +2,12 @@ package dev.twunk.lib.event.scheduled;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.ExtraInfo;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.exception.CodecException;
 import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
-import dev.twunk.lib.codec.AutoSerializeParser;
 import dev.twunk.lib.event.scheduled.TickSchedule.Sleeping;
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Nullable;
 import org.bson.BsonDocument;
+import org.bson.BsonInt64;
+import org.bson.BsonString;
 import org.bson.BsonValue;
 
 class TickScheduleCodec implements Codec<TickSchedule> {
@@ -69,17 +69,9 @@ class TickScheduleCodec implements Codec<TickSchedule> {
                             "Error, `NextTick` field not found in TickSchedule of type 'sleeping'"
                         );
                     }
-                    var val = map.get("NextTick").asString().getValue();
+                    var nextTick = map.get("NextTick").asInt64().getValue();
 
-                    try {
-                        var nextTick = Long.valueOf(val.trim());
-                        return new Sleeping(nextTick);
-                    } catch (NumberFormatException e) {
-                        throw new CodecException(
-                            "Error, `NextTick` field was not of type 'long' in TickSchedule of type 'sleeping'",
-                            e
-                        );
-                    }
+                    return new Sleeping(nextTick);
                 case "stopped":
                     if (map.size() != 0) {
                         throw new CodecException("Error, extra keys found in TickSchedule codec of type 'stopped'");
@@ -97,12 +89,24 @@ class TickScheduleCodec implements Codec<TickSchedule> {
         if (t == null || extraInfo == null) {
             return null;
         }
+        BsonDocument bsonDocument = new BsonDocument();
 
-        return switch (t) {
-            case TickSchedule.Active schedule -> TickSchedule.Active.CODEC.encode(schedule, extraInfo);
-            case TickSchedule.Sleeping schedule -> TickSchedule.Sleeping.CODEC.encode(schedule, extraInfo);
-            case TickSchedule.Stopped schedule -> TickSchedule.Stopped.CODEC.encode(schedule, extraInfo);
-        };
+        bsonDocument.put(
+            "State",
+            new BsonString(
+                switch (t) {
+                    case TickSchedule.Active _ -> "active";
+                    case TickSchedule.Sleeping _ -> "sleeping";
+                    case TickSchedule.Stopped _ -> "stopped";
+                }
+            )
+        );
+
+        if (t instanceof TickSchedule.Sleeping s) {
+            bsonDocument.put("NextTick", new BsonInt64(s.nextTick));
+        }
+
+        return bsonDocument;
     }
 
     @Nullable
@@ -194,21 +198,14 @@ public sealed interface TickSchedule permits TickSchedule.Active, TickSchedule.S
     /**
      * Keep ticking at the same frequency as before
      */
-    @Serializable
-    public final class Active implements TickSchedule {
-
-        public static final BuilderCodec<Active> CODEC = AutoSerializeParser.build(Active.class);
-    }
+    public final class Active implements TickSchedule {}
 
     /**
      * Don't tick until the given amount of time has passed (or until x ticks etc)
      *
      * notably, you can set this to be sleeping forever
      */
-    @Serializable
     public final class Sleeping implements TickSchedule {
-
-        public static final BuilderCodec<Sleeping> CODEC = AutoSerializeParser.build(Sleeping.class);
 
         // note: only has a default value so that the codec can construct this
         @SuppressWarnings("null")
@@ -236,9 +233,5 @@ public sealed interface TickSchedule permits TickSchedule.Active, TickSchedule.S
     /**
      * Goodbye ticking forever
      */
-    @Serializable
-    public final class Stopped implements TickSchedule {
-
-        public static final BuilderCodec<Stopped> CODEC = AutoSerializeParser.build(Stopped.class);
-    }
+    public final class Stopped implements TickSchedule {}
 }

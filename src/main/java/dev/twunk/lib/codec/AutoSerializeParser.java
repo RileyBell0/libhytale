@@ -300,9 +300,7 @@ public final class AutoSerializeParser {
                         return;
                     }
                     try {
-                        @SuppressWarnings("unchecked")
-                        final var actualField = (Map<String, V>) field.get(self);
-                        actualField.putAll(val);
+                        field.set(self, val);
                     } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }

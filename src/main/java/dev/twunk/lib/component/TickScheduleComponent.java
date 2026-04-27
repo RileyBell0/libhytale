@@ -25,7 +25,7 @@ public final class TickScheduleComponent<ECS_TYPE extends WorldProvider> impleme
     // and also means that this component could get huge if someone does something dumb,
     // but thats true regardless of my approach so that means we're good to go using this.
     @Serialize
-    private final Map<String, TickSchedule> allSchedules;
+    public Map<String, TickSchedule> allSchedules;
 
     @Nullable
     public TickSchedule getSchedule(String systemId) {
