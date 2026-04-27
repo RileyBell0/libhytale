@@ -27,8 +27,12 @@ import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
+import dev.twunk.lib.component.ActivelyTickingComponent;
+import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.event.OnScheduledTick__Component;
 import dev.twunk.lib.event.OnScheduledTick__Listener;
+import dev.twunk.lib.event.scheduled.SleepingEntity;
+import dev.twunk.lib.event.scheduled.SleepingEntity__Block;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import java.util.HashSet;
@@ -379,7 +383,7 @@ public abstract class OnScheduledTick<
                 // if they're planning to run next tick, we'll just, ignore that new
                 // schedule request. silly dummie
                 final var currentTick = ref.getStore().getExternalData().getWorld().getTick();
-                if (newSchedule.wakeUpAt == currentTick + 1) {
+                if (newSchedule.nextTick == currentTick + 1) {
                     break;
                 }
 
