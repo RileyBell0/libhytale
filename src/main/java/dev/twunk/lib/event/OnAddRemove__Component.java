@@ -19,7 +19,7 @@ import dev.twunk.hytale.ref.AnyRef;
  *
  * it's the exact same as a system that fetches your component then calls the method on it
  */
-public abstract class OnAddRemove__Component<
+public class OnAddRemove__Component<
     ECS_TYPE extends WorldProvider,
     T extends Component<ECS_TYPE>
 > extends OnAddRemove<ECS_TYPE> {

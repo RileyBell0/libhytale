@@ -12,7 +12,7 @@ import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import dev.twunk.hytale.ref.BlockRef;
 
 // <ECS_TYPE extends WorldProvider>
-public abstract class OnBlockTick__Component<T extends Component<ChunkStore>> extends OnBlockTick {
+public class OnBlockTick__Component<T extends Component<ChunkStore>> extends OnBlockTick {
 
     private final ComponentType<ChunkStore, T> componentType;
 

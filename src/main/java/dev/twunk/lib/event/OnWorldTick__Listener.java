@@ -9,7 +9,7 @@ import dev.twunk.hytale.event.OnWorldTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 
-public abstract class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> extends OnWorldTick<ECS_TYPE> {
+public class OnWorldTick__Listener<ECS_TYPE extends WorldProvider> extends OnWorldTick<ECS_TYPE> {
 
     private final IOnWorldTick<ECS_TYPE> listener;
 

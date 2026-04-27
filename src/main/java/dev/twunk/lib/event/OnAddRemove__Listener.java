@@ -25,7 +25,7 @@ import dev.twunk.lib.event.OnAddRemove__Listener;
  * of defining game functionality in your class from finagling the hytale codebase
  * to cooperate
  */
-public abstract class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAddRemove<ECS_TYPE> {
+public class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAddRemove<ECS_TYPE> {
 
     /**
      * YOUR class (well, instance of it). I store a reference to it here so i can keep calling

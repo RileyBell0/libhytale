@@ -9,7 +9,7 @@ import dev.twunk.hytale.event.OnBlockTick;
 import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import dev.twunk.hytale.ref.BlockRef;
 
-public abstract class OnBlockTick__Listener extends OnBlockTick {
+public class OnBlockTick__Listener extends OnBlockTick {
 
     private final IOnBlockTick listener;
 

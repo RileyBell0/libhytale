@@ -10,7 +10,7 @@ import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
 
-public abstract class OnTick__Listener<ECS_TYPE extends WorldProvider> extends OnTick<ECS_TYPE> {
+public class OnTick__Listener<ECS_TYPE extends WorldProvider> extends OnTick<ECS_TYPE> {
 
     private final IOnTick<ECS_TYPE> listener;
 
