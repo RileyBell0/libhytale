@@ -21,10 +21,7 @@ public class UUIDComponent<ECS_TYPE extends WorldProvider> implements Component<
     )
         .append(
             new KeyedCodec<>("UUID", Codec.UUID_BINARY),
-            (o, i) -> {
-                System.out.println(o + " | '" + i + "'");
-                o.uuid = i == null ? UUIDUtil.generateVersion3UUID() : i;
-            },
+            (o, i) -> o.uuid = i == null ? UUIDUtil.generateVersion3UUID() : i,
             o -> o.uuid
         )
         .addValidator(Validators.nonNull())
