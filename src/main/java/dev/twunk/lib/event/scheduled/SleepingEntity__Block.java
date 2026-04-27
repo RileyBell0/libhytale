@@ -1,4 +1,4 @@
-package dev.twunk.hytale.event.composite;
+package dev.twunk.lib.event.scheduled;
 
 import dev.twunk.lib.event.scheduled.TickSchedule.Sleeping;
 import java.util.UUID;

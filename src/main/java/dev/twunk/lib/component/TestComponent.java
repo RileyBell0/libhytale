@@ -1,4 +1,4 @@
-package dev.twunk.lib.test;
+package dev.twunk.lib.component;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;

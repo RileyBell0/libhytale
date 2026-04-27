@@ -1,6 +1,5 @@
-package dev.twunk.hytale.event.composite;
+package dev.twunk.lib.event.scheduled;
 
-import dev.twunk.lib.event.scheduled.TickSchedule;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -9,9 +8,9 @@ public sealed class SleepingEntity implements Comparable<SleepingEntity> permits
     public final UUID uuid;
     public final long nextTick;
 
-    protected SleepingEntity(UUID uuid, TickSchedule.Sleeping schedule) {
+    public SleepingEntity(UUID uuid, TickSchedule.Sleeping schedule) {
         this.uuid = uuid;
-        this.nextTick = schedule.wakeUpAt;
+        this.nextTick = schedule.nextTick;
     }
 
     @SuppressWarnings("null")
