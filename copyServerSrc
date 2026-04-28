@@ -1,0 +1,7 @@
+#!/bin/zsh
+cd /home/rileyb/coding/patcher
+
+
+# copy to dest
+cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/libtwunk/src/main/java/
+cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/hytale-plugin/src/main/java/

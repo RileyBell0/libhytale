@@ -1,0 +1,36 @@
+#!/bin/zsh
+cd /home/rileyb/coding/patcher
+
+# reset git
+git clean -fd
+git reset --hard
+git pull
+PATH=$PATH:/home/rileyb/coding/apache-maven-3.9.15/bin
+
+# copy in latest server from hytales game folder
+HYTALE_HOME=~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/install/release/package/game/latest
+printf "\nUpdating Hytale Server resources from:\n"
+printf "$HYTALE_HOME\n\n"
+
+printf "Removing files...\n"
+if [[ -f HytaleServer.jar ]]; then
+    printf "  Removing | HytaleServer.jar\n"
+    rm HytaleServer.jar
+fi
+
+printf "Copying files...\n"
+printf "  Copying  | HytaleServer.jar  ->  patcher/HytaleServer.jar\n"
+cp $HYTALE_HOME/Server/HytaleServer.jar /home/rileyb/coding/patcher
+
+# create python venv
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+
+# decomp
+python run.py setup
+
+
+# copy to dest
+cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/libtwunk/src/main/java/
+cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/hytale-plugin/src/main/java/

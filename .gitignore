@@ -44,3 +44,5 @@ bin/
 ### Libs ###
 libs/
 node_modules/
+
+src/main/java/com
