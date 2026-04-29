@@ -12,7 +12,6 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.AnyRef;
 
 /**
  * This version will call the add and remove events defined in a specific component instance
@@ -46,18 +45,16 @@ public class OnAddRemove__Component<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        var anyRef = new AnyRef<>(ref);
-
         // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `init` define
         // this bound for me (because i can if its on a static method???) and then i'll just cast it here which IS SAFE given i've got that
         // bound guarnateed earlier
         @SuppressWarnings("unchecked")
-        var component = (IOnAddRemove<ECS_TYPE>) anyRef.getComponent(componentType);
+        var component = (IOnAddRemove<ECS_TYPE>) commandBuffer.getComponent(ref, componentType);
         if (component == null) {
             return;
         }
 
-        component.onEntityAdded(anyRef, reason, commandBuffer);
+        component.onEntityAdded(ref, reason, commandBuffer);
     }
 
     @Override
@@ -67,17 +64,15 @@ public class OnAddRemove__Component<
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        var anyRef = new AnyRef<>(ref);
-
         // java is weird and won't let me define T to be both IOnAddRemove and Component, so i have the `init` define
         // this bound for me (because i can if its on a static method???) and then i'll just cast it here which IS SAFE given i've got that
         // bound guarnateed earlier
         @SuppressWarnings("unchecked")
-        var component = (IOnAddRemove<ECS_TYPE>) anyRef.getComponent(componentType);
+        var component = (IOnAddRemove<ECS_TYPE>) commandBuffer.getComponent(ref, componentType);
         if (component == null) {
             return;
         }
 
-        component.onEntityRemove(anyRef, reason, commandBuffer);
+        component.onEntityRemove(ref, reason, commandBuffer);
     }
 }

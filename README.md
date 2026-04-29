@@ -74,7 +74,7 @@ So, instead of all that junk now you can define
 // @Serializable
 public class Example extends IOnAddRemove<ChunkStore>, IOnBlockTick {
 
-    public void onEntityAdded(AnyRef<ChunkStore> ref, AddReason reason, CommandBuffer<ChunkStore> commandBuffer) {
+    public void onEntityAdded(Ref<ChunkStore> ref, AddReason reason, CommandBuffer<ChunkStore> commandBuffer) {
         // your code here
     }
 
@@ -83,7 +83,7 @@ public class Example extends IOnAddRemove<ChunkStore>, IOnBlockTick {
         // ItemUtils.spawn(blockRef, commandBuffer, blockRef.getGlobalCoords(), new ItemStack("Soil_Grass", 1));
     }
 
-    public void onEntityRemove(AnyRef<ChunkStore> ref, RemoveReason reason, CommandBuffer<ChunkStore> commandBuffer) {
+    public void onEntityRemove(Ref<ChunkStore> ref, RemoveReason reason, CommandBuffer<ChunkStore> commandBuffer) {
         // your other code here
     }
 

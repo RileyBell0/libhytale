@@ -6,6 +6,10 @@ git clean -fd
 git reset --hard
 git pull
 PATH=$PATH:/home/rileyb/coding/apache-maven-3.9.15/bin
+rm /home/rileyb/coding/patcher/tools/vineflower.jar
+rm -rf /home/rileyb/coding/patcher/hytale-server
+rm -rf /home/rileyb/coding/patcher/work
+cp /home/rileyb/coding/vineflower.jar /home/rileyb/coding/patcher/tools
 
 # copy in latest server from hytales game folder
 HYTALE_HOME=~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/install/release/package/game/latest
@@ -32,5 +36,4 @@ python run.py setup
 
 
 # copy to dest
-cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/libtwunk/src/main/java/
-cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/hytale-plugin/src/main/java/
+# cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/libtwunk/src/main/java/

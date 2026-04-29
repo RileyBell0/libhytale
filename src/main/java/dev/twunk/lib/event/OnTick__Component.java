@@ -4,13 +4,13 @@ import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.AnyRef;
 
 public class OnTick__Component<ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> extends OnTick<ECS_TYPE> {
 
@@ -37,10 +37,10 @@ public class OnTick__Component<ECS_TYPE extends WorldProvider, T extends Compone
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        var ref = new AnyRef<>(archetypeChunk.getReferenceTo(index));
+        var ref = archetypeChunk.getReferenceTo(index);
 
         @SuppressWarnings("unchecked")
-        var component = (IOnTick<ECS_TYPE>) ref.getComponent(componentType);
+        var component = (IOnTick<ECS_TYPE>) ref.getStore().getComponent(ref, componentType);
         if (component == null) {
             return;
         }

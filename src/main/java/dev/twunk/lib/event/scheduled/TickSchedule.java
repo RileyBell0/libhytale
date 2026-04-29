@@ -221,13 +221,13 @@ public sealed interface TickSchedule permits TickSchedule.Active, TickSchedule.S
 
         public Sleeping() {}
 
-        public static Sleeping forSeconds(final long seconds) {
-            return new TickSchedule.Sleeping(30 * seconds);
-        }
+        // public static Sleeping forSeconds(final long seconds) {
+        //     return new TickSchedule.Sleeping(30 * seconds);
+        // }
 
-        public static Sleeping forTicks(final long ticks) {
-            return new Sleeping(ticks);
-        }
+        // public static Sleeping forTicks(final long ticks) {
+        //     return new Sleeping(ticks);
+        // }
     }
 
     /**

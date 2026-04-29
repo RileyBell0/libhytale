@@ -21,7 +21,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import dev.twunk.hytale.interfaces.methods.IContainer;
 import dev.twunk.hytale.interfaces.methods.IPersistentContainer;
-import dev.twunk.hytale.ref.AnyRef;
 import java.util.Map;
 import java.util.UUID;
 
@@ -106,11 +105,11 @@ public abstract class ContainerUtils {
 
         final Map<UUID, ContainerBlockWindow> windows = containerComponent.getWindows();
         if (windows.putIfAbsent(uuid, window) != null) {
-            containerComponent.onOpen(new AnyRef<>(ref));
+            containerComponent.onOpen(ref);
             return;
         }
         if (!playerComponent.getPageManager().setPageWithWindows(ref, store, Page.Bench, true, window)) {
-            containerComponent.onOpen(new AnyRef<>(ref));
+            containerComponent.onOpen(ref);
             windows.remove(uuid, window);
             return;
         }
@@ -168,6 +167,6 @@ public abstract class ContainerUtils {
         SoundUtil.playSoundEvent3d(ref, soundEventIndex, soundPos, commandBuffer);
         windows.remove(uuid, window);
 
-        containerComponent.onOpen(new AnyRef<>(ref));
+        containerComponent.onOpen(ref);
     }
 }

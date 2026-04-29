@@ -1,6 +1,7 @@
 package dev.twunk.hytale.event.composite;
 
 import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -12,17 +13,15 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.hytale.LibHytaleException;
 import dev.twunk.hytale.component.UUIDComponent;
 import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.IQueryableEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
-import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
+import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
@@ -66,7 +65,7 @@ import javax.annotation.Nullable;
  */
 public abstract class OnScheduledTick<
     ECS_TYPE extends WorldProvider
-> implements IOnAddRemove<ECS_TYPE>, IOnUniverseTick<ECS_TYPE>, IOnTick<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
+> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
 
     @FunctionalInterface
     private static interface SleepingEntityCreator<ECS_TYPE extends WorldProvider> {
@@ -217,6 +216,9 @@ public abstract class OnScheduledTick<
         if (clazz.equals(IOnTick.class)) {
             return Query.and(this.query, this.activeFlagComponentType);
         }
+        if (clazz.equals(IOnWorldTick.class)) {
+            return Query.and(this.query, Query.not(this.activeFlagComponentType));
+        }
         return this.query;
     }
 
@@ -236,7 +238,7 @@ public abstract class OnScheduledTick<
      * Guarantees that entities will have a UUID component after this point.
      */
     @Override
-    public final void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+    public final void onEntityAdded(Ref<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         // get the UUID component, or force one onto the entity otherwise
         final UUIDComponent<ECS_TYPE> uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
         final UUID uuid = uuidComponent.getUuid();
@@ -258,9 +260,7 @@ public abstract class OnScheduledTick<
         switch (schedule) {
             // it wants to be ticking so make sure its got that component that we query on for ticking entities and move along
             // something about the combination of adding or removing a block + editing components + ticking = race condition
-            case TickSchedule.Active _ when (
-                commandBuffer.getComponent(ref, this.activeFlagComponentType) == null
-            ) -> commandBuffer.addComponent(ref, this.activeFlagComponentType);
+            case TickSchedule.Active _ -> commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
             // it wants to be sleeping, so just need to record when it wants to be awake so i can wake it up (as long as its still loaded when that happens)
             case TickSchedule.Sleeping s -> {
                 this.sleeping.add(this.sleepingEntityCreator.fromRef(ref, uuid, s));
@@ -283,13 +283,9 @@ public abstract class OnScheduledTick<
      * Actively ticking entities are handled automatically due to their components dipping from the world and thus the query
      */
     @Override
-    public final void onEntityRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
-        // get the UUID component
-        @Nullable
-        UUIDComponent<ECS_TYPE> uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
-
+    public final void onEntityRemove(Ref<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         // mark that the sleeper handler should discard element next time it sees it, as we're just, yeah, done with it
-        removed.add(uuidComponent.getUuid());
+        removed.add(commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType).getUuid());
     }
 
     // #endregion schedule
@@ -300,27 +296,33 @@ public abstract class OnScheduledTick<
     // #region awaken
 
     @Override
-    public void onUniverseTick(float dt, int index, Store<ECS_TYPE> store) {
+    public void onWorldTick(
+        float dt,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
         // first: wake up elements that are ready to wake
         SleepingEntity next;
         final var currentTick = store.getExternalData().getWorld().getTick();
         // while the next sleeper exists and is waiting to be ticked (<= currentTick)
-        while ((next = sleeping.peek()) != null && next.nextTick <= currentTick) {
-            // skip over & remove entites that are no longer loaded from our
-            // next tick queue
-            final var uuid = next.uuid;
-            if (removed.contains(uuid)) {
-                sleeping.remove();
-                removed.remove(uuid);
+        while ((next = sleeping.peek()) != null && currentTick + 1 >= next.nextTick) {
+            sleeping.remove();
+
+            if (removed.contains(next.uuid)) {
+                removed.remove(next.uuid);
                 continue;
             }
 
+            // skip over & remove entites that are no longer loaded from our
+            // next tick queue
+            final var uuid = next.uuid;
+
             // neat, this one's ready to go. We need to FIND the element and, heck ok. shit. need to store the coords and chunk and world
             // meaning, i need to also store with the nextToWake its coords and shit
-            final var nowAwake = sleeping.remove();
 
             // if we're in chunk mode we have to use the coords to get a ref
-            final Ref<ECS_TYPE> ref = switch (nowAwake) {
+            final Ref<ECS_TYPE> ref = switch (next) {
                 case SleepingEntity__Block asChunk -> {
                     // getRef based on its coords. We can't use UUID for this without modifying hytales ChunkStore to also record entites vs uuids and i so cbf doing that
                     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -341,19 +343,12 @@ public abstract class OnScheduledTick<
                     yield entityRef;
                 }
             };
-            if (ref == null) {
-                throw new LibHytaleException(
-                    "This shouldn't happen, means we failed to get a ref via coords for a block entity that's still loaded and ready for its scheduled tick"
-                );
-                // happens if we delete the block in the previous step and somehow didn't catch it
-                // continue;
+            if (ref == null || !ref.isValid()) {
+                continue;
             }
 
             // waking it up is as easy as adding the activeFlagComponent to it
-            store
-                .getExternalData()
-                .getWorld()
-                .execute(() -> store.ensureComponent(ref, this.activeFlagComponentType));
+            commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
 
             // then we just loop and keep going till we run out of things to tick
         }
@@ -364,7 +359,7 @@ public abstract class OnScheduledTick<
     @Nullable
     protected abstract TickSchedule _onScheduledTick(
         float dt,
-        AnyRef<ECS_TYPE> ref,
+        Ref<ECS_TYPE> ref,
         CommandBuffer<ECS_TYPE> commandBuffer
     );
 
@@ -376,7 +371,11 @@ public abstract class OnScheduledTick<
      * return a plan for when they should tick next, or null to just keep ticking
      */
     @Override
-    public void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
+    public void onTick(float dt, Ref<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
+        if (!ref.isValid()) {
+            return;
+        }
+
         // run your tick method
         final var res = this._onScheduledTick(dt, ref, commandBuffer);
         if (res == null) {
@@ -396,8 +395,7 @@ public abstract class OnScheduledTick<
                 }
 
                 // write us into the sleep queue
-                final var uuidComponent = commandBuffer.getComponent(ref, this.uuidComponentType);
-                final var uuid = uuidComponent.getUuid();
+                final var uuid = commandBuffer.getComponent(ref, this.uuidComponentType).getUuid();
                 this.sleeping.add(this.sleepingEntityCreator.fromRef(ref, uuid, newSchedule));
 
                 // persist our new schedule
@@ -406,7 +404,7 @@ public abstract class OnScheduledTick<
 
                 // finally: remove the flag that says we're ticking (so we don't anymore)
                 // (occurs AFTER our system finishes running all ticks)
-                commandBuffer.removeComponent(ref, this.activeFlagComponentType);
+                commandBuffer.tryRemoveComponent(ref, this.activeFlagComponentType);
             }
             case TickSchedule.Stopped newSchedule -> {
                 // persist our new schedule
@@ -415,7 +413,7 @@ public abstract class OnScheduledTick<
 
                 // finally: remove the flag that says we're ticking (so we don't anymore)
                 // (occurs AFTER our system finishes running all ticks)
-                commandBuffer.removeComponent(ref, this.activeFlagComponentType);
+                commandBuffer.tryRemoveComponent(ref, this.activeFlagComponentType);
             }
             default -> {
                 // default behaviour is to continue ticking, so can sip this

@@ -1,42 +1,35 @@
 package dev.twunk.hytale.event;
 
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.dependency.Dependency;
+import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
-import com.hypixel.hytale.component.system.tick.TickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.ISystemEventDriver;
-import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
+import dev.twunk.hytale.interfaces.event.IOnWorldTick;
+import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.lib.event.OnUniverseTick__Listener;
+import dev.twunk.lib.event.OnWorldTick__Listener;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/**
- * Subsystem for calling `onSystemTick` on the parent system every tick
- *
- * GOAL: run code ONCE per tick globally. not per element, just, run this once per tick
- *
- * REQUIRES:
- * - N/A (this is a leaf)
- * PRODUCES:
- * - IGlobalTickSystem runner
- *
- * My code
- * @see IOnUniverseTick - Something that this subsystem can call and run.
- *
- * Hytale's code
- * @see ArchetypeTickingSystem - I use this to run the subsystem. Only way i currently know
- *                               of for getting a commandBuffer in a global tick
- */
-public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
-    extends TickingSystem<ECS_TYPE> // hytale's underlying driver for my code
+public class OnWorldTick<ECS_TYPE extends WorldProvider>
+    extends ArchetypeTickingSystem<ECS_TYPE>
     implements ISystemEventDriver<ECS_TYPE>
 {
 
+    private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
+
+    protected OnWorldTick(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query) {
+        this.query = query;
+        this.registry = registry;
+    }
 
     @SuppressWarnings("null")
     private Set<Dependency<ECS_TYPE>> dependencies = Collections.emptySet();
@@ -63,8 +56,9 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
         this.group = group;
     }
 
-    protected OnUniverseTick(IRegistry<ECS_TYPE> registry) {
-        this.registry = registry;
+    @Override
+    public final Query<ECS_TYPE> getQuery() {
+        return this.query;
     }
 
     @Override
@@ -72,22 +66,45 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
         return this.registry;
     }
 
+    @Override
+    public void tick(
+        float dt,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        // stub
+    }
+
     // ////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
     // ////////////////////////////////////////////////////////////////////////
     // #region hide
 
-    public static final <ECS_TYPE extends WorldProvider> OnUniverseTick<ECS_TYPE> newDriverFor(
+    /**
+     * Shim around other method for reducing boilerplate if i define a query on my class
+     */
+    public static final <
+        ECS_TYPE extends WorldProvider,
+        T extends IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>
+    > OnWorldTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
+        return newDriverFor(registry, listener.getQuery(IOnWorldTick.class), listener);
+    }
+
+    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
         IRegistry<ECS_TYPE> registry,
-        IOnUniverseTick<ECS_TYPE> listener
+        Query<ECS_TYPE> query,
+        IOnWorldTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
-                OnUniverseTick__Listener.class,
+                OnWorldTick__Listener.class,
                 IRegistry.class,
-                IOnUniverseTick.class
+                Query.class,
+                IOnWorldTick.class
             ),
             registry,
+            query,
             listener
         );
     }

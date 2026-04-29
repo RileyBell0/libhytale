@@ -2,11 +2,11 @@ package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnAddRemove;
-import dev.twunk.hytale.ref.AnyRef;
 
 /**
  * Methods for my subsytem version of `RefSystem<ECS_Store>`
@@ -30,7 +30,7 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityAdded(
-        final AnyRef<ECS_TYPE> ref,
+        final Ref<ECS_TYPE> ref,
         final AddReason reason,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {}
@@ -47,7 +47,7 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityRemove(
-        final AnyRef<ECS_TYPE> ref,
+        final Ref<ECS_TYPE> ref,
         final RemoveReason reason,
         final CommandBuffer<ECS_TYPE> commandBuffer
     ) {}

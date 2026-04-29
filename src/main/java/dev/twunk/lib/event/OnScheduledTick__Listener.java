@@ -1,12 +1,12 @@
 package dev.twunk.lib.event;
 
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
 
@@ -41,11 +41,7 @@ public class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends O
 
     @Override
     @Nullable
-    protected final TickSchedule _onScheduledTick(
-        float dt,
-        AnyRef<ECS_TYPE> ref,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
+    protected final TickSchedule _onScheduledTick(float dt, Ref<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
         return listener.onScheduledTick(dt, ref, commandBuffer);
     }
 }

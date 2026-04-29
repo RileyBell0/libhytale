@@ -3,12 +3,12 @@ package dev.twunk.lib.event;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
@@ -44,11 +44,7 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
 
     @Override
     @Nullable
-    protected final TickSchedule _onScheduledTick(
-        float dt,
-        AnyRef<ECS_TYPE> ref,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
+    protected final TickSchedule _onScheduledTick(float dt, Ref<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
         @SuppressWarnings("unchecked")
         final IOnScheduledTick<ECS_TYPE> component = (IOnScheduledTick<ECS_TYPE>) ComponentUtils.get(
             ref,

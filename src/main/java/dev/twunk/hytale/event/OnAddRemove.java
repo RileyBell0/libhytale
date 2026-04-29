@@ -2,6 +2,8 @@ package dev.twunk.hytale.event;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.SystemGroup;
+import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
@@ -15,6 +17,9 @@ import dev.twunk.hytale.interfaces.methods.IQuery;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.event.OnAddRemove__Component;
 import dev.twunk.lib.event.OnAddRemove__Listener;
+import java.util.Collections;
+import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * Tiny Subsystem to simply tell our parent system when we added/removed entities
@@ -47,6 +52,31 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
 
     private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
+
+    @SuppressWarnings("null")
+    private Set<Dependency<ECS_TYPE>> dependencies = Collections.emptySet();
+
+    @Override
+    public Set<Dependency<ECS_TYPE>> getDependencies() {
+        return this.dependencies;
+    }
+
+    public void setDependencies(Set<Dependency<ECS_TYPE>> dependencies) {
+        this.dependencies = dependencies;
+    }
+
+    @Nullable
+    private SystemGroup<ECS_TYPE> group = null;
+
+    @Override
+    @Nullable
+    public SystemGroup<ECS_TYPE> getGroup() {
+        return this.group;
+    }
+
+    public void setGroup(SystemGroup<ECS_TYPE> group) {
+        this.group = group;
+    }
 
     protected OnAddRemove(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query) {
         this.query = query;

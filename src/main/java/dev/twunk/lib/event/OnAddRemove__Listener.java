@@ -10,7 +10,6 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.lib.event.OnAddRemove__Listener;
 
 /**
@@ -53,7 +52,7 @@ public class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAdd
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onEntityAdded(new AnyRef<>(ref), reason, commandBuffer);
+        listener.onEntityAdded(ref, reason, commandBuffer);
     }
 
     @Override
@@ -63,6 +62,6 @@ public class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAdd
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onEntityRemove(new AnyRef<>(ref), reason, commandBuffer);
+        listener.onEntityRemove(ref, reason, commandBuffer);
     }
 }

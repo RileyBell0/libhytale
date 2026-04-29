@@ -1,7 +1,8 @@
 package dev.twunk.hytale.interfaces.event;
 
+import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnTick;
@@ -15,6 +16,11 @@ import dev.twunk.hytale.event.OnTick;
  *                            It's the underlying driver of IEntityTickSubSystem
  */
 @FunctionalInterface
-public interface IOnTick<ECS_TYPE extends WorldProvider> {
-    public void onTick(final float dt, final Ref<ECS_TYPE> ref, final CommandBuffer<ECS_TYPE> commandBuffer);
+public interface IOnWorldTick<ECS_TYPE extends WorldProvider> {
+    public void onWorldTick(
+        float dt,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    );
 }

@@ -1,12 +1,12 @@
 package dev.twunk.hytale.interfaces.methods;
 
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerBlockWindow;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenContainerInteraction;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
-import dev.twunk.hytale.ref.AnyRef;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,7 +26,7 @@ public interface IContainer {
 
     public short getCapacity();
 
-    public default <ECS_TYPE extends WorldProvider> void onOpen(final AnyRef<ECS_TYPE> ref) {}
+    public default <ECS_TYPE extends WorldProvider> void onOpen(final Ref<ECS_TYPE> ref) {}
 
     // Hytale src code (deprecated) called this `isAllowViewing`
     public default boolean canView() {
