@@ -7,12 +7,15 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
+import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.component.UUIDComponent;
 import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.IQueryableEventDriver;
@@ -25,6 +28,7 @@ import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
+import dev.twunk.lib.WorldTickResource;
 import dev.twunk.lib.component.ActivelyTickingComponent;
 import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.event.OnScheduledTick__Component;
@@ -70,6 +74,22 @@ public abstract class OnScheduledTick<
     @FunctionalInterface
     private static interface SleepingEntityCreator<ECS_TYPE extends WorldProvider> {
         SleepingEntity fromRef(Ref<ECS_TYPE> ref, UUID uuid, TickSchedule.Sleeping schedule);
+    }
+
+    @SuppressWarnings("null")
+    private static ResourceType<ChunkStore, WorldTickResource> worldTickResourceType = null;
+
+    @SuppressWarnings("null")
+    private WorldTickResource tickResource = null;
+
+    @Override
+    @SuppressWarnings({ "unused", "null" })
+    public void onRegister(JavaPlugin plugin) {
+        if (OnScheduledTick.worldTickResourceType == null) {
+            OnScheduledTick.worldTickResourceType = LibHytale.CHUNK_REGISTRY.getResourceType(WorldTickResource.class);
+        }
+
+        this.getRegistry().registerEventListeners(plugin, this);
     }
 
     // A unique and STABLE identifier for the system. you cannot change this.
@@ -238,7 +258,17 @@ public abstract class OnScheduledTick<
      * Guarantees that entities will have a UUID component after this point.
      */
     @Override
+    @SuppressWarnings("unused")
     public final void onEntityAdded(Ref<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+        if (this.tickResource == null) {
+            this.tickResource = commandBuffer
+                .getExternalData()
+                .getWorld()
+                .getChunkStore()
+                .getStore()
+                .getResource(OnScheduledTick.worldTickResourceType);
+        }
+
         // get the UUID component, or force one onto the entity otherwise
         final UUIDComponent<ECS_TYPE> uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
         final UUID uuid = uuidComponent.getUuid();
@@ -304,7 +334,7 @@ public abstract class OnScheduledTick<
     ) {
         // first: wake up elements that are ready to wake
         SleepingEntity next;
-        final var currentTick = store.getExternalData().getWorld().getTick();
+        final var currentTick = this.tickResource.worldTick;
         // while the next sleeper exists and is waiting to be ticked (<= currentTick)
         while ((next = sleeping.peek()) != null && currentTick + 1 >= next.nextTick) {
             sleeping.remove();
@@ -359,6 +389,7 @@ public abstract class OnScheduledTick<
     @Nullable
     protected abstract TickSchedule _onScheduledTick(
         float dt,
+        long worldTick,
         Ref<ECS_TYPE> ref,
         CommandBuffer<ECS_TYPE> commandBuffer
     );
@@ -377,7 +408,7 @@ public abstract class OnScheduledTick<
         }
 
         // run your tick method
-        final var res = this._onScheduledTick(dt, ref, commandBuffer);
+        final var res = this._onScheduledTick(dt, this.tickResource.worldTick, ref, commandBuffer);
         if (res == null) {
             return;
         }
@@ -389,7 +420,8 @@ public abstract class OnScheduledTick<
             case TickSchedule.Sleeping newSchedule -> {
                 // if they're planning to run next tick, we'll just, ignore that new
                 // schedule request. silly dummie
-                final var currentTick = ref.getStore().getExternalData().getWorld().getTick();
+                final var currentTick = this.tickResource.worldTick;
+                newSchedule.nextTick += currentTick;
                 if (newSchedule.nextTick == currentTick + 1) {
                     break;
                 }

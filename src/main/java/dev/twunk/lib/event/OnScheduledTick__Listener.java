@@ -41,7 +41,12 @@ public class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends O
 
     @Override
     @Nullable
-    protected final TickSchedule _onScheduledTick(float dt, Ref<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
-        return listener.onScheduledTick(dt, ref, commandBuffer);
+    protected final TickSchedule _onScheduledTick(
+        float dt,
+        long worldTick,
+        Ref<ECS_TYPE> ref,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        return listener.onScheduledTick(dt, worldTick, ref, commandBuffer);
     }
 }

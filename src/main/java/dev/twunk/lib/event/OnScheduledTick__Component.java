@@ -44,7 +44,12 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
 
     @Override
     @Nullable
-    protected final TickSchedule _onScheduledTick(float dt, Ref<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
+    protected final TickSchedule _onScheduledTick(
+        float dt,
+        long worldTick,
+        Ref<ECS_TYPE> ref,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
         @SuppressWarnings("unchecked")
         final IOnScheduledTick<ECS_TYPE> component = (IOnScheduledTick<ECS_TYPE>) ComponentUtils.get(
             ref,
@@ -54,6 +59,6 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
             return null;
         }
 
-        return component.onScheduledTick(dt, ref, commandBuffer);
+        return component.onScheduledTick(dt, worldTick, ref, commandBuffer);
     }
 }
