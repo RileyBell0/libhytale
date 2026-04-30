@@ -9,6 +9,8 @@ import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.component.UUIDComponent;
 import dev.twunk.hytale.interaction.LogInteraction;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
+import dev.twunk.lib.WorldTickResource;
+import dev.twunk.lib.WorldTickRunner;
 import dev.twunk.lib.component.ActivelyTickingComponent;
 import dev.twunk.lib.component.TestComponent;
 import dev.twunk.lib.component.TickScheduleComponent;
@@ -65,9 +67,15 @@ public abstract class LibHytale {
         HytalePlugin.register(plugin, ActivelyTickingComponent.class);
         HytalePlugin.register(plugin, UUIDComponent.class);
 
+        // Register resources
+        HytalePlugin.register(plugin, WorldTickResource.class);
+
         // Register interactions
         HytalePlugin.register(plugin, LogInteraction.class, "Log");
         HytalePlugin.register(plugin, SpawnItemInteraction.class, "SpawnItem");
         HytalePlugin.register(plugin, OpenContainerComponentInteraction.class, "OpenMahContainerPls");
+
+        // Register anything else (systems)
+        LibHytale.CHUNK_REGISTRY.registerEventListeners(plugin, new WorldTickRunner());
     }
 }
