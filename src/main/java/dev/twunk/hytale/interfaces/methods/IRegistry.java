@@ -4,6 +4,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentRegistryProxy;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Resource;
+import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -68,6 +70,18 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         String id
     );
 
+    public <T extends Resource<ECS_TYPE>> void cacheResourceType(
+        ResourceType<ECS_TYPE, T> resourceType,
+        Class<T> myClass,
+        String id
+    );
+
+    @Nullable
+    public <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> getResourceType(Class<T> resourceClass);
+
+    @Nullable
+    public <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> getResourceType(String resourceId);
+
     @Nullable
     public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(Class<T> componentClass);
 
@@ -79,6 +93,102 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     // ////////////////////////////////////////////////////////////////////////
     // All of the below should be left as is, an implementor not need change them.
     // ////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////
+    // get/register resource
+    // //////////////////////
+
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> getOrRegisterResource(
+        JavaPlugin plugin,
+        Class<T> clazz
+    ) {
+        return getOrRegisterResource(plugin, clazz, getBuilderCodec(clazz));
+    }
+
+    @SuppressWarnings("null") // suppressing null warning from clazz.getName()
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> getOrRegisterResource(
+        JavaPlugin plugin,
+        Class<T> clazz,
+        BuilderCodec<T> codec
+    ) {
+        final var resourceType = this.getResourceType(clazz);
+        if (resourceType != null) {
+            return resourceType;
+        }
+
+        return this.registerResource(plugin, clazz, codec, clazz.getName());
+    }
+
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> getOrRegisterResource(
+        JavaPlugin plugin,
+        Class<T> clazz,
+        String id
+    ) {
+        final var resourceType = this.getResourceType(clazz);
+        if (resourceType != null) {
+            return resourceType;
+        }
+
+        return this.registerResource(plugin, clazz, getBuilderCodec(clazz), id);
+    }
+
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> getOrRegisterResource(
+        JavaPlugin plugin,
+        Class<T> clazz,
+        BuilderCodec<T> codec,
+        String id
+    ) {
+        final var resourceType = this.getResourceType(clazz);
+        if (resourceType != null) {
+            return resourceType;
+        }
+
+        return this.registerResource(plugin, clazz, codec, id);
+    }
+
+    // //////////////////
+    // register resource
+    // //////////////////
+
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> registerResource(
+        JavaPlugin plugin,
+        Class<T> clazz,
+        String id
+    ) {
+        return this.registerResource(plugin, clazz, getBuilderCodec(clazz), id);
+    }
+
+    @SuppressWarnings("null") // suppressing null warning from clazz.getName()
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> registerResource(
+        JavaPlugin plugin,
+        Class<T> clazz
+    ) {
+        return this.registerResource(plugin, clazz, getBuilderCodec(clazz), clazz.getName());
+    }
+
+    @SuppressWarnings("null") // suppressing null warning from clazz.getName()
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> registerResource(
+        JavaPlugin plugin,
+        BuilderCodec<T> codec
+    ) {
+        return this.registerResource(plugin, codec.getInnerClass(), codec, codec.getInnerClass().getName());
+    }
+
+    /// BASE method that actually registers the component
+    public default <T extends Resource<ECS_TYPE>> ResourceType<ECS_TYPE, T> registerResource(
+        JavaPlugin plugin,
+        Class<T> clazz,
+        BuilderCodec<T> codec,
+        String id
+    ) {
+        // register the component with hytale
+        final var resourceType = this.getStoreRegistry(plugin).registerResource(clazz, id, codec);
+
+        // store the component type for lookup via <class> or <id>
+        this.cacheResourceType(resourceType, clazz, id);
+
+        return resourceType;
+    }
 
     // //////////////////////
     // get/register component
