@@ -114,6 +114,8 @@ public final class AutoSerializeParser {
             return appendComponentType(builder, field);
         } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
             return appendInt(builder, field);
+        } else if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
+            return appendLong(builder, field);
         } else if (List.class.isAssignableFrom(fieldClass)) {
             var genericType = field.getGenericType();
             if (!(genericType instanceof ParameterizedType)) {
@@ -672,6 +674,40 @@ public final class AutoSerializeParser {
                 self -> {
                     try {
                         return field.getInt(self);
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            )
+            .add();
+    }
+
+    private static final <T> BuilderCodec.Builder<T> appendLong(BuilderCodec.Builder<T> builder, Field field) {
+        final var annotation = field.getAnnotation(Serialize.class);
+        var name = annotation.key();
+        var required = annotation.required();
+        var minVal = annotation.min();
+        if (name.isEmpty()) {
+            name = normaliseFieldName(field);
+        }
+
+        field.setAccessible(true);
+        return builder
+            .append(
+                new KeyedCodec<>(name, Codec.LONG, required),
+                (self, val) -> {
+                    if (val != null && val >= minVal) {
+                        try {
+                            field.set(self, val);
+                        } catch (IllegalArgumentException | IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                self -> {
+                    try {
+                        return field.getLong(self);
                     } catch (IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
