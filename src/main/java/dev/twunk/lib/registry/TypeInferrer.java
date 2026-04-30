@@ -1,6 +1,5 @@
 package dev.twunk.lib.registry;
 
-import com.hypixel.hytale.component.Component;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -217,7 +216,7 @@ public class TypeInferrer {
      */
     @Nullable
     public static final <T> Class<?> inferTypeReceivedByGenericInClassT(Class<T> clazz, Class<? extends T> subClass) {
-        var prediction = analyzeClass(Component.class, 0, subClass);
+        var prediction = analyzeClass(clazz, 0, subClass);
 
         // 1) search all the types i've seen for classes
         var classes = new HashSet<Class<?>>();
