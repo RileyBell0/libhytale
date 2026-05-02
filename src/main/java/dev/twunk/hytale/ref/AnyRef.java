@@ -23,7 +23,6 @@ public class AnyRef<ECS_TYPE extends WorldProvider> extends Ref<ECS_TYPE> {
     // \/======================\/-  Methods  -\/==========================\/ //
     // ////////////////////////////////////////////////////////////////////////
 
-    // todo ALL methods need to actually use the underlying ref. none can be on self, anything that ever gets called ON ref has to return the inner ref. ALWAYS. especailly get index. fuck me i thought i did that. been bug hunting for WEEKS on this shit just AAAAAH its fine it works it finally works
     public AnyRef(Ref<ECS_TYPE> ref) {
         super(ref.getStore(), ref.getIndex());
     }

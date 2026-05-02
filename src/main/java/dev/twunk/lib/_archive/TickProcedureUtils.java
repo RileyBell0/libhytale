@@ -11,22 +11,15 @@ import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.BlockUtils.Coords;
 import dev.twunk.hytale.utils.ChunkUtils;
 
-/**
- * TODO undeprecate this, need this to hook up and create subsystems for onBlockUpdate
- * @deprecated
- */
-@Deprecated(forRemoval = false)
 public abstract class TickProcedureUtils {
 
     @SuppressWarnings("null")
     private static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final Ref<ChunkStore> ref) {
         return TickProcedureUtils.setTicking(ref, true);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final Ref<ChunkStore> ref, final boolean ticking) {
         final var info = BlockUtils.Info.get(ref);
         if (info == null) {
@@ -37,12 +30,10 @@ public abstract class TickProcedureUtils {
         return TickProcedureUtils.setTicking(info, ticking);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final BlockStateInfo info) {
         return TickProcedureUtils.setTicking(info, true);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final BlockStateInfo info, final boolean ticking) {
         final var worldChunk = ChunkUtils.WorldChunks.get(info);
         if (worldChunk == null) {
@@ -54,28 +45,23 @@ public abstract class TickProcedureUtils {
         return TickProcedureUtils.setTicking(worldChunk, coords, ticking);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final WorldChunk worldChunk, final Vector3i coords) {
         return TickProcedureUtils.setTicking(worldChunk, coords, true);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final WorldChunk worldChunk, final Vector3i coords, final boolean ticking) {
         return worldChunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final BlockChunk chunk, final BlockStateInfo info, final boolean ticking) {
         final var coords = Coords.Local.get(info);
         return chunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final BlockChunk chunk, final Vector3i coords) {
         return chunk.setTicking(coords.x, coords.y, coords.z, true);
     }
 
-    @Deprecated(forRemoval = false)
     public static final boolean setTicking(final BlockChunk chunk, final Vector3i coords, final boolean ticking) {
         return chunk.setTicking(coords.x, coords.y, coords.z, ticking);
     }

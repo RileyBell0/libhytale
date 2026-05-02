@@ -7,10 +7,6 @@ import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
 
 /**
- * TODO really not working that well atm, needs to be cleaned up BUT it worked
- * well in concept and practice. Just, yeah, needs to be cleaned up and extended to support
- * more advanced ticking ideas like "every x ticks" or "every x seconds" etc etc
- *
  * Gives your system the event handler function it needs to run code for every entity
  * that matches your system, AND for that entity to be able to sleep etc (and remember
  * if it was awake/sleeping etc when it loads back in)
