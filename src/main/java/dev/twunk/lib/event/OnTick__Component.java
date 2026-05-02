@@ -1,5 +1,6 @@
 package dev.twunk.lib.event;
 
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
@@ -44,6 +45,6 @@ public class OnTick__Component<ECS_TYPE extends WorldProvider, T extends Compone
             return;
         }
 
-        component.onTick(dt, ref, commandBuffer);
+        component.onTick(dt, AnyRef.of(ref), commandBuffer);
     }
 }

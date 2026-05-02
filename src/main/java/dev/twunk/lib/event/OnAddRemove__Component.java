@@ -1,6 +1,7 @@
 package dev.twunk.lib.event;
 
 import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -54,7 +55,7 @@ public class OnAddRemove__Component<
             return;
         }
 
-        component.onEntityAdded(ref, reason, commandBuffer);
+        component.onEntityAdded(AnyRef.of(ref), reason, commandBuffer);
     }
 
     @Override
@@ -73,6 +74,6 @@ public class OnAddRemove__Component<
             return;
         }
 
-        component.onEntityRemove(ref, reason, commandBuffer);
+        component.onEntityRemove(AnyRef.of(ref), reason, commandBuffer);
     }
 }

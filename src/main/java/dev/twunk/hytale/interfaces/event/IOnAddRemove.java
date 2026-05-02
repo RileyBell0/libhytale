@@ -1,8 +1,8 @@
 package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
@@ -29,11 +29,7 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
      *                      and run your MUTATION methods using the `store` within the lambda
      *                      you pass to `commandBuffer.run(...)`
      */
-    public default void onEntityAdded(
-        final Ref<ECS_TYPE> ref,
-        final AddReason reason,
-        final CommandBuffer<ECS_TYPE> commandBuffer
-    ) {}
+    public default void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {}
 
     /**
      * Event for when an entity is removed/unloaded from the world
@@ -47,8 +43,8 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
      *                      you pass to `commandBuffer.run(...)`
      */
     public default void onEntityRemove(
-        final Ref<ECS_TYPE> ref,
-        final RemoveReason reason,
-        final CommandBuffer<ECS_TYPE> commandBuffer
+        AnyRef<ECS_TYPE> ref,
+        RemoveReason reason,
+        CommandBuffer<ECS_TYPE> commandBuffer
     ) {}
 }

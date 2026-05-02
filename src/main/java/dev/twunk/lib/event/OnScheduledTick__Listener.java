@@ -1,5 +1,6 @@
 package dev.twunk.lib.event;
 
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.query.Query;
@@ -47,6 +48,6 @@ public class OnScheduledTick__Listener<ECS_TYPE extends WorldProvider> extends O
         Ref<ECS_TYPE> ref,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        return listener.onScheduledTick(dt, worldTick, ref, commandBuffer);
+        return listener.onScheduledTick(dt, worldTick, AnyRef.of(ref), commandBuffer);
     }
 }

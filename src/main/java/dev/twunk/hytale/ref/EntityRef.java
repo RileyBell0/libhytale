@@ -1,5 +1,6 @@
 package dev.twunk.hytale.ref;
 
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 

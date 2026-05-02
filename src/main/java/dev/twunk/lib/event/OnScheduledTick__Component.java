@@ -1,5 +1,6 @@
 package dev.twunk.lib.event;
 
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -59,6 +60,6 @@ public class OnScheduledTick__Component<ECS_TYPE extends WorldProvider> extends 
             return null;
         }
 
-        return component.onScheduledTick(dt, worldTick, ref, commandBuffer);
+        return component.onScheduledTick(dt, worldTick, AnyRef.of(ref), commandBuffer);
     }
 }

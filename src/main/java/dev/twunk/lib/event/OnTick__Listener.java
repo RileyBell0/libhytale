@@ -1,5 +1,6 @@
 package dev.twunk.lib.event;
 
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
@@ -29,6 +30,6 @@ public class OnTick__Listener<ECS_TYPE extends WorldProvider> extends OnTick<ECS
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onTick(dt, archetypeChunk.getReferenceTo(index), commandBuffer);
+        listener.onTick(dt, AnyRef.of(archetypeChunk.getReferenceTo(index)), commandBuffer);
     }
 }

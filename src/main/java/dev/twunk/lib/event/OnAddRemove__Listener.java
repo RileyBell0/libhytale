@@ -1,6 +1,7 @@
 package dev.twunk.lib.event;
 
 import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
@@ -52,7 +53,7 @@ public class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAdd
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onEntityAdded(ref, reason, commandBuffer);
+        listener.onEntityAdded(AnyRef.of(ref), reason, commandBuffer);
     }
 
     @Override
@@ -62,6 +63,6 @@ public class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAdd
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onEntityRemove(ref, reason, commandBuffer);
+        listener.onEntityRemove(AnyRef.of(ref), reason, commandBuffer);
     }
 }

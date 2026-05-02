@@ -1,5 +1,6 @@
 package dev.twunk.hytale.ref;
 
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;

@@ -1,6 +1,7 @@
 package dev.twunk.hytale.event.composite;
 
 import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
@@ -259,7 +260,7 @@ public abstract class OnScheduledTick<
      */
     @Override
     @SuppressWarnings("unused")
-    public final void onEntityAdded(Ref<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+    public final void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         if (this.tickResource == null) {
             this.tickResource = commandBuffer
                 .getExternalData()
@@ -313,7 +314,7 @@ public abstract class OnScheduledTick<
      * Actively ticking entities are handled automatically due to their components dipping from the world and thus the query
      */
     @Override
-    public final void onEntityRemove(Ref<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+    public final void onEntityRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         // mark that the sleeper handler should discard element next time it sees it, as we're just, yeah, done with it
         removed.add(commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType).getUuid());
     }
@@ -400,7 +401,7 @@ public abstract class OnScheduledTick<
      * return a plan for when they should tick next, or null to just keep ticking
      */
     @Override
-    public void onTick(float dt, Ref<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
+    public void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
         if (!ref.isValid()) {
             return;
         }
@@ -411,7 +412,10 @@ public abstract class OnScheduledTick<
             return;
         }
 
-        final var tickScheduleComponent = commandBuffer.getComponent(ref, this.tickScheduleComponentType);
+        final var tickScheduleComponent = ref.getComponent(this.tickScheduleComponentType);
+        if (tickScheduleComponent == null) {
+            return;
+        }
 
         // Configure future schedule for this entity according to your returned tick schedule
         switch (res) {

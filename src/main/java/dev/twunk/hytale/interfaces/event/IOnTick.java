@@ -1,7 +1,7 @@
 package dev.twunk.hytale.interfaces.event;
 
+import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnTick;
@@ -16,5 +16,5 @@ import dev.twunk.hytale.event.OnTick;
  */
 @FunctionalInterface
 public interface IOnTick<ECS_TYPE extends WorldProvider> {
-    public void onTick(final float dt, final Ref<ECS_TYPE> ref, final CommandBuffer<ECS_TYPE> commandBuffer);
+    public void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer);
 }
