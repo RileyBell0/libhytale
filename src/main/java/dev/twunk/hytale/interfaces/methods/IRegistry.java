@@ -12,6 +12,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.codec.SerializeParser;
 import dev.twunk.hytale.event.OnAddRemove;
 import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.event.OnUniverseTick;
@@ -28,7 +29,6 @@ import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry.EventDriver;
 import dev.twunk.lib.LibHytaleException;
-import dev.twunk.lib.codec.AutoSerializeParser;
 import dev.twunk.lib.registry.EventOrderInferrer;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
     static final HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     public static <T> BuilderCodec<T> getBuilderCodec(Class<T> clazz) {
-        final BuilderCodec<T> codec = AutoSerializeParser.tryGetBuilderCodec(clazz);
+        final BuilderCodec<T> codec = SerializeParser.tryGetBuilderCodec(clazz);
         if (codec == null || !BuilderCodec.class.isAssignableFrom(codec.getClass())) {
             throw new LibHytaleException("Failed to get codec for class " + clazz);
         }

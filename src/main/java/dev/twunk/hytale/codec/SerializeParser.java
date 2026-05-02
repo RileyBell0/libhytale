@@ -1,4 +1,4 @@
-package dev.twunk.lib.codec;
+package dev.twunk.hytale.codec;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -7,7 +7,6 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.component.ComponentType;
 import dev.twunk.hytale.LibHytale;
-import dev.twunk.hytale.codec.Codecs;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;
@@ -34,7 +33,7 @@ import javax.lang.model.type.NullType;
  * I figure you've got a sense of what you're doing, so, yeah, welcome, enjoy your stay,
  * and feel free to leave a PR or advice etc on how to make this less spaghetti and more, neat.
  */
-public final class AutoSerializeParser {
+public final class SerializeParser {
 
     private static final String normaliseFieldName(Field field) {
         // first letter must be capitalised in codec key
@@ -746,7 +745,7 @@ public final class AutoSerializeParser {
                 return null;
             }
         };
-        return AutoSerializeParser.build(clazz, supplier);
+        return SerializeParser.build(clazz, supplier);
     }
 
     @Nullable
@@ -786,6 +785,6 @@ public final class AutoSerializeParser {
             }
         };
 
-        return AutoSerializeParser.build(clazz, supplier);
+        return SerializeParser.build(clazz, supplier);
     }
 }

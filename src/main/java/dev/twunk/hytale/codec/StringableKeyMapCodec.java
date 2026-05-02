@@ -1,4 +1,4 @@
-package dev.twunk.lib.codec;
+package dev.twunk.hytale.codec;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.ExtraInfo;
@@ -7,7 +7,6 @@ import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.ObjectSchema;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
-import dev.twunk.hytale.codec.FromStringCodec;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
