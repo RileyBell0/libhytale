@@ -7,6 +7,7 @@ import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.interfaces.IRegistryProvider;
 import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.hytale.resource.CurrentWorldTick;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -14,18 +15,18 @@ import javax.annotation.Nullable;
 
 public class WorldTickRunner implements IOnUniverseTick<ChunkStore>, IRegistryProvider<ChunkStore> {
 
-    protected static final Map<UUID, WorldTickResource> worldTimeMap = new HashMap<>();
+    protected static final Map<UUID, CurrentWorldTick> worldTimeMap = new HashMap<>();
 
     @SuppressWarnings("null")
-    private final ResourceType<ChunkStore, WorldTickResource> resourceType = LibHytale.CHUNK_REGISTRY.getResourceType(
-        WorldTickResource.class
+    private final ResourceType<ChunkStore, CurrentWorldTick> resourceType = LibHytale.CHUNK_REGISTRY.getResourceType(
+        CurrentWorldTick.class
     );
 
     @Nullable
     private UUID id = null;
 
     @Nullable
-    private WorldTickResource resource;
+    private CurrentWorldTick resource;
 
     @Override
     public final IRegistry<ChunkStore> getRegistry() {

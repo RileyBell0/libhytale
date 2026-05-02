@@ -17,7 +17,6 @@ import dev.twunk.lib.registry.TypeInferrer;
 // Simple wrapper around JavaPlugin to make behaviour less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
 
-    @SuppressWarnings("null")
     private static final HytaleLogger console = HytaleLogger.forEnclosingClass();
 
     protected HytalePlugin(final JavaPluginInit init) {

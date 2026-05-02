@@ -28,10 +28,10 @@ import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
+import dev.twunk.hytale.resource.CurrentWorldTick;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
-import dev.twunk.lib.WorldTickResource;
 import dev.twunk.lib.component.ActivelyTickingComponent;
 import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.event.OnScheduledTick__Component;
@@ -81,16 +81,16 @@ public abstract class OnScheduledTick<
     }
 
     @SuppressWarnings("null")
-    private static ResourceType<ChunkStore, WorldTickResource> worldTickResourceType = null;
+    private static ResourceType<ChunkStore, CurrentWorldTick> worldTickResourceType = null;
 
     @SuppressWarnings("null")
-    private WorldTickResource tickResource = null;
+    private CurrentWorldTick tickResource = null;
 
     @Override
     @SuppressWarnings({ "unused", "null" })
     public void onRegister(JavaPlugin plugin) {
         if (OnScheduledTick.worldTickResourceType == null) {
-            OnScheduledTick.worldTickResourceType = LibHytale.CHUNK_REGISTRY.getResourceType(WorldTickResource.class);
+            OnScheduledTick.worldTickResourceType = LibHytale.CHUNK_REGISTRY.getResourceType(CurrentWorldTick.class);
         }
 
         this.getRegistry().registerEventListeners(plugin, this);
