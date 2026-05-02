@@ -756,7 +756,9 @@ public final class AutoSerializeParser {
             if (clazz == codecField.getDeclaringClass()) {
                 var codec = codecField.get(clazz);
                 if (codec instanceof BuilderCodec<?> c) {
-                    return (BuilderCodec<T>) c;
+                    @SuppressWarnings("unchecked")
+                    var res = (BuilderCodec<T>) c;
+                    return res;
                 }
             }
         } catch (Exception _) {

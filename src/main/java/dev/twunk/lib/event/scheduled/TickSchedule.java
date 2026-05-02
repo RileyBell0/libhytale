@@ -6,7 +6,6 @@ import com.hypixel.hytale.codec.exception.CodecException;
 import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
-import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.lib.event.scheduled.TickSchedule.Sleeping;
 import java.io.IOException;
@@ -35,15 +34,23 @@ class TickScheduleCodec implements Codec<TickSchedule> {
 
             for (Entry<String, BsonValue> entry : bsonDocument.entrySet()) {
                 final String key = entry.getKey();
-                extraInfo.pushKey(key);
+                if (extraInfo != null) {
+                    extraInfo.pushKey(key);
+                }
 
                 final BsonValue value = entry.getValue();
                 try {
                     map.put(key, value);
                 } catch (Exception var13) {
-                    throw new CodecException("Failed to decode", value, extraInfo, var13);
+                    if (extraInfo == null) {
+                        throw new CodecException("Failed to decode " + bsonValue);
+                    } else {
+                        throw new CodecException("Failed to decode", value, extraInfo, var13);
+                    }
                 } finally {
-                    extraInfo.popKey();
+                    if (extraInfo != null) {
+                        extraInfo.popKey();
+                    }
                 }
             }
 
@@ -110,6 +117,7 @@ class TickScheduleCodec implements Codec<TickSchedule> {
     }
 
     @Nullable
+    @Override
     public TickSchedule decodeJson(RawJsonReader reader, @Nullable ExtraInfo extraInfo) throws IOException {
         reader.expect('{');
         reader.consumeWhiteSpace();
@@ -125,15 +133,23 @@ class TickScheduleCodec implements Codec<TickSchedule> {
                 reader.consumeWhiteSpace();
                 reader.expect(':');
                 reader.consumeWhiteSpace();
-                extraInfo.pushKey(key, reader);
+                if (extraInfo != null) {
+                    extraInfo.pushKey(key, reader);
+                }
 
                 if (key.equals("State")) {
                     try {
                         state = Codec.STRING.decodeJson(reader, extraInfo);
                     } catch (Exception var9) {
-                        throw new CodecException("Failed to decode", reader, extraInfo, var9);
+                        if (extraInfo == null) {
+                            throw new CodecException("Failed to decode " + reader);
+                        } else {
+                            throw new CodecException("Failed to decode", reader, extraInfo, var9);
+                        }
                     } finally {
-                        extraInfo.popKey();
+                        if (extraInfo != null) {
+                            extraInfo.popKey();
+                        }
                     }
                 } else if (key.equals("NextTick")) {
                     nextTick = Codec.LONG.decodeJson(reader, extraInfo);
@@ -163,13 +179,14 @@ class TickScheduleCodec implements Codec<TickSchedule> {
                     "NextTick set for state " + state + " except its only expected for 'State' sleeping"
                 );
             }
-            if (state.equals("sleeping") && nextTick == null) {
-                throw new CodecException("NextTick MUST be set if 'State' is sleeping");
-            }
 
             if (state.equals("active")) {
                 return TickSchedule.ACTIVE;
             } else if (state.equals("sleeping")) {
+                if (nextTick == null) {
+                    throw new CodecException("NextTick MUST be set if 'State' is sleeping");
+                }
+
                 return new Sleeping(nextTick);
             } else {
                 return TickSchedule.STOP;

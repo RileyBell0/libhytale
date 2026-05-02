@@ -43,6 +43,7 @@ public abstract class ComponentUtils {
     /**
      * Tests all methods i've defined for getWorldChunk
      */
+    @SuppressWarnings("null")
     public static final void test(
         final Ref<ChunkStore> blockRef,
         final CommandBuffer<ChunkStore> commandBuffer,
