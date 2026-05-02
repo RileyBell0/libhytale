@@ -10,7 +10,7 @@ import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.event.OnUniverseTick__Listener;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 
@@ -38,16 +38,22 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
 
     private final IRegistry<ECS_TYPE> registry;
 
-    @SuppressWarnings("null")
-    private Set<Dependency<ECS_TYPE>> dependencies = Collections.emptySet();
+    private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
 
     @Override
     public Set<Dependency<ECS_TYPE>> getDependencies() {
         return this.dependencies;
     }
 
+    @Override
     public void setDependencies(Set<Dependency<ECS_TYPE>> dependencies) {
-        this.dependencies = dependencies;
+        this.dependencies = new HashSet<>();
+        this.dependencies.addAll(dependencies);
+    }
+
+    @Override
+    public boolean addDependency(Dependency<ECS_TYPE> dependency) {
+        return this.dependencies.add(dependency);
     }
 
     @Nullable
@@ -59,7 +65,7 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
         return this.group;
     }
 
-    public void setGroup(SystemGroup<ECS_TYPE> group) {
+    public void setGroup(@Nullable SystemGroup<ECS_TYPE> group) {
         this.group = group;
     }
 

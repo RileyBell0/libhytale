@@ -1,14 +1,18 @@
 package dev.twunk.hytale.interfaces;
 
+import com.hypixel.hytale.component.SystemGroup;
+import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.interfaces.config.IEventConfig;
 import dev.twunk.lib.LibHytaleException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Set;
 import javax.annotation.Nullable;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;
@@ -25,7 +29,9 @@ import net.bytebuddy.utility.RandomString;
  *
  * No touchy.
  */
-public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryProvider<ECS_TYPE> {
+public interface IEventDriver<
+    ECS_TYPE extends WorldProvider
+> extends IRegistryProvider<ECS_TYPE>, IEventConfig<ECS_TYPE> {
     static final @Nullable HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     /**
@@ -167,4 +173,8 @@ public interface IEventDriver<ECS_TYPE extends WorldProvider> extends IRegistryP
     }
 
     public abstract void onRegister(JavaPlugin plugin);
+
+    public abstract boolean addDependency(Dependency<ECS_TYPE> dependency);
+    public abstract void setDependencies(Set<Dependency<ECS_TYPE>> dependencies);
+    public abstract void setGroup(@Nullable SystemGroup<ECS_TYPE> group);
 }

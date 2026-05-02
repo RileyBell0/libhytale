@@ -9,6 +9,8 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.SystemGroup;
+import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -111,6 +113,54 @@ public abstract class OnScheduledTick<
     private ComponentType<ECS_TYPE, ActivelyTickingComponent<ECS_TYPE>> activeFlagComponentType;
     private ComponentType<ECS_TYPE, TickScheduleComponent<ECS_TYPE>> tickScheduleComponentType;
     private final ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponentType;
+
+    private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
+
+    @Nullable
+    private SystemGroup<ECS_TYPE> group = null;
+
+    @Override
+    public Set<Dependency<ECS_TYPE>> getDependencies() {
+        return this.dependencies;
+    }
+
+    @Override
+    public void setDependencies(Set<Dependency<ECS_TYPE>> dependencies) {
+        this.dependencies = new HashSet<>();
+        this.dependencies.addAll(dependencies);
+    }
+
+    @Override
+    public boolean addDependency(Dependency<ECS_TYPE> dependency) {
+        return this.dependencies.add(dependency);
+    }
+
+    @Override
+    @Nullable
+    public SystemGroup<ECS_TYPE> getGroup() {
+        return this.group;
+    }
+
+    @Override
+    public void setGroup(@Nullable SystemGroup<ECS_TYPE> group) {
+        this.group = group;
+    }
+
+    @Override
+    public final Query<ECS_TYPE> getQuery() {
+        return this.query;
+    }
+
+    @Override
+    public final Query<ECS_TYPE> getQuery(Class<?> clazz) {
+        if (clazz.equals(IOnTick.class)) {
+            return Query.and(this.query, this.activeFlagComponentType);
+        }
+        if (clazz.equals(IOnWorldTick.class)) {
+            return Query.and(this.query, Query.not(this.activeFlagComponentType));
+        }
+        return this.query;
+    }
 
     public static final SleepingEntity sleepingEntityCreator__ChunkStore(
         Ref<ChunkStore> ref,
@@ -226,22 +276,6 @@ public abstract class OnScheduledTick<
             TickScheduleComponent.class
         );
         this.tickScheduleComponentType = tickScheduleComponent;
-    }
-
-    @Override
-    public final Query<ECS_TYPE> getQuery() {
-        return this.query;
-    }
-
-    @Override
-    public final Query<ECS_TYPE> getQuery(Class<?> clazz) {
-        if (clazz.equals(IOnTick.class)) {
-            return Query.and(this.query, this.activeFlagComponentType);
-        }
-        if (clazz.equals(IOnWorldTick.class)) {
-            return Query.and(this.query, Query.not(this.activeFlagComponentType));
-        }
-        return this.query;
     }
 
     @Override

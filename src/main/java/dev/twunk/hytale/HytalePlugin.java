@@ -4,7 +4,6 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.Resource;
-import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -36,14 +35,6 @@ public abstract class HytalePlugin extends JavaPlugin {
     // ///////////////////////////////////////////
     //    (system)
     // ///////////////////////////////////////////
-
-    public final void register(ISystem<ChunkStore> system) {
-        HytalePlugin.register(this, system);
-    }
-
-    public static final void register(JavaPlugin plugin, ISystem<ChunkStore> system) {
-        plugin.getChunkStoreRegistry().registerSystem(system);
-    }
 
     // /////////////////////////////////////////////
     //    (component/interaction)

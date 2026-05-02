@@ -14,7 +14,7 @@ import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.event.OnWorldTick__Listener;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -32,20 +32,26 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
         this.registry = registry;
     }
 
-    @SuppressWarnings("null")
-    private Set<Dependency<ECS_TYPE>> dependencies = Collections.emptySet();
+    @Nullable
+    private SystemGroup<ECS_TYPE> group = null;
+
+    private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
 
     @Override
     public Set<Dependency<ECS_TYPE>> getDependencies() {
         return this.dependencies;
     }
 
+    @Override
     public void setDependencies(Set<Dependency<ECS_TYPE>> dependencies) {
-        this.dependencies = dependencies;
+        this.dependencies = new HashSet<>();
+        this.dependencies.addAll(dependencies);
     }
 
-    @Nullable
-    private SystemGroup<ECS_TYPE> group = null;
+    @Override
+    public boolean addDependency(Dependency<ECS_TYPE> dependency) {
+        return this.dependencies.add(dependency);
+    }
 
     @Override
     @Nullable
@@ -53,7 +59,8 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
         return this.group;
     }
 
-    public void setGroup(SystemGroup<ECS_TYPE> group) {
+    @Override
+    public void setGroup(@Nullable SystemGroup<ECS_TYPE> group) {
         this.group = group;
     }
 

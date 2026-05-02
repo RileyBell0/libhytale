@@ -6,8 +6,9 @@ import com.hypixel.hytale.component.ComponentRegistryProxy;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Resource;
 import com.hypixel.hytale.component.ResourceType;
+import com.hypixel.hytale.component.dependency.Order;
+import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
@@ -17,6 +18,8 @@ import dev.twunk.hytale.event.OnUniverseTick;
 import dev.twunk.hytale.event.OnWorldTick;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.IEventDriver;
+import dev.twunk.hytale.interfaces.config.IDependencies;
+import dev.twunk.hytale.interfaces.config.IGroup;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
@@ -266,17 +269,6 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         return componentType;
     }
 
-    // ///////////////
-    // register system
-    // ///////////////
-
-    /**
-     * kinda low level as far as this library is concerned, as i've mostly tried to do away with the idea of systems
-     */
-    public default void registerSystem(JavaPlugin plugin, ISystem<ECS_TYPE> system) {
-        this.getStoreRegistry(plugin).registerSystem(system);
-    }
-
     // ////////////////////
     // bind event listeners
     // ////////////////////
@@ -384,6 +376,17 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
         drivers.addAll(this.bindRegistrySpecificEventListeners(plugin, componentClass, query, componentType));
 
+        if (globalInstance instanceof IGroup instance) {
+            for (var elem : drivers) {
+                elem.driver.setGroup(instance.getGroup(elem.interfaceClass));
+            }
+        }
+        if (globalInstance instanceof IDependencies instance) {
+            for (var elem : drivers) {
+                elem.driver.setDependencies(instance.getDependencies(elem.interfaceClass));
+            }
+        }
+
         Methods.registerDrivers(plugin, this, drivers, componentClass);
     }
 
@@ -431,15 +434,16 @@ class Methods {
         List<EventDriver<ECS_TYPE>> drivers,
         Class<?> clazz
     ) {
-        @SuppressWarnings("null")
         var order = new ArrayList<Class<?>>(EventOrderInferrer.analyze(clazz, registry.getKnownInterfaceClasses()));
         drivers.sort((a, b) -> Integer.compare(order.indexOf(a.interfaceClass), order.indexOf(b.interfaceClass)));
 
+        // then i order the dependencies by the order they're defined
         IEventDriver<ECS_TYPE> lastDependency = null;
         for (var elem : drivers) {
             if (lastDependency != null) {
-                // TODO set dependencies to be in the order specified
+                elem.driver.addDependency(new SystemDependency<>(Order.AFTER, lastDependency.getClass()));
             }
+
             elem.driver.onRegister(plugin);
 
             lastDependency = elem.driver;

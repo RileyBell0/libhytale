@@ -9,6 +9,8 @@ import dev.twunk.hytale.event.OnAddRemove;
 import dev.twunk.hytale.ref.AnyRef;
 
 /**
+ * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
+ *
  * Methods for my subsytem version of `RefSystem<ECS_Store>`
  *
  * My code

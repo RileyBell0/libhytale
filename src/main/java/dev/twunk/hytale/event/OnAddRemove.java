@@ -17,12 +17,14 @@ import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.event.OnAddRemove__Component;
 import dev.twunk.lib.event.OnAddRemove__Listener;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
+ * WARNING: dependencies don't seem to really matter for this, always seems to get called at the start of the tick
+ *
  * Tiny Subsystem to simply tell our parent system when we added/removed entities
  * that match our parent's query
  *
@@ -54,20 +56,38 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
 
-    @SuppressWarnings("null")
-    private Set<Dependency<ECS_TYPE>> dependencies = Collections.emptySet();
+    @Nullable
+    private SystemGroup<ECS_TYPE> group = null;
 
+    /**
+     * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
+     */
+    private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
+
+    /**
+     * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
+     */
     @Override
     public Set<Dependency<ECS_TYPE>> getDependencies() {
         return this.dependencies;
     }
 
+    /**
+     * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
+     */
+    @Override
     public void setDependencies(Set<Dependency<ECS_TYPE>> dependencies) {
-        this.dependencies = dependencies;
+        this.dependencies = new HashSet<>();
+        this.dependencies.addAll(dependencies);
     }
 
-    @Nullable
-    private SystemGroup<ECS_TYPE> group = null;
+    /**
+     * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
+     */
+    @Override
+    public boolean addDependency(Dependency<ECS_TYPE> dependency) {
+        return this.dependencies.add(dependency);
+    }
 
     @Override
     @Nullable
@@ -75,7 +95,8 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         return this.group;
     }
 
-    public void setGroup(SystemGroup<ECS_TYPE> group) {
+    @Override
+    public void setGroup(@Nullable SystemGroup<ECS_TYPE> group) {
         this.group = group;
     }
 

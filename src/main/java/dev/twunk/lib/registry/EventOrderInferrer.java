@@ -45,7 +45,6 @@ public abstract class EventOrderInferrer {
 
         // then each interface on the current class
         for (var iClass : clazz.getInterfaces()) {
-            System.out.println(clazz + " | Interface: " + iClass);
             if (iClass == null) {
                 continue;
             }
