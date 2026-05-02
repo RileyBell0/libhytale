@@ -9,12 +9,12 @@ import javax.annotation.Nullable;
  * more methods from Utils so that you can just take a ref and access the stuff
  * you want without having to go through a billion processes
  */
-public class LibHytaleRefWrapper<ECS_TYPE extends WorldProvider> extends Ref<ECS_TYPE> {
+public abstract class LibHytaleRefWrapper<ECS_TYPE extends WorldProvider> extends Ref<ECS_TYPE> {
 
     @Nonnull
     protected final Ref<ECS_TYPE> _ref;
 
-    public LibHytaleRefWrapper(@Nonnull Ref<ECS_TYPE> ref) {
+    protected LibHytaleRefWrapper(@Nonnull Ref<ECS_TYPE> ref) {
         super(ref.getStore(), ref.getIndex());
         this._ref = ref;
     }
