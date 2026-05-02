@@ -15,8 +15,12 @@ import org.bson.internal.UuidHelper;
 
 public class UUIDComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
 
+    // stupid java and its stupid type inference being all stupid n shit
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static final Class<UUIDComponent<? extends WorldProvider>> UUID_CLASS = (Class) UUIDComponent.class;
+
     public static final BuilderCodec<UUIDComponent<? extends WorldProvider>> CODEC = BuilderCodec.builder(
-        (Class<UUIDComponent<? extends WorldProvider>>) (Class) UUIDComponent.class,
+        UUID_CLASS,
         UUIDComponent::new
     )
         .append(

@@ -373,14 +373,12 @@ public abstract class OnScheduledTick<
                     yield entityRef;
                 }
             };
-            if (ref == null || !ref.isValid()) {
-                continue;
-            }
 
-            // waking it up is as easy as adding the activeFlagComponent to it
-            commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
-
+            // waking it up is as easy as adding the activeFlagComponent to it.
             // then we just loop and keep going till we run out of things to tick
+            if (ref != null && ref.isValid()) {
+                commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
+            }
         }
     }
 
