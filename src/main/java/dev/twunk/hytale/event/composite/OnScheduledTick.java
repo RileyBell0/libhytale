@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -541,6 +542,59 @@ public abstract class OnScheduledTick<
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
+     */
+    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnScheduledTick<ECS_TYPE> listener,
+        String id
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Listener.class,
+                IRegistry.class,
+                Query.class,
+                IOnScheduledTick.class,
+                String.class
+            ),
+            registry,
+            queryProider.getQuery(IOnScheduledTick.class),
+            listener,
+            id
+        );
+    }
+
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     */
+    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnScheduledTick<ECS_TYPE> listener,
+        String id,
+        @Nullable TickSchedule defaultSchedule
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Listener.class,
+                IRegistry.class,
+                Query.class,
+                IOnScheduledTick.class,
+                String.class,
+                TickSchedule.class
+            ),
+            registry,
+            queryProider.getQuery(IOnScheduledTick.class),
+            listener,
+            id,
+            defaultSchedule
+        );
+    }
+
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
      *
      * Bound for T fully defined here
      */
@@ -588,6 +642,61 @@ public abstract class OnScheduledTick<
             ),
             registry,
             query,
+            componentType,
+            id
+        );
+    }
+
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     *
+     * Bound for T fully defined here
+     */
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
+        ECS_TYPE
+    > newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        Function<Class<?>, Query<ECS_TYPE>> queryProider,
+        ComponentType<ECS_TYPE, T> componentType,
+        String id,
+        TickSchedule defaultSchedule
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Component.class,
+                IRegistry.class,
+                Query.class,
+                ComponentType.class,
+                String.class,
+                TickSchedule.class
+            ),
+            registry,
+            queryProider.apply(IOnScheduledTick.class),
+            componentType,
+            id,
+            defaultSchedule
+        );
+    }
+
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnScheduledTick<
+        ECS_TYPE
+    > newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        Function<Class<?>, Query<ECS_TYPE>> queryProider,
+        ComponentType<ECS_TYPE, T> componentType,
+        String id
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnScheduledTick__Component.class,
+                IRegistry.class,
+                Query.class,
+                ComponentType.class,
+                String.class
+            ),
+            registry,
+            queryProider.apply(IOnScheduledTick.class),
             componentType,
             id
         );

@@ -17,6 +17,7 @@ import dev.twunk.lib.event.OnTick__Component;
 import dev.twunk.lib.event.OnTick__Listener;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -120,6 +121,24 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
         );
     }
 
+    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnTick<ECS_TYPE> listener
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnTick__Listener.class,
+                IRegistry.class,
+                Query.class,
+                IOnTick.class
+            ),
+            registry,
+            queryProider.getQuery(IOnTick.class),
+            listener
+        );
+    }
+
     /**
      * Bound for T fully defined here
      */
@@ -137,6 +156,27 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
             ),
             registry,
             query,
+            componentType
+        );
+    }
+
+    /**
+     * Bound for T fully defined here
+     */
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        Function<Class<?>, Query<ECS_TYPE>> queryProider,
+        ComponentType<ECS_TYPE, T> componentType
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnTick__Component.class,
+                IRegistry.class,
+                Query.class,
+                ComponentType.class
+            ),
+            registry,
+            queryProider.apply(IOnTick.class),
             componentType
         );
     }

@@ -16,6 +16,7 @@ import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.event.OnWorldTick__Listener;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 public class OnWorldTick<ECS_TYPE extends WorldProvider>
@@ -105,6 +106,42 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
             ),
             registry,
             query,
+            listener
+        );
+    }
+
+    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnWorldTick<ECS_TYPE> listener
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnWorldTick__Listener.class,
+                IRegistry.class,
+                Query.class,
+                IOnWorldTick.class
+            ),
+            registry,
+            queryProider.getQuery(IOnWorldTick.class),
+            listener
+        );
+    }
+
+    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        Function<Class<?>, Query<ECS_TYPE>> queryProider,
+        IOnWorldTick<ECS_TYPE> listener
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnWorldTick__Listener.class,
+                IRegistry.class,
+                Query.class,
+                IOnWorldTick.class
+            ),
+            registry,
+            queryProider.apply(IOnWorldTick.class),
             listener
         );
     }

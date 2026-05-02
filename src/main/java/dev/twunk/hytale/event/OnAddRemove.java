@@ -19,6 +19,7 @@ import dev.twunk.lib.event.OnAddRemove__Component;
 import dev.twunk.lib.event.OnAddRemove__Listener;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -130,6 +131,24 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         );
     }
 
+    public static <ECS_TYPE extends WorldProvider> OnAddRemove<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnAddRemove<ECS_TYPE> listener
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnAddRemove__Listener.class,
+                IRegistry.class,
+                Query.class,
+                IOnAddRemove.class
+            ),
+            registry,
+            queryProider.getQuery(IOnAddRemove.class),
+            listener
+        );
+    }
+
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
@@ -148,6 +167,32 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
             ),
             registry,
             query,
+            componentType
+        );
+    }
+
+    /**
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
+     *
+     * Bound for T fully defined here
+     */
+    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnAddRemove<
+        ECS_TYPE
+    > newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        Function<Class<?>, Query<ECS_TYPE>> queryProider,
+        ComponentType<ECS_TYPE, T> componentType
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(
+                OnAddRemove__Component.class,
+                IRegistry.class,
+                Query.class,
+                ComponentType.class
+            ),
+            registry,
+            queryProider.apply(IOnAddRemove.class),
             componentType
         );
     }

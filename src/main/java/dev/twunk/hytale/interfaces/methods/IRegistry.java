@@ -16,14 +16,20 @@ import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.event.OnUniverseTick;
 import dev.twunk.hytale.event.OnWorldTick;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
+import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
+import dev.twunk.hytale.interfaces.methods.IRegistry.EventDriver;
 import dev.twunk.lib.LibHytaleException;
 import dev.twunk.lib.codec.AutoSerializeParser;
+import dev.twunk.lib.registry.EventOrderInferrer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -89,6 +95,10 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     @Nullable
     public <T extends Component<ECS_TYPE>> ComponentType<ECS_TYPE, T> getComponentType(String componentId);
+
+    public default Set<Class<?>> getKnownInterfaceClasses() {
+        return EventOrderInferrer.EVENT_INTERFACES;
+    }
 
     public abstract ComponentRegistryProxy<ECS_TYPE> getStoreRegistry(JavaPlugin plugin);
 
@@ -294,45 +304,33 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
 
     @SuppressWarnings({ "unchecked" })
     public default <T> void registerEventListeners(JavaPlugin plugin, T listener, String id) {
+        List<EventDriver<ECS_TYPE>> drivers = new ArrayList<>();
+
         if (listener instanceof IQuery q) {
-            if (listener instanceof IOnAddRemove) {
-                OnAddRemove.newDriverFor(
-                    this,
-                    q.getQuery(IOnAddRemove.class),
-                    (IQuery<ECS_TYPE> & IOnAddRemove<ECS_TYPE>) listener
-                ).onRegister(plugin);
+            if (listener instanceof IOnAddRemove l) {
+                drivers.add(EventDriver.of(OnAddRemove.newDriverFor(this, q, l), IOnAddRemove.class));
             }
 
-            if (listener instanceof IOnTick) {
-                OnTick.newDriverFor(
-                    this,
-                    q.getQuery(IOnTick.class),
-                    (IQuery<ECS_TYPE> & IOnTick<ECS_TYPE>) listener
-                ).onRegister(plugin);
+            if (listener instanceof IOnTick l) {
+                drivers.add(EventDriver.of(OnTick.newDriverFor(this, q, l), IOnTick.class));
             }
 
-            if (listener instanceof IOnScheduledTick) {
-                OnScheduledTick.newDriverFor(
-                    this,
-                    q.getQuery(IOnScheduledTick.class),
-                    (IQuery<ECS_TYPE> & IOnScheduledTick<ECS_TYPE>) listener,
-                    id
-                ).onRegister(plugin);
+            if (listener instanceof IOnScheduledTick l) {
+                drivers.add(EventDriver.of(OnScheduledTick.newDriverFor(this, q, l, id), IOnScheduledTick.class));
             }
-            if (listener instanceof IOnWorldTick) {
-                OnWorldTick.newDriverFor(
-                    this,
-                    q.getQuery(IOnWorldTick.class),
-                    (IOnWorldTick<ECS_TYPE>) listener
-                ).onRegister(plugin);
+
+            if (listener instanceof IOnWorldTick l) {
+                drivers.add(EventDriver.of(OnWorldTick.newDriverFor(this, q, l), IOnWorldTick.class));
             }
         }
 
-        if (listener instanceof IOnUniverseTick) {
-            OnUniverseTick.newDriverFor(this, (IOnUniverseTick<ECS_TYPE>) listener).onRegister(plugin);
+        if (listener instanceof IOnUniverseTick l) {
+            drivers.add(EventDriver.of(OnUniverseTick.newDriverFor(this, l), IOnUniverseTick.class));
         }
 
-        this.bindRegistrySpecificEventListeners(plugin, listener);
+        drivers.addAll(this.bindRegistrySpecificEventListeners(plugin, listener));
+
+        Methods.registerDrivers(plugin, this, drivers, listener.getClass());
     }
 
     @SuppressWarnings("null")
@@ -345,6 +343,7 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         this.registerEventListeners(plugin, componentClass, globalInstance, componentType, componentClass.getName());
     }
 
+    @SuppressWarnings("unchecked")
     public default <T extends Component<ECS_TYPE>, @Nonnull U extends T> void registerEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
@@ -353,64 +352,97 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         String id
     ) {
         var globalInstance = supplier.get();
-        Function<Class<?>, Query<ECS_TYPE>> querySupplier = clazz -> Query.and(componentType);
-        if (globalInstance instanceof IQuery) {
-            @SuppressWarnings("unchecked")
-            var asQueryable = ((IQuery<ECS_TYPE>) globalInstance);
-            querySupplier = asQueryable::getQuery;
+        Function<Class<?>, Query<ECS_TYPE>> query = clazz -> Query.and(componentType);
+
+        List<EventDriver<ECS_TYPE>> drivers = new ArrayList<>();
+
+        if (globalInstance instanceof IQuery q) {
+            query = q::getQuery;
         }
 
         if (IOnAddRemove.class.isAssignableFrom(componentClass)) {
-            @Nonnull
-            @SuppressWarnings("null")
-            var query = querySupplier.apply(IOnAddRemove.class);
-            OnAddRemove.newDriverFor(this, query, componentType).onRegister(plugin);
+            drivers.add(EventDriver.of(OnAddRemove.newDriverFor(this, query, componentType), IOnAddRemove.class));
         }
 
         if (IOnTick.class.isAssignableFrom(componentClass)) {
-            @Nonnull
-            @SuppressWarnings("null")
-            var query = querySupplier.apply(IOnTick.class);
-            OnTick.newDriverFor(this, query, componentType).onRegister(plugin);
+            drivers.add(EventDriver.of(OnTick.newDriverFor(this, query, componentType), IOnTick.class));
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
-            @Nonnull
-            @SuppressWarnings("null")
-            var query = querySupplier.apply(IOnScheduledTick.class);
-            OnScheduledTick.newDriverFor(this, query, componentType, id).onRegister(plugin);
+            drivers.add(
+                EventDriver.of(OnScheduledTick.newDriverFor(this, query, componentType, id), IOnScheduledTick.class)
+            );
         }
 
-        if (IOnUniverseTick.class.isAssignableFrom(componentClass)) {
-            @SuppressWarnings({ "unchecked" })
-            var instance = (IOnUniverseTick<ECS_TYPE>) globalInstance;
-
-            OnUniverseTick.newDriverFor(this, instance).onRegister(plugin);
+        if (globalInstance instanceof IOnUniverseTick instance) {
+            drivers.add(EventDriver.of(OnUniverseTick.newDriverFor(this, instance), IOnUniverseTick.class));
         }
 
-        if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
-            @Nonnull
-            @SuppressWarnings("null")
-            var query = querySupplier.apply(IOnWorldTick.class);
-            @SuppressWarnings({ "unchecked" })
-            var instance = (IOnWorldTick<ECS_TYPE>) globalInstance;
-
-            OnWorldTick.newDriverFor(this, query, instance).onRegister(plugin);
+        if (globalInstance instanceof IOnWorldTick instance) {
+            drivers.add(EventDriver.of(OnWorldTick.newDriverFor(this, query, instance), IOnWorldTick.class));
         }
 
-        this.bindRegistrySpecificEventListeners(plugin, componentClass, querySupplier, componentType);
+        drivers.addAll(this.bindRegistrySpecificEventListeners(plugin, componentClass, query, componentType));
+
+        Methods.registerDrivers(plugin, this, drivers, componentClass);
     }
 
     // only need to override this if you've got specific events for the given registry you want to init
     // e.g. onBlockTick
-    public default <T extends Component<ECS_TYPE>> void bindRegistrySpecificEventListeners(
+    public default <T extends Component<ECS_TYPE>> List<EventDriver<ECS_TYPE>> bindRegistrySpecificEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
         Function<Class<?>, Query<ECS_TYPE>> supplier, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
         ComponentType<ECS_TYPE, T> componentType
-    ) {}
+    ) {
+        return new ArrayList<>();
+    }
 
     // only need to override this if you've got specific events for the given registry you want to init
     // e.g. onBlockTick
-    public default <T> void bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {}
+    public default <T> List<EventDriver<ECS_TYPE>> bindRegistrySpecificEventListeners(JavaPlugin plugin, T listener) {
+        return new ArrayList<>();
+    }
+
+    public static class EventDriver<ECS_TYPE extends WorldProvider> {
+
+        public final IEventDriver<ECS_TYPE> driver;
+        public final Class<?> interfaceClass;
+
+        public EventDriver(IEventDriver<ECS_TYPE> driver, Class<?> interfaceClass) {
+            this.driver = driver;
+            this.interfaceClass = interfaceClass;
+        }
+
+        public static final <ECS_TYPE extends WorldProvider> EventDriver<ECS_TYPE> of(
+            IEventDriver<ECS_TYPE> driver,
+            Class<?> interfaceClass
+        ) {
+            return new EventDriver<>(driver, interfaceClass);
+        }
+    }
+}
+
+class Methods {
+
+    public static final <ECS_TYPE extends WorldProvider> void registerDrivers(
+        JavaPlugin plugin,
+        IRegistry<ECS_TYPE> registry,
+        List<EventDriver<ECS_TYPE>> drivers,
+        Class<?> clazz
+    ) {
+        @SuppressWarnings("null")
+        var order = new ArrayList<Class<?>>(EventOrderInferrer.analyze(clazz, registry.getKnownInterfaceClasses()));
+        drivers.sort((a, b) -> Integer.compare(order.indexOf(a.interfaceClass), order.indexOf(b.interfaceClass)));
+
+        IEventDriver<ECS_TYPE> lastDependency = null;
+        for (var elem : drivers) {
+            if (lastDependency != null) {
+                // TODO set dependencies to be in the order specified
+            }
+            elem.driver.onRegister(plugin);
+
+            lastDependency = elem.driver;
+        }
+    }
 }

@@ -10,6 +10,7 @@ import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import dev.twunk.lib.event.OnBlockTick__Component;
 import dev.twunk.lib.event.OnBlockTick__Listener;
+import java.util.function.Function;
 
 /**
  * Composite subsystem to allow the parent to run code on its elements every
@@ -52,6 +53,14 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
         );
     }
 
+    public static final OnBlockTick newDriverFor(IQuery<ChunkStore> queryProider, IOnBlockTick listener) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Listener.class, Query.class, IOnBlockTick.class),
+            queryProider.getQuery(IOnBlockTick.class),
+            listener
+        );
+    }
+
     /**
      * Bound for T fully defined here
      */
@@ -62,6 +71,20 @@ public abstract class OnBlockTick extends OnTick<ChunkStore> {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Component.class, Query.class, ComponentType.class),
             query,
+            componentType
+        );
+    }
+
+    /**
+     * Bound for T fully defined here
+     */
+    public static final <T extends Component<ChunkStore>> OnBlockTick newDriverFor(
+        Function<Class<?>, Query<ChunkStore>> queryProider,
+        ComponentType<ChunkStore, T> componentType
+    ) {
+        return IEventDriver.__construct(
+            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick__Component.class, Query.class, ComponentType.class),
+            queryProider.apply(IOnBlockTick.class),
             componentType
         );
     }
