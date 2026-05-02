@@ -260,7 +260,7 @@ public abstract class OnScheduledTick<
      */
     @Override
     @SuppressWarnings("unused")
-    public final void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+    public final void onAdd(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         if (this.tickResource == null) {
             this.tickResource = commandBuffer
                 .getExternalData()
@@ -314,7 +314,7 @@ public abstract class OnScheduledTick<
      * Actively ticking entities are handled automatically due to their components dipping from the world and thus the query
      */
     @Override
-    public final void onEntityRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+    public final void onRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         // mark that the sleeper handler should discard element next time it sees it, as we're just, yeah, done with it
         removed.add(commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType).getUuid());
     }

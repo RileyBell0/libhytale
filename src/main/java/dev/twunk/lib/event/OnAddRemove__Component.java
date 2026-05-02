@@ -55,7 +55,7 @@ public class OnAddRemove__Component<
             return;
         }
 
-        component.onEntityAdded(AnyRef.of(ref), reason, commandBuffer);
+        component.onAdd(AnyRef.of(ref), reason, commandBuffer);
     }
 
     @Override
@@ -74,6 +74,6 @@ public class OnAddRemove__Component<
             return;
         }
 
-        component.onEntityRemove(AnyRef.of(ref), reason, commandBuffer);
+        component.onRemove(AnyRef.of(ref), reason, commandBuffer);
     }
 }

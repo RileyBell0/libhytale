@@ -53,7 +53,7 @@ public class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAdd
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onEntityAdded(AnyRef.of(ref), reason, commandBuffer);
+        listener.onAdd(AnyRef.of(ref), reason, commandBuffer);
     }
 
     @Override
@@ -63,6 +63,6 @@ public class OnAddRemove__Listener<ECS_TYPE extends WorldProvider> extends OnAdd
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
-        listener.onEntityRemove(AnyRef.of(ref), reason, commandBuffer);
+        listener.onRemove(AnyRef.of(ref), reason, commandBuffer);
     }
 }

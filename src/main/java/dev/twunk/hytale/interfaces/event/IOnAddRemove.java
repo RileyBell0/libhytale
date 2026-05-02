@@ -29,7 +29,7 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
      *                      and run your MUTATION methods using the `store` within the lambda
      *                      you pass to `commandBuffer.run(...)`
      */
-    public default void onEntityAdded(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {}
+    public default void onAdd(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {}
 
     /**
      * Event for when an entity is removed/unloaded from the world
@@ -42,9 +42,5 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
      *                      and run your MUTATION methods using the `store` within the lambda
      *                      you pass to `commandBuffer.run(...)`
      */
-    public default void onEntityRemove(
-        AnyRef<ECS_TYPE> ref,
-        RemoveReason reason,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {}
+    public default void onRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {}
 }
