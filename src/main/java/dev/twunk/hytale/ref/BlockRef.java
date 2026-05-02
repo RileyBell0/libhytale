@@ -1,6 +1,5 @@
 package dev.twunk.hytale.ref;
 
-import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -53,6 +52,10 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     // ////////////////////////////////////////////////////////////////////////
+
+    public BlockRef(AnyRef<ChunkStore> ref) {
+        this(AnyRef.getInnerRef(ref));
+    }
 
     public BlockRef(Ref<ChunkStore> ref) {
         super(ref);

@@ -1,12 +1,12 @@
 package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.component.AddReason;
-import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnAddRemove;
+import dev.twunk.hytale.ref.AnyRef;
 
 /**
  * Methods for my subsytem version of `RefSystem<ECS_Store>`

@@ -1,7 +1,6 @@
 package dev.twunk.lib.event;
 
 import com.hypixel.hytale.component.AddReason;
-import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -13,6 +12,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.hytale.ref.AnyRef;
 
 /**
  * This version will call the add and remove events defined in a specific component instance

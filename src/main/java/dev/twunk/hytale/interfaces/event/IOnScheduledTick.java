@@ -1,8 +1,8 @@
 package dev.twunk.hytale.interfaces.event;
 
-import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
 

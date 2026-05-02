@@ -1,7 +1,6 @@
 package dev.twunk.hytale.event.composite;
 
 import com.hypixel.hytale.component.AddReason;
-import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
@@ -26,6 +25,7 @@ import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;

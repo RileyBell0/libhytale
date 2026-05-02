@@ -1,6 +1,5 @@
 package dev.twunk.lib.event;
 
-import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
@@ -11,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.hytale.ref.AnyRef;
 
 public class OnTick__Component<ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> extends OnTick<ECS_TYPE> {
 

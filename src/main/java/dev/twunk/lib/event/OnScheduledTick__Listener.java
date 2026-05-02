@@ -1,6 +1,5 @@
 package dev.twunk.lib.event;
 
-import com.hypixel.hytale.component.AnyRef;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.query.Query;
@@ -8,6 +7,7 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
 
