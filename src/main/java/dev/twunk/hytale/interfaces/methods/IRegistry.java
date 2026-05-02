@@ -17,6 +17,7 @@ import dev.twunk.hytale.event.OnTick;
 import dev.twunk.hytale.event.OnUniverseTick;
 import dev.twunk.hytale.event.OnWorldTick;
 import dev.twunk.hytale.event.composite.OnScheduledTick;
+import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
 import dev.twunk.hytale.interfaces.event.IOnTick;
@@ -25,6 +26,7 @@ import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.lib.codec.AutoSerializeParser;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -343,10 +345,10 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         this.registerEventListeners(plugin, componentClass, globalInstance, componentType, componentClass.getName());
     }
 
-    public default <T extends Component<ECS_TYPE>> void registerEventListeners(
+    public default <T extends Component<ECS_TYPE>, @Nonnull U extends T> void registerEventListeners(
         JavaPlugin plugin,
         Class<T> componentClass,
-        Supplier<T> supplier, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
+        Supplier<U> supplier, // probably just use codec::getDefaultValue for this, cause, i know that should work for components
         ComponentType<ECS_TYPE, T> componentType,
         String id
     ) {
@@ -359,20 +361,24 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         }
 
         if (IOnAddRemove.class.isAssignableFrom(componentClass)) {
-            OnAddRemove.newDriverFor(this, querySupplier.apply(IOnAddRemove.class), componentType).onRegister(plugin);
+            @Nonnull
+            @SuppressWarnings("null")
+            var query = querySupplier.apply(IOnAddRemove.class);
+            OnAddRemove.newDriverFor(this, query, componentType).onRegister(plugin);
         }
 
         if (IOnTick.class.isAssignableFrom(componentClass)) {
-            OnTick.newDriverFor(this, querySupplier.apply(IOnTick.class), componentType).onRegister(plugin);
+            @Nonnull
+            @SuppressWarnings("null")
+            var query = querySupplier.apply(IOnTick.class);
+            OnTick.newDriverFor(this, query, componentType).onRegister(plugin);
         }
 
         if (IOnScheduledTick.class.isAssignableFrom(componentClass)) {
-            OnScheduledTick.newDriverFor(
-                this,
-                querySupplier.apply(IOnScheduledTick.class),
-                componentType,
-                id
-            ).onRegister(plugin);
+            @Nonnull
+            @SuppressWarnings("null")
+            var query = querySupplier.apply(IOnScheduledTick.class);
+            OnScheduledTick.newDriverFor(this, query, componentType, id).onRegister(plugin);
         }
 
         if (IOnUniverseTick.class.isAssignableFrom(componentClass)) {
@@ -383,10 +389,13 @@ public interface IRegistry<ECS_TYPE extends WorldProvider> {
         }
 
         if (IOnWorldTick.class.isAssignableFrom(componentClass)) {
+            @Nonnull
+            @SuppressWarnings("null")
+            var query = querySupplier.apply(IOnWorldTick.class);
             @SuppressWarnings({ "unchecked" })
             var instance = (IOnWorldTick<ECS_TYPE>) globalInstance;
 
-            OnWorldTick.newDriverFor(this, querySupplier.apply(IOnWorldTick.class), instance).onRegister(plugin);
+            OnWorldTick.newDriverFor(this, query, instance).onRegister(plugin);
         }
 
         this.bindRegistrySpecificEventListeners(plugin, componentClass, querySupplier, componentType);

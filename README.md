@@ -213,7 +213,7 @@ area.add(trackedRef); // we'll put chuck our cache into the right ticking group 
 ```java
 public static final <
     ECS_TYPE extends WorldProvider,
-    T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
+    T extends IOnScheduledTick<ECS_TYPE> & IEventQuery<ECS_TYPE>
 > OnScheduledTick<ECS_TYPE> newDriverFor(String id, T listener, IRegistry<ECS_TYPE> registry) {
     return new OnScheduledTick__Listener<>(id, listener, listener.getQuery(), registry);
 }

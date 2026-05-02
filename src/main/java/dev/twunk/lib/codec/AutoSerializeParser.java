@@ -1,6 +1,3 @@
-/**
- * TODO this file is pretty uuh, repetitive, and hard to verify. needs a redo eventually
- */
 package dev.twunk.lib.codec;
 
 import com.hypixel.hytale.codec.Codec;
@@ -80,28 +77,27 @@ public final class AutoSerializeParser {
         if (!field.isAnnotationPresent(Serialize.class)) {
             return builder;
         }
-        var fieldClass = field.getType();
+        final var fieldClass = field.getType();
 
         // First: check if i've specifically defined a codec for that class
-        try {
-            var codec = Codecs.tryGetCodec(clazz);
-            if (codec != null) {
-                return appendRawCodec(builder, field, codec);
-            }
-        } catch (Exception _) {}
+        final var codec = Codecs.tryGetCodec(clazz);
+        if (codec != null) {
+            return appendRawCodec(builder, field, codec);
+        }
 
         // Next: in case the type is something like `SimpleItemContainer`, we'll check if there's an
         //        existing codec on the class itself for the type of the var we're handling that we
         //        can use
         try {
-            var codecField = fieldClass.getField("CODEC");
-            var codec = codecField.get(fieldClass);
-
-            if (codec != null && Codec.class.isAssignableFrom(codec.getClass())) {
+            final var codecField = fieldClass.getField("CODEC");
+            final var fieldVal = codecField.get(fieldClass);
+            if (fieldVal != null && Codec.class.isAssignableFrom(fieldVal.getClass())) {
                 field.setAccessible(true);
-                return appendCodec(builder, field, (Codec<?>) codec);
+                return appendCodec(builder, field, (Codec<?>) fieldVal);
             }
-        } catch (Exception _) {}
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException _) {
+            // on failure we just, keep going, try the next one
+        }
 
         // Otherwise, we'll do some manual checking
         if (fieldClass.equals(Boolean.TYPE) || fieldClass.equals(boolean.class)) {
@@ -117,40 +113,40 @@ public final class AutoSerializeParser {
         } else if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
             return appendLong(builder, field);
         } else if (List.class.isAssignableFrom(fieldClass)) {
-            var genericType = field.getGenericType();
+            final var genericType = field.getGenericType();
             if (!(genericType instanceof ParameterizedType)) {
                 return builder;
             }
 
-            ParameterizedType pType = (ParameterizedType) genericType;
+            final ParameterizedType pType = (ParameterizedType) genericType;
 
-            Type[] fieldArgTypes = pType.getActualTypeArguments();
+            final Type[] fieldArgTypes = pType.getActualTypeArguments();
             if (fieldArgTypes.length != 1) {
                 return builder;
             }
 
-            var arrayValueType = fieldArgTypes[0];
+            final var arrayValueType = fieldArgTypes[0];
             if (!(arrayValueType instanceof Class)) {
                 return builder;
             }
-            Class<?> innerClass = (Class<?>) arrayValueType;
+            final Class<?> innerClass = (Class<?>) arrayValueType;
 
             return appendArray(builder, field, innerClass);
         } else if (Map.class.isAssignableFrom(fieldClass)) {
-            var genericType = field.getGenericType();
+            final var genericType = field.getGenericType();
             if (!(genericType instanceof ParameterizedType)) {
                 return builder;
             }
 
-            ParameterizedType pType = (ParameterizedType) genericType;
+            final ParameterizedType pType = (ParameterizedType) genericType;
 
-            Type[] fieldArgTypes = pType.getActualTypeArguments();
+            final Type[] fieldArgTypes = pType.getActualTypeArguments();
             if (fieldArgTypes.length != 2) {
                 return builder;
             }
 
-            var keyType = fieldArgTypes[0];
-            var valueType = fieldArgTypes[1];
+            final var keyType = fieldArgTypes[0];
+            final var valueType = fieldArgTypes[1];
             if (!(keyType instanceof Class)) {
                 return builder;
             }
@@ -158,8 +154,8 @@ public final class AutoSerializeParser {
                 return builder;
             }
 
-            Class<?> keyClass = (Class<?>) keyType;
-            Class<?> valueClass = (Class<?>) valueType;
+            final Class<?> keyClass = (Class<?>) keyType;
+            final Class<?> valueClass = (Class<?>) valueType;
 
             if (keyClass == String.class) {
                 return appendMap(builder, field, valueClass);
@@ -172,10 +168,10 @@ public final class AutoSerializeParser {
     }
 
     public static final <T> BuilderCodec.Builder<T> builder(Class<T> clazz, Supplier<T> supplier) {
-        var fields = clazz.getDeclaredFields();
-        var registeredComponent = clazz.getAnnotation(Serializable.class);
-        var inherits = registeredComponent.inherits();
-        var docString = registeredComponent.documentation();
+        final var fields = clazz.getDeclaredFields();
+        final var registeredComponent = clazz.getAnnotation(Serializable.class);
+        final var inherits = registeredComponent.inherits();
+        final var docString = registeredComponent.documentation();
 
         if (!inherits.equals(NullType.class) && !inherits.isAssignableFrom(clazz)) {
             throw new LibHytaleException(
@@ -187,13 +183,11 @@ public final class AutoSerializeParser {
         }
 
         @SuppressWarnings("unchecked")
-        var asSuperT = (Class<? super T>) inherits;
+        final var asSuperT = (Class<? super T>) inherits;
 
-        var temp = tryGetInheritedCodec(asSuperT, clazz);
-        BuilderCodec<T> inheritedCodec = null;
-        if (temp instanceof BuilderCodec c) {
-            inheritedCodec = c;
-        }
+        final var temp = tryGetInheritedCodec(asSuperT, clazz);
+        @SuppressWarnings("unchecked")
+        final BuilderCodec<T> inheritedCodec = temp instanceof BuilderCodec<?> c ? (BuilderCodec<T>) c : null;
 
         BuilderCodec.Builder<T> builder;
         if (inheritedCodec == null) {
@@ -724,7 +718,9 @@ public final class AutoSerializeParser {
             var codec = codecField.get(clazz);
 
             if (codec instanceof Codec<?> c) {
-                return (Codec<T>) c;
+                @SuppressWarnings("unchecked")
+                var ret = (Codec<T>) c;
+                return ret;
             }
         } catch (Exception _) {
             // just trynna see if there is a codec for this class

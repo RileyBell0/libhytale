@@ -25,17 +25,25 @@ public class Codecs {
 
     @Nullable
     public static final <T> Codec<T> tryGetCodec(Class<T> clazz) {
-        @SuppressWarnings("unchecked")
-        var codec = (Codec<T>) ALL_CODECS.get(clazz);
+        try {
+            @SuppressWarnings("unchecked")
+            var codec = (Codec<T>) ALL_CODECS.get(clazz);
 
-        return codec;
+            return codec;
+        } catch (ClassCastException | NullPointerException _) {
+            return null;
+        }
     }
 
     @Nullable
     public static final <T> FromStringCodec<T> tryGetFromStrCodec(Class<T> clazz) {
-        @SuppressWarnings("unchecked")
-        var codec = (FromStringCodec<T>) ALL_CODECS.get(clazz);
+        try {
+            @SuppressWarnings("unchecked")
+            var codec = (FromStringCodec<T>) ALL_CODECS.get(clazz);
 
-        return codec;
+            return codec;
+        } catch (ClassCastException | NullPointerException _) {
+            return null;
+        }
     }
 }
