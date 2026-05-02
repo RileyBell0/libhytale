@@ -15,7 +15,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.hytale.LibHytaleException;
+import dev.twunk.lib.LibHytaleException;
 import dev.twunk.lib.test.TestUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -837,11 +837,6 @@ public abstract class BlockUtils {
         //       refs/etc are enough to identify a chunk, look at methods
         //       within here that use similar data and just, copy+paste
 
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
-        // TODO Blocks I believe operate under a different chunk store to
-        // the world they're in? not sure. should test...
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
-
         // #region BlockRef (Ref<ChunkStore>)
 
         // => (ChunkStore, chunkIndex, blockIndex)
@@ -1208,12 +1203,7 @@ public abstract class BlockUtils {
             final long chunkIndex,
             final int blockIndex
         ) {
-            final var chunkRef = chunkStore.getChunkReference(chunkIndex);
-            if (chunkRef == null) {
-                return null;
-            }
-
-            return BlockUtils.Refs.getLocal1_chunkRef(chunkRef, blockIndex);
+            return get2(chunkStore, chunkIndex, blockIndex);
         }
 
         @Nullable
@@ -1652,11 +1642,6 @@ public abstract class BlockUtils {
          * Which, to do that, all you need is an implementation of any and
          * all methods in `Ref_`
          */
-
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
-        // TODO Blocks I believe operate under a different chunk store to
-        // the world they're in? not sure. should test...
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
 
         // #region Ref<ChunkStore> (BlockRef)
 
@@ -2212,10 +2197,6 @@ public abstract class BlockUtils {
             return ComponentUtils.get(blockRef, BLOCK_STATE_INFO_COMPONENT);
         }
         // #endregion BlockRef
-
-        // TODO multiple endpoints:
-        // - blockRef + store => store gets OTHER component on entity with ref blockRef
-        // - blockChunk -> gets the componnet on a block (doesn't require a ref!!, just the local coords of the block)
 
         // #endregion getInfo
     }

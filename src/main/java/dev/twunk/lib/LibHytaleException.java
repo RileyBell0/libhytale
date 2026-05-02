@@ -1,4 +1,4 @@
-package dev.twunk.hytale;
+package dev.twunk.lib;
 
 public class LibHytaleException extends RuntimeException {
 

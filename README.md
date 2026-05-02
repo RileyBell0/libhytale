@@ -303,3 +303,40 @@ if (uuidComponent == null) {
 ```
 
 annoyingly since theres no way to get a block ref back from its component that i know of (except maybe persistent ref though havent had a chance to read up on it that much, seems to be entity locked iirc) ive got this whole weird stupid ass system. that checks at runtime if its a block or entity. hate it. but hey it works? probably? maybe i can instead just put a method onto the UUID component that will get you the ref? that way i CAN put whatever data i want on the uuid and sure it might be a bit weird at a standing data thing but as long as nobody tries to hardcode UUIDS and shit we'll be good, yeah i could do that, means its two different components technically but hey who says i NEED to define both fields? coud just, yeah im sure i can find some hacks
+
+
+
+
+        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
+        // TODO Blocks I believe operate under a different chunk store to
+        // the world they're in? not sure. should test...
+        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
+
+
+
+
+        // TODO multiple endpoints:
+        // - blockRef + store => store gets OTHER component on entity with ref blockRef
+        // - blockChunk -> gets the componnet on a block (doesn't require a ref!!, just the local coords of the block)
+
+
+
+            // TODO worldChunk.getIndex()  and      Chunk.Coords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ()) do the same thing
+
+        // TODO don't register this, instead register a new component each time it loads
+        HytalePlugin.register(plugin, ActivelyTickingComponent.class);
+
+
+
+
+        // TODO some day add some type inferrer logic that means we can search for Component.class's generic
+        // for a type that implements it, e.g. if i implement onTick<ChunkStore> and onUniverseTick<EntityStore> theoretically
+        // that should be legal, no reason to block it, so i should lean into it and MAKE it super legal so you can
+        // define both on the same one and i'll just figure out if i should have both entity and chunk systems for it or just entity or just chunk etc
+        // and then if ive got that the code would do it for each one, e.g. whenever i find X is assignable from <your class> i can just
+        // follow X down until i find the actual class that defines IOnAddRemove or whatever and just check that path for one that satisfies both.
+        //
+        // might be as easy as replacing Component.class with (Class other) -> Component.class.isAssignableFrom(other) && IOnAddRemove.isAssignableFrom(other)
+        // except, notably, i need to have two "modes" i think, yeah one that finds IOnAdddRemove and THEN one that finds component
+        // so more like an array for me to go down, use the first until you actually find the exact defintion of it, then use the second etc. if i wrote it recursively
+        // that would be really easy, meaning i dont do a lambda, i do [IOnAddRemove.class, Component.class] and yeah you find IOnAddRemove then keep going down JUST into that type via reflection

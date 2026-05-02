@@ -12,8 +12,8 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.hytale.LibHytaleException;
 import dev.twunk.hytale.types.ChunkCoordinates;
+import dev.twunk.lib.LibHytaleException;
 import dev.twunk.lib.test.TestUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -247,7 +247,6 @@ public abstract class ChunkUtils {
                 return worldChunk.getIndex();
             }
 
-            // TODO worldChunk.getIndex()  and      Chunk.Coords.Index.get_chunkCoords(worldChunk.getX(), worldChunk.getZ()) do the same thing
             public static final long get(final WorldChunk worldChunk) {
                 return worldChunk.getIndex();
             }

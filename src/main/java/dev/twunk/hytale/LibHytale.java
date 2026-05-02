@@ -63,7 +63,6 @@ public abstract class LibHytale {
         HytalePlugin.register(plugin, TickScheduleComponent.class);
         HytalePlugin.register(plugin, ContainerComponent.class);
         HytalePlugin.register(plugin, TrashComponent.class);
-        // TODO don't register this, instead register a new component each time it loads
         HytalePlugin.register(plugin, ActivelyTickingComponent.class);
         HytalePlugin.register(plugin, UUIDComponent.class);
 

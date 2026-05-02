@@ -3,7 +3,7 @@ package dev.twunk.hytale.interfaces;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import dev.twunk.hytale.LibHytaleException;
+import dev.twunk.lib.LibHytaleException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
