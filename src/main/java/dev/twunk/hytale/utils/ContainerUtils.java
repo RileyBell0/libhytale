@@ -2,8 +2,6 @@ package dev.twunk.hytale.utils;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3i;
@@ -21,6 +19,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import dev.twunk.hytale.interfaces.methods.IContainer;
 import dev.twunk.hytale.interfaces.methods.IPersistentContainer;
+import dev.twunk.hytale.ref.EntityRef;
 import java.util.Map;
 import java.util.UUID;
 
@@ -58,19 +57,13 @@ public abstract class ContainerUtils {
         final InteractionContext context,
         final Vector3i pos
     ) {
-        final Ref<EntityStore> ref = context.getEntity();
-        final Store<EntityStore> store = ref.getStore();
-        final Player playerComponent = commandBuffer.getComponent(ref, Player.getComponentType());
-        if (playerComponent == null) {
-            return;
-        }
-
+        // get ref to the block we're looking at
+        final EntityRef ref = new EntityRef(context.getEntity());
+        final var world = ref.getWorld();
         final var block = context.getTargetBlock();
         if (block == null) {
             return;
         }
-
-        final var world = commandBuffer.getExternalData().getWorld();
         final var blockRef = BlockUtils.Refs.get(world, block.x, block.y, block.z);
         if (blockRef == null) {
             return;
@@ -88,8 +81,10 @@ public abstract class ContainerUtils {
             return;
         }
 
-        final UUIDComponent uuidComponent = commandBuffer.getComponent(ref, UUIDComponent.getComponentType());
-        assert uuidComponent != null;
+        final UUIDComponent uuidComponent = ref.getComponent(UUIDComponent.getComponentType());
+        if (uuidComponent == null) {
+            return;
+        }
 
         final UUID uuid = uuidComponent.getUuid();
         final WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(pos.x, pos.z));
@@ -108,14 +103,20 @@ public abstract class ContainerUtils {
             containerComponent.onOpen(ref);
             return;
         }
-        if (!playerComponent.getPageManager().setPageWithWindows(ref, store, Page.Bench, true, window)) {
+
+        final Player playerComponent = ref.getComponent(Player.getComponentType());
+        if (playerComponent == null) {
+            return;
+        }
+
+        if (!playerComponent.getPageManager().setPageWithWindows(ref, ref.getStore(), Page.Bench, true, window)) {
             containerComponent.onOpen(ref);
             windows.remove(uuid, window);
             return;
         }
 
-        if (IPersistentContainer.class.isAssignableFrom(containerComponent.getClass())) {
-            ((IPersistentContainer) containerComponent).setChunk(chunk);
+        if (containerComponent instanceof IPersistentContainer persistentContainer) {
+            persistentContainer.setChunk(chunk);
         }
 
         window.registerCloseEvent(event -> {
