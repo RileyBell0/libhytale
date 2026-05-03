@@ -8,27 +8,7 @@ A library for modding [Hytale](https://hytale.com/) server-side code.
 >
 > ### Main TODO
 >
-> - need to make events run in the order they're listed in the class, meaning i do
->     - what is defined on this class,
->         - superclass
->         - interfaces
->     - i'll prioritise interfaces on this class. Starting from left to right
->         - interfaceA extends eventA and eventB
->         - Go up into interface A
->         - does it implement A or B here?
->             - both: add in the order they're defined
->             - just one: the one that we've defined here will be at the top of our queue
->     - i want interfaces of events to be prioritiy based. Anything in an interface on a current class wins out, then superclass etc so we have
->         - event type (e.g. IOnBlockTick.class)
->         - class depth (0 for current class, 1 for superclass)
->         - interface depth (distance from root interface. if class implements eventA directly, eventA has interface depth of 0. if it implements an interface that itself implements the event -> 1, then 2 etc)
->         - interface index (0 for furthest left, meaning if we have it defined twice on the same class at the same depth in two different interfaces, the first one that defines it wins out)
->     - meaning if i have class implements interface A.  interface A extends eventA and interffaceB. then interfaceB extends eventB and eventA i'd get
->         - eventA, 0, 1, 0
->         - eventB, 0, 2, 0
->         - eventA, 0, 2, 1
->     - we order by class depth first. they're all at zero
->     - then do we want to sort by first to appear (regardless of depth) or by depth (regardless of first to appear)
+> - 
 >
 > ### Docs
 >
@@ -39,7 +19,7 @@ A library for modding [Hytale](https://hytale.com/) server-side code.
 >
 > ### Fixes
 >
-> - Fix ScheduledTickSystem
+> - 
 > - The team just added an `ItemContainerBlock` component, probably need to update my container utils to suit. might be able to extend that directly for containers
 >
 > ### Features 

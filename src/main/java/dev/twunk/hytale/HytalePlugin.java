@@ -107,12 +107,19 @@ public abstract class HytalePlugin extends JavaPlugin {
         final BuilderCodec rawCodec = codec;
 
         if (ChunkStore.class.isAssignableFrom(inferredStore)) {
-            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+            final var chunkComponentType = LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+
+            InitComponentType.trySetAnnotatedComponentType(rawClass, ChunkStore.class, chunkComponentType);
         } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
-            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+            final var entityComponentType = LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+
+            InitComponentType.trySetAnnotatedComponentType(rawClass, EntityStore.class, entityComponentType);
         } else {
-            LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
-            LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+            final var chunkComponentType = LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+            final var entityComponentType = LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
+
+            InitComponentType.trySetAnnotatedComponentType(rawClass, ChunkStore.class, chunkComponentType);
+            InitComponentType.trySetAnnotatedComponentType(rawClass, EntityStore.class, entityComponentType);
         }
     }
 

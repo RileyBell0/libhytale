@@ -1,12 +1,22 @@
 package dev.twunk.lib.component;
 
 import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import dev.twunk.hytale.OnRegister;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
 
 @Serializable
 public class TestComponent implements Component<ChunkStore> {
+
+    @OnRegister
+    @SuppressWarnings("null")
+    private static ComponentType<ChunkStore, TestComponent> componentType;
+
+    public static ComponentType<ChunkStore, TestComponent> getComponentType() {
+        return TestComponent.componentType;
+    }
 
     @Serialize
     private int value;
