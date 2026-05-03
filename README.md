@@ -58,7 +58,7 @@ This library serves to provide **documented** and **tested** utilities to make y
 > - codecs, making codecs easy
 > - events. redefining systems as instead "observable" things you can listen to, kind of. you still need to define systems and such since its query based BUT doing so is a whole lot easier with you being able to define HOW and WHAT you want to listen to within your class definition itself by simply implementing the interface for the given event listener. WAY easier than before, all works through the same handler too, just gotta actually you know, finish this project and get it out there. ok. finish is a strong word, but, you know, get a 1.0.0 out that i can then fix bugs and docs and such later
 >
-> TODO: my release of it should include a few example mods, some staples we haven't had made yet to show how easy it is, and some dumb stuff, should be easy as long as i can come up with some ideas to throw at the systems
+> TODO: my release of it should include a few example mods, some staples we haven't had made yet to show how using this can simplify stuff, and some dumb stuff, should be easy as long as i can come up with some ideas to throw at the systems
 
 Hytale is designed around Entity Component Systems (ECS), meaning you've got Entities (anything in a world) that has Components (data). To then run code and respond to events on these you have Systems.
 
