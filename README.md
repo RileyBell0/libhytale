@@ -58,7 +58,7 @@ This library serves to provide **documented** and **tested** utilities to make y
 > - codecs, making codecs easy
 > - events. redefining systems as instead "observable" things you can listen to, kind of. you still need to define systems and such since its query based BUT doing so is a whole lot easier with you being able to define HOW and WHAT you want to listen to within your class definition itself by simply implementing the interface for the given event listener. WAY easier than before, all works through the same handler too, just gotta actually you know, finish this project and get it out there. ok. finish is a strong word, but, you know, get a 1.0.0 out that i can then fix bugs and docs and such later
 >
-> TODO: my release of it should include a few example mods, some staples we haven't had made yet to show how easy it is, and some dumb stuff, should be easy as long as i can come up with some ideas to throw at the systems
+> TODO: my release of it should include a few example mods, some staples we haven't had made yet to show how using this can simplify stuff, and some dumb stuff, should be easy as long as i can come up with some ideas to throw at the systems
 
 Hytale is designed around Entity Component Systems (ECS), meaning you've got Entities (anything in a world) that has Components (data). To then run code and respond to events on these you have Systems.
 
@@ -156,20 +156,20 @@ Plus, there's some annoying concepts in hytale's code such as thier `ChunkBlockT
 
 If you have requests or suggestions that fit here LMK.
 
-I come from the `rust` programming language side of things, so the idea of trusting that your code will run as you expect it to (barring other people specifically doing weird things to your blocks) is exactly the goal of this.
+I come from the `rust` programming language side of things, so the idea of trusting that your code will run as you expect it to (barring other people specifically doing weird things to your blocks) is exactly the goal of this. (lmao ive not even started working on this bit yet really, well, ok ive done some stuff, but i really need to understand hytale a bit more and see its direction before i can commit to more of this plan)
 
 Plus, if i've learned anything in my career, it's that basic really usable utilities that let you MAKE abstractions easliy (rather than abstracting pretty much anything) are amazing. Code that just, does what it says on the tin, and is completely replaceable if need be
 
 The goals/mission-statement of this library is basically
 
-- serving as a standard library for hytale modding
+- serving as a standard library for hytale modding (yeah thats right i'd love you to submit PRs to add functionality rather than us all inventing the wheel billions of times then making even more conversion layers inbetween)
 - ^^ Specifically, i want to make sure that really common functionality can all go through here, with an abundance of interfaces etc to ensure cross compatibility between libraries/mods with BASIC stuff such as items, item transferring, blocks, containers, common components
 - Anything implemented in here is a THIN wrapper that should basically be thought of as a fancy macro, meaning if you don't like what i did, great, do it yourself, it will still work just fine, you don't need to jump through any more hoops than what this library does in setting up the code you're replacing
-- making their code FAR safer to use in ways that stop mod developers breaking code from other mods, or rather really encourages thinking about problems in ways that WON'T break other mods (e.g. avoiding `setTicking` like your life depends on it).
+- making their code FAR safer to use in ways that stop mod developers breaking code from other mods, or rather really encourages thinking about problems in ways that WON'T break other mods (e.g. avoiding `setTicking` like your life depends on it). (i mean come on, ticking runs on all 27 blocks around yours, thats alot when you know you just want to update something internally)
 
-AND, since i come from rust, i want to do my absolute very best to do-away with the idea that "you can code something that will break at runtime really easliy doing stuff that works at compile time", e.g. i don't want my code to expose methods that would result in a "error, you shouldnt be calling this from a system" kinda thing.
+AND, since i come from rust, i want to do my absolute very best to do-away with the idea that "you can code something that will break at runtime really easliy doing stuff that works at compile time" (currently yet to be implemented, i've been a big fan of RuntimeException while testing that i'm going through and stripping out every now and then as i understand hytale more and more each week), e.g. i don't want my code to expose methods that would result in a "error, you shouldnt be calling this from a system" kinda thing.
 
-Plus, i've seen us all reinventing the same wheel a ton of times, each in a different way usually due to a different scope of knowledge/understanding of their server SRC code. We really do keep doing the exact same thing, just with slight differences that can be really easily generalised
+Plus, i've seen us all reinventing the same wheel a ton of times, (e.g. i've reinvented the serialize wheel as i hadn't seen other mods doing it back then, though, there are tons now, so i'll probably just incorporate one of those with the authors permission instead of mine) each in a different way usually due to a different scope of knowledge/understanding of their server SRC code. We really do keep doing the exact same thing, just with slight differences that can be really easily generalised
 
 and, doing anything common (e.g. "Get me block X", "Delete block Y", "Where am i?") should be EASY and ACCESIBLE METHODS from the props you receive in any function, AND the helpers i've got for this should be really easily constructable no-matter where you are in your code. Hence, why the utils files are HUGE. I really insist on being able to run `BlockUtils.Ref.get()` with any parameters that give you
 
@@ -183,6 +183,8 @@ https://github.com/RileyBell0/hytale-plugin
 
 ^^ It's where I test LibHytale. It has some examples of some use cases (usually of whatever part I'm working on) but should be pretty easy to follow or follow on from
 
+if the current state of it is broken, try a previous commit, or one before that again, or send me a message on discord or smthn. Again, this is pre 1.0 so i'm not expecting anyone to be using this, but ofc it would be a welcome surprise if someone found this useful in its current state)
+
 ## Extra
 
 Got most of my resources from reading the src code directly and from <https://hytalemodding.dev/en/docs>
@@ -191,7 +193,8 @@ I highly recommend checking out <https://hytalemodding.dev/en/docs> for an overv
 
 ---
 
-## ignore this, im just dumping code
+## ignore this, im just dumping code i thought i might need again later etc
+fr, you don't wanna be down here. A real library error message is `reiwriwjeroijwaorijawioj` because, highkey smashing on your keyboard is a great way to make an error code when you're printf debugging your way through modding decompiled server code. of course, i'll rmeove all exceptions (if possible) before release and give actual error messages. Haters will say `reiwriwjeroijwaorijawioj` not very informative of what went wrong
 
 ```java
 public final int getIndexInArchetypeChunk(
