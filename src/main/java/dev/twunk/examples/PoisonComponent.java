@@ -1,3 +1,35 @@
+/**
+ * Understanding the below code
+ *
+ * ### Annotations
+ * @Serializable auto-generates a Codec for you
+ * @Serialize    adds the given field to the auto-generated codec
+ * @OnRegister   stores the generated ComponentType in the static field when
+ *               it's created during component registration
+ *
+ * ### Running `onTick`
+ * When registering your component a unique EntityTickingSystem is spun up
+ * for your component.
+ *
+ * The (simplified) implementation of said ticking system is as follows
+ *
+ * ```java
+ * @Override
+ * public void tick(
+ *     float dt,
+ *     int index,
+ *     ArchetypeChunk<ECS_TYPE> archetypeChunk,
+ *     Store<ECS_TYPE> store,
+ *     CommandBuffer<ECS_TYPE> commandBuffer
+ * ) {
+ *     var ref = archetypeChunk.getReferenceTo(index);
+ *     var component = ref.getStore().getComponent(ref, componentType);
+ *
+ *     component.onTick(dt, ref, commandBuffer);
+ * }
+ * ```
+ */
+
 package dev.twunk.examples;
 
 import com.hypixel.hytale.component.CommandBuffer;
@@ -17,26 +49,34 @@ import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.ref.AnyRef;
 import javax.annotation.Nullable;
 
-@Serializable // auto-generates a Codec for you
+// @Serializable - Auto-generate a Codec from fields marked with @Serialize
+@Serializable
 public class PoisonComponent implements Component<EntityStore>, IOnTick<EntityStore>, IGroup<EntityStore> {
 
+    // \/==================\/-  Component Type  -\/===================\/ //
+
+    // set during component registration
     @OnRegister
     @SuppressWarnings("null")
-    private static ComponentType<EntityStore, PoisonComponent> componentType = null;
+    private static ComponentType<EntityStore, PoisonComponent> componentType;
 
     public static ComponentType<EntityStore, PoisonComponent> getComponentType() {
         return PoisonComponent.componentType;
     }
 
-    // ////////////////////////////////////////////////////////////////////////
-    // Component setup (previously - and currently - `PoisonComponent`)
-    // ////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Component State  -\/==================\/ //
 
-    // Fields annotated with @Serialize will be added to the generated codec
-    private @Serialize float damagePerTick = 5f;
-    private @Serialize float tickInterval = 1.0f;
-    private @Serialize int remainingTicks = 10;
-    private @Serialize float elapsedTime = 0;
+    @Serialize
+    private float damagePerTick = 5f;
+
+    @Serialize
+    private float tickInterval = 1.0f;
+
+    @Serialize
+    private int remainingTicks = 10;
+
+    @Serialize
+    private float elapsedTime = 0;
 
     @Nullable
     @Override
@@ -51,14 +91,8 @@ public class PoisonComponent implements Component<EntityStore>, IOnTick<EntitySt
         return other;
     }
 
-    // ////////////////////////////////////////////////////////////////////////
-    // Event setup (previously in `PoisonSystem`)
-    // ////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Event handler(s)  -\/=================\/ //
 
-    /**
-     * Event handler: `IOnTick`
-     * Run every tick for your actual component(s), ON your actual component(s)
-     */
     @Override
     public void onTick(float dt, AnyRef<EntityStore> ref, CommandBuffer<EntityStore> commandBuffer) {
         this.elapsedTime += dt;
@@ -78,9 +112,6 @@ public class PoisonComponent implements Component<EntityStore>, IOnTick<EntitySt
         }
     }
 
-    /**
-     * Defines the group for your Event Handler(s)
-     */
     @Nullable
     @Override
     public SystemGroup<EntityStore> getGroup() {
