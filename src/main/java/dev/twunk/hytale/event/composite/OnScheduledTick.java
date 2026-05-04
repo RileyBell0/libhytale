@@ -9,13 +9,9 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.component.UUIDComponent;
+import dev.twunk.hytale.component.UUIDLookupResource;
 import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
@@ -25,19 +21,14 @@ import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.hytale.resource.CurrentWorldTick;
-import dev.twunk.hytale.utils.BlockUtils;
-import dev.twunk.hytale.utils.ChunkUtils;
-import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.lib.component.ActivelyTickingComponent;
 import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.event.scheduled.SleepingEntity;
 import dev.twunk.lib.event.scheduled.TickSchedule;
-import dev.twunk.lib.registry.ChunkRegisterProvider;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -64,51 +55,11 @@ import javax.annotation.Nullable;
  * - IScheduledTickSystem runner
  */
 public class OnScheduledTick<ECS_TYPE extends WorldProvider>
-    extends QueryableCompositeSystem<ECS_TYPE, IOnScheduledTick<ECS_TYPE>>
+    extends QueryableCompositeSystem<ECS_TYPE>
     implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE>
 {
 
-    private static final SleepingEntity sleepingEntityCreator__ChunkStore(
-        Ref<ChunkStore> ref,
-        UUID uuid,
-        TickSchedule.Sleeping schedule
-    ) {
-        // get the BlockStateInfo component -> this gives us access to the
-        // local index directly with info.getIndex(), and gives us a chunk
-        // ref that we can turn into a chunk index easily too
-        @SuppressWarnings("null")
-        @Nonnull
-        final var info = ComponentUtils.get(ref, BlockStateInfo.getComponentType());
-
-        final var blockIndex = info.getIndex();
-
-        @SuppressWarnings("null")
-        @Nonnull
-        final var chunkIndex = ChunkUtils.Coords.Index.get(info);
-
-        return new SleepingEntity.SleepingBlockEntity(uuid, schedule, chunkIndex, blockIndex);
-    }
-
-    @FunctionalInterface
-    private static interface SleepingEntityCreator<ECS_TYPE extends WorldProvider> {
-        SleepingEntity fromRef(Ref<ECS_TYPE> ref, UUID uuid, TickSchedule.Sleeping schedule);
-    }
-
-    @SuppressWarnings("null")
-    private static ResourceType<ChunkStore, CurrentWorldTick> worldTickResourceType = null;
-
-    @Nullable
-    private CurrentWorldTick tickResource = null;
-
-    @Override
-    @SuppressWarnings({ "unused", "null" })
-    public void onRegister(JavaPlugin plugin) {
-        if (OnScheduledTick.worldTickResourceType == null) {
-            OnScheduledTick.worldTickResourceType = LibHytale.CHUNK_REGISTRY.getResourceType(CurrentWorldTick.class);
-        }
-
-        super.onRegister(plugin);
-    }
+    protected final IOnScheduledTick<ECS_TYPE> listener;
 
     // A unique and STABLE identifier for the system. you cannot change this.
     // once you decide on an ID your players REQUIRE it to be stable (or everything
@@ -122,14 +73,15 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
     private final TickSchedule defaultSchedule;
     private final String id;
 
-    private final Set<UUID> removed = new HashSet<>();
+    private final Set<UUID> unloadedEntities = new HashSet<>();
     private final PriorityQueue<SleepingEntity> sleeping = new PriorityQueue<>();
-    private final SleepingEntityCreator<ECS_TYPE> sleepingEntityCreator;
-    private ComponentType<ECS_TYPE, ActivelyTickingComponent<ECS_TYPE>> activeFlagComponentType;
-    private ComponentType<ECS_TYPE, TickScheduleComponent<ECS_TYPE>> tickScheduleComponentType;
+    private final ComponentType<ECS_TYPE, ActivelyTickingComponent<ECS_TYPE>> activeFlagComponentType;
+    private final ComponentType<ECS_TYPE, TickScheduleComponent<ECS_TYPE>> tickScheduleComponentType;
+    private final ResourceType<ECS_TYPE, CurrentWorldTick<ECS_TYPE>> worldTickResourceType;
+    private final ResourceType<ECS_TYPE, UUIDLookupResource<ECS_TYPE>> uuidLookupResourceType;
     private final ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponentType;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
     protected OnScheduledTick(
         IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
@@ -137,22 +89,15 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
         String id,
         TickSchedule defaultSchedule
     ) {
-        super(registry, query, listener);
+        super(registry, query);
+        this.listener = listener;
         this.id = id;
         this.defaultSchedule = defaultSchedule;
-        this.activeFlagComponentType = registry.getComponentType(ActivelyTickingComponent.class);
-        this.uuidComponentType = registry.getComponentType(UUIDComponent.class);
-        this.tickScheduleComponentType = registry.getComponentType(TickScheduleComponent.class);
-
-        if (this.registry instanceof ChunkRegisterProvider) {
-            this.sleepingEntityCreator = (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__ChunkStore;
-        } else {
-            this.sleepingEntityCreator = (
-                Ref<ECS_TYPE> ref,
-                @Nonnull UUID uuid,
-                @Nonnull TickSchedule.Sleeping schedule
-            ) -> new SleepingEntity(uuid, schedule);
-        }
+        this.worldTickResourceType = this.registry.getResourceType(CurrentWorldTick.class);
+        this.uuidLookupResourceType = this.registry.getResourceType(UUIDLookupResource.class);
+        this.activeFlagComponentType = this.registry.getComponentType(ActivelyTickingComponent.class);
+        this.uuidComponentType = this.registry.getComponentType(UUIDComponent.class);
+        this.tickScheduleComponentType = this.registry.getComponentType(TickScheduleComponent.class);
     }
 
     // ////////////////////////////////////////////////////////////////////////
@@ -167,15 +112,6 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
      */
     @Override
     public final void onAdd(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
-        if (this.tickResource == null) {
-            this.tickResource = commandBuffer
-                .getExternalData()
-                .getWorld()
-                .getChunkStore()
-                .getStore()
-                .getResource(OnScheduledTick.worldTickResourceType);
-        }
-
         // get the UUID component, or force one onto the entity otherwise
         final UUIDComponent<ECS_TYPE> uuidComponent = commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType);
         final UUID uuid = uuidComponent.getUuid();
@@ -200,7 +136,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
             case TickSchedule.Active _ -> commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
             // it wants to be sleeping, so just need to record when it wants to be awake so i can wake it up (as long as its still loaded when that happens)
             case TickSchedule.Sleeping s -> {
-                this.sleeping.add(this.sleepingEntityCreator.fromRef(ref, uuid, s));
+                this.sleeping.add(new SleepingEntity(uuid, s));
 
                 // trash an active flag if im asleep
                 if (commandBuffer.getComponent(ref, this.activeFlagComponentType) != null) {
@@ -222,7 +158,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
     @Override
     public final void onRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         // mark that the sleeper handler should discard element next time it sees it, as we're just, yeah, done with it
-        removed.add(commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType).getUuid());
+        unloadedEntities.add(commandBuffer.ensureAndGetComponent(ref, this.uuidComponentType).getUuid());
     }
 
     // #endregion schedule
@@ -239,50 +175,22 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
         Store<ECS_TYPE> store,
         CommandBuffer<ECS_TYPE> commandBuffer
     ) {
+        final var currentTick = commandBuffer.getResource(this.worldTickResourceType).getTick();
+
         // first: wake up elements that are ready to wake
         SleepingEntity next;
-        final var currentTick = this.tickResource.worldTick;
         // while the next sleeper exists and is waiting to be ticked (<= currentTick)
         while ((next = sleeping.peek()) != null && currentTick + 1 >= next.nextTick) {
             sleeping.remove();
 
-            if (removed.contains(next.uuid)) {
-                removed.remove(next.uuid);
+            if (unloadedEntities.contains(next.uuid)) {
+                unloadedEntities.remove(next.uuid);
                 continue;
             }
 
-            // skip over & remove entites that are no longer loaded from our
-            // next tick queue
-            final var uuid = next.uuid;
-
-            // neat, this one's ready to go. We need to FIND the element and, heck ok. shit. need to store the coords and chunk and world
-            // meaning, i need to also store with the nextToWake its coords and shit
-
-            // if we're in chunk mode we have to use the coords to get a ref
-            final Ref<ECS_TYPE> ref = switch (next) {
-                case SleepingEntity.SleepingBlockEntity asChunk -> {
-                    // getRef based on its coords. We can't use UUID for this without modifying hytales ChunkStore to also record entites vs uuids and i so cbf doing that
-                    @SuppressWarnings({ "unchecked", "rawtypes" })
-                    final Ref<ECS_TYPE> blockRef = (Ref) BlockUtils.Refs.get(
-                        (ChunkStore) store.getExternalData(),
-                        asChunk.chunkCoords,
-                        asChunk.localCoords
-                    );
-                    yield blockRef;
-                }
-                case SleepingEntity _ -> {
-                    // getRef based on its UUID
-                    final var entityStore = ((EntityStore) store.getExternalData());
-
-                    @SuppressWarnings({ "unchecked", "rawtypes" })
-                    final Ref<ECS_TYPE> entityRef = (Ref) entityStore.getRefFromUUID(uuid);
-
-                    yield entityRef;
-                }
-            };
-
             // waking it up is as easy as adding the activeFlagComponent to it.
             // then we just loop and keep going till we run out of things to tick
+            final Ref<ECS_TYPE> ref = commandBuffer.getResource(this.uuidLookupResourceType).getRefByUUID(next.uuid);
             if (ref != null && ref.isValid()) {
                 commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
             }
@@ -300,21 +208,28 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
      */
     @Override
     public void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
-        if (!ref.isValid()) return;
+        if (!ref.isValid()) {
+            return;
+        }
+
+        final var currentTick = commandBuffer.getResource(this.worldTickResourceType).getTick();
 
         // run your tick method
-        final var res = listener.onScheduledTick(dt, this.tickResource.worldTick, ref, commandBuffer);
-        if (res == null) return;
+        final var res = listener.onScheduledTick(dt, currentTick, ref, commandBuffer);
+        if (res == null) {
+            return;
+        }
 
         final var tickScheduleComponent = ref.getComponent(this.tickScheduleComponentType);
-        if (tickScheduleComponent == null) return;
+        if (tickScheduleComponent == null) {
+            return;
+        }
 
         // Configure future schedule for this entity according to your returned tick schedule
         switch (res) {
             case TickSchedule.Sleeping newSchedule -> {
                 // if they're planning to run next tick, we'll just, ignore that new
                 // schedule request. silly dummie
-                final var currentTick = this.tickResource.worldTick;
                 newSchedule.nextTick += currentTick;
                 if (newSchedule.nextTick == currentTick + 1) {
                     break;
@@ -322,7 +237,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
 
                 // write us into the sleep queue
                 final var uuid = commandBuffer.getComponent(ref, this.uuidComponentType).getUuid();
-                this.sleeping.add(this.sleepingEntityCreator.fromRef(ref, uuid, newSchedule));
+                this.sleeping.add(new SleepingEntity(uuid, newSchedule));
 
                 // persist our new schedule
                 tickScheduleComponent.setSchedule(this.id, newSchedule);

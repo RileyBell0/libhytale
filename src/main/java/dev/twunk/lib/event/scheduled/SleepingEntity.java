@@ -1,10 +1,9 @@
 package dev.twunk.lib.event.scheduled;
 
-import dev.twunk.lib.event.scheduled.TickSchedule.Sleeping;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-public sealed class SleepingEntity implements Comparable<SleepingEntity> {
+public final class SleepingEntity implements Comparable<SleepingEntity> {
 
     public final UUID uuid;
     public final long nextTick;
@@ -31,18 +30,5 @@ public sealed class SleepingEntity implements Comparable<SleepingEntity> {
     @Override
     public int hashCode() {
         return (int) nextTick;
-    }
-
-    public static final class SleepingBlockEntity extends SleepingEntity {
-
-        public final long chunkCoords;
-        public final int localCoords;
-
-        public SleepingBlockEntity(UUID uuid, Sleeping schedule, long chunkIndex, int blockIndex) {
-            this.chunkCoords = chunkIndex;
-            this.localCoords = blockIndex;
-
-            super(uuid, schedule);
-        }
     }
 }

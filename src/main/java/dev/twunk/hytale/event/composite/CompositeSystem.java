@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-public class CompositeSystem<ECS_TYPE extends WorldProvider, Listener> implements IEventDriver<ECS_TYPE> {
+public class CompositeSystem<ECS_TYPE extends WorldProvider> implements IEventDriver<ECS_TYPE> {
 
     private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
 
@@ -18,10 +18,8 @@ public class CompositeSystem<ECS_TYPE extends WorldProvider, Listener> implement
     private SystemGroup<ECS_TYPE> group = null;
 
     protected final IRegistry<ECS_TYPE> registry;
-    protected final Listener listener;
 
-    protected CompositeSystem(IRegistry<ECS_TYPE> registry, Listener listener) {
-        this.listener = listener;
+    protected CompositeSystem(IRegistry<ECS_TYPE> registry) {
         this.registry = registry;
     }
 

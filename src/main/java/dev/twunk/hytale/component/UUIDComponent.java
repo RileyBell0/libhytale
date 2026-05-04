@@ -3,7 +3,6 @@ package dev.twunk.hytale.component;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
@@ -13,22 +12,18 @@ import javax.annotation.Nullable;
 import org.bson.UuidRepresentation;
 import org.bson.internal.UuidHelper;
 
-public class UUIDComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
+public final class UUIDComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
 
-    // stupid java and its stupid type inference being all stupid n shit
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static final Class<UUIDComponent<? extends WorldProvider>> UUID_CLASS = (Class) UUIDComponent.class;
+    @SuppressWarnings({ "unchecked" })
+    private static final Class<UUIDComponent<? extends WorldProvider>> UUID_CLASS = (Class<
+        UUIDComponent<? extends WorldProvider>
+    >) (Class<?>) UUIDComponent.class;
 
     public static final BuilderCodec<UUIDComponent<? extends WorldProvider>> CODEC = BuilderCodec.builder(
         UUID_CLASS,
         UUIDComponent::new
     )
-        .append(
-            new KeyedCodec<>("UUID", Codec.UUID_BINARY),
-            (o, i) -> o.uuid = i == null ? UUIDUtil.generateVersion3UUID() : i,
-            o -> o.uuid
-        )
-        .addValidator(Validators.nonNull())
+        .append(new KeyedCodec<>("UUID", Codec.UUID_BINARY), (o, i) -> o.uuid = i, o -> o.uuid)
         .add()
         .afterDecode(v -> {
             if (v.uuid == null) {
@@ -37,15 +32,8 @@ public class UUIDComponent<ECS_TYPE extends WorldProvider> implements Component<
         })
         .build();
 
-    // Only null during codec construction, but after codec construction its already non nulls
     @Nullable
     protected UUID uuid;
-
-    protected UUIDComponent(UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    protected UUIDComponent() {}
 
     @SuppressWarnings("null")
     public UUID getUuid() {
