@@ -8,8 +8,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.component.SystemGroup;
-import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.modules.block.BlockModule.BlockStateInfo;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -19,7 +17,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.LibHytale;
 import dev.twunk.hytale.component.UUIDComponent;
 import dev.twunk.hytale.interfaces.IEventDriver;
-import dev.twunk.hytale.interfaces.IQueryableEventDriver;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnScheduledTick;
@@ -66,9 +63,31 @@ import javax.annotation.Nullable;
  * PRODUCES:
  * - IScheduledTickSystem runner
  */
-public class OnScheduledTick<
-    ECS_TYPE extends WorldProvider
-> implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE>, IQueryableEventDriver<ECS_TYPE> {
+public class OnScheduledTick<ECS_TYPE extends WorldProvider>
+    extends QueryableCompositeSystem<ECS_TYPE, IOnScheduledTick<ECS_TYPE>>
+    implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE>
+{
+
+    private static final SleepingEntity sleepingEntityCreator__ChunkStore(
+        Ref<ChunkStore> ref,
+        UUID uuid,
+        TickSchedule.Sleeping schedule
+    ) {
+        // get the BlockStateInfo component -> this gives us access to the
+        // local index directly with info.getIndex(), and gives us a chunk
+        // ref that we can turn into a chunk index easily too
+        @SuppressWarnings("null")
+        @Nonnull
+        final var info = ComponentUtils.get(ref, BlockStateInfo.getComponentType());
+
+        final var blockIndex = info.getIndex();
+
+        @SuppressWarnings("null")
+        @Nonnull
+        final var chunkIndex = ChunkUtils.Coords.Index.get(info);
+
+        return new SleepingEntity.SleepingBlockEntity(uuid, schedule, chunkIndex, blockIndex);
+    }
 
     @FunctionalInterface
     private static interface SleepingEntityCreator<ECS_TYPE extends WorldProvider> {
@@ -88,13 +107,8 @@ public class OnScheduledTick<
             OnScheduledTick.worldTickResourceType = LibHytale.CHUNK_REGISTRY.getResourceType(CurrentWorldTick.class);
         }
 
-        this.getRegistry().registerEventListeners(plugin, this);
+        super.onRegister(plugin);
     }
-
-    private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
-
-    @Nullable
-    private SystemGroup<ECS_TYPE> group = null;
 
     // A unique and STABLE identifier for the system. you cannot change this.
     // once you decide on an ID your players REQUIRE it to be stable (or everything
@@ -107,9 +121,6 @@ public class OnScheduledTick<
     // what state they held
     private final TickSchedule defaultSchedule;
     private final String id;
-    private final Query<ECS_TYPE> query;
-    private final IRegistry<ECS_TYPE> registry;
-    private final IOnScheduledTick<ECS_TYPE> listener;
 
     private final Set<UUID> removed = new HashSet<>();
     private final PriorityQueue<SleepingEntity> sleeping = new PriorityQueue<>();
@@ -126,10 +137,8 @@ public class OnScheduledTick<
         String id,
         TickSchedule defaultSchedule
     ) {
-        this.listener = listener;
+        super(registry, query, listener);
         this.id = id;
-        this.query = query;
-        this.registry = registry;
         this.defaultSchedule = defaultSchedule;
         this.activeFlagComponentType = registry.getComponentType(ActivelyTickingComponent.class);
         this.uuidComponentType = registry.getComponentType(UUIDComponent.class);
@@ -144,96 +153,6 @@ public class OnScheduledTick<
                 @Nonnull TickSchedule.Sleeping schedule
             ) -> new SleepingEntity(uuid, schedule);
         }
-    }
-
-    // ////////////////////////////////////////////////////////////////////////
-    // \/======================\/-  Methods  -\/==========================\/ //
-    // ////////////////////////////////////////////////////////////////////////
-
-    @Nullable
-    protected final TickSchedule _onScheduledTick(
-        float dt,
-        long worldTick,
-        Ref<ECS_TYPE> ref,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        return listener.onScheduledTick(dt, worldTick, AnyRef.of(ref), commandBuffer);
-    }
-
-    // ////////////////////////////////////////////////////////////////////////
-    // \/==================\/-  Getters/setters  -\/======================\/ //
-    // ////////////////////////////////////////////////////////////////////////
-    // #region getters/setters
-
-    @Override
-    public Set<Dependency<ECS_TYPE>> getDependencies() {
-        return this.dependencies;
-    }
-
-    @Override
-    public void setDependencies(Set<Dependency<ECS_TYPE>> dependencies) {
-        this.dependencies = new HashSet<>();
-        this.dependencies.addAll(dependencies);
-    }
-
-    @Override
-    public boolean addDependency(Dependency<ECS_TYPE> dependency) {
-        return this.dependencies.add(dependency);
-    }
-
-    @Override
-    @Nullable
-    public SystemGroup<ECS_TYPE> getGroup() {
-        return this.group;
-    }
-
-    @Override
-    public void setGroup(@Nullable SystemGroup<ECS_TYPE> group) {
-        this.group = group;
-    }
-
-    @Override
-    public final Query<ECS_TYPE> getQuery() {
-        return this.query;
-    }
-
-    @Override
-    public final Query<ECS_TYPE> getQuery(Class<?> clazz) {
-        if (clazz.equals(IOnTick.class)) {
-            return Query.and(this.query, this.activeFlagComponentType);
-        }
-        if (clazz.equals(IOnWorldTick.class)) {
-            return Query.and(this.query, Query.not(this.activeFlagComponentType));
-        }
-        return this.query;
-    }
-
-    @Override
-    public final IRegistry<ECS_TYPE> getRegistry() {
-        return this.registry;
-    }
-
-    // #endregion getters/setters
-
-    public static final SleepingEntity sleepingEntityCreator__ChunkStore(
-        Ref<ChunkStore> ref,
-        UUID uuid,
-        TickSchedule.Sleeping schedule
-    ) {
-        // get the BlockStateInfo component -> this gives us access to the
-        // local index directly with info.getIndex(), and gives us a chunk
-        // ref that we can turn into a chunk index easily too
-        @SuppressWarnings("null")
-        @Nonnull
-        final var info = ComponentUtils.get(ref, BlockStateInfo.getComponentType());
-
-        final var blockIndex = info.getIndex();
-
-        @SuppressWarnings("null")
-        @Nonnull
-        final var chunkIndex = ChunkUtils.Coords.Index.get(info);
-
-        return new SleepingEntity.SleepingBlockEntity(uuid, schedule, chunkIndex, blockIndex);
     }
 
     // ////////////////////////////////////////////////////////////////////////
@@ -381,20 +300,14 @@ public class OnScheduledTick<
      */
     @Override
     public void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer) {
-        if (!ref.isValid()) {
-            return;
-        }
+        if (!ref.isValid()) return;
 
         // run your tick method
         final var res = listener.onScheduledTick(dt, this.tickResource.worldTick, AnyRef.of(ref), commandBuffer);
-        if (res == null) {
-            return;
-        }
+        if (res == null) return;
 
         final var tickScheduleComponent = ref.getComponent(this.tickScheduleComponentType);
-        if (tickScheduleComponent == null) {
-            return;
-        }
+        if (tickScheduleComponent == null) return;
 
         // Configure future schedule for this entity according to your returned tick schedule
         switch (res) {
