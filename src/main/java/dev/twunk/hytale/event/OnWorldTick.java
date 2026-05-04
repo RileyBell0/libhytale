@@ -13,7 +13,6 @@ import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.lib.event.OnWorldTick__Listener;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -24,18 +23,39 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
     implements ISystemEventDriver<ECS_TYPE>
 {
 
-    private final Query<ECS_TYPE> query;
-    private final IRegistry<ECS_TYPE> registry;
-
-    protected OnWorldTick(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query) {
-        this.query = query;
-        this.registry = registry;
-    }
+    private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
 
     @Nullable
     private SystemGroup<ECS_TYPE> group = null;
 
-    private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
+    private final IOnWorldTick<ECS_TYPE> listener;
+    private final Query<ECS_TYPE> query;
+    private final IRegistry<ECS_TYPE> registry;
+
+    protected OnWorldTick(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query, IOnWorldTick<ECS_TYPE> listener) {
+        this.query = query;
+        this.registry = registry;
+        this.listener = listener;
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void tick(
+        float dt,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        listener.onWorldTick(dt, archetypeChunk, store, commandBuffer);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Getters/setters  -\/======================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+    // #region getters/setters
 
     @Override
     public Set<Dependency<ECS_TYPE>> getDependencies() {
@@ -74,15 +94,7 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
         return this.registry;
     }
 
-    @Override
-    public void tick(
-        float dt,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
-    ) {
-        // stub
-    }
+    // #endregion getters/setters
 
     // ////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
@@ -106,7 +118,7 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
-                OnWorldTick__Listener.class,
+                OnWorldTick.class,
                 IRegistry.class,
                 Query.class,
                 IOnWorldTick.class
@@ -124,7 +136,7 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
-                OnWorldTick__Listener.class,
+                OnWorldTick.class,
                 IRegistry.class,
                 Query.class,
                 IOnWorldTick.class
@@ -142,7 +154,7 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
-                OnWorldTick__Listener.class,
+                OnWorldTick.class,
                 IRegistry.class,
                 Query.class,
                 IOnWorldTick.class

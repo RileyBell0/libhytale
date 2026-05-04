@@ -1,7 +1,10 @@
 package dev.twunk.hytale.event;
 
-import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.RemoveReason;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.component.query.Query;
@@ -15,11 +18,9 @@ import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.lib.event.OnAddRemove__Component;
-import dev.twunk.lib.event.OnAddRemove__Listener;
+import dev.twunk.hytale.ref.AnyRef;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -55,6 +56,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
 
     private final Query<ECS_TYPE> query;
     private final IRegistry<ECS_TYPE> registry;
+    private final IOnAddRemove<ECS_TYPE> listener;
 
     @Nullable
     private SystemGroup<ECS_TYPE> group = null;
@@ -63,6 +65,41 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
      * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
      */
     private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
+
+    protected OnAddRemove(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query, IOnAddRemove<ECS_TYPE> listener) {
+        this.query = query;
+        this.registry = registry;
+        this.listener = listener;
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onEntityAdded(
+        Ref<ECS_TYPE> ref,
+        AddReason reason,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        listener.onAdd(AnyRef.of(ref), reason, commandBuffer);
+    }
+
+    @Override
+    public void onEntityRemove(
+        Ref<ECS_TYPE> ref,
+        RemoveReason reason,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        listener.onRemove(AnyRef.of(ref), reason, commandBuffer);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Getters/setters  -\/======================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+    // #region getters/setters
 
     /**
      * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
@@ -100,11 +137,6 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         this.group = group;
     }
 
-    protected OnAddRemove(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query) {
-        this.query = query;
-        this.registry = registry;
-    }
-
     @Override
     public Query<ECS_TYPE> getQuery() {
         return this.query;
@@ -114,6 +146,8 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     public IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
+
+    // #endregion getters/setters
 
     // ////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
@@ -141,7 +175,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
-                OnAddRemove__Listener.class,
+                OnAddRemove.class,
                 IRegistry.class,
                 Query.class,
                 IOnAddRemove.class
@@ -159,7 +193,7 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(
-                OnAddRemove__Listener.class,
+                OnAddRemove.class,
                 IRegistry.class,
                 Query.class,
                 IOnAddRemove.class
@@ -170,52 +204,5 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         );
     }
 
-    /**
-     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
-     * of subsystems, each one must secretly create a new class each and every time you call it
-     *
-     * Bound for T fully defined here
-     */
-    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnAddRemove<
-        ECS_TYPE
-    > newDriverFor(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query, ComponentType<ECS_TYPE, T> componentType) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnAddRemove__Component.class,
-                IRegistry.class,
-                Query.class,
-                ComponentType.class
-            ),
-            registry,
-            query,
-            componentType
-        );
-    }
-
-    /**
-     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
-     * of subsystems, each one must secretly create a new class each and every time you call it
-     *
-     * Bound for T fully defined here
-     */
-    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnAddRemove<
-        ECS_TYPE
-    > newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Function<Class<?>, Query<ECS_TYPE>> queryProider,
-        ComponentType<ECS_TYPE, T> componentType
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnAddRemove__Component.class,
-                IRegistry.class,
-                Query.class,
-                ComponentType.class
-            ),
-            registry,
-            queryProider.apply(IOnAddRemove.class),
-            componentType
-        );
-    }
     // #endregion hide
 }

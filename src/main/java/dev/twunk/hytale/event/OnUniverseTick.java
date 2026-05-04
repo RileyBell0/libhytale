@@ -1,5 +1,6 @@
 package dev.twunk.hytale.event;
 
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
@@ -9,7 +10,6 @@ import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.lib.event.OnUniverseTick__Listener;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -39,6 +39,26 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
     private final IRegistry<ECS_TYPE> registry;
 
     private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
+    private final IOnUniverseTick<ECS_TYPE> listener;
+
+    protected OnUniverseTick(IRegistry<ECS_TYPE> registry, IOnUniverseTick<ECS_TYPE> listener) {
+        this.registry = registry;
+        this.listener = listener;
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public final void tick(float dt, int index, Store<ECS_TYPE> store) {
+        this.listener.onUniverseTick(dt, index, store);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Getters/setters  -\/======================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+    // #region getters/setters
 
     @Override
     public Set<Dependency<ECS_TYPE>> getDependencies() {
@@ -69,14 +89,12 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
         this.group = group;
     }
 
-    protected OnUniverseTick(IRegistry<ECS_TYPE> registry) {
-        this.registry = registry;
-    }
-
     @Override
     public final IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
+
+    // #endregion getters/setters
 
     // ////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
@@ -88,11 +106,7 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
         IOnUniverseTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnUniverseTick__Listener.class,
-                IRegistry.class,
-                IOnUniverseTick.class
-            ),
+            IEventDriver.__dupeClassAndGetConstructor(OnUniverseTick.class, IRegistry.class, IOnUniverseTick.class),
             registry,
             listener
         );

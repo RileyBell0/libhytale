@@ -1,7 +1,8 @@
 package dev.twunk.hytale.event;
 
-import com.hypixel.hytale.component.Component;
-import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.dependency.Dependency;
 import com.hypixel.hytale.component.query.Query;
@@ -13,11 +14,9 @@ import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import dev.twunk.lib.event.OnTick__Component;
-import dev.twunk.lib.event.OnTick__Listener;
+import dev.twunk.hytale.ref.AnyRef;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -46,13 +45,39 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     implements ISystemEventDriver<ECS_TYPE>
 {
 
-    private final Query<ECS_TYPE> query;
-    private final IRegistry<ECS_TYPE> registry;
-
     private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
 
     @Nullable
     private SystemGroup<ECS_TYPE> group = null;
+
+    private final IOnTick<ECS_TYPE> listener;
+    private final Query<ECS_TYPE> query;
+    private final IRegistry<ECS_TYPE> registry;
+
+    protected OnTick(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query, IOnTick<ECS_TYPE> listener) {
+        this.query = query;
+        this.registry = registry;
+        this.listener = listener;
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/======================\/-  Methods  -\/==========================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+
+    public final void tick(
+        float dt,
+        int index,
+        ArchetypeChunk<ECS_TYPE> archetypeChunk,
+        Store<ECS_TYPE> store,
+        CommandBuffer<ECS_TYPE> commandBuffer
+    ) {
+        listener.onTick(dt, AnyRef.of(archetypeChunk.getReferenceTo(index)), commandBuffer);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // \/==================\/-  Getters/setters  -\/======================\/ //
+    // ////////////////////////////////////////////////////////////////////////
+    // #region getters/setters
 
     @Override
     public Set<Dependency<ECS_TYPE>> getDependencies() {
@@ -80,11 +105,6 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
         this.group = group;
     }
 
-    protected OnTick(IRegistry<ECS_TYPE> registry, Query<ECS_TYPE> query) {
-        this.query = query;
-        this.registry = registry;
-    }
-
     @Override
     public final Query<ECS_TYPE> getQuery() {
         return this.query;
@@ -94,6 +114,8 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     public final IRegistry<ECS_TYPE> getRegistry() {
         return this.registry;
     }
+
+    // #endregion getters/setters
 
     // ////////////////////////////////////////////////////////////////////////
     // \/==================\/-  Implementations  -\/======================\/ //
@@ -115,12 +137,7 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
         IOnTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnTick__Listener.class,
-                IRegistry.class,
-                Query.class,
-                IOnTick.class
-            ),
+            IEventDriver.__dupeClassAndGetConstructor(OnTick.class, IRegistry.class, Query.class, IOnTick.class),
             registry,
             query,
             listener
@@ -133,58 +150,12 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
         IOnTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnTick__Listener.class,
-                IRegistry.class,
-                Query.class,
-                IOnTick.class
-            ),
+            IEventDriver.__dupeClassAndGetConstructor(OnTick.class, IRegistry.class, Query.class, IOnTick.class),
             registry,
             queryProider.getQuery(IOnTick.class),
             listener
         );
     }
 
-    /**
-     * Bound for T fully defined here
-     */
-    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        ComponentType<ECS_TYPE, T> componentType
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnTick__Component.class,
-                IRegistry.class,
-                Query.class,
-                ComponentType.class
-            ),
-            registry,
-            query,
-            componentType
-        );
-    }
-
-    /**
-     * Bound for T fully defined here
-     */
-    public static final <ECS_TYPE extends WorldProvider, T extends Component<ECS_TYPE>> OnTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Function<Class<?>, Query<ECS_TYPE>> queryProider,
-        ComponentType<ECS_TYPE, T> componentType
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnTick__Component.class,
-                IRegistry.class,
-                Query.class,
-                ComponentType.class
-            ),
-            registry,
-            queryProider.apply(IOnTick.class),
-            componentType
-        );
-    }
     // #endregion hide
 }
