@@ -4,6 +4,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnTick;
+import dev.twunk.hytale.interfaces.config.IEventConfig;
+import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.ref.AnyRef;
 
 /**
@@ -14,7 +16,6 @@ import dev.twunk.hytale.ref.AnyRef;
  * @see EntityTickingSystem - Baseline hytale system for ticking entities.
  *                            It's the underlying driver of IEntityTickSubSystem
  */
-@FunctionalInterface
-public interface IOnTick<ECS_TYPE extends WorldProvider> {
+public interface IOnTick<ECS_TYPE extends WorldProvider> extends IEventConfig<ECS_TYPE>, IQuery<ECS_TYPE> {
     public void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer);
 }

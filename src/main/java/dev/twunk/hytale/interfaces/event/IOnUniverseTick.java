@@ -3,6 +3,7 @@ package dev.twunk.hytale.interfaces.event;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.interfaces.config.IEventConfig;
 
 /**
  * Gives your system the event handler function it needs to run some code every
@@ -23,6 +24,6 @@ import com.hypixel.hytale.server.core.universe.world.WorldProvider;
  *                               of for getting a commandBuffer in a global tick
  */
 @FunctionalInterface
-public interface IOnUniverseTick<ECS_TYPE extends WorldProvider> {
+public interface IOnUniverseTick<ECS_TYPE extends WorldProvider> extends IEventConfig<ECS_TYPE> {
     public void onUniverseTick(float dt, int index, Store<ECS_TYPE> store);
 }

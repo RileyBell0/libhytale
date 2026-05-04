@@ -30,28 +30,19 @@
  * ```
  */
 
-package dev.twunk.examples;
+package dev.twunk.examples.poison;
 
-import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.SystemGroup;
-import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
-import com.hypixel.hytale.server.core.modules.entity.damage.DamageCause;
-import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
-import com.hypixel.hytale.server.core.modules.entity.damage.DamageSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.OnRegister;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
-import dev.twunk.hytale.interfaces.config.IGroup;
-import dev.twunk.hytale.interfaces.event.IOnTick;
-import dev.twunk.hytale.ref.AnyRef;
 import javax.annotation.Nullable;
 
 // @Serializable - Auto-generate a Codec from fields marked with @Serialize
 @Serializable
-public class PoisonComponent implements Component<EntityStore>, IOnTick<EntityStore>, IGroup<EntityStore> {
+public class PoisonComponent implements Component<EntityStore> {
 
     // \/==================\/-  Component Type  -\/===================\/ //
 
@@ -78,6 +69,38 @@ public class PoisonComponent implements Component<EntityStore>, IOnTick<EntitySt
     @Serialize
     private float elapsedTime = 0;
 
+    public float getDamagePerTick() {
+        return damagePerTick;
+    }
+
+    public float getTickInterval() {
+        return tickInterval;
+    }
+
+    public int getRemainingTicks() {
+        return remainingTicks;
+    }
+
+    public float getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public void addElapsedTime(float dt) {
+        this.elapsedTime += dt;
+    }
+
+    public void resetElapsedTime() {
+        this.elapsedTime = 0f;
+    }
+
+    public void decrementRemainingTicks() {
+        this.remainingTicks--;
+    }
+
+    public boolean isExpired() {
+        return this.remainingTicks <= 0;
+    }
+
     @Nullable
     @Override
     public Component<EntityStore> clone() {
@@ -89,32 +112,5 @@ public class PoisonComponent implements Component<EntityStore>, IOnTick<EntitySt
         other.elapsedTime = this.elapsedTime;
 
         return other;
-    }
-
-    // \/==================\/-  Event handler(s)  -\/=================\/ //
-
-    @Override
-    public void onTick(float dt, AnyRef<EntityStore> ref, CommandBuffer<EntityStore> commandBuffer) {
-        this.elapsedTime += dt;
-
-        if (this.elapsedTime >= this.tickInterval) {
-            this.elapsedTime = 0;
-
-            @SuppressWarnings({ "deprecation", "null" })
-            Damage damage = new Damage(Damage.NULL_SOURCE, DamageCause.OUT_OF_WORLD, this.damagePerTick);
-            DamageSystems.executeDamage(ref, commandBuffer, damage);
-
-            this.remainingTicks--;
-        }
-
-        if (this.remainingTicks <= 0) {
-            commandBuffer.removeComponent(ref, PoisonComponent.getComponentType());
-        }
-    }
-
-    @Nullable
-    @Override
-    public SystemGroup<EntityStore> getGroup() {
-        return DamageModule.get().getGatherDamageGroup();
     }
 }

@@ -6,6 +6,8 @@ import com.hypixel.hytale.component.system.tick.ArchetypeTickingSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.event.OnTick;
+import dev.twunk.hytale.interfaces.config.IEventConfig;
+import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.ref.BlockRef;
 
 /**
@@ -39,7 +41,6 @@ import dev.twunk.hytale.ref.BlockRef;
  *   everything. not all `onBlockTick` implementations will require all these, so its
  *   just wasted compute
  */
-@FunctionalInterface
-public interface IOnBlockTick {
+public interface IOnBlockTick extends IEventConfig<ChunkStore>, IQuery<ChunkStore> {
     public void onBlockTick(final BlockRef blockRef, final CommandBuffer<ChunkStore> commandBuffer);
 }

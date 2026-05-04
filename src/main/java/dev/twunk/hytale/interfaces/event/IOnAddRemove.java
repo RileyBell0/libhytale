@@ -6,6 +6,8 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnAddRemove;
+import dev.twunk.hytale.interfaces.config.IEventConfig;
+import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.ref.AnyRef;
 
 /**
@@ -19,7 +21,7 @@ import dev.twunk.hytale.ref.AnyRef;
  * Hytale's code
  * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
  */
-public interface IOnAddRemove<ECS_TYPE extends WorldProvider> {
+public interface IOnAddRemove<ECS_TYPE extends WorldProvider> extends IEventConfig<ECS_TYPE>, IQuery<ECS_TYPE> {
     /**
      * Event for when an entity is added/loaded into the world
      *

@@ -2,6 +2,8 @@ package dev.twunk.hytale.interfaces.event;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
+import dev.twunk.hytale.interfaces.config.IEventConfig;
+import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.ref.AnyRef;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import javax.annotation.Nullable;
@@ -16,7 +18,7 @@ import javax.annotation.Nullable;
  * - extend SubSystemOwner (or look into its code to see what it does and dupe that)
  * - call `this.appendSubSystem`, passing in the sub system(s) IN THE ORDER you want them to run
  */
-public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> {
+public interface IOnScheduledTick<ECS_TYPE extends WorldProvider> extends IEventConfig<ECS_TYPE>, IQuery<ECS_TYPE> {
     @Nullable
     public abstract TickSchedule onScheduledTick(
         float dt,

@@ -6,6 +6,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.event.OnTick;
+import dev.twunk.hytale.interfaces.config.IEventConfig;
+import dev.twunk.hytale.interfaces.config.IQuery;
 
 /**
  * My code
@@ -15,8 +17,7 @@ import dev.twunk.hytale.event.OnTick;
  * @see EntityTickingSystem - Baseline hytale system for ticking entities.
  *                            It's the underlying driver of IEntityTickSubSystem
  */
-@FunctionalInterface
-public interface IOnWorldTick<ECS_TYPE extends WorldProvider> {
+public interface IOnWorldTick<ECS_TYPE extends WorldProvider> extends IEventConfig<ECS_TYPE>, IQuery<ECS_TYPE> {
     public void onWorldTick(
         float dt,
         ArchetypeChunk<ECS_TYPE> archetypeChunk,
