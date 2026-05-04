@@ -24,6 +24,7 @@ public class PoisonSystem implements IOnTick<EntityStore> {
         poison.addElapsedTime(dt);
         if (poison.getElapsedTime() >= poison.getTickInterval()) {
             poison.resetElapsedTime();
+            @SuppressWarnings({ "deprecation", "null" })
             Damage damage = new Damage(Damage.NULL_SOURCE, DamageCause.OUT_OF_WORLD, poison.getDamagePerTick());
             DamageSystems.executeDamage(ref, commandBuffer, damage);
             poison.decrementRemainingTicks();

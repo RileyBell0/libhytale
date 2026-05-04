@@ -81,7 +81,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
     private final ResourceType<ECS_TYPE, UUIDLookupResource<ECS_TYPE>> uuidLookupResourceType;
     private final ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponentType;
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({ "unchecked", "null" })
     protected OnScheduledTick(
         IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
