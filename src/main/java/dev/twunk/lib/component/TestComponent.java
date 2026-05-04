@@ -3,9 +3,9 @@ package dev.twunk.lib.component;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import dev.twunk.hytale.OnRegister;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
+import dev.twunk.hytale.interfaces.component.OnRegister;
 
 @Serializable
 public class TestComponent implements Component<ChunkStore> {

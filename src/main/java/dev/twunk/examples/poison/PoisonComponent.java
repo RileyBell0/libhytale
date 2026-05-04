@@ -35,9 +35,9 @@ package dev.twunk.examples.poison;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.twunk.hytale.OnRegister;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
+import dev.twunk.hytale.interfaces.component.OnRegister;
 import javax.annotation.Nullable;
 
 // @Serializable - Auto-generate a Codec from fields marked with @Serialize

@@ -1,4 +1,4 @@
-package dev.twunk.hytale;
+package dev.twunk.hytale.interfaces.component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

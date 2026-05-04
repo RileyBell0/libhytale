@@ -16,6 +16,7 @@ import dev.twunk.hytale.interfaces.methods.IRegistry;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class OnWorldTick<ECS_TYPE extends WorldProvider>
@@ -113,6 +114,20 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
 
     public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
         IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnWorldTick<ECS_TYPE> listener
+    ) {
+        return newDriverFor(registry, queryProider.getQuery(IOnWorldTick.class), listener);
+    }
+
+    public static final <ECS_TYPE extends WorldProvider, @Nonnull T extends Query<ECS_TYPE>> OnWorldTick<
+        ECS_TYPE
+    > newDriverFor(IRegistry<ECS_TYPE> registry, Function<Class<?>, T> queryProider, IOnWorldTick<ECS_TYPE> listener) {
+        return newDriverFor(registry, queryProider.apply(IOnWorldTick.class), listener);
+    }
+
+    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
         IOnWorldTick<ECS_TYPE> listener
     ) {
@@ -125,42 +140,6 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
             ),
             registry,
             query,
-            listener
-        );
-    }
-
-    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnWorldTick<ECS_TYPE> listener
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnWorldTick.class,
-                IRegistry.class,
-                Query.class,
-                IOnWorldTick.class
-            ),
-            registry,
-            queryProider.getQuery(IOnWorldTick.class),
-            listener
-        );
-    }
-
-    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Function<Class<?>, Query<ECS_TYPE>> queryProider,
-        IOnWorldTick<ECS_TYPE> listener
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnWorldTick.class,
-                IRegistry.class,
-                Query.class,
-                IOnWorldTick.class
-            ),
-            registry,
-            queryProider.apply(IOnWorldTick.class),
             listener
         );
     }

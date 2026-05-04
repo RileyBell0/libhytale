@@ -123,18 +123,14 @@ public abstract class OnBlockTick
         return newDriverFor(listener.getQuery(IOnBlockTick.class), listener);
     }
 
+    public static final OnBlockTick newDriverFor(IQuery<ChunkStore> queryProider, IOnBlockTick listener) {
+        return newDriverFor(queryProider.getQuery(IOnBlockTick.class), listener);
+    }
+
     public static final OnBlockTick newDriverFor(Query<ChunkStore> query, IOnBlockTick listener) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(OnBlockTick.class, Query.class, IOnBlockTick.class),
             query,
-            listener
-        );
-    }
-
-    public static final OnBlockTick newDriverFor(IQuery<ChunkStore> queryProider, IOnBlockTick listener) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick.class, Query.class, IOnBlockTick.class),
-            queryProider.getQuery(IOnBlockTick.class),
             listener
         );
     }

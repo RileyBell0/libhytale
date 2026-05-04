@@ -133,6 +133,14 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
 
     public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
         IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnTick<ECS_TYPE> listener
+    ) {
+        return newDriverFor(registry, queryProider.getQuery(IOnTick.class), listener);
+    }
+
+    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
         IOnTick<ECS_TYPE> listener
     ) {
@@ -140,19 +148,6 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
             IEventDriver.__dupeClassAndGetConstructor(OnTick.class, IRegistry.class, Query.class, IOnTick.class),
             registry,
             query,
-            listener
-        );
-    }
-
-    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnTick<ECS_TYPE> listener
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnTick.class, IRegistry.class, Query.class, IOnTick.class),
-            registry,
-            queryProider.getQuery(IOnTick.class),
             listener
         );
     }

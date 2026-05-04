@@ -164,6 +164,14 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
         return newDriverFor(registry, listener.getQuery(IOnAddRemove.class), listener);
     }
 
+    public static <ECS_TYPE extends WorldProvider> OnAddRemove<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnAddRemove<ECS_TYPE> listener
+    ) {
+        return newDriverFor(registry, queryProider.getQuery(IOnAddRemove.class), listener);
+    }
+
     /**
      * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
      * of subsystems, each one must secretly create a new class each and every time you call it
@@ -182,24 +190,6 @@ public abstract class OnAddRemove<ECS_TYPE extends WorldProvider>
             ),
             registry,
             query,
-            listener
-        );
-    }
-
-    public static <ECS_TYPE extends WorldProvider> OnAddRemove<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnAddRemove<ECS_TYPE> listener
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnAddRemove.class,
-                IRegistry.class,
-                Query.class,
-                IOnAddRemove.class
-            ),
-            registry,
-            queryProider.getQuery(IOnAddRemove.class),
             listener
         );
     }
