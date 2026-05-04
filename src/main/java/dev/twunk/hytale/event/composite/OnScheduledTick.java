@@ -303,7 +303,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
         if (!ref.isValid()) return;
 
         // run your tick method
-        final var res = listener.onScheduledTick(dt, this.tickResource.worldTick, AnyRef.of(ref), commandBuffer);
+        final var res = listener.onScheduledTick(dt, this.tickResource.worldTick, ref, commandBuffer);
         if (res == null) return;
 
         final var tickScheduleComponent = ref.getComponent(this.tickScheduleComponentType);
