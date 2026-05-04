@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Serializable
-public final class CurrentWorldTick<ECS_TYPE extends WorldProvider> implements Resource<ECS_TYPE> {
+public final class WorldTickResource<ECS_TYPE extends WorldProvider> implements Resource<ECS_TYPE> {
 
     @Serialize
     private long worldTick = 0;
@@ -24,8 +24,8 @@ public final class CurrentWorldTick<ECS_TYPE extends WorldProvider> implements R
     }
 
     @Nonnull
-    public final CurrentWorldTick<ECS_TYPE> clone() {
-        var data = new CurrentWorldTick<ECS_TYPE>();
+    public final WorldTickResource<ECS_TYPE> clone() {
+        var data = new WorldTickResource<ECS_TYPE>();
         data.worldTick = this.worldTick;
         return data;
     }
@@ -35,7 +35,7 @@ public final class CurrentWorldTick<ECS_TYPE extends WorldProvider> implements R
         implements IOnUniverseTick<ECS_TYPE>
     {
 
-        private final ResourceType<ECS_TYPE, CurrentWorldTick<ECS_TYPE>> resourceType;
+        private final ResourceType<ECS_TYPE, WorldTickResource<ECS_TYPE>> resourceType;
 
         @Nullable
         private UUID id = null;
@@ -43,7 +43,7 @@ public final class CurrentWorldTick<ECS_TYPE extends WorldProvider> implements R
         @SuppressWarnings({ "unchecked", "null" })
         protected WorldTickRunner(IRegistry<ECS_TYPE> registry) {
             super(registry);
-            this.resourceType = registry.getResourceType(CurrentWorldTick.class);
+            this.resourceType = registry.getResourceType(WorldTickResource.class);
         }
 
         @Override

@@ -1,4 +1,4 @@
-package dev.twunk.hytale.component;
+package dev.twunk.hytale.resource;
 
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,6 +9,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.codec.auto.Serializable;
+import dev.twunk.hytale.component.UUIDComponent;
 import dev.twunk.hytale.event.composite.QueryableCompositeSystem;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
 import dev.twunk.hytale.interfaces.methods.IRegistry;

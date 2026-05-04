@@ -11,7 +11,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.component.UUIDComponent;
-import dev.twunk.hytale.component.UUIDLookupResource;
 import dev.twunk.hytale.interfaces.IEventDriver;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnAddRemove;
@@ -20,7 +19,8 @@ import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
-import dev.twunk.hytale.resource.CurrentWorldTick;
+import dev.twunk.hytale.resource.UUIDLookupResource;
+import dev.twunk.hytale.resource.WorldTickResource;
 import dev.twunk.lib.component.ActivelyTickingComponent;
 import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.event.scheduled.SleepingEntity;
@@ -77,7 +77,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
     private final PriorityQueue<SleepingEntity> sleeping = new PriorityQueue<>();
     private final ComponentType<ECS_TYPE, ActivelyTickingComponent<ECS_TYPE>> activeFlagComponentType;
     private final ComponentType<ECS_TYPE, TickScheduleComponent<ECS_TYPE>> tickScheduleComponentType;
-    private final ResourceType<ECS_TYPE, CurrentWorldTick<ECS_TYPE>> worldTickResourceType;
+    private final ResourceType<ECS_TYPE, WorldTickResource<ECS_TYPE>> worldTickResourceType;
     private final ResourceType<ECS_TYPE, UUIDLookupResource<ECS_TYPE>> uuidLookupResourceType;
     private final ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponentType;
 
@@ -93,7 +93,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
         this.listener = listener;
         this.id = id;
         this.defaultSchedule = defaultSchedule;
-        this.worldTickResourceType = this.registry.getResourceType(CurrentWorldTick.class);
+        this.worldTickResourceType = this.registry.getResourceType(WorldTickResource.class);
         this.uuidLookupResourceType = this.registry.getResourceType(UUIDLookupResource.class);
         this.activeFlagComponentType = this.registry.getComponentType(ActivelyTickingComponent.class);
         this.uuidComponentType = this.registry.getComponentType(UUIDComponent.class);
