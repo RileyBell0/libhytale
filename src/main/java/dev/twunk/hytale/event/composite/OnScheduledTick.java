@@ -34,7 +34,6 @@ import dev.twunk.hytale.utils.ComponentUtils;
 import dev.twunk.lib.component.ActivelyTickingComponent;
 import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.event.scheduled.SleepingEntity;
-import dev.twunk.lib.event.scheduled.SleepingEntity__Block;
 import dev.twunk.lib.event.scheduled.TickSchedule;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import java.util.HashSet;
@@ -79,7 +78,7 @@ public class OnScheduledTick<
     @SuppressWarnings("null")
     private static ResourceType<ChunkStore, CurrentWorldTick> worldTickResourceType = null;
 
-    @SuppressWarnings("null")
+    @Nullable
     private CurrentWorldTick tickResource = null;
 
     @Override
@@ -119,15 +118,7 @@ public class OnScheduledTick<
     private ComponentType<ECS_TYPE, TickScheduleComponent<ECS_TYPE>> tickScheduleComponentType;
     private final ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponentType;
 
-    protected OnScheduledTick(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id
-    ) {
-        this(registry, query, listener, id, TickSchedule.ACTIVE);
-    }
-
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected OnScheduledTick(
         IRegistry<ECS_TYPE> registry,
         Query<ECS_TYPE> query,
@@ -140,38 +131,19 @@ public class OnScheduledTick<
         this.query = query;
         this.registry = registry;
         this.defaultSchedule = defaultSchedule;
+        this.activeFlagComponentType = registry.getComponentType(ActivelyTickingComponent.class);
+        this.uuidComponentType = registry.getComponentType(UUIDComponent.class);
+        this.tickScheduleComponentType = registry.getComponentType(TickScheduleComponent.class);
 
         if (this.registry instanceof ChunkRegisterProvider) {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            SleepingEntityCreator<ECS_TYPE> creator =
-                (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__ChunkStore;
-            this.sleepingEntityCreator = creator;
+            this.sleepingEntityCreator = (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__ChunkStore;
         } else {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            SleepingEntityCreator<ECS_TYPE> creator =
-                (SleepingEntityCreator) OnScheduledTick::sleepingEntityCreator__EntityStore;
-            this.sleepingEntityCreator = creator;
+            this.sleepingEntityCreator = (
+                Ref<ECS_TYPE> ref,
+                @Nonnull UUID uuid,
+                @Nonnull TickSchedule.Sleeping schedule
+            ) -> new SleepingEntity(uuid, schedule);
         }
-
-        @SuppressWarnings({ "unchecked", "null" })
-        @Nonnull
-        final ComponentType<ECS_TYPE, ActivelyTickingComponent<ECS_TYPE>> activeComponent =
-            this.registry.getComponentType(ActivelyTickingComponent.class);
-        this.activeFlagComponentType = activeComponent;
-
-        @SuppressWarnings({ "unchecked", "null" })
-        @Nonnull
-        ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponent = this.registry.getComponentType(
-            UUIDComponent.class
-        );
-        this.uuidComponentType = uuidComponent;
-
-        @SuppressWarnings({ "unchecked", "null" })
-        @Nonnull
-        ComponentType<ECS_TYPE, TickScheduleComponent<ECS_TYPE>> tickScheduleComponent = this.registry.getComponentType(
-            TickScheduleComponent.class
-        );
-        this.tickScheduleComponentType = tickScheduleComponent;
     }
 
     // ////////////////////////////////////////////////////////////////////////
@@ -236,6 +208,13 @@ public class OnScheduledTick<
         return this.query;
     }
 
+    @Override
+    public final IRegistry<ECS_TYPE> getRegistry() {
+        return this.registry;
+    }
+
+    // #endregion getters/setters
+
     public static final SleepingEntity sleepingEntityCreator__ChunkStore(
         Ref<ChunkStore> ref,
         UUID uuid,
@@ -254,23 +233,8 @@ public class OnScheduledTick<
         @Nonnull
         final var chunkIndex = ChunkUtils.Coords.Index.get(info);
 
-        return new SleepingEntity__Block(uuid, schedule, chunkIndex, blockIndex);
+        return new SleepingEntity.SleepingBlockEntity(uuid, schedule, chunkIndex, blockIndex);
     }
-
-    private static final SleepingEntity sleepingEntityCreator__EntityStore(
-        Ref<EntityStore> ref,
-        UUID uuid,
-        TickSchedule.Sleeping schedule
-    ) {
-        return new SleepingEntity(uuid, schedule);
-    }
-
-    @Override
-    public final IRegistry<ECS_TYPE> getRegistry() {
-        return this.registry;
-    }
-
-    // #endregion getters/setters
 
     // ////////////////////////////////////////////////////////////////////////
     // \/===========\/-  Logic driving the tick scheduling  -\/===========\/ //
@@ -283,7 +247,6 @@ public class OnScheduledTick<
      * Guarantees that entities will have a UUID component after this point.
      */
     @Override
-    @SuppressWarnings("unused")
     public final void onAdd(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         if (this.tickResource == null) {
             this.tickResource = commandBuffer
@@ -378,7 +341,7 @@ public class OnScheduledTick<
 
             // if we're in chunk mode we have to use the coords to get a ref
             final Ref<ECS_TYPE> ref = switch (next) {
-                case SleepingEntity__Block asChunk -> {
+                case SleepingEntity.SleepingBlockEntity asChunk -> {
                     // getRef based on its coords. We can't use UUID for this without modifying hytales ChunkStore to also record entites vs uuids and i so cbf doing that
                     @SuppressWarnings({ "unchecked", "rawtypes" })
                     final Ref<ECS_TYPE> blockRef = (Ref) BlockUtils.Refs.get(
@@ -477,28 +440,30 @@ public class OnScheduledTick<
     // #region hide
 
     /**
-     * Shim around other method for reducing boilerplate if i define a query on my class
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static final <
-        ECS_TYPE extends WorldProvider,
-        T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnScheduledTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener, String id) {
-        return newDriverFor(registry, listener.getQuery(IOnScheduledTick.class), listener, id, null);
+    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
+        IRegistry<ECS_TYPE> registry,
+        IQuery<ECS_TYPE> queryProider,
+        IOnScheduledTick<ECS_TYPE> listener,
+        String id
+    ) {
+        return newDriverFor(registry, queryProider.getQuery(IOnScheduledTick.class), listener, id);
     }
 
     /**
-     * Shim around other method for reducing boilerplate if i define a query on my class
+     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
+     * of subsystems, each one must secretly create a new class each and every time you call it
      */
-    public static final <
-        ECS_TYPE extends WorldProvider,
-        T extends IOnScheduledTick<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnScheduledTick<ECS_TYPE> newDriverFor(
+    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
         IRegistry<ECS_TYPE> registry,
-        T listener,
+        IQuery<ECS_TYPE> queryProider,
+        IOnScheduledTick<ECS_TYPE> listener,
         String id,
         @Nullable TickSchedule defaultSchedule
     ) {
-        return newDriverFor(registry, listener.getQuery(IOnScheduledTick.class), listener, id, defaultSchedule);
+        return newDriverFor(registry, queryProider.getQuery(IOnScheduledTick.class), listener, id, defaultSchedule);
     }
 
     /**
@@ -511,19 +476,7 @@ public class OnScheduledTick<
         IOnScheduledTick<ECS_TYPE> listener,
         String id
     ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnScheduledTick.class,
-                IRegistry.class,
-                Query.class,
-                IOnScheduledTick.class,
-                String.class
-            ),
-            registry,
-            query,
-            listener,
-            id
-        );
+        return newDriverFor(registry, query, listener, id, TickSchedule.ACTIVE);
     }
 
     /**
@@ -548,59 +501,6 @@ public class OnScheduledTick<
             ),
             registry,
             query,
-            listener,
-            id,
-            defaultSchedule
-        );
-    }
-
-    /**
-     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
-     * of subsystems, each one must secretly create a new class each and every time you call it
-     */
-    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnScheduledTick.class,
-                IRegistry.class,
-                Query.class,
-                IOnScheduledTick.class,
-                String.class
-            ),
-            registry,
-            queryProider.getQuery(IOnScheduledTick.class),
-            listener,
-            id
-        );
-    }
-
-    /**
-     * Hytale expects a new "class" for each system you register. Thus, to have these composable modules
-     * of subsystems, each one must secretly create a new class each and every time you call it
-     */
-    public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id,
-        @Nullable TickSchedule defaultSchedule
-    ) {
-        return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnScheduledTick.class,
-                IRegistry.class,
-                Query.class,
-                IOnScheduledTick.class,
-                String.class,
-                TickSchedule.class
-            ),
-            registry,
-            queryProider.getQuery(IOnScheduledTick.class),
             listener,
             id,
             defaultSchedule
