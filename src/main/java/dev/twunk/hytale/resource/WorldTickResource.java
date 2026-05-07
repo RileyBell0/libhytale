@@ -9,9 +9,10 @@ import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.hytale.event.composite.CompositeSystem;
 import dev.twunk.hytale.interfaces.event.IOnUniverseTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
-import java.util.UUID;
-import javax.annotation.Nonnull;
+
 import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.UUID;
 
 @Serializable
 public final class WorldTickResource<ECS_TYPE extends WorldProvider> implements Resource<ECS_TYPE> {
@@ -19,31 +20,31 @@ public final class WorldTickResource<ECS_TYPE extends WorldProvider> implements 
     @Serialize
     private long worldTick = 0;
 
-    public final long getTick() {
+    public long getTick() {
         return this.worldTick;
     }
 
-    @Nonnull
-    public final WorldTickResource<ECS_TYPE> clone() {
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    public WorldTickResource<ECS_TYPE> clone() {
         var data = new WorldTickResource<ECS_TYPE>();
         data.worldTick = this.worldTick;
         return data;
     }
 
     public static class WorldTickRunner<ECS_TYPE extends WorldProvider>
-        extends CompositeSystem<ECS_TYPE>
-        implements IOnUniverseTick<ECS_TYPE>
-    {
+            extends CompositeSystem<ECS_TYPE>
+            implements IOnUniverseTick<ECS_TYPE> {
 
         private final ResourceType<ECS_TYPE, WorldTickResource<ECS_TYPE>> resourceType;
 
         @Nullable
         private UUID id = null;
 
-        @SuppressWarnings({ "unchecked", "null" })
+
+        @SuppressWarnings({"null", "unchecked", "rawtypes"})
         protected WorldTickRunner(IRegistry<ECS_TYPE> registry) {
             super(registry);
-            this.resourceType = registry.getResourceType(WorldTickResource.class);
+            this.resourceType = (ResourceType) Objects.requireNonNull(registry.getResourceType(WorldTickResource.class));
         }
 
         @Override

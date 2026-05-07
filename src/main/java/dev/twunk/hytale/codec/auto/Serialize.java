@@ -13,13 +13,11 @@ public @interface Serialize {
      */
     boolean required() default false;
 
-    /**
-     * The string name (must start with an Uppercase Letter) under which to
-     * store the value in the CODEC. Defaults to the same name as the variable
-     * itself with an uppercase letter
-     *
-     * e.g. java variable named `myField` will be stored in the codec under "MyField": <>
-     */
+    /// The string name (must start with an Uppercase Letter) under which to
+    /// store the value in the CODEC. Defaults to the same name as the variable
+    /// itself with an uppercase letter
+    ///
+    /// e.g. java variable named `myField` will be stored in the codec under "MyField": <>
     String key() default "";
 
     /**
@@ -31,11 +29,9 @@ public @interface Serialize {
      */
     boolean inChunkStore() default true;
 
-    /**
-     * IFF the variable this is annotating is a short/int, i'll ensure it is
-     * greater than or equal to the value put in here
-     *
-     * If it's not a short/int, i'm not going to check anything.
-     */
+    /// IFF the variable this is annotating is a short/int, i'll ensure it is
+    /// greater than or equal to the value put in here
+    ///
+    /// If it's not a short/int, i'm not going to check anything.
     int min() default Integer.MIN_VALUE;
 }

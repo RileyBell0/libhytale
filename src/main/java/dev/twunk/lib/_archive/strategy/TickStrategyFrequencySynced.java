@@ -2,7 +2,7 @@ package dev.twunk.lib._archive.strategy;
 
 public class TickStrategyFrequencySynced extends TickStrategy {
 
-    // i want to run every X ticks
+    // I want to run every X ticks
     // - Importantly, all entities of the given type are synced for this
     // meaning, they will still be "sleeping" but by predetermined amounts
     public final int tickFrequency;

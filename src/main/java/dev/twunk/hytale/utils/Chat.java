@@ -5,10 +5,11 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import dev.twunk.hytale.codec.MessageCodec;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 
 /**
  * for writing messages to the chat. Scoped.
@@ -20,12 +21,13 @@ public abstract class Chat {
 
     private static final String DEFAULT_COLOR = "#00d9ed";
 
-    public static final String getColor(final @Nullable Level level) {
+    @SuppressWarnings("DuplicateBranchesInSwitch")
+    public static String getColor(final @Nullable Level level) {
         if (level == null) {
             return DEFAULT_COLOR;
         }
 
-        Integer val = level.intValue();
+        int val = level.intValue();
         return switch (val) {
             case Integer c when c <= Level.ALL.intValue() -> "#dadada";
             case Integer c when c <= Level.FINEST.intValue() -> "#a600ed";
@@ -40,7 +42,7 @@ public abstract class Chat {
     }
 
     @SuppressWarnings("null")
-    public static final Message parse(final @Nullable Object toMessage) {
+    public static Message parse(final @Nullable Object toMessage) {
         return switch (toMessage) {
             case Message m -> m;
             case String m -> Message.raw(m);
@@ -50,7 +52,7 @@ public abstract class Chat {
         };
     }
 
-    public static final Message join(final @Nullable Object... messages) {
+    public static Message join(final @Nullable Object... messages) {
         if (messages == null) {
             return Message.empty();
         }
@@ -77,11 +79,7 @@ public abstract class Chat {
             level = Level.INFO;
         }
 
-        if (level == null) {
-            return message.monospace(true);
-        }
-
-        final var prefix = Message.raw("[" + level.toString() + "] ").color(getColor(level)).bold(true).monospace(true);
+        final var prefix = Message.raw("[" + level + "] ").color(getColor(level)).bold(true).monospace(true);
 
         return Message.join(prefix, message.monospace(true)).monospace(true);
     }

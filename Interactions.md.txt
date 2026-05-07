@@ -40,14 +40,14 @@ Mine was created 4x times total, one near the start of setup, and three very clo
 
 not sure if that's going to be helpful info or not later
 
-seems like its just a good idea to define interactions super basically, just make a class and go from there
+seems like it's just a good idea to define interactions super basically, just make a class and go from there
 
-I COULD define "ids" or someting in it and make a map adn go back to my code with it but honestly, their code for this is actually totally fine, their API works, and makes sense, i can define block stuff on the block definition
-and since interactions are per BLOCK and not based on components i don't want it mixed in with systems anyway
+I COULD define "ids" or something in it and make a map adn go back to my code with it but honestly, their code for this is actually totally fine, their API works, and makes sense, I can define block stuff on the block definition
+and since interactions are per BLOCK and not based on components I don't want it mixed in with systems anyway
 
 so honestly, this works
 
-plus, i see how to do interactions now
+plus, I see how to do interactions now
 
 the structure is
 

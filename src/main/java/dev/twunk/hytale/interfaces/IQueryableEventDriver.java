@@ -7,7 +7,7 @@ import dev.twunk.hytale.interfaces.config.IQuery;
 public interface IQueryableEventDriver<
     ECS_TYPE extends WorldProvider
 > extends IEventDriver<ECS_TYPE>, IQuery<ECS_TYPE> {
-    public default void onRegister(JavaPlugin plugin) {
+    default void onRegister(JavaPlugin plugin) {
         this.getRegistry().registerEventListeners(plugin, this);
     }
 }

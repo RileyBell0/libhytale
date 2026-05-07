@@ -17,33 +17,31 @@ import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.registry.ChunkRegisterProvider;
 import dev.twunk.lib.registry.EntityRegisterProvider;
 
-/**
- * General need to knows for hytale's internals
- *
- * Stores
- * @see EntityStore EntityStore - same as ChunkStore but for entities
- * @see ChunkStore ChunkStore  - same as EntityStore but for blocks/chunks etc
- *
- * To clear up that recursive definition, a "store" stores stuff.
- * Ok, i hear you, that doesn't clear it up.
- * - An entity store contains "entities"
- * - A chunk store contains "blocks", "chunks", and "block entities"
- *
- * basically, if it moves or CAN move -> its probably an entity and in EntityStore
- * if it can't move and it's in a grid-like-fashion -> its probably a block/block-entity ChunkStore
- *
- * each world has these stores. So a WORLD has
- * - EntityStore: contains all the entities in the world (or a way to access
- *   them at the very least. obviously not ALL entities are stored in memory
- *   simultaneously. have you seen how large minecraft world sizes get? Hytale's
- *   BIGGER than minecraft (iirc) and 2b2t is 80 terrabytes. Nobody has that much ram)
- * - ChunkStore: contains all the chunks/blocks in the world
- *
- * Great, now we're officialy as clear as mud. I'll come back to this later. Unfortunately
- * the definition of "a store stores stuff" and that "its scoped to the world" and
- * "the kind of stuff it stores is defiend by either it being an `EntityStore` or `ChunkStore`
- * inside" is kind of the best definition i've got right now
- */
+/// General need to knows for hytale's internals
+///
+/// Stores
+/// @see EntityStore EntityStore - same as ChunkStore but for entities
+/// @see ChunkStore ChunkStore  - same as EntityStore but for blocks/chunks etc
+///
+/// To clear up that recursive definition, a "store" stores stuff.
+/// Ok, i hear you, that doesn't clear it up.
+/// - An entity store contains "entities"
+/// - A chunk store contains "blocks", "chunks", and "block entities"
+///
+/// basically, if it moves or CAN move -> its probably an entity and in EntityStore
+/// if it can't move and it's in a grid-like-fashion -> its probably a block/block-entity ChunkStore
+///
+/// each world has these stores. So a WORLD has
+/// - EntityStore: contains all the entities in the world (or a way to access
+///   them at the very least. obviously not ALL entities are stored in memory
+///   simultaneously. have you seen how large minecraft world sizes get? Hytale's
+///   BIGGER than minecraft (iirc) and 2b2t is 80 terrabytes. Nobody has that much ram)
+/// - ChunkStore: contains all the chunks/blocks in the world
+///
+/// Great, now we're officialy as clear as mud. I'll come back to this later. Unfortunately
+/// the definition of "a store stores stuff" and that "its scoped to the world" and
+/// "the kind of stuff it stores is defiend by either it being an \`EntityStore\` or \`ChunkStore\`
+/// inside" is kind of the best definition i've got right now
 public abstract class LibHytale {
 
     public static final EntityRegisterProvider ENTITY_REGISTRY = new EntityRegisterProvider();

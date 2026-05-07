@@ -1,21 +1,13 @@
 package dev.twunk.hytale.types;
 
-import java.util.Objects;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
-public final class ChunkCoordinates {
-
-    public final int x;
-    public final int z;
+public record ChunkCoordinates(int x, int z) {
 
     // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
     // ////////////////////////////////////////////////////////////////////////
-
-    public ChunkCoordinates(final int x, final int z) {
-        this.x = x;
-        this.z = z;
-    }
 
     @Override
     public boolean equals(@Nullable Object o) {
@@ -25,8 +17,8 @@ public final class ChunkCoordinates {
         if (o == null) return false;
         // type check and cast
         if (getClass() != o.getClass()) return false;
-        ChunkCoordinates othercoordslmao = (ChunkCoordinates) o;
+        ChunkCoordinates otherCoords = (ChunkCoordinates) o;
         // field comparison
-        return Objects.equals(x, othercoordslmao.x) && Objects.equals(z, othercoordslmao.z);
+        return Objects.equals(x, otherCoords.x) && Objects.equals(z, otherCoords.z);
     }
 }

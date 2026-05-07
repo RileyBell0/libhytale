@@ -20,42 +20,40 @@ import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import dev.twunk.hytale.interfaces.methods.IContainer;
 import dev.twunk.hytale.interfaces.methods.IPersistentContainer;
 import dev.twunk.hytale.ref.EntityRef;
+
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Currently just has a method for opening a GUI for a given container for a given player
- *
- * My code
- * @see IContainer          - MY container interface. Defines the methods a class must
- *                            satisfy to be able to be considered a container. Really base level.
- *                            requires:
- *                            - getCapacity of the container
- *                            - getContainer - container itself (doesn't have to be the same one each time,
- *                              e.g. for "trash" i just instantiate a new empty container each time
- *                              someone tries to open it)
- * @see IContainerComponent - is both IContainer and a Component. The absolte minimum
- *                            requirements for my ContainerUtils code functions.
- *
- *
- * Hytale's code
- * @see SimpleItemContainer - THE underlying BASE item container. Just stores items
- *                            and has a capacity. Really. if you need to store items
- *                            in any capacity, probably just use this
- */
+/// Currently just has a method for opening a GUI for a given container for a given player
+///
+/// My code
+///
+/// @see IContainer          - MY container interface. Defines the methods a class must
+///                            satisfy to be able to be considered a container. Really base level.
+///                            requires:
+///                            - getCapacity of the container
+///                            - getContainer - container itself (doesn't have to be the same one each time,
+///                              e.g. for "trash" I just instantiate a new empty container each time
+///                              someone tries to open it)
+/// @see IContainerComponent - is both IContainer and a Component. The absolute minimum
+///                            requirements for my ContainerUtils code functions.
+///
+///
+/// Hytale's code
+/// @see SimpleItemContainer - THE underlying BASE item container. Just stores items
+///                            and has a capacity. Really. if you need to store items
+///                            in any capacity, probably just use this
 public abstract class ContainerUtils {
 
-    /**
-     * Opens a UI window for the player (only works for players here) for the
-     * container within the container component type
-     *
-     * Most of this comes from the hytale src code
-     */
+    /// Opens a UI window for the player (only works for players here) for the
+    /// container within the container component type
+    ///
+    /// Most of this comes from the hytale src code
     public static void openContainerGUI(
-        final ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType,
-        final CommandBuffer<EntityStore> commandBuffer,
-        final InteractionContext context,
-        final Vector3i pos
+            final ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> containerComponentType,
+            final CommandBuffer<EntityStore> commandBuffer,
+            final InteractionContext context,
+            final Vector3i pos
     ) {
         // get ref to the block we're looking at
         final EntityRef ref = new EntityRef(context.getEntity());
@@ -88,14 +86,17 @@ public abstract class ContainerUtils {
 
         final UUID uuid = uuidComponent.getUuid();
         final WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(pos.x, pos.z));
-        @SuppressWarnings("removal")
-        final ContainerBlockWindow window = new ContainerBlockWindow(
-            pos.x,
-            pos.y,
-            pos.z,
-            chunk.getRotationIndex(pos.x, pos.y, pos.z),
-            blockType,
-            container
+        if (chunk == null) {
+            return;
+        }
+
+        @SuppressWarnings("removal") final ContainerBlockWindow window = new ContainerBlockWindow(
+                pos.x,
+                pos.y,
+                pos.z,
+                chunk.getRotationIndex(pos.x, pos.y, pos.z),
+                blockType,
+                container
         );
 
         final Map<UUID, ContainerBlockWindow> windows = containerComponent.getWindows();
@@ -129,21 +130,20 @@ public abstract class ContainerUtils {
                 world.setBlockInteractionState(pos, currentBlockType, "CloseWindow");
             }
 
-            final BlockType interactionStatex = currentBlockType.getBlockForState("CloseWindow");
-            if (interactionStatex == null) {
+            final BlockType interactionState = currentBlockType.getBlockForState("CloseWindow");
+            if (interactionState == null) {
                 return;
             }
-            final int soundEventIndexx = interactionStatex.getInteractionSoundEventIndex();
-            if (soundEventIndexx == 0) {
+            final int soundEventIndex = interactionState.getInteractionSoundEventIndex();
+            if (soundEventIndex == 0) {
                 return;
             }
 
-            @SuppressWarnings("removal")
-            final int rotationIndexx = chunk.getRotationIndex(pos.x, pos.y, pos.z);
-            final Vector3d soundPosx = new Vector3d();
-            blockType.getBlockCenter(rotationIndexx, soundPosx);
-            soundPosx.add(pos);
-            SoundUtil.playSoundEvent3d(ref, soundEventIndexx, soundPosx, commandBuffer);
+            @SuppressWarnings("removal") final int rotationIndex = chunk.getRotationIndex(pos.x, pos.y, pos.z);
+            final Vector3d soundPos = new Vector3d();
+            blockType.getBlockCenter(rotationIndex, soundPos);
+            soundPos.add(pos);
+            SoundUtil.playSoundEvent3d(ref, soundEventIndex, soundPos, commandBuffer);
         });
 
         if (windows.size() == 1) {
@@ -160,8 +160,7 @@ public abstract class ContainerUtils {
             return;
         }
 
-        @SuppressWarnings("removal")
-        final int rotationIndex = chunk.getRotationIndex(pos.x, pos.y, pos.z);
+        @SuppressWarnings("removal") final int rotationIndex = chunk.getRotationIndex(pos.x, pos.y, pos.z);
         final Vector3d soundPos = new Vector3d();
         blockType.getBlockCenter(rotationIndex, soundPos);
         soundPos.add(pos);

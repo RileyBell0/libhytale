@@ -10,12 +10,14 @@ import dev.twunk.hytale.types.ChunkCoordinates;
 import dev.twunk.hytale.utils.BlockUtils;
 import dev.twunk.hytale.utils.ChunkUtils;
 import dev.twunk.hytale.utils.ComponentUtils;
+
 import javax.annotation.Nullable;
 
 /**
  * Implements the SAME methods as Ref<ChunkStore> BUT also will include a bunch
  * more methods from Utils so that you can just take a ref and access the stuff
  * you want without having to go through a billion processes
+ *
  * @see AnyRef
  * @see Ref (Ref<ChunkStore>)
  */
@@ -23,21 +25,29 @@ public final class BlockRef extends AnyRef<ChunkStore> {
 
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_STATE_INFO_COMPONENT_TYPE =
-        BlockStateInfo.getComponentType();
+            BlockStateInfo.getComponentType();
 
-    /** Index of the block within its chunk (local coords) */
+    /**
+     * Index of the block within its chunk (local coords)
+     */
     @Nullable
     private Integer blockIndex = null;
 
-    /** Index of the chunk within its world */
+    /**
+     * Index of the chunk within its world
+     */
     @Nullable
     private Long chunkIndex = null;
 
-    /** Reference to the chunk containing this block */
+    /**
+     * Reference to the chunk containing this block
+     */
     @Nullable
     private ChunkRef chunkRef = null;
 
-    /** Global coordinates of the block */
+    /**
+     * Global coordinates of the block
+     */
     @Nullable
     private Vector3i blockCoords = null;
 
@@ -61,18 +71,18 @@ public final class BlockRef extends AnyRef<ChunkStore> {
         super(ref);
     }
 
-    // suppressing "unchecked" but, really, i've checked it. silly java.
+    // suppressing "unchecked" but, really, I've checked it. silly java.
     @Nullable
     @Override
-    public final <T extends Component<ChunkStore>> T getComponent(
-        @Nullable ComponentType<ChunkStore, T> componentType
+    public <T extends Component<ChunkStore>> T getComponent(
+            @Nullable ComponentType<ChunkStore, T> componentType
     ) {
         if (componentType == null) {
             return null;
         }
 
-        // just gonna cache BlockStateInfo in here if i see it, i assume thats a
-        // frequent enough slip up that i'd prefer to just cache `info` rather
+        // just gonna cache BlockStateInfo in here if I see it, I assume that's a
+        // frequent enough slip up that I'd prefer to just cache `info` rather
         // than keep computing it
         if (componentType == BLOCK_STATE_INFO_COMPONENT_TYPE) {
             @SuppressWarnings("unchecked")
@@ -85,7 +95,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final BlockStateInfo getInfo() {
+    public BlockStateInfo getInfo() {
         if (this.info != null) {
             return this.info;
         }
@@ -96,7 +106,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final ChunkRef getOtherChunkRef(long otherChunkIndex) {
+    public ChunkRef getOtherChunkRef(long otherChunkIndex) {
         var loadedChunkRef = this.getChunkRef();
         if (loadedChunkRef == null) {
             return null;
@@ -106,7 +116,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final Integer getBlockId() {
+    public Integer getBlockId() {
         // block ID can only be found via world chunk
         var loadedChunkRef = this.getChunkRef();
         if (loadedChunkRef == null) {
@@ -123,7 +133,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final Integer getOtherBlockId(Vector3i otherBlockCoords) {
+    public Integer getOtherBlockId(Vector3i otherBlockCoords) {
         // block ID can only be found via world chunk
         var loadedChunkRef = this.getChunkRef();
         if (loadedChunkRef == null) {
@@ -139,12 +149,12 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final Integer getLocalIndex() {
+    public Integer getLocalIndex() {
         return this.getBlockIndex();
     }
 
     @Nullable
-    public final Integer getBlockIndex() {
+    public Integer getBlockIndex() {
         if (this.blockIndex != null) {
             return this.blockIndex;
         }
@@ -154,12 +164,12 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final Vector3i getCoords() {
+    public Vector3i getCoords() {
         return this.getBlockCoords();
     }
 
     @Nullable
-    public final Vector3i getBlockCoords() {
+    public Vector3i getBlockCoords() {
         if (this.blockCoords != null) {
             return this.blockCoords;
         }
@@ -176,7 +186,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final Long getChunkIndex() {
+    public Long getChunkIndex() {
         if (this.chunkIndex != null) {
             return this.chunkIndex;
         }
@@ -191,7 +201,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final ChunkRef getChunkRef() {
+    public ChunkRef getChunkRef() {
         if (this.chunkRef != null) {
             return this.chunkRef;
         }
@@ -206,7 +216,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Nullable
-    public final ChunkCoordinates getChunkCoords() {
+    public ChunkCoordinates getChunkCoords() {
         var loadedChunkIndex = this.getChunkIndex();
         if (loadedChunkIndex == null) {
             return null;
@@ -218,7 +228,7 @@ public final class BlockRef extends AnyRef<ChunkStore> {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return "BlockRef{" + super.toString() + "}";
     }
 }

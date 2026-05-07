@@ -10,16 +10,15 @@ import dev.twunk.hytale.codec.MessageCodec;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.hytale.utils.Chat;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 
-/**
- * An interaction that when run simply logs to the chat the message you included
- * with the severity you specified.
- *
- * Useful for light printf debugging interactions in-game
- */
+/// An interaction that when run simply logs to the chat the message you included
+/// with the severity you specified.
+///
+/// Useful for light printf debugging interactions in-game
 @Serializable(documentation = "Debug interaction that sends a message on use.")
 public class LogInteraction extends SimpleInstantInteraction {
 
@@ -31,32 +30,46 @@ public class LogInteraction extends SimpleInstantInteraction {
     @SuppressWarnings("null")
     private Level level = Level.INFO;
 
-    /** Your overarching message itself */
+    /**
+     * Your overarching message itself
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize(required = true)
     private String message = "";
 
-    /** The text color of the message (as hex string, e.g. "#cacaca") */
+    /**
+     * The text color of the message (as hex string, e.g. "#cacaca")
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     private @Nullable String color = null;
 
-    /** A link to associate with your message */
+    /**
+     * A link to associate with your message
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     private @Nullable String link = null;
 
-    /** If your message should be bold */
+    /**
+     * If your message should be bold
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     private boolean bold = false;
 
-    /** If your message should be italic */
+    /**
+     * If your message should be italic
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     private boolean italic = false;
 
-    /**
-     * Exra messages that will be joined to the end of the log. Useful for
-     * formatting or having text with different colors etc
-     *
-     * They'll be concatenated with Message.join before printing them
-     */
+    /// Exra messages that will be joined to the end of the log. Useful for
+    /// formatting or having text with different colors etc
+    ///
+    /// They'll be concatenated with Message.join before printing them
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     private ArrayList<MessageCodec> messages = new ArrayList<>();
 
@@ -69,14 +82,14 @@ public class LogInteraction extends SimpleInstantInteraction {
      * This one's designed to be part of an interaction workflow, to effectively 'printf'
      * debug your way through. Chuck it in part of any row of interactions and it'll log some
      * stuff for you.
-     *
+     * <p>
      * SO. this writes a message to the chat for the player that started the interaction
      */
     @Override
     protected void firstRun(
-        final InteractionType interactionType,
-        final InteractionContext interactionContext,
-        final CooldownHandler cooldownHandler
+            InteractionType interactionType,
+            InteractionContext interactionContext,
+            CooldownHandler cooldownHandler
     ) {
         final var commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {
@@ -95,11 +108,7 @@ public class LogInteraction extends SimpleInstantInteraction {
 
         Message msg;
         final var subMessages = this.messages.stream().map(MessageCodec::toMessage).toArray(Message[]::new);
-        if (subMessages == null) {
-            msg = Chat.parse(this.message);
-        } else {
-            msg = Message.join(Chat.parse(message), Message.join(subMessages));
-        }
+        msg = Message.join(Chat.parse(message), Message.join(subMessages));
 
         if (this.color != null) {
             msg = msg.color(this.color);

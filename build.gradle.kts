@@ -23,30 +23,30 @@ dependencies {
 }
 
 tasks {
-    val ENABLE_PREVIEW = "--enable-preview"
+    val enablePreview = "--enable-preview"
 
     // In our project we have the tasks compileJava and
     // compileTestJava that need to have the
     // --enable-preview compiler arguments.
-    withType<JavaCompile>() {
-        options.compilerArgs.add(ENABLE_PREVIEW)
+    withType<JavaCompile> {
+        options.compilerArgs.add(enablePreview)
         // Optionally we can show which preview feature we use.
         // options.compilerArgs.add("-Xlint:preview")
 
         // Explicitly setting compiler option --release
         // is needed when we wouldn't set the
-        // sourceCompatiblity and targetCompatibility
+        // sourceCompatibility and targetCompatibility
         // properties of the Java plugin extension.
         options.release.set(26)
     }
     // Test tasks need to have the JVM argument --enable-preview.
-    withType<Test>() {
+    withType<Test> {
         useJUnitPlatform()
-        jvmArgs.add(ENABLE_PREVIEW)
+        jvmArgs.add(enablePreview)
     }
     // JavaExec tasks need to have the JVM argument --enable-preview.
-    withType<JavaExec>() {
-        jvmArgs.add(ENABLE_PREVIEW)
+    withType<JavaExec> {
+        jvmArgs.add(enablePreview)
     }
 
     // test {

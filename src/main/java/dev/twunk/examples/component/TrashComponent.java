@@ -10,21 +10,21 @@ import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import dev.twunk.hytale.interfaces.methods.IContainer;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * My code
- * @see OpenContainerComponentInteraction - the interaction i wrote that is capable of
- *                                          opening a GUI for the block a trash can is on.
- * @see ContainerComponent                - A regular 'ol container without trash can schenanigans
- * @see IContainer                        - My interface for methods I need containers to
- *                                          fulfil to show them in GUI
- *
- * Hytale's code
- * @see OpenContainerInteraction - Their interaction that opens containers
- */
+/// My code
+///
+/// @see OpenContainerComponentInteraction - the interaction I wrote that is capable of
+/// opening a GUI for the block a trash can is on.
+/// @see ContainerComponent                - A regular 'ol container without trash can shenanigans
+/// @see IContainer                        - My interface for methods I need containers to
+/// fulfil to show them in GUI
+///
+/// Hytale's code
+/// @see OpenContainerInteraction - Their interaction that opens containers
 @Serializable
 public class TrashComponent<ECS_TYPE extends WorldProvider> implements IContainerComponent<ECS_TYPE> {
 
@@ -78,6 +78,7 @@ public class TrashComponent<ECS_TYPE extends WorldProvider> implements IContaine
         return this.canOpen;
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public TrashComponent<ECS_TYPE> clone() {
         var trash = new TrashComponent<ECS_TYPE>();

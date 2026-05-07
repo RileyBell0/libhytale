@@ -1,28 +1,28 @@
 package dev.twunk.lib.registry;
 
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-/**
- * I've got this filled with runtime exceptions atm since its just used in server startup
- *
- * so, conveniently as long as the server boots these will be fine, plus, the goal is to crash loudly
- * rather than fail silently atm
- *
- * also don't mind all the mentions to "Component" in here, just take that to mean the base `Class<T>` cause
- * yeah i cbf going through rn updating all the names of the vars, that's a step for when i'm doing
- * a more thorough passover at the end of this project
- */
+/// I've got this filled with runtime exceptions atm since it's just used in server startup
+///
+/// so, conveniently as long as the server boots these will be fine, plus, the goal is to crash loudly
+/// rather than fail silently atm
+///
+/// also don't mind all the mentions to "Component" in here, just take that to mean the base `Class<T>` cause
+/// yeah i cbf going through rn updating all the names of the vars, that's a step for when I'm doing
+/// a more thorough passover at the end of this project>
 public class TypeInferrer {
 
     @Nullable
-    public static final Class<?> getClassFromType(Type t) {
+    public static Class<?> getClassFromType(Type t) {
         if (t instanceof Class) {
             return (Class<?>) t;
         } else if (t instanceof ParameterizedType) {
@@ -35,7 +35,7 @@ public class TypeInferrer {
 
     @SuppressWarnings("unchecked")
     @Nullable
-    public static final <T> Class<? extends T> getClassFromTypeIfSubtypeOfProvidedClass(Class<T> clazz, Type t) {
+    public static <T> Class<? extends T> getClassFromTypeIfSubtypeOfProvidedClass(Class<T> clazz, Type t) {
         Class<?> innerClass = getClassFromType(t);
         if (innerClass == null) {
             return null;
@@ -48,27 +48,23 @@ public class TypeInferrer {
         return (Class<? extends T>) innerClass;
     }
 
-    private static final AnalysisReturn analyzeClass(Class<?> componentClass, int index, Class<?> clazz) {
+    private static AnalysisReturn analyzeClass(Class<?> componentClass, Class<?> clazz) {
         var searchRes = new AnalysisReturn();
         var superClass = clazz.getGenericSuperclass();
         if (superClass != null) {
-            searchRes.append(analyzeType(componentClass, index, superClass));
+            searchRes.append(analyzeType(componentClass, 0, superClass));
         }
         for (var val : clazz.getGenericInterfaces()) {
-            if (val == null) {
-                continue;
-            }
-
-            searchRes.append(analyzeType(componentClass, index, val));
+            searchRes.append(analyzeType(componentClass, 0, val));
         }
 
-        // finally, need to analyse results. Gotta join everything in current onto self then return results, the parent will filter so that i can just figure it out later
+        // finally, need to analyze results. Gotta join everything in current onto self then return results, the parent will filter so that I can just figure it out later
         // NOTE: ive tried joining it back onto the parent but there's no need since getActualTypeArguments will return any type arguments passed through to here anyway. so. yeah. we're already good to go.
 
         return searchRes;
     }
 
-    private static final AnalysisReturn analyzeType(Class<?> componentClass, int index, Type type) {
+    private static AnalysisReturn analyzeType(Class<?> componentClass, int index, Type type) {
         // figure out the underlying class of the type
         Class<?> clazz = getClassFromType(type);
         if (clazz == null) {
@@ -88,14 +84,10 @@ public class TypeInferrer {
         // recursively search through each interface defined on our class
         var subSearchRes = new AnalysisReturn();
         for (var val : clazz.getGenericInterfaces()) {
-            if (val == null) {
-                continue;
-            }
-
             subSearchRes.append(analyzeType(componentClass, index, val));
         }
 
-        // also recursively search up to the next superclass (and its interfaces etc etc)
+        // also recursively search up to the next superclass (and its interfaces etc)
         var superClass = clazz.getGenericSuperclass();
         if (superClass != null) {
             subSearchRes.append(analyzeType(componentClass, index, superClass));
@@ -117,29 +109,29 @@ public class TypeInferrer {
         for (var subClassGeneric : subSearchRes.current) {
             // and we'll sus the current ones and figure out what we plan to do with them
             // if our parent type isn't parameterized we can't keep following any of the current generic types up the tree, so we end here
-            if (!(subClassGeneric instanceof TypeVariable) || !(type instanceof ParameterizedType)) {
+            if (!(subClassGeneric instanceof TypeVariable)) {
                 // if it's NOT a type variable, this means something concrete was received, meaning
                 // we can stop looking down this path and save this
                 //
                 // We keep looking in general since we might find something MORE specific, really we could propell this
-                // up the tree but i'm not really sure how this works so i'll go for a full approach first then cut back
-                // where i can after
+                // up the tree but I'm not really sure how this works so I'll go for a full approach first then cut back
+                // where I can after
                 res.finalised.add(subClassGeneric);
                 continue;
             }
 
             // next up, we'll look backwards at OUR type arguments to figure out if this comes from one of ours, if so, we'll add OUR type argument
 
-            // so, we have type X and we want to figure out which one it is
+            // so, we have type X, and we want to figure out which one it is
 
             // remember:
             // genericA<A1> genericB<B1>
             // becomes
             // genericA<Concrete>
             // genericB<A1>
-            // so our next in heirarchy SHOULD be a type from our type arguments
+            // so our next in hierarchy SHOULD be a type from our type arguments
 
-            // in the case that we weren't lucky enough to have the type hard-coded as a given ECSStore for us
+            // in the case that we weren't lucky enough to have the type hard-coded as a given ECSStore for us,
             // we'll look backwards until we can either determine what one to use, or give up
             // Join 1x way up the tree towards component
             Type foundGeneric = null;
@@ -147,7 +139,7 @@ public class TypeInferrer {
                 var ourClassGeneric = ourClassTypes[i];
 
                 if (ourClassGeneric == subClassGeneric) {
-                    // if we found a mathcing generic from the subclass type variable
+                    // if we found a matching generic from the subclass type variable
                     // we can use that index to figure out which actual generic
                     // would have been passed where
                     //
@@ -164,19 +156,19 @@ public class TypeInferrer {
                     // - e.g. we have at this stage the info SubClass<?, ?> extends Component<B2>
                     // then we loop through to go hey was C the first type arg or the second?
                     // SubClass<B1, ?> extends Component<B2>
-                    // ok it wasnt that one, our class generic (B!) was not equal to sub class generic (B2)
+                    // ok it wasn't that one, our class generic (B!) was not equal to subclass generic (B2)
                     // then we find out
                     // SubClass<B1, B2> extends Component<B2>
                     // and we go
                     // ok is B2 == B2? woah ok sick so we KNOW that our SubClass must have passed its type param "B2" in index 1
                     // to the Component
                     //
-                    // then we can go ok what was ACTUALLY passed to our SubClass generics themselves
+                    // then we can go ok what was ACTUALLY passed to our SubClass generics themselves,
                     // and we find that our class definition for the actual types are as follows
                     // - MyClass<String, ChunkStore, EntityStore>
                     // - SubClass<A3, A2>
                     // - Component<B2>
-                    // thus we can simply go ok so since I component received b2, i'll see that i join on B2 in SubClass
+                    // thus we can simply go ok so since I component received b2, I'll see that I join on B2 in SubClass
                     // and return whatever subclass got instead, so subclass got A2 for its B2 param (A2 received in index 1)
                     // so we use that
                     //
@@ -197,28 +189,26 @@ public class TypeInferrer {
         return res;
     }
 
-    /**
-     * Returned value is not constrained by T directly, its constrained by the generic
-     * args T can accept, e.g. if T is
-     * ClassA<? extends String>
-     * then i might return the class String or any class that extends it
-     *
-     * if i return null, that means i don't know what the type is, i couldn't find it, something
-     * failed and it very much could be my logic in here, i'm not in with the java compiler
-     * crowd so i really don't know the specifics well enough here to make any bold or
-     * concrete statements
-     *
-     * Plus, if this gives you null when you're not expecting it, if YOU can find what
-     * class its used in the generic, odds are my code is wrong
-     *
-     * if you CAN'T find what class is used in the generic where it failed, my code probably
-     * can't either
-     */
+    /// Returned value is not constrained by T directly, it's constrained by the generic
+    /// args T can accept, e.g. if T is
+    /// ClassA<? extends String>
+    /// then I might return the class String or any class that extends it
+    ///
+    /// if I return null, that means I don't know what the type is, I couldn't find it, something
+    /// failed, and it very much could be my logic in here, I'm not in with the java compiler
+    /// crowd so I really don't know the specifics well enough here to make any bold or
+    /// concrete statements
+    ///
+    /// Plus, if this gives you null when you're not expecting it, if YOU can find what
+    /// class it's used in the generic, odds are my code is wrong
+    ///
+    /// if you CAN'T find what class is used in the generic where it failed, my code probably
+    /// can't either
     @Nullable
-    public static final <T> Class<?> inferTypeReceivedByGenericInClassT(Class<T> clazz, Class<? extends T> subClass) {
-        var prediction = analyzeClass(clazz, 0, subClass);
+    public static <T> Class<?> inferTypeReceivedByGenericInClassT(Class<T> clazz, Class<? extends T> subClass) {
+        var prediction = analyzeClass(clazz, subClass);
 
-        // 1) search all the types i've seen for classes
+        // 1) search all the types I've seen for classes
         var classes = new HashSet<Class<?>>();
         var allBounds = new HashSet<Type>();
         for (var type : prediction.allSeen) {
@@ -237,6 +227,11 @@ public class TypeInferrer {
         }
 
         // find the most extended/specific class (highest priority)
+        return getMostSpecificClass(classes);
+    }
+
+    @NullableDecl
+    private static Class<?> getMostSpecificClass(HashSet<Class<?>> classes) {
         Class<?> mostSpecificClass = null;
         for (var currentClass : classes) {
             if (mostSpecificClass == null) {
@@ -246,20 +241,19 @@ public class TypeInferrer {
                 continue;
             }
 
-            /**
-             * // shouldn't be possible for this to happen so just commented it out but yeah not certain
-             * if (
-             *     !currentClass.isAssignableFrom(mostSpecificClass) && !mostSpecificClass.isAssignableFrom(currentClass)
-             * ) {
-             *     continue;
-             * }
+            /*
+              // shouldn't be possible for this to happen so just commented it out but yeah not certain
+              if (
+                  !currentClass.isAssignableFrom(mostSpecificClass) && !mostSpecificClass.isAssignableFrom(currentClass)
+              ) {
+                  continue;
+              }
              */
 
             if (mostSpecificClass.isAssignableFrom(currentClass)) {
                 mostSpecificClass = currentClass;
             }
         }
-
         return mostSpecificClass;
     }
 }
@@ -271,12 +265,11 @@ class AnalysisReturn {
     public final Set<Type> lost = new HashSet<>();
     public final Set<Type> allSeen = new HashSet<>();
 
-    public AnalysisReturn append(AnalysisReturn other) {
+    public void append(AnalysisReturn other) {
         this.current.addAll(other.current);
         this.lost.addAll(other.lost);
         this.finalised.addAll(other.finalised);
         this.allSeen.addAll(other.allSeen);
-        return this;
     }
 
     @Override

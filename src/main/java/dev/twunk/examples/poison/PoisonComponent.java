@@ -1,34 +1,33 @@
-/**
- * Understanding the below code
- *
- * ### Annotations
- * @Serializable auto-generates a Codec for you
- * @Serialize    adds the given field to the auto-generated codec
- * @OnRegister   stores the generated ComponentType in the static field when
- *               it's created during component registration
- *
- * ### Running `onTick`
- * When registering your component a unique EntityTickingSystem is spun up
- * for your component.
- *
- * The (simplified) implementation of said ticking system is as follows
- *
- * ```java
- * @Override
- * public void tick(
- *     float dt,
- *     int index,
- *     ArchetypeChunk<ECS_TYPE> archetypeChunk,
- *     Store<ECS_TYPE> store,
- *     CommandBuffer<ECS_TYPE> commandBuffer
- * ) {
- *     var ref = archetypeChunk.getReferenceTo(index);
- *     var component = ref.getStore().getComponent(ref, componentType);
- *
- *     component.onTick(dt, ref, commandBuffer);
- * }
- * ```
- */
+/// Understanding the below code
+///
+/// ### Annotations
+///
+/// @Serializable auto-generates a Codec for you
+/// @Serialize adds the given field to the auto-generated codec
+/// @OnRegister stores the generated ComponentType in the static field when
+/// it's created during component registration
+///
+/// ### Running `onTick`
+/// When registering your component a unique EntityTickingSystem is spun up
+/// for your component.
+///
+/// The (simplified) implementation of said ticking system is as follows
+///
+/// ```java
+/// @Override
+/// public void tick(
+/// float dt,
+/// int index,
+/// ArchetypeChunk<ECS_TYPE> archetypeChunk,
+/// Store<ECS_TYPE> store,
+/// CommandBuffer<ECS_TYPE> commandBuffer
+/// ) {
+/// var ref = archetypeChunk.getReferenceTo(index);
+/// var component = ref.getStore().getComponent(ref, componentType);
+///
+/// component.onTick(dt, ref, commandBuffer);
+/// }
+/// ```
 
 package dev.twunk.examples.poison;
 
@@ -38,6 +37,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.hytale.interfaces.component.OnRegister;
+
 import javax.annotation.Nullable;
 
 // @Serializable - Auto-generate a Codec from fields marked with @Serialize
@@ -101,6 +101,7 @@ public class PoisonComponent implements Component<EntityStore> {
         return this.remainingTicks <= 0;
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Nullable
     @Override
     public Component<EntityStore> clone() {

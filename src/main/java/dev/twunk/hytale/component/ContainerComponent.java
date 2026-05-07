@@ -12,23 +12,22 @@ import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import dev.twunk.hytale.interfaces.methods.IContainer;
 import dev.twunk.hytale.interfaces.methods.IPersistentContainer;
+
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
 
-/**
- * My code
- * @see IContainer - My interface for methods I need containers to fulfil to
- *                   show them in GUI
- *
- * Hytale's code
- * @see OpenContainerInteraction - Their interaction that opens containers
- */
+/// My code
+///
+/// @see IContainer - My interface for methods I need containers to fulfil to
+///                   show them in GUI
+/// Hytale's code
+/// @see OpenContainerInteraction - Their interaction that opens containers
 @Serializable
 public class ContainerComponent<
-    ECS_TYPE extends WorldProvider
-> implements IContainerComponent<ECS_TYPE>, IPersistentContainer {
+        ECS_TYPE extends WorldProvider
+        > implements IContainerComponent<ECS_TYPE>, IPersistentContainer {
 
     //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
     //==> Codec
@@ -114,6 +113,8 @@ public class ContainerComponent<
         return this.worldChunk;
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    @Override
     public ContainerComponent<ECS_TYPE> clone() {
         var component = new ContainerComponent<ECS_TYPE>();
         component.container = this.container.clone();

@@ -3,20 +3,13 @@ package dev.twunk.lib.event.scheduled;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-public final class SleepingEntity implements Comparable<SleepingEntity> {
+public record SleepingEntity(UUID uuid, long nextTick) implements Comparable<SleepingEntity> {
 
-    public final UUID uuid;
-    public final long nextTick;
-
-    public SleepingEntity(UUID uuid, TickSchedule.Sleeping schedule) {
-        this.uuid = uuid;
-        this.nextTick = schedule.nextTick;
-    }
 
     @SuppressWarnings("null")
     @Override
     public int compareTo(@Nullable SleepingEntity o) {
-        return Long.compare(this.nextTick, o.nextTick);
+        return Long.compare(this.nextTick, o != null ? o.nextTick : 0);
     }
 
     @Override

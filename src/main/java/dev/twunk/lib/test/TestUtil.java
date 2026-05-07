@@ -18,7 +18,7 @@ public final class TestUtil {
 
     @SuppressWarnings("null")
     private static final ComponentType<ChunkStore, BlockStateInfo> BLOCK_INFO_COMPONENT =
-        BlockStateInfo.getComponentType();
+            BlockStateInfo.getComponentType();
 
     public final WorldProvider worldProvider;
 
@@ -42,73 +42,73 @@ public final class TestUtil {
 
     public final BlockChunk blockChunk;
 
+    // ```java
     // public TestUtil(
     //     final WorldChunk worldChunk,
     //     final CommandBuffer<ChunkStore> commandBuffer,
     //     final Vector3i blockCoords
     // ) {
     //     this.commandBuffer = commandBuffer;
-
+    //
     //     this.store = commandBuffer.getStore(); //  this works too
     //     // this.store = blockRef.getStore();
-
+    //
     //     this.chunkStore = commandBuffer.getExternalData(); // this one works too
     //     // this.chunkStore = blockRef.getStore().getExternalData();
-
+    //
     //     this.worldProvider = this.chunkStore;
-
+    //
     //     this.world = commandBuffer.getExternalData().getWorld();
     //     // this.world = blockRef.getStore().getExternalData().getWorld(); // this works too
-
+    //
     //     this.worldChunk = worldChunk;
-
+    //
     //     var blockChunk = worldChunk.getBlockComponentChunk();
     //     if (blockChunk == null) {
     //         throw new LibHytaleException("ERROR: BlockChunk was null!!!");
     //     }
-
+    //
     //     this.blockChunk = blockChunk;
-
+    //
     //     // this.blockRef = blockRef; // this works too
     //     var blockRef = Utils.Block.Ref_.getRef(commandBuffer, blockCoords);
     //     if (blockRef == null) {
     //         throw new LibHytaleException("ERROR: Failed to get ref for block at " + blockCoords);
     //     }
     //     this.blockRef = blockRef;
-
+    //
     //     var chunkRef = worldChunk.getReference();
     //     if (chunkRef == null) {
     //         throw new LibHytaleException("ERROR: chunk ref was null!!");
     //     }
-
+    //
     //     this.chunkRef = chunkRef;
     //     var info = blockRef.getStore().getComponent(blockRef, BLOCK_INFO_COMPONENT);
     //     if (info == null) {
     //         throw new LibHytaleException("ERROR: info was null");
     //     }
-
+    //
     //     // this works
-    //     var wlrdChunk = Utils.Chunk.WorldChunk_.getWorldChunk(info);
-    //     if (wlrdChunk == null) {
-    //         throw new LibHytaleException("ERROR: wlrdChunk was null");
+    //     var worldChunkVar = Utils.Chunk.WorldChunk_.getWorldChunk(info);
+    //     if (worldChunkVar == null) {
+    //         throw new LibHytaleException("ERROR: worldChunkVar was null");
     //     }
-
+    //
     //     /** this works too */
     //     if (Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) == null) {
     //         throw new LibHytaleException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) was null");
     //     }
-
+    //
     //     // sick, stuff seems to be working now?? weird
     //     if (Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) == null) {
     //         throw new LibHytaleException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromChunk(chunkRef) was null");
     //     }
     //     this.info = info;
     // }
+    // ```
 
     /**
-     * All methods that work with command buffer ALSO work with a block ref :) WOOOOOO
-     * @param commandBuffer
-     * @param blockCoords
+     * All methods that work with command buffer ALSO work with a block ref :)
      */
     public TestUtil(final CommandBuffer<ChunkStore> commandBuffer, final Vector3i blockCoords) {
         this.commandBuffer = commandBuffer;
@@ -156,9 +156,9 @@ public final class TestUtil {
         }
 
         // this works
-        final var wlrdChunk = dev.twunk.hytale.utils.ChunkUtils.WorldChunks.get(foundInfo);
-        if (wlrdChunk == null) {
-            throw new LibHytaleException("ERROR: wlrdChunk was null");
+        final var worldChunkVar = dev.twunk.hytale.utils.ChunkUtils.WorldChunks.get(foundInfo);
+        if (worldChunkVar == null) {
+            throw new LibHytaleException("ERROR: worldChunkVar was null");
         }
 
         final var foundBlockChunk = this.worldChunk.getBlockChunk();
@@ -167,7 +167,7 @@ public final class TestUtil {
         }
         this.blockChunk = foundBlockChunk;
 
-        /** this works too */
+        // this works too
         if (dev.twunk.hytale.utils.ChunkUtils.WorldChunks.get_blockRef(foundBlockRef) == null) {
             throw new LibHytaleException("ERROR: Utils.Chunk.WorldChunk_.getWorldChunkFromBlock(blockRef) was null");
         }

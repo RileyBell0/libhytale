@@ -7,13 +7,6 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.config.IEventConfig;
 import dev.twunk.lib.LibHytaleException;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Set;
-import javax.annotation.Nullable;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;
 import net.bytebuddy.description.type.TypeDescription;
@@ -22,24 +15,34 @@ import net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy;
 import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.utility.RandomString;
 
-/**
- * Helper interface that means you can easily register sub systems by default
- *
- * Only useful for sub systems that extend actual hytale systems.
- *
- * No touchy.
- */
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+
+/// Helper interface that means you can easily register sub systems by default
+///
+/// Only useful for sub systems that extend actual hytale systems.
+///
+/// No touchy.
 public interface IEventDriver<
-    ECS_TYPE extends WorldProvider
-> extends IRegistryProvider<ECS_TYPE>, IEventConfig<ECS_TYPE> {
-    static final @Nullable HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
+        ECS_TYPE extends WorldProvider
+        > extends IRegistryProvider<ECS_TYPE>, IEventConfig<ECS_TYPE> {
+    @Nullable
+    HytaleLogger.Api console = HytaleLogger.forEnclosingClass().atInfo();
 
     /**
      * It will ALWAYS return a new class, one that didn't exist before. don't abuse this method. it's prefixed with
      * two underscores for a good reason - making you question yourself before deciding to use this...
      */
     @SuppressWarnings("null")
-    public static <T> Class<? extends T> __duplicateClass(Class<T> subSystemClass, Class<?>... constructorArgTypes) {
+    static <T> Class<? extends T> __duplicateClass(Class<T> subSystemClass, Class<?>... constructorArgTypes) {
         int[] indexes = new int[constructorArgTypes.length];
         for (var i = 0; i < constructorArgTypes.length; i++) {
             indexes[i] = i;
@@ -48,36 +51,37 @@ public interface IEventDriver<
         try {
             // Define constraints/link to parent class
             return new ByteBuddy()
-                .with(
-                    new NamingStrategy.PrefixingRandom(subSystemClass.getName()) {
-                        @Override
-                        protected String name(TypeDescription superClass) {
-                            return IEventDriver.class.getName() + "$" + new RandomString().nextString();
-                        }
-                    }
-                )
-                .subclass(subSystemClass, ConstructorStrategy.Default.NO_CONSTRUCTORS)
-                // Add in the (now public) constructor
-                .defineConstructor(Modifier.PUBLIC)
-                .withParameters(constructorArgTypes)
-                .intercept(
-                    MethodCall.invoke(subSystemClass.getDeclaredConstructor(constructorArgTypes)).withArgument(indexes)
-                )
-                // Build the class
-                .make()
-                .load(subSystemClass.getClassLoader(), ClassLoadingStrategy.UsingLookup.of(MethodHandles.lookup()))
-                .getLoaded();
+                    .with(
+                            new NamingStrategy.PrefixingRandom(subSystemClass.getName()) {
+                                @Override
+                                @Nonnull
+                                protected String name(@Nonnull TypeDescription superClass) {
+                                    return IEventDriver.class.getName() + "$" + new RandomString().nextString();
+                                }
+                            }
+                    )
+                    .subclass(subSystemClass, ConstructorStrategy.Default.NO_CONSTRUCTORS)
+                    // Add in the (now public) constructor
+                    .defineConstructor(Modifier.PUBLIC)
+                    .withParameters(constructorArgTypes)
+                    .intercept(
+                            MethodCall.invoke(subSystemClass.getDeclaredConstructor(constructorArgTypes)).withArgument(indexes)
+                    )
+                    // Build the class
+                    .make()
+                    .load(subSystemClass.getClassLoader(), ClassLoadingStrategy.UsingLookup.of(MethodHandles.lookup()))
+                    .getLoaded();
         } catch (Exception e) {
             throw new LibHytaleException(
-                "RILEY, you called a constructor that doesnt exist for:" +
-                    "\n- CALLER class: " +
-                    subSystemClass.getName() +
-                    "\n- ARG TYPES:       " +
-                    constructorArgTypes +
-                    "\n- EXCEPTION:    " +
-                    e +
-                    "\n" +
-                    e.getCause()
+                    "RILEY, you called a constructor that doesn't exist for:" +
+                            "\n- CALLER class: " +
+                            subSystemClass.getName() +
+                            "\n- ARG TYPES:       " +
+                            Arrays.toString(constructorArgTypes) +
+                            "\n- EXCEPTION:    " +
+                            e +
+                            "\n" +
+                            e.getCause()
             );
         }
     }
@@ -87,9 +91,9 @@ public interface IEventDriver<
      * two underscores for a good reason - making you question yourself before deciding to use this...
      */
     @SuppressWarnings("null")
-    public static <T> Constructor<? extends T> __dupeClassAndGetConstructor(
-        Class<T> subSystemClass,
-        Class<?>... constructorArgTypes
+    static <T> Constructor<? extends T> __dupeClassAndGetConstructor(
+            Class<T> subSystemClass,
+            Class<?>... constructorArgTypes
     ) {
         int[] indexes = new int[constructorArgTypes.length];
         for (var i = 0; i < constructorArgTypes.length; i++) {
@@ -99,82 +103,76 @@ public interface IEventDriver<
         try {
             // Define constraints/link to parent class
             return new ByteBuddy()
-                .with(
-                    new NamingStrategy.PrefixingRandom(subSystemClass.getName()) {
-                        @Override
-                        protected String name(TypeDescription superClass) {
-                            return IEventDriver.class.getName() + "$" + new RandomString().nextString();
-                        }
-                    }
-                )
-                .subclass(subSystemClass, ConstructorStrategy.Default.NO_CONSTRUCTORS)
-                // Add in the (now public) constructor
-                .defineConstructor(Modifier.PUBLIC)
-                .withParameters(constructorArgTypes)
-                .intercept(
-                    MethodCall.invoke(subSystemClass.getDeclaredConstructor(constructorArgTypes)).withArgument(indexes)
-                )
-                // Build the class
-                .make()
-                .load(subSystemClass.getClassLoader(), ClassLoadingStrategy.UsingLookup.of(MethodHandles.lookup()))
-                .getLoaded()
-                .getDeclaredConstructor(constructorArgTypes);
+                    .with(
+                            new NamingStrategy.PrefixingRandom(subSystemClass.getName()) {
+                                @Override
+                                @Nonnull
+                                protected String name(@Nonnull TypeDescription superClass) {
+                                    return IEventDriver.class.getName() + "$" + new RandomString().nextString();
+                                }
+                            }
+                    )
+                    .subclass(subSystemClass, ConstructorStrategy.Default.NO_CONSTRUCTORS)
+                    // Add in the (now public) constructor
+                    .defineConstructor(Modifier.PUBLIC)
+                    .withParameters(constructorArgTypes)
+                    .intercept(
+                            MethodCall.invoke(subSystemClass.getDeclaredConstructor(constructorArgTypes)).withArgument(indexes)
+                    )
+                    // Build the class
+                    .make()
+                    .load(subSystemClass.getClassLoader(), ClassLoadingStrategy.UsingLookup.of(MethodHandles.lookup()))
+                    .getLoaded()
+                    .getDeclaredConstructor(constructorArgTypes);
         } catch (Exception e) {
             throw new LibHytaleException(
-                "RILEY, you called a constructor that doesnt exist for:" +
-                    "\n- CALLER class: " +
-                    subSystemClass.getName() +
-                    "\n- ARG TYPES:       " +
-                    constructorArgTypes +
-                    "\n- EXCEPTION:    " +
-                    e +
-                    "\n" +
-                    e.getCause()
+                    "RILEY, you called a constructor that doesn't exist for:" +
+                            "\n- CALLER class: " +
+                            subSystemClass.getName() +
+                            "\n- ARG TYPES:       " +
+                            Arrays.toString(constructorArgTypes) +
+                            "\n- EXCEPTION:    " +
+                            e +
+                            "\n" +
+                            e.getCause()
             );
         }
     }
 
-    public static <T> Constructor<T> __getConstructor(Class<T> clazz, Class<?>... args) {
+    static <T> Constructor<T> __getConstructor(Class<T> clazz, Class<?>... args) {
         // get the classes for the objects
         ArrayList<Class<?>> classes = new ArrayList<>();
-        for (var arg : args) {
-            classes.add(arg.getClass());
-        }
+        Collections.addAll(classes, args);
 
         try {
-            var constructor = clazz.getDeclaredConstructor(classes.toArray(Class<?>[]::new));
-            if (constructor == null) {
-                throw new LibHytaleException("ERROR: shouldn't have been null but was asfhao8wh23r");
-            }
-            return constructor;
+            return clazz.getDeclaredConstructor(classes.toArray(Class<?>[]::new));
         } catch (IllegalArgumentException | NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+            HytaleLogger.forEnclosingClass().atSevere().log("Error: " + e);
             throw new LibHytaleException(e);
         }
     }
 
-    public static <T> T __construct(Constructor<T> constructor, Object... args) {
+    static <T> T __construct(Constructor<T> constructor, Object... args) {
         try {
-            var res = constructor.newInstance(args);
-            if (res == null) {
-                throw new LibHytaleException("ERROR: shouldn't have been null but was asfhao8wh23r");
-            }
-            return res;
+            return constructor.newInstance(args);
         } catch (
-            InstantiationException
-            | IllegalAccessException
-            | IllegalArgumentException
-            | InvocationTargetException
-            | SecurityException e
+                InstantiationException
+                | IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException
+                | SecurityException e
         ) {
-            e.printStackTrace();
+            HytaleLogger.forEnclosingClass().atSevere().log("Error: " + e);
             throw new LibHytaleException(e);
         }
     }
 
-    public abstract void onRegister(JavaPlugin plugin);
+    void onRegister(JavaPlugin plugin);
 
-    public abstract boolean addDependency(Dependency<ECS_TYPE> dependency);
-    public abstract void setDependencies(Set<Dependency<ECS_TYPE>> dependencies);
-    public abstract void setGroup(@Nullable SystemGroup<ECS_TYPE> group);
+    @SuppressWarnings("UnusedReturnValue")
+    boolean addDependency(Dependency<ECS_TYPE> dependency);
+
+    void setDependencies(Set<Dependency<ECS_TYPE>> dependencies);
+
+    void setGroup(@Nullable SystemGroup<ECS_TYPE> group);
 }

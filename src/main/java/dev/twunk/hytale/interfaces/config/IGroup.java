@@ -6,12 +6,12 @@ import javax.annotation.Nullable;
 
 public interface IGroup<ECS_TYPE extends WorldProvider> {
     @Nullable
-    public default SystemGroup<ECS_TYPE> getGroup() {
+    default SystemGroup<ECS_TYPE> getGroup() {
         return null;
     }
 
     @Nullable
-    public default SystemGroup<ECS_TYPE> getGroup(Class<?> clazz) {
+    default SystemGroup<ECS_TYPE> getGroup(Class<?> clazz) {
         return this.getGroup();
     }
 }

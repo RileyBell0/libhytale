@@ -6,27 +6,29 @@ import com.hypixel.hytale.component.Resource;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> implements IRegistry<ECS_TYPE> {
 
     public final Map<
-        Class<? extends Component<ECS_TYPE>>,
-        ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>
-    > components = new HashMap<>();
+            Class<? extends Component<ECS_TYPE>>,
+            ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>
+            > components = new HashMap<>();
 
     public final Map<String, ComponentType<ECS_TYPE, ? extends Component<ECS_TYPE>>> componentsById = new HashMap<>();
 
     public final Map<
-        Class<? extends Resource<ECS_TYPE>>,
-        ResourceType<ECS_TYPE, ? extends Resource<ECS_TYPE>>
-    > resources = new HashMap<>();
+            Class<? extends Resource<ECS_TYPE>>,
+            ResourceType<ECS_TYPE, ? extends Resource<ECS_TYPE>>
+            > resources = new HashMap<>();
 
     public final Map<String, ResourceType<ECS_TYPE, ? extends Resource<ECS_TYPE>>> resourcesById = new HashMap<>();
 
-    protected ComponentRegistryHelper() {}
+    protected ComponentRegistryHelper() {
+    }
 
     /**
      * Registers the component type with the static map that stores
@@ -35,9 +37,9 @@ public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> im
      */
     @Override
     public final <T extends Component<ECS_TYPE>> void cacheComponentType(
-        ComponentType<ECS_TYPE, T> componentType,
-        Class<T> myClass,
-        String id
+            ComponentType<ECS_TYPE, T> componentType,
+            Class<T> myClass,
+            String id
     ) {
         this.components.put(myClass, componentType);
         this.componentsById.put(id, componentType);
@@ -51,7 +53,7 @@ public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> im
             return null;
         }
 
-        // casting is safe as long as i haven't stuffed something up
+        // casting is safe as long as I haven't stuffed something up
         @SuppressWarnings("unchecked")
         var res = (ComponentType<ECS_TYPE, T>) componentType;
 
@@ -67,9 +69,9 @@ public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> im
 
     @Override
     public final <T extends Resource<ECS_TYPE>> void cacheResourceType(
-        ResourceType<ECS_TYPE, T> resourceType,
-        Class<T> myClass,
-        String id
+            ResourceType<ECS_TYPE, T> resourceType,
+            Class<T> myClass,
+            String id
     ) {
         this.resources.put(myClass, resourceType);
         this.resourcesById.put(id, resourceType);
@@ -83,7 +85,7 @@ public abstract class ComponentRegistryHelper<ECS_TYPE extends WorldProvider> im
             return null;
         }
 
-        // casting is safe as long as i haven't stuffed something up
+        // casting is safe as long as I haven't stuffed something up
         @SuppressWarnings("unchecked")
         var res = (ResourceType<ECS_TYPE, T>) resourceType;
 

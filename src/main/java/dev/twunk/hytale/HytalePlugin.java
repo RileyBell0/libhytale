@@ -14,7 +14,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.lib.registry.TypeInferrer;
 
-// Simple wrapper around JavaPlugin to make behaviour less annoying...
+// Simple wrapper around JavaPlugin to make behavior less annoying...
 public abstract class HytalePlugin extends JavaPlugin {
 
     private static final HytaleLogger console = HytaleLogger.forEnclosingClass();
@@ -39,9 +39,9 @@ public abstract class HytalePlugin extends JavaPlugin {
     //    (component/interaction)
     // /////////////////////////////////////////////
     // Register event listeners for components of the given type. Note: this will
-    // setup systems to call the methods defined ON your component of type T
+    // set up systems to call the methods defined ON your component of type T
     //
-    //  T should extend Interaction or Component
+    //   should extend Interaction or Component
 
     @SuppressWarnings("null")
     public final <T> void register(Class<T> clazz) {
@@ -57,20 +57,20 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     @SuppressWarnings("null")
-    public static final <T> void register(JavaPlugin plugin, Class<T> clazz) {
+    public static <T> void register(JavaPlugin plugin, Class<T> clazz) {
         HytalePlugin.register0(plugin, clazz, IRegistry.getBuilderCodec(clazz), clazz.getName());
     }
 
-    public static final <T> void register(JavaPlugin plugin, Class<T> clazz, String id) {
+    public static <T> void register(JavaPlugin plugin, Class<T> clazz, String id) {
         HytalePlugin.register0(plugin, clazz, IRegistry.getBuilderCodec(clazz), id);
     }
 
-    public static final <T> void register(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
+    public static <T> void register(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
         HytalePlugin.register0(plugin, clazz, codec, id);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected static final void register0(JavaPlugin plugin, Class clazz, BuilderCodec codec, String id) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected static void register0(JavaPlugin plugin, Class clazz, BuilderCodec codec, String id) {
         if (Interaction.class.isAssignableFrom(clazz)) {
             HytalePlugin.registerInteraction0(plugin, clazz, codec, id);
         }
@@ -85,14 +85,16 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     @SuppressWarnings("unchecked")
-    protected static final <T extends Component<?>> void registerComponent0(
-        JavaPlugin plugin,
-        Class<T> componentClass,
-        BuilderCodec<T> codec,
-        String id
+    protected static <T extends Component<?>> void registerComponent0(
+            JavaPlugin plugin,
+            Class<T> componentClass,
+            BuilderCodec<T> codec,
+            String id
     ) {
         final var inferredStore = TypeInferrer.inferTypeReceivedByGenericInClassT(Component.class, componentClass);
-        if (ChunkStore.class.isAssignableFrom(inferredStore)) {
+        if (inferredStore == null) {
+            console.atWarning().log(" > [INFERRED] ECS type  <Common>   " + componentClass);
+        } else if (ChunkStore.class.isAssignableFrom(inferredStore)) {
             console.atInfo().log(" > [INFERRED] ECS type  <Chunk>    " + componentClass);
         } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
             console.atInfo().log(" > [INFERRED] ECS type  <Entity>   " + componentClass);
@@ -100,21 +102,20 @@ public abstract class HytalePlugin extends JavaPlugin {
             console.atWarning().log(" > [INFERRED] ECS type  <Common>   " + componentClass);
         }
 
-        @SuppressWarnings("rawtypes")
-        final Class rawClass = componentClass;
+        @SuppressWarnings("rawtypes") final Class rawClass = componentClass;
 
-        @SuppressWarnings("rawtypes")
-        final BuilderCodec rawCodec = codec;
+        @SuppressWarnings("rawtypes") final BuilderCodec rawCodec = codec;
 
-        if (ChunkStore.class.isAssignableFrom(inferredStore)) {
+        if (inferredStore != null && ChunkStore.class.isAssignableFrom(inferredStore)) {
             final var chunkComponentType = LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
 
             InitComponentType.trySetAnnotatedComponentType(rawClass, ChunkStore.class, chunkComponentType);
-        } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
+        } else if (inferredStore != null && EntityStore.class.isAssignableFrom(inferredStore)) {
             final var entityComponentType = LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
 
             InitComponentType.trySetAnnotatedComponentType(rawClass, EntityStore.class, entityComponentType);
         } else {
+            // same as `inferredStore == null` statement
             final var chunkComponentType = LibHytale.CHUNK_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
             final var entityComponentType = LibHytale.ENTITY_REGISTRY.registerComponent(plugin, rawClass, rawCodec, id);
 
@@ -124,14 +125,16 @@ public abstract class HytalePlugin extends JavaPlugin {
     }
 
     @SuppressWarnings("unchecked")
-    protected static final <T extends Resource<?>> void registerResource0(
-        JavaPlugin plugin,
-        Class<T> resourceClass,
-        BuilderCodec<T> codec,
-        String id
+    protected static <T extends Resource<?>> void registerResource0(
+            JavaPlugin plugin,
+            Class<T> resourceClass,
+            BuilderCodec<T> codec,
+            String id
     ) {
         final var inferredStore = TypeInferrer.inferTypeReceivedByGenericInClassT(Resource.class, resourceClass);
-        if (ChunkStore.class.isAssignableFrom(inferredStore)) {
+        if (inferredStore == null) {
+            console.atWarning().log(" > [INFERRED] ECS type  <Common>   " + resourceClass);
+        } else if (ChunkStore.class.isAssignableFrom(inferredStore)) {
             console.atInfo().log(" > [INFERRED] ECS type  <Chunk>    " + resourceClass);
         } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
             console.atInfo().log(" > [INFERRED] ECS type  <Entity>   " + resourceClass);
@@ -139,15 +142,13 @@ public abstract class HytalePlugin extends JavaPlugin {
             console.atWarning().log(" > [INFERRED] ECS type  <Common>   " + resourceClass);
         }
 
-        @SuppressWarnings("rawtypes")
-        final Class rawClass = resourceClass;
+        @SuppressWarnings("rawtypes") final Class rawClass = resourceClass;
 
-        @SuppressWarnings("rawtypes")
-        final BuilderCodec rawCodec = codec;
+        @SuppressWarnings("rawtypes") final BuilderCodec rawCodec = codec;
 
-        if (ChunkStore.class.isAssignableFrom(inferredStore)) {
+        if (inferredStore != null && ChunkStore.class.isAssignableFrom(inferredStore)) {
             LibHytale.CHUNK_REGISTRY.registerResource(plugin, rawClass, rawCodec, id);
-        } else if (EntityStore.class.isAssignableFrom(inferredStore)) {
+        } else if (inferredStore != null && EntityStore.class.isAssignableFrom(inferredStore)) {
             LibHytale.ENTITY_REGISTRY.registerResource(plugin, rawClass, rawCodec, id);
         } else {
             LibHytale.CHUNK_REGISTRY.registerResource(plugin, rawClass, rawCodec, id);
@@ -155,10 +156,11 @@ public abstract class HytalePlugin extends JavaPlugin {
         }
     }
 
-    protected static final <T extends Interaction> Assets<
-        Interaction,
-        ? extends Codec<? extends Interaction>
-    > registerInteraction0(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
+    @SuppressWarnings("UnusedReturnValue")
+    protected static <T extends Interaction> Assets<
+            Interaction,
+            ? extends Codec<? extends Interaction>
+            > registerInteraction0(JavaPlugin plugin, Class<T> clazz, BuilderCodec<T> codec, String id) {
         return plugin.getCodecRegistry(Interaction.CODEC).register(id, clazz, codec);
     }
 }

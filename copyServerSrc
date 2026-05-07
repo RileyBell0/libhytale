@@ -2,5 +2,5 @@
 cd /home/rileyb/coding/patcher
 
 
-# copy to dest
+# copy to destination directory
 # cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/libtwunk/src/main/java/

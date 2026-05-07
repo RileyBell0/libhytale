@@ -10,17 +10,16 @@ import dev.twunk.hytale.interfaces.config.IEventConfig;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.ref.AnyRef;
 
-/**
- * WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
- *
- * Methods for my subsytem version of `RefSystem<ECS_Store>`
- *
- * My code
- * @see OnAddRemove      - The base subsystem that "runs" something with "IEntityLifetime"
- *
- * Hytale's code
- * @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
- */
+/// WARNING: dependencies don't seem to really matter for OnAddRemove, always seems to get called at the start of the tick
+///
+/// Methods for my subsystem version of `RefSystem<ECS_Store>`
+///
+/// My code
+///
+/// @see OnAddRemove      - The base subsystem that "runs" something with "IEntityLifetime"
+///
+/// Hytale's code
+/// @see RefSystem - Hytale's underlying system that provides the `onEntityAdded` and `onEntityRemove` events
 public interface IOnAddRemove<ECS_TYPE extends WorldProvider> extends IEventConfig<ECS_TYPE>, IQuery<ECS_TYPE> {
     /**
      * Event for when an entity is added/loaded into the world
@@ -33,7 +32,8 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> extends IEventConf
      *                      and run your MUTATION methods using the `store` within the lambda
      *                      you pass to `commandBuffer.run(...)`
      */
-    public default void onAdd(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {}
+    default void onAdd(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+    }
 
     /**
      * Event for when an entity is removed/unloaded from the world
@@ -46,5 +46,6 @@ public interface IOnAddRemove<ECS_TYPE extends WorldProvider> extends IEventConf
      *                      and run your MUTATION methods using the `store` within the lambda
      *                      you pass to `commandBuffer.run(...)`
      */
-    public default void onRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {}
+    default void onRemove(AnyRef<ECS_TYPE> ref, RemoveReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
+    }
 }

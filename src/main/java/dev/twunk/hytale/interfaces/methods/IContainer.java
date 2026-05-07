@@ -10,30 +10,30 @@ import dev.twunk.hytale.interaction.OpenContainerComponentInteraction;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * My code
- * @see ContainerComponent                - Basically just this + Component
- * @see OpenContainerComponentInteraction - My interaction that'll open a GUI for the ContainerComponent
- *                                          on the block it's attached to
- *
- * Hytale's code
- * @see OpenContainerInteraction - Their interaction that opens containers
- */
+/// My code
+/// @see ContainerComponent                - Basically just this + Component
+/// @see OpenContainerComponentInteraction - My interaction that'll open a GUI for the ContainerComponent
+///                                          on the block it's attached to
+///
+/// Hytale's code
+/// @see OpenContainerInteraction - Their interaction that opens containers
 public interface IContainer {
-    public Map<UUID, ContainerBlockWindow> getWindows();
+     Map<UUID, ContainerBlockWindow> getWindows();
 
-    public SimpleItemContainer getContainer();
+     SimpleItemContainer getContainer();
 
-    public short getCapacity();
+     short getCapacity();
 
-    public default <ECS_TYPE extends WorldProvider> void onOpen(final Ref<ECS_TYPE> ref) {}
+     default <ECS_TYPE extends WorldProvider> void onOpen(final Ref<ECS_TYPE> ref) {
+        // TODO not sure if this is used
+    }
 
     // Hytale src code (deprecated) called this `isAllowViewing`
-    public default boolean canView() {
+     default boolean canView() {
         return true;
     }
 
-    public default boolean canOpen() {
+     default boolean canOpen() {
         return true;
     }
 }

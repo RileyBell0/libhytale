@@ -5,11 +5,13 @@ import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
-import java.io.IOException;
-import java.util.function.Function;
-import javax.annotation.Nullable;
+import dev.twunk.lib.LibHytaleException;
 import org.bson.BsonString;
 import org.bson.BsonValue;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.function.Function;
 
 public class FromStringCodec<T> implements Codec<T> {
 
@@ -46,9 +48,14 @@ public class FromStringCodec<T> implements Codec<T> {
 
     @Override
     public BsonValue encode(@Nullable T t, @Nullable ExtraInfo extraInfo) {
+        if (t == null) {
+            throw new LibHytaleException("ERROR: not sure why but t value is null in " + extraInfo);
+        }
+
         return new BsonString(this.encoder.apply(t));
     }
 
+    @Override
     @Nullable
     public T decodeJson(RawJsonReader reader, @Nullable ExtraInfo extraInfo) throws IOException {
         return this.decoder.apply(reader.readString());

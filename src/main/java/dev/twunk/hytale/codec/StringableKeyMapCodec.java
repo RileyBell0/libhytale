@@ -7,14 +7,15 @@ import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.ObjectSchema;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
+import org.bson.BsonDocument;
+import org.bson.BsonValue;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.bson.BsonDocument;
-import org.bson.BsonValue;
 
 public class StringableKeyMapCodec<K, V, M extends Map<K, V>> implements Codec<Map<K, V>> {
 
@@ -40,14 +41,19 @@ public class StringableKeyMapCodec<K, V, M extends Map<K, V>> implements Codec<M
 
             for (Entry<String, BsonValue> entry : bsonDocument.entrySet()) {
                 @SuppressWarnings("null")
-                @Nonnull
-                final String keyStr = entry.getKey();
+                @Nonnull final String keyStr = entry.getKey();
                 extraInfo.pushKey(keyStr);
                 final var key = this.keyCodec.fromString(keyStr);
+                if (key == null) {
+                    continue;
+                }
 
                 final BsonValue value = entry.getValue();
                 try {
-                    map.put(key, this.valueCodec.decode(value, extraInfo));
+                    var val = this.valueCodec.decode(value, extraInfo);
+                    if (val != null) {
+                        map.put(key, val);
+                    }
                 } catch (Exception var13) {
                     throw new CodecException("Failed to decode", value, extraInfo, var13);
                 } finally {
@@ -73,10 +79,10 @@ public class StringableKeyMapCodec<K, V, M extends Map<K, V>> implements Codec<M
             final BsonValue value = this.valueCodec.encode(entry.getValue(), extraInfo);
 
             if (
-                value != null &&
-                !value.isNull() &&
-                (!value.isDocument() || !value.asDocument().isEmpty()) &&
-                (!value.isArray() || !value.asArray().isEmpty())
+                    value != null &&
+                            !value.isNull() &&
+                            (!value.isDocument() || !value.asDocument().isEmpty()) &&
+                            (!value.isArray() || !value.asArray().isEmpty())
             ) {
                 bsonDocument.put(key, value);
             }
@@ -102,9 +108,13 @@ public class StringableKeyMapCodec<K, V, M extends Map<K, V>> implements Codec<M
                 reader.expect(':');
                 reader.consumeWhiteSpace();
                 extraInfo.pushKey(keyStr, reader);
+                var val = this.valueCodec.decodeJson(reader, extraInfo);
+                if (key == null || val == null) {
+                    continue;
+                }
 
                 try {
-                    map.put(key, this.valueCodec.decodeJson(reader, extraInfo));
+                    map.put(key, val);
                 } catch (Exception var9) {
                     throw new CodecException("Failed to decode", reader, extraInfo, var9);
                 } finally {
@@ -121,9 +131,8 @@ public class StringableKeyMapCodec<K, V, M extends Map<K, V>> implements Codec<M
         }
     }
 
-    @Nonnull
     @Override
-    public Schema toSchema(@Nonnull SchemaContext context) {
+    public Schema toSchema(SchemaContext context) {
         ObjectSchema schema = new ObjectSchema();
         schema.setTitle("Map");
         return schema;

@@ -2,9 +2,9 @@ package dev.twunk.lib._archive.strategy;
 
 public class TickStrategyFrequency extends TickStrategy {
 
-    // i want to run every X ticks
+    // I want to run every X ticks
     // - basically just means we want to SLEEP x seconds between each run for each
-    // component, BUT, they don't necessarily need to be synchronised
+    // component, BUT, they don't necessarily need to be synchronized
     public final int tickFrequency;
 
     // When something starts ticking, this is how long we should DELAY until
@@ -33,15 +33,15 @@ public class TickStrategyFrequency extends TickStrategy {
         this.initialDelay = enforceInitialDelayBounds(initialDelay);
     }
 
-    private static final int enforceFrequencyBounds(final int tickFrequency) {
-        return tickFrequency < 1 ? 1 : tickFrequency;
+    private static int enforceFrequencyBounds(final int tickFrequency) {
+        return Math.max(tickFrequency, 1);
     }
 
-    private static final int enforceInitialDelayBounds(final int initialDelay) {
-        return initialDelay < 0 ? 0 : initialDelay;
+    private static int enforceInitialDelayBounds(final int initialDelay) {
+        return Math.max(initialDelay, 0);
     }
 
-    public static final TickStrategyFrequency always() {
+    public static TickStrategyFrequency always() {
         return new TickStrategyFrequency();
     }
 }

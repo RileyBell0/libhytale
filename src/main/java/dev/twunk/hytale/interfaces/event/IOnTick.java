@@ -8,14 +8,12 @@ import dev.twunk.hytale.interfaces.config.IEventConfig;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.ref.AnyRef;
 
-/**
- * My code
- * @see OnTick - SubSystem that runs IEntityTick methods via IEntityTickSystem(s)
- *
- * Hytale's code
- * @see EntityTickingSystem - Baseline hytale system for ticking entities.
- *                            It's the underlying driver of IEntityTickSubSystem
- */
+/// My code
+/// @see OnTick - SubSystem that runs IEntityTick methods via IEntityTickSystem(s)
+///
+/// Hytale's code
+/// @see EntityTickingSystem - Baseline hytale system for ticking entities.
+///                            It's the underlying driver of IEntityTickSubSystem
 public interface IOnTick<ECS_TYPE extends WorldProvider> extends IEventConfig<ECS_TYPE>, IQuery<ECS_TYPE> {
-    public void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer);
+    void onTick(float dt, AnyRef<ECS_TYPE> ref, CommandBuffer<ECS_TYPE> commandBuffer);
 }

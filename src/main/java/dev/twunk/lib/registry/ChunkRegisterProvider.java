@@ -4,7 +4,6 @@ import com.hypixel.hytale.component.ComponentRegistryProxy;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import dev.twunk.hytale.event.OnBlockTick;
-import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,12 +22,11 @@ public final class ChunkRegisterProvider extends ComponentRegistryHelper<ChunkSt
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> List<EventDriver<ChunkStore>> bindRegistrySpecificEventListeners(JavaPlugin _unused, T listener) {
         List<EventDriver<ChunkStore>> drivers = new ArrayList<>();
 
-        if (listener instanceof IQuery q && listener instanceof IOnBlockTick l) {
-            drivers.add(EventDriver.of(OnBlockTick.newDriverFor(q, l), IOnBlockTick.class));
+        if (listener instanceof IOnBlockTick l) {
+            drivers.add(EventDriver.of(OnBlockTick.newDriverFor(l, l), IOnBlockTick.class));
         }
 
         return drivers;

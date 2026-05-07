@@ -20,24 +20,24 @@ import dev.twunk.hytale.component.ContainerComponent;
 import dev.twunk.hytale.interfaces.component.IContainerComponent;
 import dev.twunk.hytale.interfaces.methods.IContainer;
 import dev.twunk.hytale.utils.ContainerUtils;
-import javax.annotation.Nullable;
 
-/**
- * @see ContainerComponent                - a basic container. Effectively, a block + ContainerComponent
- *                                          + OpenContainerComponentInteraction is effectively just a chest
- * @see IContainerComponent               - IContainer + Component -> simplest form of a container in a component
- * @see IContainer                        - The minimum requirements something needs to satisfy to be considered a container
- * @see TrashComponent                    - an alternative implementation of IContainerComponent, showing you
- *                                          other ways of utilising containers for more unique use-cases
- * @see OpenContainerComponentInteraction - my interaction for opening a GUI for containers stored in a component
- *                                          on a block (specifically extensions or implementors of IContainerComponent)
- *
- * Hytale's code that I based my implementation around
- * @see OpenContainerInteraction - Their interaction that opens containers
- */
+import javax.annotation.Nullable;
+import java.util.Objects;
+
+/// @see ContainerComponent                - a basic container. Effectively, a block + ContainerComponent
+///                                          + OpenContainerComponentInteraction is effectively just a chest
+/// @see IContainerComponent               - IContainer + Component -> simplest form of a container in a component
+/// @see IContainer                        - The minimum requirements something needs to satisfy to be considered a container
+/// @see TrashComponent                    - an alternative implementation of IContainerComponent, showing you
+///                                          other ways of utilising containers for more unique use-cases
+/// @see OpenContainerComponentInteraction - my interaction for opening a GUI for containers stored in a component
+///                                          on a block (specifically extensions or implementors of IContainerComponent)
+///
+/// Hytale's code that I based my implementation around
+/// @see OpenContainerInteraction - Their interaction that opens containers
 @Serializable(
-    inherits = SimpleBlockInteraction.class,
-    documentation = "Opens the container of the block currently being interacted with based on its ContainerComponent."
+        inherits = SimpleBlockInteraction.class,
+        documentation = "Opens the container of the block currently being interacted with based on its ContainerComponent."
 )
 public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
@@ -48,10 +48,10 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
      * Pass in the ID of the container component that this interaction will search for
      * and open on the interacted entity
      */
-    @SuppressWarnings({ "unchecked", "null" })
+    @SuppressWarnings({"unchecked", "CanBeFinal"})
     @Serialize
     private ComponentType<ChunkStore, ? extends IContainerComponent<ChunkStore>> componentType =
-        LibHytale.CHUNK_REGISTRY.getComponentType(ContainerComponent.class);
+            Objects.requireNonNull(LibHytale.CHUNK_REGISTRY.getComponentType(ContainerComponent.class));
 
     //--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/--/-
 
@@ -61,24 +61,24 @@ public class OpenContainerComponentInteraction extends SimpleBlockInteraction {
 
     @Override
     protected void interactWithBlock(
-        final World world2,
-        final CommandBuffer<EntityStore> commandBuffer,
-        final InteractionType type,
-        final InteractionContext context,
-        final @Nullable ItemStack itemInHand,
-        final Vector3i pos,
-        final CooldownHandler cooldownHandler
+            World world2,
+            CommandBuffer<EntityStore> commandBuffer,
+            InteractionType type,
+            InteractionContext context,
+            @Nullable ItemStack itemInHand,
+            Vector3i pos,
+            CooldownHandler cooldownHandler
     ) {
         ContainerUtils.openContainerGUI(this.componentType, commandBuffer, context, pos);
     }
 
     @Override
     protected void simulateInteractWithBlock(
-        final InteractionType type,
-        final InteractionContext context,
-        final @Nullable ItemStack itemInHand,
-        final World world,
-        final Vector3i targetBlock
+            InteractionType type,
+            InteractionContext context,
+            @Nullable ItemStack itemInHand,
+            World world,
+            Vector3i targetBlock
     ) {
         /* simulate interact with block is what gets run when an NPC or smthn like that interacts with this. They don't need a GUI. They're not real */
     }

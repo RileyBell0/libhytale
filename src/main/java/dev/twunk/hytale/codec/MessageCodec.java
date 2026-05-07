@@ -17,6 +17,7 @@ public class MessageCodec {
      * Your overarching message itself
      */
     @Serialize
+    @SuppressWarnings("CanBeFinal")
     private String message = "";
 
     /**
@@ -24,6 +25,7 @@ public class MessageCodec {
      * The text color of the message (as hex string, e.g. "#cacaca")
      */
     @Serialize
+    @SuppressWarnings("CanBeFinal")
     private @Nullable String color = null;
 
     /**
@@ -31,6 +33,7 @@ public class MessageCodec {
      * A link to associate with your message
      */
     @Serialize
+    @SuppressWarnings("CanBeFinal")
     private @Nullable String link = null;
 
     /**
@@ -38,6 +41,7 @@ public class MessageCodec {
      * If your message should be bold
      */
     @Serialize
+    @SuppressWarnings("CanBeFinal")
     private boolean bold = false;
 
     /**
@@ -45,6 +49,7 @@ public class MessageCodec {
      * If your message should be italic
      */
     @Serialize
+    @SuppressWarnings("CanBeFinal")
     private boolean italic = false;
 
     // ////////////////////////////////////////////////////////////////////////

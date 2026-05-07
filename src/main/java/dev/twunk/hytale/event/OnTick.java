@@ -15,35 +15,34 @@ import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.AnyRef;
+
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 
-/**
- * Subsystem for calling `onEntityTick` on the parent system every tick
- *
- * GOAL: run code on entities every tick
- *
- * REQUIRES:
- * - N/A (this is a leaf)
- * PRODUCES:
- * - IEntityTickSystem runner
- *
- *
- * My code
- * @see IOnTick       - Underlying method for ticking an entity
- *
- * Hytale's code
- * @see EntityTickingSystem    - Baseline hytale system for ticking entities.
- *                               It's the underlying driver of IEntityTickSubSystem
- * @see ArchetypeTickingSystem - Underlying sort of baseline ticking system (that i know how to implement).
- *                               Runs ONCE per tick (global, not per matching entity, just runs a single
- *                               time per tick) and has an inbuilt query
- */
+/// Subsystem for calling `onEntityTick` on the parent system every tick
+///
+/// GOAL: run code on entities every tick
+///
+/// REQUIRES:
+/// - N/A (this is a leaf)
+/// PRODUCES:
+/// - IEntityTickSystem runner
+///
+///
+/// My code
+///
+/// @see IOnTick       - Underlying method for ticking an entity
+///
+/// Hytale's code
+/// @see EntityTickingSystem    - Baseline hytale system for ticking entities.
+///                               It's the underlying driver of IEntityTickSubSystem
+/// @see ArchetypeTickingSystem - Underlying sort of baseline ticking system (that i know how to implement).
+///                               Runs ONCE per tick (global, not per matching entity, just runs a single
+///                               time per tick) and has an inbuilt query
 public abstract class OnTick<ECS_TYPE extends WorldProvider>
-    extends EntityTickingSystem<ECS_TYPE> // EntityTickingSystem is hytale's underlying code that powers this
-    implements ISystemEventDriver<ECS_TYPE>
-{
+        extends EntityTickingSystem<ECS_TYPE> // EntityTickingSystem is hytale's underlying code that powers this
+        implements ISystemEventDriver<ECS_TYPE> {
 
     private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
 
@@ -65,11 +64,11 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     // ////////////////////////////////////////////////////////////////////////
 
     public final void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
+            float dt,
+            int index,
+            ArchetypeChunk<ECS_TYPE> archetypeChunk,
+            Store<ECS_TYPE> store,
+            CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         listener.onTick(dt, AnyRef.of(archetypeChunk.getReferenceTo(index)), commandBuffer);
     }
@@ -125,30 +124,30 @@ public abstract class OnTick<ECS_TYPE extends WorldProvider>
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
-    public static final <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>> OnTick<
-        ECS_TYPE
-    > newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
+    public static <ECS_TYPE extends WorldProvider, T extends IOnTick<ECS_TYPE> & IQuery<ECS_TYPE>> OnTick<
+            ECS_TYPE
+            > newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
         return newDriverFor(registry, listener.getQuery(IOnTick.class), listener);
     }
 
-    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnTick<ECS_TYPE> listener
+    public static <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
+            IRegistry<ECS_TYPE> registry,
+            IQuery<ECS_TYPE> queryProvider,
+            IOnTick<ECS_TYPE> listener
     ) {
-        return newDriverFor(registry, queryProider.getQuery(IOnTick.class), listener);
+        return newDriverFor(registry, queryProvider.getQuery(IOnTick.class), listener);
     }
 
-    public static final <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        IOnTick<ECS_TYPE> listener
+    public static <ECS_TYPE extends WorldProvider> OnTick<ECS_TYPE> newDriverFor(
+            IRegistry<ECS_TYPE> registry,
+            Query<ECS_TYPE> query,
+            IOnTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnTick.class, IRegistry.class, Query.class, IOnTick.class),
-            registry,
-            query,
-            listener
+                IEventDriver.__dupeClassAndGetConstructor(OnTick.class, IRegistry.class, Query.class, IOnTick.class),
+                registry,
+                query,
+                listener
         );
     }
 

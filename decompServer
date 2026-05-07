@@ -11,7 +11,7 @@ rm -rf /home/rileyb/coding/patcher/hytale-server
 rm -rf /home/rileyb/coding/patcher/work
 cp /home/rileyb/coding/vineflower.jar /home/rileyb/coding/patcher/tools
 
-# copy in latest server from hytales game folder
+# copy in latest server from hytale's game folder
 HYTALE_HOME=~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/install/release/package/game/latest
 printf "\nUpdating Hytale Server resources from:\n"
 printf "$HYTALE_HOME\n\n"
@@ -35,5 +35,5 @@ pip install -r requirements.txt
 python run.py setup
 
 
-# copy to dest
+# copy to destination
 # cp -r ./hytale-server/src/main/java/* /home/rileyb/coding/libtwunk/src/main/java/

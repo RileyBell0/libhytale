@@ -8,15 +8,16 @@ import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
 import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.lib.event.scheduled.TickSchedule.Sleeping;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.annotation.Nullable;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
 import org.bson.BsonString;
 import org.bson.BsonValue;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 class TickScheduleCodec implements Codec<TickSchedule> {
 
@@ -66,21 +67,21 @@ class TickScheduleCodec implements Codec<TickSchedule> {
 
             switch (state) {
                 case "active":
-                    if (map.size() != 0) {
+                    if (!map.isEmpty()) {
                         throw new CodecException("Error, extra keys found in TickSchedule codec of type 'active'");
                     }
                     return TickSchedule.ACTIVE;
                 case "sleeping":
                     if (map.size() != 1 || !map.containsKey("NextTick")) {
                         throw new CodecException(
-                            "Error, `NextTick` field not found in TickSchedule of type 'sleeping'"
+                                "Error, `NextTick` field not found in TickSchedule of type 'sleeping'"
                         );
                     }
                     var nextTick = map.get("NextTick").asInt64().getValue();
 
                     return new Sleeping(nextTick);
                 case "stopped":
-                    if (map.size() != 0) {
+                    if (!map.isEmpty()) {
                         throw new CodecException("Error, extra keys found in TickSchedule codec of type 'stopped'");
                     }
                     return TickSchedule.STOP;
@@ -99,14 +100,14 @@ class TickScheduleCodec implements Codec<TickSchedule> {
         BsonDocument bsonDocument = new BsonDocument();
 
         bsonDocument.put(
-            "State",
-            new BsonString(
-                switch (t) {
-                    case TickSchedule.Active _ -> "active";
-                    case TickSchedule.Sleeping _ -> "sleeping";
-                    case TickSchedule.Stopped _ -> "stopped";
-                }
-            )
+                "State",
+                new BsonString(
+                        switch (t) {
+                            case TickSchedule.Active _ -> "active";
+                            case TickSchedule.Sleeping _ -> "sleeping";
+                            case TickSchedule.Stopped _ -> "stopped";
+                        }
+                )
         );
 
         if (t instanceof TickSchedule.Sleeping s) {
@@ -155,7 +156,7 @@ class TickScheduleCodec implements Codec<TickSchedule> {
                     nextTick = Codec.LONG.decodeJson(reader, extraInfo);
                 } else {
                     throw new CodecException(
-                        "Unexpected key " + key + " encountered when decoding TickSchedule via json"
+                            "Unexpected key " + key + " encountered when decoding TickSchedule via json"
                     );
                 }
 
@@ -169,14 +170,14 @@ class TickScheduleCodec implements Codec<TickSchedule> {
 
             if (state == null || (!state.equals("active") && !state.equals("sleeping") && !state.equals("stopped"))) {
                 throw new CodecException(
-                    "Unexpected value " +
-                        state +
-                        " encountered for 'State' in codec TickSchedule (json) - must be one of (active|sleeping|stopped)"
+                        "Unexpected value " +
+                                state +
+                                " encountered for 'State' in codec TickSchedule (json) - must be one of (active|sleeping|stopped)"
                 );
             }
             if (!state.equals("sleeping") && nextTick != null) {
                 throw new CodecException(
-                    "NextTick set for state " + state + " except its only expected for 'State' sleeping"
+                        "NextTick set for state " + state + " except its only expected for 'State' sleeping"
                 );
             }
 
@@ -201,12 +202,12 @@ class TickScheduleCodec implements Codec<TickSchedule> {
 }
 
 public sealed interface TickSchedule permits TickSchedule.Active, TickSchedule.Sleeping, TickSchedule.Stopped {
-    // its defined above in TickScheduleCodec to be basically the same logic as a NoSQL db entry
+    // it's defined above in TickScheduleCodec to be basically the same logic as a NoSQL db entry
     // -> a field defines what "type" it is, then the rest gets parsed as that type
-    public static final Codec<TickSchedule> CODEC = new TickScheduleCodec();
+    Codec<TickSchedule> CODEC = new TickScheduleCodec();
 
-    public static final TickSchedule ACTIVE = new TickSchedule.Active();
-    public static final TickSchedule STOP = new TickSchedule.Stopped();
+    TickSchedule ACTIVE = new TickSchedule.Active();
+    TickSchedule STOP = new TickSchedule.Stopped();
 
     // ////////////////////////////////////////////////////////////////////////
     // \/======================\/-  Methods  -\/==========================\/ //
@@ -215,14 +216,13 @@ public sealed interface TickSchedule permits TickSchedule.Active, TickSchedule.S
     /**
      * Keep ticking at the same frequency as before
      */
-    public final class Active implements TickSchedule {}
+    final class Active implements TickSchedule {
+    }
 
-    /**
-     * Don't tick until the given amount of time has passed (or until x ticks etc)
-     *
-     * notably, you can set this to be sleeping forever
-     */
-    public final class Sleeping implements TickSchedule {
+    /// Don't tick until the given amount of time has passed (or until x ticks etc.)
+    ///
+    /// notably, you can set this to be sleeping forever
+    final class Sleeping implements TickSchedule {
 
         // note: only has a default value so that the codec can construct this
         @SuppressWarnings("null")
@@ -236,12 +236,15 @@ public sealed interface TickSchedule permits TickSchedule.Active, TickSchedule.S
             this.nextTick = wakeUpTick;
         }
 
-        public Sleeping() {}
+        public Sleeping() {
+        }
 
+        // TODO
         // public static Sleeping forSeconds(final long seconds) {
         //     return new TickSchedule.Sleeping(30 * seconds);
         // }
 
+        // TODO
         // public static Sleeping forTicks(final long ticks) {
         //     return new Sleeping(ticks);
         // }
@@ -250,5 +253,6 @@ public sealed interface TickSchedule permits TickSchedule.Active, TickSchedule.S
     /**
      * Goodbye ticking forever
      */
-    public final class Stopped implements TickSchedule {}
+    final class Stopped implements TickSchedule {
+    }
 }

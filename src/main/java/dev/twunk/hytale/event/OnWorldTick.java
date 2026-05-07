@@ -13,16 +13,16 @@ import dev.twunk.hytale.interfaces.ISystemEventDriver;
 import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnWorldTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
+import org.checkerframework.checker.nullness.compatqual.NonNullType;
+
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class OnWorldTick<ECS_TYPE extends WorldProvider>
-    extends ArchetypeTickingSystem<ECS_TYPE>
-    implements ISystemEventDriver<ECS_TYPE>
-{
+        extends ArchetypeTickingSystem<ECS_TYPE>
+        implements ISystemEventDriver<ECS_TYPE> {
 
     private Set<Dependency<ECS_TYPE>> dependencies = new HashSet<>();
 
@@ -45,10 +45,10 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
 
     @Override
     public void tick(
-        float dt,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
+            float dt,
+            ArchetypeChunk<ECS_TYPE> archetypeChunk,
+            Store<ECS_TYPE> store,
+            CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         listener.onWorldTick(dt, archetypeChunk, store, commandBuffer);
     }
@@ -105,42 +105,42 @@ public class OnWorldTick<ECS_TYPE extends WorldProvider>
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
-    public static final <
-        ECS_TYPE extends WorldProvider,
-        T extends IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>
-    > OnWorldTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
+    public static <
+            ECS_TYPE extends WorldProvider,
+            T extends IOnWorldTick<ECS_TYPE> & IQuery<ECS_TYPE>
+            > OnWorldTick<ECS_TYPE> newDriverFor(IRegistry<ECS_TYPE> registry, T listener) {
         return newDriverFor(registry, listener.getQuery(IOnWorldTick.class), listener);
     }
 
-    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnWorldTick<ECS_TYPE> listener
+    public static <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
+            IRegistry<ECS_TYPE> registry,
+            IQuery<ECS_TYPE> queryProvider,
+            IOnWorldTick<ECS_TYPE> listener
     ) {
-        return newDriverFor(registry, queryProider.getQuery(IOnWorldTick.class), listener);
+        return newDriverFor(registry, queryProvider.getQuery(IOnWorldTick.class), listener);
     }
 
-    public static final <ECS_TYPE extends WorldProvider, @Nonnull T extends Query<ECS_TYPE>> OnWorldTick<
-        ECS_TYPE
-    > newDriverFor(IRegistry<ECS_TYPE> registry, Function<Class<?>, T> queryProider, IOnWorldTick<ECS_TYPE> listener) {
+    public static <ECS_TYPE extends WorldProvider, @NonNullType T extends Query<ECS_TYPE>> OnWorldTick<
+            ECS_TYPE
+            > newDriverFor(IRegistry<ECS_TYPE> registry, Function<Class<?>, T> queryProider, IOnWorldTick<ECS_TYPE> listener) {
         return newDriverFor(registry, queryProider.apply(IOnWorldTick.class), listener);
     }
 
-    public static final <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        IOnWorldTick<ECS_TYPE> listener
+    public static <ECS_TYPE extends WorldProvider> OnWorldTick<ECS_TYPE> newDriverFor(
+            IRegistry<ECS_TYPE> registry,
+            Query<ECS_TYPE> query,
+            IOnWorldTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnWorldTick.class,
-                IRegistry.class,
-                Query.class,
-                IOnWorldTick.class
-            ),
-            registry,
-            query,
-            listener
+                IEventDriver.__dupeClassAndGetConstructor(
+                        OnWorldTick.class,
+                        IRegistry.class,
+                        Query.class,
+                        IOnWorldTick.class
+                ),
+                registry,
+                query,
+                listener
         );
     }
 

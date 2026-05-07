@@ -8,7 +8,9 @@ import com.hypixel.hytale.server.core.io.PacketHandler;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
+
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * For displaying notifications (lil GUI popups in the bottom right ish)
@@ -79,32 +81,28 @@ public class Toast extends NotificationUtil {
     }
 
     public Toast setStyle(final @Nullable NotificationStyle style) {
-        if (style == null) {
-            this.style = NotificationStyle.Default;
-        } else {
-            this.style = style;
-        }
+        this.style = Objects.requireNonNullElse(style, NotificationStyle.Default);
         return this;
     }
 
     public void send() {
         NotificationUtil.sendNotificationToUniverse(
-            this.message,
-            this.secondaryMessage,
-            this.icon,
-            this.item,
-            this.style
+                this.message,
+                this.secondaryMessage,
+                this.icon,
+                this.item,
+                this.style
         );
     }
 
     public void send(PacketHandler handler) {
         NotificationUtil.sendNotification(
-            handler,
-            this.message,
-            this.secondaryMessage,
-            this.icon,
-            this.item,
-            this.style
+                handler,
+                this.message,
+                this.secondaryMessage,
+                this.icon,
+                this.item,
+                this.style
         );
     }
 
@@ -119,12 +117,12 @@ public class Toast extends NotificationUtil {
     }
 
     public static void sendNotificationToPlayer(
-        final Player player,
-        final Message message,
-        final @Nullable Message secondaryMessage,
-        final @Nullable String icon,
-        final @Nullable ItemWithAllMetadata item,
-        final NotificationStyle style
+            final Player player,
+            final Message message,
+            final @Nullable Message secondaryMessage,
+            final @Nullable String icon,
+            final @Nullable ItemWithAllMetadata item,
+            final NotificationStyle style
     ) {
         final var ref = player.getReference();
         if (ref == null) {
@@ -133,6 +131,9 @@ public class Toast extends NotificationUtil {
         }
 
         final var playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+        if (playerRef == null) {
+            return;
+        }
 
         NotificationUtil.sendNotification(playerRef.getPacketHandler(), message, secondaryMessage, icon, item, style);
     }

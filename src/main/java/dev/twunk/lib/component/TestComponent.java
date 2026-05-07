@@ -30,6 +30,7 @@ public class TestComponent implements Component<ChunkStore> {
         return this.value;
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public TestComponent clone() {
         return new TestComponent();
     }

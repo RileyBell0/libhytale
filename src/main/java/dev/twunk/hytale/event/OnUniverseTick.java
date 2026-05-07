@@ -14,23 +14,21 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/**
- * Subsystem for calling `onSystemTick` on the parent system every tick
- *
- * GOAL: run code ONCE per tick globally. not per element, just, run this once per tick
- *
- * REQUIRES:
- * - N/A (this is a leaf)
- * PRODUCES:
- * - IGlobalTickSystem runner
- *
- * My code
- * @see IOnUniverseTick - Something that this subsystem can call and run.
- *
- * Hytale's code
- * @see ArchetypeTickingSystem - I use this to run the subsystem. Only way i currently know
- *                               of for getting a commandBuffer in a global tick
- */
+/// Subsystem for calling `onSystemTick` on the parent system every tick
+///
+/// GOAL: run code ONCE per tick globally. not per element, just, run this once per tick
+///
+/// REQUIRES:
+/// - N/A (this is a leaf)
+/// PRODUCES:
+/// - IGlobalTickSystem runner
+///
+/// My code
+/// @see IOnUniverseTick - Something that this subsystem can call and run.
+///
+/// Hytale's code
+/// @see ArchetypeTickingSystem - I use this to run the subsystem. Only way i currently know
+///                               of for getting a commandBuffer in a global tick
 public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
     extends TickingSystem<ECS_TYPE> // hytale's underlying driver for my code
     implements ISystemEventDriver<ECS_TYPE>
@@ -101,9 +99,9 @@ public abstract class OnUniverseTick<ECS_TYPE extends WorldProvider>
     // ////////////////////////////////////////////////////////////////////////
     // #region hide
 
-    public static final <ECS_TYPE extends WorldProvider> OnUniverseTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IOnUniverseTick<ECS_TYPE> listener
+    public static <ECS_TYPE extends WorldProvider> OnUniverseTick<ECS_TYPE> newDriverFor(
+            IRegistry<ECS_TYPE> registry,
+            IOnUniverseTick<ECS_TYPE> listener
     ) {
         return IEventDriver.__construct(
             IEventDriver.__dupeClassAndGetConstructor(OnUniverseTick.class, IRegistry.class, IOnUniverseTick.class),

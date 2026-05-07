@@ -10,11 +10,13 @@ import com.hypixel.hytale.server.core.modules.entity.damage.DamageSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.twunk.hytale.interfaces.event.IOnTick;
 import dev.twunk.hytale.ref.AnyRef;
+
 import javax.annotation.Nullable;
 
 public class PoisonSystem implements IOnTick<EntityStore> {
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onTick(float dt, AnyRef<EntityStore> ref, CommandBuffer<EntityStore> commandBuffer) {
         var poison = ref.getComponent(PoisonComponent.getComponentType()); // You could also just call PoisonComponent.getComponentType() instead of taking in the passed in variable here.
         if (poison == null) {
@@ -24,7 +26,8 @@ public class PoisonSystem implements IOnTick<EntityStore> {
         poison.addElapsedTime(dt);
         if (poison.getElapsedTime() >= poison.getTickInterval()) {
             poison.resetElapsedTime();
-            @SuppressWarnings({ "deprecation", "null" })
+            assert DamageCause.OUT_OF_WORLD != null;
+            @SuppressWarnings("null")
             Damage damage = new Damage(Damage.NULL_SOURCE, DamageCause.OUT_OF_WORLD, poison.getDamagePerTick());
             DamageSystems.executeDamage(ref, commandBuffer, damage);
             poison.decrementRemainingTicks();

@@ -15,30 +15,28 @@ import dev.twunk.hytale.interfaces.config.IQuery;
 import dev.twunk.hytale.interfaces.event.IOnBlockTick;
 import dev.twunk.hytale.interfaces.methods.IRegistry;
 import dev.twunk.hytale.ref.BlockRef;
+
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 
-/**
- * Composite subsystem to allow the parent to run code on its elements every
- * tick in a smarter way
- *
- * GOAL: tick all block entities that match the given query.
- *
- * REQUIRES:
- * - EntityTickSubSystem -> allows us to tick all blocks that match our query
- * PRODUCES:
- * - IQueryTickingSystem runner
- *
- * @see OnTick - BlockTickSubSystem is simply an extension of EntityTickSubSystem
- *                            that grabs some more block-related data out of a ref before calling
- *                            the onBlockTick method your `IEntityTickSystem` provides
- * @see IOnBlockTick      - method i'll be calling on your class
- */
+/// Composite subsystem to allow the parent to run code on its elements every
+/// tick in a smarter way
+///
+/// GOAL: tick all block entities that match the given query.
+///
+/// REQUIRES:
+/// - EntityTickSubSystem -> allows us to tick all blocks that match our query
+/// PRODUCES:
+/// - IQueryTickingSystem runner
+///
+/// @see OnTick - BlockTickSubSystem is simply an extension of EntityTickSubSystem
+///                            that grabs some more block-related data out of a ref before calling
+///                            the onBlockTick method your `IEntityTickSystem` provides
+/// @see IOnBlockTick      - method i'll be calling on your class
 public abstract class OnBlockTick
-    extends EntityTickingSystem<ChunkStore> // EntityTickingSystem is hytale's underlying code that powers this
-    implements ISystemEventDriver<ChunkStore>
-{
+        extends EntityTickingSystem<ChunkStore> // EntityTickingSystem is hytale's underlying code that powers this
+        implements ISystemEventDriver<ChunkStore> {
 
     private Set<Dependency<ChunkStore>> dependencies = new HashSet<>();
 
@@ -60,11 +58,11 @@ public abstract class OnBlockTick
     // ////////////////////////////////////////////////////////////////////////
 
     public final void tick(
-        float dt,
-        int index,
-        ArchetypeChunk<ChunkStore> archetypeChunk,
-        Store<ChunkStore> store,
-        CommandBuffer<ChunkStore> commandBuffer
+            float dt,
+            int index,
+            ArchetypeChunk<ChunkStore> archetypeChunk,
+            Store<ChunkStore> store,
+            CommandBuffer<ChunkStore> commandBuffer
     ) {
         listener.onBlockTick(new BlockRef(archetypeChunk.getReferenceTo(index)), commandBuffer);
     }
@@ -119,19 +117,19 @@ public abstract class OnBlockTick
     /**
      * Shim around other method for reducing boilerplate if i define a query on my class
      */
-    public static final <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTick newDriverFor(T listener) {
+    public static <T extends IOnBlockTick & IQuery<ChunkStore>> OnBlockTick newDriverFor(T listener) {
         return newDriverFor(listener.getQuery(IOnBlockTick.class), listener);
     }
 
-    public static final OnBlockTick newDriverFor(IQuery<ChunkStore> queryProider, IOnBlockTick listener) {
-        return newDriverFor(queryProider.getQuery(IOnBlockTick.class), listener);
+    public static OnBlockTick newDriverFor(IQuery<ChunkStore> queryProvider, IOnBlockTick listener) {
+        return newDriverFor(queryProvider.getQuery(IOnBlockTick.class), listener);
     }
 
-    public static final OnBlockTick newDriverFor(Query<ChunkStore> query, IOnBlockTick listener) {
+    public static OnBlockTick newDriverFor(Query<ChunkStore> query, IOnBlockTick listener) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(OnBlockTick.class, Query.class, IOnBlockTick.class),
-            query,
-            listener
+                IEventDriver.__dupeClassAndGetConstructor(OnBlockTick.class, Query.class, IOnBlockTick.class),
+                query,
+                listener
         );
     }
 }

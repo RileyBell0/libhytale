@@ -10,19 +10,23 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import dev.twunk.hytale.codec.auto.Serializable;
 import dev.twunk.hytale.codec.auto.Serialize;
 import dev.twunk.hytale.utils.ItemUtils;
+
 import javax.annotation.Nullable;
 
 /**
  * @see com.hypixel.hytale.server.core.entity.ItemUtils I based most of my implementation on this
- * @see dev.twunk.hytale.utils.ItemUtils I extended hytales ItemUtils a bit, so my implementation uses this alot
+ * @see dev.twunk.hytale.utils.ItemUtils I extended hytale's ItemUtils a bit, so my implementation uses this a lot
  */
 @Serializable(
-    inherits = SimpleInstantInteraction.class,
-    documentation = "Interaction that simply spawns an item when run at the location specified (defaults to position of target entity"
+        inherits = SimpleInstantInteraction.class,
+        documentation = "Interaction that simply spawns an item when run at the location specified (defaults to position of target entity"
 )
 public class SpawnItemInteraction extends SimpleInstantInteraction {
 
-    /** X, Y, Z Offset from the interacted block */
+    /**
+     * X, Y, Z Offset from the interacted block
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     private Vector3d offset = new Vector3d(0, 0, 0);
 
@@ -30,15 +34,22 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
      * Position to spawn item. If value is null, will spawn at the location
      * of the interacted block + offset
      */
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     @Nullable
     private Vector3d at = null;
 
-    /** ID of the item to spawn */
+    /**
+     * ID of the item to spawn
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize
     private String itemId = "Soil_Grass";
 
-    /** Quantity of items (within the item stack) to spawns */
+    /**
+     * Quantity of items (within the item stack) to spawns
+     */
+    @SuppressWarnings("CanBeFinal")
     @Serialize(min = 1)
     private int quantity = 1;
 
@@ -46,12 +57,14 @@ public class SpawnItemInteraction extends SimpleInstantInteraction {
     // \/======================\/-  Methods  -\/==========================\/ //
     // ////////////////////////////////////////////////////////////////////////
 
-    /** Function that's run when the interaction is activated */
+    /**
+     * Function that's run when the interaction is activated
+     */
     @Override
     protected void firstRun(
-        final InteractionType interactionType,
-        final InteractionContext interactionContext,
-        final CooldownHandler cooldownHandler
+            final InteractionType interactionType,
+            final InteractionContext interactionContext,
+            final CooldownHandler cooldownHandler
     ) {
         final var commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {

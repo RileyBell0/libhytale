@@ -1,13 +1,6 @@
 package dev.twunk.hytale.event.composite;
 
-import com.hypixel.hytale.component.AddReason;
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.RemoveReason;
-import com.hypixel.hytale.component.ResourceType;
-import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.*;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.component.UUIDComponent;
@@ -25,39 +18,34 @@ import dev.twunk.lib.component.ActivelyTickingComponent;
 import dev.twunk.lib.component.TickScheduleComponent;
 import dev.twunk.lib.event.scheduled.SleepingEntity;
 import dev.twunk.lib.event.scheduled.TickSchedule;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.UUID;
-import javax.annotation.Nullable;
 
-/**
- * You need to provide me an ID so that i can create, serialize and deserialize components UNIQUE to this system consistently
- *
- * i create one component
- * - 1x dupe of ActivelyTickingComponent -> means i can mark an entity as ticking for any number of ScheduledTick systems and their queries INDIVIDUALLY
- *
- * Originally i was also going to create a dupe of TickScheduleComponent, but i may as well just store all system tick info in there and let you fetch yours via
- * your system's ID
- *
- * Composite subsystem to allow the parent to run code on its elements every
- * tick in a smarter way
- *
- * GOAL: need to tick my entities that match the query but not necessarily EVERY
- *       tick. Need logic to determine if my entity should sleep/continue ticking
- *       without changing its components constantly
- *
- * REQUIRES:
- * - LifetimeSystem   -> keep track of existing entities ourselves manually
- * - GlobalTickSystem -> loop through ticking entities we've tracked manually
- *                       and run their tick method (tick entities)
- * PRODUCES:
- * - IScheduledTickSystem runner
- */
+import javax.annotation.Nullable;
+import java.util.*;
+
+/// You need to provide me an ID so that i can create, serialize and deserialize components UNIQUE to this system consistently
+///
+/// i create one component
+/// - 1x dupe of ActivelyTickingComponent -> means i can mark an entity as ticking for any number of ScheduledTick systems and their queries INDIVIDUALLY
+///
+/// Originally i was also going to create a dupe of TickScheduleComponent, but i may as well just store all system tick info in there and let you fetch yours via
+/// your system's ID
+///
+/// Composite subsystem to allow the parent to run code on its elements every
+/// tick in a smarter way
+///
+/// GOAL: need to tick my entities that match the query but not necessarily EVERY
+///       tick. Need logic to determine if my entity should sleep/continue ticking
+///       without changing its components constantly
+///
+/// REQUIRES:
+/// - LifetimeSystem   -> keep track of existing entities ourselves manually
+/// - GlobalTickSystem -> loop through ticking entities we've tracked manually
+///                       and run their tick method (tick entities)
+/// PRODUCES:
+/// - IScheduledTickSystem runner
 public class OnScheduledTick<ECS_TYPE extends WorldProvider>
-    extends QueryableCompositeSystem<ECS_TYPE>
-    implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE>
-{
+        extends QueryableCompositeSystem<ECS_TYPE>
+        implements IOnAddRemove<ECS_TYPE>, IOnWorldTick<ECS_TYPE>, IOnTick<ECS_TYPE> {
 
     protected final IOnScheduledTick<ECS_TYPE> listener;
 
@@ -81,23 +69,23 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
     private final ResourceType<ECS_TYPE, UUIDLookupResource<ECS_TYPE>> uuidLookupResourceType;
     private final ComponentType<ECS_TYPE, UUIDComponent<ECS_TYPE>> uuidComponentType;
 
-    @SuppressWarnings({ "unchecked", "null" })
+    @SuppressWarnings({"null", "unchecked", "rawtypes"})
     protected OnScheduledTick(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id,
-        TickSchedule defaultSchedule
+            IRegistry<ECS_TYPE> registry,
+            Query<ECS_TYPE> query,
+            IOnScheduledTick<ECS_TYPE> listener,
+            String id,
+            TickSchedule defaultSchedule
     ) {
         super(registry, query);
         this.listener = listener;
         this.id = id;
         this.defaultSchedule = defaultSchedule;
-        this.worldTickResourceType = this.registry.getResourceType(WorldTickResource.class);
-        this.uuidLookupResourceType = this.registry.getResourceType(UUIDLookupResource.class);
-        this.activeFlagComponentType = this.registry.getComponentType(ActivelyTickingComponent.class);
-        this.uuidComponentType = this.registry.getComponentType(UUIDComponent.class);
-        this.tickScheduleComponentType = this.registry.getComponentType(TickScheduleComponent.class);
+        this.worldTickResourceType = (ResourceType) Objects.requireNonNull(this.registry.getResourceType(WorldTickResource.class));
+        this.uuidLookupResourceType = (ResourceType) Objects.requireNonNull(this.registry.getResourceType(UUIDLookupResource.class));
+        this.activeFlagComponentType = (ComponentType) Objects.requireNonNull(this.registry.getComponentType(ActivelyTickingComponent.class));
+        this.uuidComponentType = (ComponentType) Objects.requireNonNull(this.registry.getComponentType(UUIDComponent.class));
+        this.tickScheduleComponentType = (ComponentType) Objects.requireNonNull(this.registry.getComponentType(TickScheduleComponent.class));
     }
 
     // ////////////////////////////////////////////////////////////////////////
@@ -105,11 +93,9 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
     // ////////////////////////////////////////////////////////////////////////
     // #region schedule
 
-    /**
-     * Load in tick schedule (or use default fallback)
-     *
-     * Guarantees that entities will have a UUID component after this point.
-     */
+    /// Load in tick schedule (or use default fallback)
+    ///
+    /// Guarantees that entities will have a UUID component after this point.
     @Override
     public final void onAdd(AnyRef<ECS_TYPE> ref, AddReason reason, CommandBuffer<ECS_TYPE> commandBuffer) {
         // get the UUID component, or force one onto the entity otherwise
@@ -136,7 +122,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
             case TickSchedule.Active _ -> commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
             // it wants to be sleeping, so just need to record when it wants to be awake so i can wake it up (as long as its still loaded when that happens)
             case TickSchedule.Sleeping s -> {
-                this.sleeping.add(new SleepingEntity(uuid, s));
+                this.sleeping.add(new SleepingEntity(uuid, s.nextTick));
 
                 // trash an active flag if im asleep
                 if (commandBuffer.getComponent(ref, this.activeFlagComponentType) != null) {
@@ -170,27 +156,27 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
 
     @Override
     public void onWorldTick(
-        float dt,
-        ArchetypeChunk<ECS_TYPE> archetypeChunk,
-        Store<ECS_TYPE> store,
-        CommandBuffer<ECS_TYPE> commandBuffer
+            float dt,
+            ArchetypeChunk<ECS_TYPE> archetypeChunk,
+            Store<ECS_TYPE> store,
+            CommandBuffer<ECS_TYPE> commandBuffer
     ) {
         final var currentTick = commandBuffer.getResource(this.worldTickResourceType).getTick();
 
         // first: wake up elements that are ready to wake
         SleepingEntity next;
         // while the next sleeper exists and is waiting to be ticked (<= currentTick)
-        while ((next = sleeping.peek()) != null && currentTick + 1 >= next.nextTick) {
+        while ((next = sleeping.peek()) != null && currentTick + 1 >= next.nextTick()) {
             sleeping.remove();
 
-            if (unloadedEntities.contains(next.uuid)) {
-                unloadedEntities.remove(next.uuid);
+            if (unloadedEntities.contains(next.uuid())) {
+                unloadedEntities.remove(next.uuid());
                 continue;
             }
 
             // waking it up is as easy as adding the activeFlagComponent to it.
             // then we just loop and keep going till we run out of things to tick
-            final Ref<ECS_TYPE> ref = commandBuffer.getResource(this.uuidLookupResourceType).getRefByUUID(next.uuid);
+            final Ref<ECS_TYPE> ref = commandBuffer.getResource(this.uuidLookupResourceType).getRefByUUID(next.uuid());
             if (ref != null && ref.isValid()) {
                 commandBuffer.ensureComponent(ref, this.activeFlagComponentType);
             }
@@ -202,6 +188,7 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
     // ////////////////////////////////////////////////////////////////////////
     // \/======\/-  Tick, and potentially sleep/stop entities  -\/========\/ //
     // ////////////////////////////////////////////////////////////////////////
+
     /**
      * Tick any entities that are scheduled to run this tick. Those entities can
      * return a plan for when they should tick next, or null to just keep ticking
@@ -236,8 +223,13 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
                 }
 
                 // write us into the sleep queue
-                final var uuid = commandBuffer.getComponent(ref, this.uuidComponentType).getUuid();
-                this.sleeping.add(new SleepingEntity(uuid, newSchedule));
+                final var uuidComponent = commandBuffer.getComponent(ref, this.uuidComponentType);
+                if (uuidComponent == null) {
+                    break;
+                }
+
+                final var uuid = uuidComponent.getUuid();
+                this.sleeping.add(new SleepingEntity(uuid, newSchedule.nextTick));
 
                 // persist our new schedule
                 tickScheduleComponent.setSchedule(this.id, newSchedule);
@@ -272,12 +264,12 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id
+            IRegistry<ECS_TYPE> registry,
+            IQuery<ECS_TYPE> queryProvider,
+            IOnScheduledTick<ECS_TYPE> listener,
+            String id
     ) {
-        return newDriverFor(registry, queryProider.getQuery(IOnScheduledTick.class), listener, id);
+        return newDriverFor(registry, queryProvider.getQuery(IOnScheduledTick.class), listener, id);
     }
 
     /**
@@ -285,11 +277,11 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        IQuery<ECS_TYPE> queryProider,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id,
-        @Nullable TickSchedule defaultSchedule
+            IRegistry<ECS_TYPE> registry,
+            IQuery<ECS_TYPE> queryProider,
+            IOnScheduledTick<ECS_TYPE> listener,
+            String id,
+            @Nullable TickSchedule defaultSchedule
     ) {
         return newDriverFor(registry, queryProider.getQuery(IOnScheduledTick.class), listener, id, defaultSchedule);
     }
@@ -299,10 +291,10 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id
+            IRegistry<ECS_TYPE> registry,
+            Query<ECS_TYPE> query,
+            IOnScheduledTick<ECS_TYPE> listener,
+            String id
     ) {
         return newDriverFor(registry, query, listener, id, TickSchedule.ACTIVE);
     }
@@ -312,26 +304,26 @@ public class OnScheduledTick<ECS_TYPE extends WorldProvider>
      * of subsystems, each one must secretly create a new class each and every time you call it
      */
     public static <ECS_TYPE extends WorldProvider> OnScheduledTick<ECS_TYPE> newDriverFor(
-        IRegistry<ECS_TYPE> registry,
-        Query<ECS_TYPE> query,
-        IOnScheduledTick<ECS_TYPE> listener,
-        String id,
-        @Nullable TickSchedule defaultSchedule
+            IRegistry<ECS_TYPE> registry,
+            Query<ECS_TYPE> query,
+            IOnScheduledTick<ECS_TYPE> listener,
+            String id,
+            @Nullable TickSchedule defaultSchedule
     ) {
         return IEventDriver.__construct(
-            IEventDriver.__dupeClassAndGetConstructor(
-                OnScheduledTick.class,
-                IRegistry.class,
-                Query.class,
-                IOnScheduledTick.class,
-                String.class,
-                TickSchedule.class
-            ),
-            registry,
-            query,
-            listener,
-            id,
-            defaultSchedule
+                IEventDriver.__dupeClassAndGetConstructor(
+                        OnScheduledTick.class,
+                        IRegistry.class,
+                        Query.class,
+                        IOnScheduledTick.class,
+                        String.class,
+                        TickSchedule.class
+                ),
+                registry,
+                query,
+                listener,
+                id,
+                defaultSchedule
         );
     }
 

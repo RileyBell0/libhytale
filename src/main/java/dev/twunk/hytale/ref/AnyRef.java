@@ -7,15 +7,16 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import dev.twunk.hytale.utils.ComponentUtils;
-import javax.annotation.Nonnull;
+
 import javax.annotation.Nullable;
 
 public sealed class AnyRef<ECS_TYPE extends WorldProvider>
-    extends LibHytaleRefWrapper<ECS_TYPE>
-    permits BlockRef, ChunkRef, EntityRef
-{
+        extends LibHytaleRefWrapper<ECS_TYPE>
+        permits BlockRef, ChunkRef, EntityRef {
 
-    /** World that the entity is in (lazily evaluated) */
+    /**
+     * World that the entity is in (lazily evaluated)
+     */
     @Nullable
     protected World world;
 
@@ -23,11 +24,11 @@ public sealed class AnyRef<ECS_TYPE extends WorldProvider>
         super(ref);
     }
 
-    public static final <T extends WorldProvider> AnyRef<T> of(Ref<T> ref) {
+    public static <T extends WorldProvider> AnyRef<T> of(Ref<T> ref) {
         return new AnyRef<>(ref);
     }
 
-    protected static final <T extends WorldProvider> Ref<T> getInnerRef(AnyRef<T> ref) {
+    protected static <T extends WorldProvider> Ref<T> getInnerRef(AnyRef<T> ref) {
         return ref._ref;
     }
 
@@ -55,7 +56,6 @@ public sealed class AnyRef<ECS_TYPE extends WorldProvider>
     }
 
     @Override
-    @Nonnull
     public String toString() {
         return "AnyRef{" + super.toString() + "}";
     }

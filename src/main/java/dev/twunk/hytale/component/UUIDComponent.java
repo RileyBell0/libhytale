@@ -6,12 +6,14 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.WorldProvider;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
+import dev.twunk.hytale.codec.auto.Serializable;
+import dev.twunk.hytale.codec.auto.Serialize;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.bson.UuidRepresentation;
 import org.bson.internal.UuidHelper;
 
+@Serializable
 public final class UUIDComponent<ECS_TYPE extends WorldProvider> implements Component<ECS_TYPE> {
 
     @SuppressWarnings({ "unchecked" })
@@ -19,38 +21,40 @@ public final class UUIDComponent<ECS_TYPE extends WorldProvider> implements Comp
         UUIDComponent<? extends WorldProvider>
     >) (Class<?>) UUIDComponent.class;
 
-    public static final BuilderCodec<UUIDComponent<? extends WorldProvider>> CODEC = BuilderCodec.builder(
-        UUID_CLASS,
-        UUIDComponent::new
-    )
-        .append(new KeyedCodec<>("UUID", Codec.UUID_BINARY), (o, i) -> o.uuid = i, o -> o.uuid)
-        .add()
-        .afterDecode(v -> {
-            if (v.uuid == null) {
-                v.uuid = UUIDUtil.generateVersion3UUID();
-            }
-        })
-        .build();
+    public static final BuilderCodec<UUIDComponent<? extends WorldProvider>> UUID_CODEC_WITH_DEFAULT =
+        BuilderCodec.builder(UUID_CLASS, UUIDComponent::new)
+            .append(new KeyedCodec<>("UUID", Codec.UUID_BINARY), (o, i) -> o.uuid = i, o -> o.uuid)
+            .add()
+            .afterDecode(v -> {
+                if (v.uuid == null) {
+                    v.uuid = UUIDUtil.generateVersion3UUID();
+                }
+            })
+            .build();
 
-    @Nullable
-    protected UUID uuid;
+    private static final UUID DEFAULT_UUID = new UUID(0, 0);
 
-    @SuppressWarnings("null")
+    // don't worry, this is set by deserialization, i think, TODO double check as ive changed a lot recently
+    @SuppressWarnings("CanBeFinal")
+    @Serialize
+    private UUID uuid = DEFAULT_UUID;
+
     public UUID getUuid() {
         return this.uuid;
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Component<ECS_TYPE> clone() {
         return this;
     }
 
     // combination of world, chunk, local index, neat idea but am not using it atm
-    public static final UUID uuidFromBlockCoords(UUID worldId, long chunkCoords, int blockCoords) {
+    public static UUID uuidFromBlockCoords(UUID worldId, long chunkCoords, int blockCoords) {
         return combine(worldId, new UUID(chunkCoords, blockCoords));
     }
 
     // neat idea but am not using it atm
-    public static final UUID combine(UUID a, UUID b) {
+    public static UUID combine(UUID a, UUID b) {
         // Source - https://stackoverflow.com/a/5683621
         // Posted by pickypg, modified by community. See post 'Timeline' for change history
         // Retrieved 2026-04-26, License - CC BY-SA 4.0

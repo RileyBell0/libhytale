@@ -7,11 +7,11 @@ import java.util.Set;
 
 public interface IDependencies<ECS_TYPE extends WorldProvider> {
     @SuppressWarnings("null")
-    public default Set<Dependency<ECS_TYPE>> getDependencies() {
+    default Set<Dependency<ECS_TYPE>> getDependencies() {
         return Collections.emptySet();
     }
 
-    public default Set<Dependency<ECS_TYPE>> getDependencies(Class<?> clazz) {
+    default Set<Dependency<ECS_TYPE>> getDependencies(Class<?> clazz) {
         return this.getDependencies();
     }
 }
